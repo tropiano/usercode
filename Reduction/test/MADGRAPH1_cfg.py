@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process("NtupleMaker")
+process = cms.Process("ZjetsNtupleMaker")
 
 
 
@@ -44,7 +44,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1))
 
 process.MessageLogger = cms.Service("MessageLogger")
 
-process.verySimplePATAnalysis = cms.EDFilter("NtupleMaker",
+process.verySimplePATAnalysis = cms.EDFilter("ZjetsNtupleMaker",
     electronTag = cms.untracked.InputTag("selectedLayer1Electrons"),
     tauTag      = cms.untracked.InputTag("selectedLayer1Taus"),
     muonTag     = cms.untracked.InputTag("selectedLayer1Muons"),
