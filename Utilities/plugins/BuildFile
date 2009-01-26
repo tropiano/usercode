@@ -1,0 +1,8 @@
+<export></export>
+<library name=FirenzeUtilities_plugins file=*.cc>
+    <use name=FWCore/Framework>
+    <use name=FWCore/ParameterSet>
+    <flags EDM_PLUGIN=1>
+</library>
+
+
