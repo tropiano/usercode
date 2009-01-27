@@ -12,12 +12,15 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1) )
 process.source = cms.Source("PoolSource",
     # replace 'myfile.root' with the source file you want to use
     fileNames = cms.untracked.vstring(
-        'file:/home/lenzip/CMSSW/CMSSW_2_2_3/src/SHERPA112_Zll_0j1incl_10TeV_QCUT20_cff_py_GEN_SIM_DIGI_L1_DIGI2RAW_HLT.root'
+        #'file:/home/lenzip/CMSSW/CMSSW_2_2_3/src/SHERPA112_Zll_0j1incl_10TeV_QCUT20_cff_py_GEN_SIM_DIGI_L1_DIGI2RAW_HLT.root'
+        'file:/home/lenzip/CMSSW/CMSSW_2_2_3/src/SHERPA112_Zll_0j1incl_10TeV_QCUT20_cff_py_RAW2DIGI_RECO.root'
     )
 )
 
 process.tracer = cms.EDAnalyzer('ProvenanceTracer',
-  Products = cms.InputTag("iterativeCone5GenJets")
+  Products = cms.InputTag("selectedLayer1Jets"),
+  #Products = cms.InputTag("sisCone5PFJets"),
+  ParentIdentifiers = cms.vstring("src", "jetSource", "blocks")
 )
 
 

@@ -1,4 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-demo = cms.EDAnalyzer('ProvenanceTracer'
+provenancetracer = cms.EDAnalyzer('ProvenanceTracer',
+    Products = cms.InputTag("selectedLayer1Jets"),
+    ParentIdentifiers = cms.vstring("src")
 )

@@ -14,7 +14,7 @@
 //
 // Original Author:  Piergiulio Lenzi,,,
 //         Created:  Mon Jan 26 16:02:23 CET 2009
-// $Id$
+// $Id: ProvenanceTracer.cc,v 1.1 2009/01/26 19:35:30 lenzip Exp $
 //
 //
 
@@ -53,6 +53,7 @@ class ProvenanceTracer : public edm::EDAnalyzer {
       // ----------member data ---------------------------
       //std::vector<InputTag> _VinputTag;
       edm::InputTag _inputTag;
+      std::vector<std::string> _vSrcNames;
 };
 
 //
@@ -70,7 +71,8 @@ ProvenanceTracer::ProvenanceTracer(const edm::ParameterSet& iConfig)
 
 {
   //now do what ever initialization is needed
-  _inputTag = iConfig.getParameter<edm::InputTag>("Products"); 
+  _inputTag  = iConfig.getParameter<edm::InputTag>("Products"); 
+  _vSrcNames = iConfig.getParameter<std::vector<std::string> >("ParentIdentifiers");
 
 }
 
@@ -142,14 +144,27 @@ ProvenanceTracer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     LogInfo("ProvenanceTracer") << pset << std::endl;
     bool hasParentSource = true;
     while (hasParentSource){
-      if (!pset.exists("src")) {
+      //check the possible src names, and take the first for the moment
+      string src_name = "none";
+      for (vector<string>::const_iterator iName = _vSrcNames.begin(); iName != _vSrcNames.end(); ++iName){
+        if (pset.exists(*iName)) {
+          src_name = *iName;
+          break;
+        }
+
+      }
+      /*if (!pset.exists("src")) {
         hasParentSource = false; 
         break;
-      } 
+      }*/
+      if (src_name == "none") {
+        hasParentSource = false; 
+        break;
+      }
       cout << "Parent source for " << pset.getParameter<string>("@module_label") << " exists with name ..." ;
       InputTag parentTag;
       try {
-        parentTag = pset.getParameter<InputTag>("src");
+        parentTag = pset.getParameter<InputTag>(src_name);
         cout << parentTag.label() << endl;
       } catch (cms::Exception&) {
         throw cms::Exception("ProvenanceTracer") << "src parameter is not an InputTag, cannot handle this for the moment ";
