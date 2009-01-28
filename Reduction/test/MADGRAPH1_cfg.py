@@ -40,7 +40,7 @@ process.source = cms.Source("PoolSource",
 "rfio:/castor/cern.ch/user/e/egallo/Zmumu/SisCone100/PATLayer1_Output.fromAOD_sisConegenMadgraph_full_32.root"
 )
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1))
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10))
 
 process.MessageLogger = cms.Service("MessageLogger")
 

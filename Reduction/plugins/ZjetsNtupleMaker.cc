@@ -30,6 +30,8 @@
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "Calibration/HcalCalibAlgos/src/GammaJetAnalysis.h"
 #include "DataFormats/JetReco/interface/GenJetCollection.h"
+#include "DataFormats/BeamSpot/interface/BeamSpot.h"
+#include <DataFormats/TrackReco/interface/TrackBase.h>
 #include <TTree.h>
 #include "TH1D.h"
 #include <map>
@@ -136,6 +138,11 @@ ZjetsNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   edm::Handle<edm::View<pat::Tau> > tauHandle;
   iEvent.getByLabel(tauLabel_,tauHandle);
   edm::View<pat::Tau> taus = *tauHandle;
+
+  edm::Handle<reco::BeamSpot> recoBeamSpotHandle;
+  iEvent.getByType(recoBeamSpotHandle);
+  //  cout << "beamSpot position" << recoBeamSpotHandle->position() << endl;
+  reco::TrackBase::Point beamSpot(recoBeamSpotHandle->position());
 
   EventNumber = iEvent.id().event();
 
@@ -260,7 +267,7 @@ ZjetsNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       
       // nhits_1=MuonMap[1].innerTrack()->nHits();      
       chi2_1=MuonMap[1].innerTrack()->chi2();
-      dxy1=MuonMap[1].innerTrack()->dxy();
+      dxy1=MuonMap[1].innerTrack()->dxy(beamSpot);
       dxy1_error=MuonMap[1].innerTrack()->dxyError();
       charge1=MuonMap[1].charge();
       phi1=MuonMap[1].phi();
