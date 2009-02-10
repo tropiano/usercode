@@ -6,8 +6,8 @@ process = cms.Process("EventContent")
 ### standard MessageLoggerConfiguration
 #process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger = cms.Service("MessageLogger",
-                                    destinations = cms.untracked.vstring("detailedInfo"),
-                                    detailedInfo = cms.untracked.PSet(threshold = cms.untracked.string("INFO"))
+                                    destinations = cms.untracked.vstring("eventContent"),
+                                    eventContent = cms.untracked.PSet(threshold = cms.untracked.string("INFO"))
                                     )
 
 
@@ -27,7 +27,7 @@ process.maxEvents = cms.untracked.PSet(
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-              'file:/home/lenzip/CMSSW/CMSSW_2_2_3/src/SHERPA112_Zll_0j1incl_10TeV_QCUT20_cff_py_GEN_SIM_DIGI_L1_DIGI2RAW_HLT.root')
+              'file:/cms/data01/lenzip/CMSSW/ZjetsAnalysis/CMSSW_2_2_4/src/Firenze/Utilities/test/PATLayer1_Output.fromAOD_sisConegenMadgraphBS_full_82.root')
 ) 
 
 process.options = cms.untracked.PSet(     wantSummary = cms.untracked.bool(True) )

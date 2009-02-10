@@ -34,7 +34,7 @@
 #include <DataFormats/TrackReco/interface/TrackBase.h>
 #include <TTree.h>
 #include "TH1D.h"
-#include <map>
+#include <vector>
 
 
 #include "DataFormats/Common/interface/View.h"
@@ -55,12 +55,15 @@ private:
   virtual void beginJob(const edm::EventSetup&) ;
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
   virtual void endJob() ;
+  
+  void resetVariables();
+  
   edm::Service<TFileService> fs;
-  float PTZ,MZ,MR,Phi,pt1,pt2,MASSAZ,PTZrec,resPTrec,resPTgen,eta1,eta2,pt1gen,pt2gen,p1xgen,p1ygen,p2xgen,p2ygen,px1,py1,px2,resMZ_MZgen,DeltaR;   
+  float PTZ,MZ,MR,Phi,pt1,pt2,MASSAZ,PTZrec,resPTrec,resPTgen,eta1,eta2,pt1gen,pt2gen,p1xgen,p1ygen,p2xgen,p2ygen,px1,py1,px2,resMZ_MZgen,DeltaR_leadJet_leadLep;   
   float x2,py2, PX,PY,PTZgen,phi1,phi2,Mt,pz1,pz2,PZ,EZ,MZgen,jetpt,jeteta,ETAZ,isolation3_1,isolation5_1,isolation3_2,isolation5_2,whisto,jetptGen,res_ptGenJet_ptJet,jetetaGen,jetpt_second,jeteta_second,jetptGen_second,jetetaGen_second,jetptGen_match,res_ptGenJet_ptJet_match,isoR03_1_emEt, isoR03_1_nTracks,isoR03_1_hadEt,isoR03_2_emEt, isoR03_2_nTracks,isoR03_2_hadEt,vertex_x_1,	vertex_y_1,vertex_z_1,vertex_x_2,vertex_y_2,vertex_z_2,dxy1,dxy2,dxy1_error,dxy2_error,chi2_2,chi2_1 ; 
   //seconJetPt,secondJetEta;
   size_t nphotonscounter;
-  int njetscounter, njetscounterGen, n2mu, particelle_jet,nhits_1, nhits_2;
+  int njetscounter, njetscounterGen, nmuonscounter, particelle_jet,nhits_1, nhits_2;
   int EventNumber,EventRun,EventSelect;
   int mamphoton,charge1,charge2,nmam;
   TTree *ZMM_PYT1;
@@ -73,19 +76,22 @@ private:
   edm::InputTag metLabel_;
   edm::InputTag phoLabel_;
   edm::InputTag jetGenLabel_;
+  edm::InputTag beamspotLabel_;
+  
 };
 
 
 
 ZjetsNtupleMaker::ZjetsNtupleMaker(const edm::ParameterSet& iConfig):
   histocontainer_(),
-  eleLabel_(iConfig.getUntrackedParameter<edm::InputTag>("electronTag")),
-  muoLabel_(iConfig.getUntrackedParameter<edm::InputTag>("muonTag")),
-  jetLabel_(iConfig.getUntrackedParameter<edm::InputTag>("jetTag")),
-  tauLabel_(iConfig.getUntrackedParameter<edm::InputTag>("tauTag")),
-  metLabel_(iConfig.getUntrackedParameter<edm::InputTag>("metTag")),
-  phoLabel_(iConfig.getUntrackedParameter<edm::InputTag>("photonTag")),
-  jetGenLabel_(iConfig.getUntrackedParameter<edm::InputTag>("jetGenTag"))
+  eleLabel_(iConfig.getParameter<edm::InputTag>("electronTag")),
+  muoLabel_(iConfig.getParameter<edm::InputTag>("muonTag")),
+  jetLabel_(iConfig.getParameter<edm::InputTag>("jetTag")),
+  tauLabel_(iConfig.getParameter<edm::InputTag>("tauTag")),
+  metLabel_(iConfig.getParameter<edm::InputTag>("metTag")),
+  phoLabel_(iConfig.getParameter<edm::InputTag>("photonTag")),
+  jetGenLabel_(iConfig.getParameter<edm::InputTag>("jetGenTag")),
+  beamspotLabel_(iConfig.getParameter<edm::InputTag>("beamSpotTag"))
 {
   //
 }
@@ -104,6 +110,8 @@ ZjetsNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 {
   using namespace edm;
   using namespace std;
+
+  resetVariables();
   EventRun=0;
 
   EventNumber=0; 
@@ -139,323 +147,215 @@ ZjetsNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   iEvent.getByLabel(tauLabel_,tauHandle);
   edm::View<pat::Tau> taus = *tauHandle;
 
-  edm::Handle<reco::BeamSpot> recoBeamSpotHandle;
-  iEvent.getByType(recoBeamSpotHandle);
+  //edm::Handle<reco::BeamSpot> recoBeamSpotHandle;
+  //iEvent.getByLabel(beamspotLabel_, recoBeamSpotHandle);
+  //iEvent.getByType(recoBeamSpotHandle);
   //  cout << "beamSpot position" << recoBeamSpotHandle->position() << endl;
-  reco::TrackBase::Point beamSpot(recoBeamSpotHandle->position());
+  reco::TrackBase::Point beamSpot(0,0,0);
 
   EventNumber = iEvent.id().event();
 
   EventRun=iEvent.id().run();
 
  
-  size_t  nmuonscounter=0;
   
-  std::map<int,pat::Muon> MuonMap;
+  //std::map<int,pat::Muon> MuonMap;
+  std::vector<pat::Muon> MuonMap;
   for(edm::View<pat::Muon>::const_iterator muon_iter = muons.begin(); muon_iter!=muons.end(); ++muon_iter){
-    if(muon_iter->pt()>20)
-      {
-	nmuonscounter++;
-	
-        
-	MuonMap[nmuonscounter]=*muon_iter;
-      }
+    if(muon_iter->pt()>20){
+      //MuonMap[nmuonscounter]=*muon_iter;
+      MuonMap.push_back(*muon_iter);
+    }
     
-  }  cout<<"il numero di muoni è: "<<nmuonscounter<<endl;
-  n2mu=nmuonscounter;
-  
-  PTZ=-1000;
-  PTZgen=-1000;
-  MZ=-1000;
-  MR=-1000;
-  Phi=0;
-  pt1=0;
-  pt2=0;
-  MASSAZ=-1000;
-  PTZrec=800;
-  resPTrec=-50;
-  resPTgen=-50;
-  MZgen=-1000;
-  eta1=-100;
-  eta2=-100;
-  pt1gen=0;
-  pt2gen=0; 
-  p1xgen=0;
-  p1ygen=0;
-  p2xgen=0;
-  p2ygen=0;
-  px1=0;
-  px2=0;
-  py1=0;
-  py2=0;
-  PX=-1000;
-  PY=-1000;
-  phi1=0;
-  phi2=0;  
-  Mt=0;
-  pz1=0; 
-  pz2=0;
-  PZ=-1000;
-  EZ=0;
-  mamphoton=-1000;
-  njetscounter=0;
-  njetscounterGen=0;
-  ETAZ=-1000;
-  isolation3_1=-1;
-  isolation5_1=-1;
-  isolation3_2=-1;
-  isolation5_2=-1;
-  jetptGen=0;
-  jetptGen_match=0;
-  jetetaGen=-10;
-  jetptGen_second=0;
-  jetetaGen_second=-10;
-  jetpt=0;
-  jeteta=-10;
-  jetpt_second=0;
-  jeteta_second=-10;
-  res_ptGenJet_ptJet=-20;
-  res_ptGenJet_ptJet_match=-20; 
-  resMZ_MZgen=-10;
-  int njetscounterGenNew=-10;
+  }
+  nmuonscounter=MuonMap.size();
+  //cout<<"il numero di muoni è: "<<nmuonscounter<<endl;
+ 
+ 
+ 
   double p1=0; 
   double p2=0;
   double absP=-1000;
   double jetPhi=-20;
   double jet_eta=-20;
-  charge1=-10;
-  charge2=-10;
-  isoR03_1_emEt=-20;
-  isoR03_1_nTracks=-10;
-  isoR03_1_hadEt=-10;
- particelle_jet=-10;
-  isoR03_2_emEt=-20;
-  isoR03_2_nTracks=-10;
-  isoR03_2_hadEt=-10;
-  vertex_x_1=-10;
-  vertex_y_1=-10;
-  vertex_z_1=-10;
-
-  vertex_x_2=-10;
-  vertex_y_2=-10;
-  vertex_z_2=-10;
-  chi2_2=-10;
-  chi2_1=-10;
-  nhits_1=-10;
-  nhits_2=-10;
-  // numeroparticelle=-10;
-  float newDeltaR;
-  //const float NumberOfevents=50000;
-  //float mclumi=NumberOfevents/1233;
-  //whisto=100./mclumi;
-
-  //  const float NumberOfevents=50000;
-  //float mclumi=NumberOfevents/3700;
-  //whisto=100/mclumi;
-  //math::XYZTLorentzVector LorentzVector;
    
   reco::Particle::LorentzVector P1, P2, P,P1gen,P2gen,PG;
    
-  cout<<"Numero di evento = "<<EventNumber<<endl;
-
-
-   
-  if(nmuonscounter==2){
-    cout<<"sono dentro l'if"<<endl;
-    
-    if(MuonMap[1].isGlobalMuon() && MuonMap[2].isGlobalMuon()){ 
-      
-      // nhits_1=MuonMap[1].innerTrack()->nHits();      
-      chi2_1=MuonMap[1].innerTrack()->chi2();
-      dxy1=MuonMap[1].innerTrack()->dxy(beamSpot);
-      dxy1_error=MuonMap[1].innerTrack()->dxyError();
-      charge1=MuonMap[1].charge();
-      phi1=MuonMap[1].phi();
-      pt1=MuonMap[1].pt();
-      px1=MuonMap[1].px();
-      py1=MuonMap[1].py();
-      pz1=MuonMap[1].pz();
-      p1=MuonMap[1].p();
-      P1=MuonMap[1].p4();
-      eta1=MuonMap[1].eta();
-      isolation3_1=MuonMap[1].isolationR03().sumPt;
-      isolation5_1=MuonMap[1].isolationR05().sumPt;
-      isoR03_1_emEt=MuonMap[1].isolationR03().emEt;
-      isoR03_1_hadEt=MuonMap[1].isolationR03().hadEt;
-      isoR03_1_nTracks=MuonMap[1].isolationR03().nTracks;
-
-
-      // nhits_2=MuonMap[2].innerTrack()->nHits();	
-      chi2_2=MuonMap[2].innerTrack()->chi2();
-      dxy2=MuonMap[2].innerTrack()->dxy();
-      dxy2_error=MuonMap[2].innerTrack()->dxyError();
-      charge2=MuonMap[2].charge();
-      phi2=MuonMap[2].phi();
-      pt2=MuonMap[2].pt();
-      px2=MuonMap[2].px();
-      py2=MuonMap[2].py();
-      pz2=MuonMap[2].pz();
-      p2=MuonMap[2].p();
-    
-      P2=MuonMap[2].p4();
-      eta2=MuonMap[2].eta();
-      isolation3_2=MuonMap[2].isolationR03().sumPt;
-      isolation5_2=MuonMap[2].isolationR05().sumPt;
-      isoR03_2_emEt=MuonMap[2].isolationR03().emEt;
-      isoR03_2_hadEt=MuonMap[2].isolationR03().hadEt;
-      isoR03_2_nTracks=MuonMap[2].isolationR03().nTracks;
-
-	  
-      vertex_x_1=MuonMap[1].vertex().X();
-      vertex_y_1=MuonMap[1].vertex().Y();
-      vertex_z_1=MuonMap[1].vertex().Z();
-	  
-      vertex_x_2=MuonMap[2].vertex().X();
-      vertex_y_2=MuonMap[2].vertex().Y();
-      vertex_z_2=MuonMap[2].vertex().Z();
-
-      P=P1+P2;
-      Phi = fabs(phi1-phi2);
-	  
-      Mt=sqrt(2*(pt1*pt2*(1-cos(Phi))));
-	  
-      MR=P.mass();
-      PTZrec=sqrt(pow(px1+px2,2)+pow(py1+py2,2));
+  //cout<<"Numero di evento = "<<EventNumber<<endl;
   
-      
-	  
-      DeltaR=100;
-      for(edm::View<pat::Jet>::const_iterator jet_iter = jets.begin(); jet_iter!=jets.end(); ++jet_iter){
-	  
-	  
-	if(jet_iter->pt()>30 && abs(jet_iter->eta())<3){
-	  njetscounter++;
-	  jetPhi=jet_iter->phi();
-	  jet_eta=jet_iter->eta();
-	  newDeltaR=sqrt(pow(phi1-jetPhi,2)+pow(eta1-jet_eta,2));
-	    
-	  if(newDeltaR<DeltaR){
-	    DeltaR=newDeltaR;}
-
-	      
-
-	  if(njetscounter==1){
-	
-	    jetpt=jet_iter->pt();
-	    jeteta=jet_iter->eta();
-	    if(jet_iter->genJet()){
-	      jetptGen_match = jet_iter->genJet()->pt();
-	      res_ptGenJet_ptJet_match=(jetptGen_match-jetpt)/jetptGen_match;
-	    }
-	  }
-		  
-	    if(njetscounter==2){
-	      jetpt_second=jet_iter->pt();
-	      jeteta_second=jet_iter->eta();
-	    }
-	  
-	}
-      }
-	
-	
-      
-      for(reco::GenJetCollection::const_iterator jetGen_iter = jetsGen.begin(); jetGen_iter!=jetsGen.end(); ++jetGen_iter){ 
-	if(jetGen_iter->pt()>30 && abs(jetGen_iter->eta())<3){
-
-	  bool hasMuon = false;
-	  
-	  std::vector< const reco::GenParticle * > numeroparticelle= jetGen_iter->getGenConstituents();
-
-	  for(std::vector< const reco::GenParticle * >::const_iterator jet_particle=numeroparticelle.begin();jet_particle!=numeroparticelle.end();jet_particle++){
-	    cout<<"che particelle sono "<<(*jet_particle)->pdgId()<<endl;
-	    if (abs((*jet_particle)->pdgId())==13 && (*jet_particle)->pt()>20){
-	      hasMuon = true;
-	    }
-	  }
-	  if (!hasMuon ||  numeroparticelle.size() > 15) njetscounterGen++;
-	    
-	  if(njetscounterGen==1){
-	    jetptGen=jetGen_iter->pt();
-	    jetetaGen=jetGen_iter->eta();
-	  
-	 
-	  }
-	  if(njetscounterGen==2){
-	    jetptGen_second=jetGen_iter->pt();
-	    jetetaGen_second=jetGen_iter->eta();
-
-	  
-
-	  }
-	}
-      }
-			
-      if(MuonMap[1].genLepton() && MuonMap[2].genLepton()){
-      
-	pt1gen=MuonMap[1].genLepton()->pt();
-	pt2gen=MuonMap[2].genLepton()->pt();
-       
-
-	p1xgen=MuonMap[1].genLepton()->px();
-	p2xgen=MuonMap[2].genLepton()->px();
-      
-	p1ygen=MuonMap[1].genLepton()->py();
-	p2ygen=MuonMap[2].genLepton()->py();
-	P1gen=MuonMap[1].genLepton()->p4();
-	P2gen=MuonMap[2].genLepton()->p4();
-	PTZgen=sqrt(pow(p1xgen+p2xgen,2)+pow(p1ygen+p2ygen,2));
-	PG=P1gen+P2gen;
-	MZgen=PG.mass();
-	resPTrec=(PTZ-PTZrec)/PTZ;
-      
-	nmam=0;
-	if(!MuonMap[1].genLepton()->mother()){cout<<"il muone generato non non ha mamma"<<endl;
-      
-	}else{
-	
-	  const reco::Candidate *mam=MuonMap[1].genLepton()->mother();
-	  while (abs(mam->pdgId())!=23 && mam->mother()){
-	    cout<<"il muone e figlio di = "<<mam->pdgId()<<endl;	  
-	    const reco::Candidate *newmam=mam->mother();
-	    mam=newmam;
-	    nmam++;
-	  }	 
-	  if(abs(mam->pdgId())!=23
-){cout<<"errore"<<endl;}else{
-	       
-	    cout<<"ho ricostruito la Z"<<endl;	
-	  
-	    MZ=mam->mass();
-	    PX=mam->px();
-	    PY=mam->py();
-	    PZ=mam->pz();
-	    EZ=mam->energy();
-	    PTZ=mam->pt();
-	    ETAZ=mam->eta();
-	    cout<<"la particella e'= "<<mam->pdgId();
-	    cout<<" il PTZ vale= "<<PTZ<<endl;
-	    absP=pow(PX,2)+pow(PY,2)+pow(PZ,2);
-	    MASSAZ=sqrt(pow(EZ,2)-absP);
-	    // cout << "Genealogia " << nmam++ <<"tipo "<<mam->pdgId()<< endl;
-
-	    resMZ_MZgen=(MZ-MZgen)/MZ;
-
-	
-	  }
-
-	}
-        
-      }  
-
-      ZMM_PYT1->Fill(); 
-     
+  // do stuff only if 2 mouns are present
+  if (nmuonscounter != 2) return;
+  // if the two muons are not global muons do nothing
+  if(! (MuonMap[0].isGlobalMuon() && MuonMap[1].isGlobalMuon()) ) return;
   
+  // fill info about the leading muon
+  chi2_1=MuonMap[0].innerTrack()->chi2();
+  dxy1=MuonMap[0].innerTrack()->dxy(beamSpot);
+  dxy1_error=MuonMap[0].innerTrack()->dxyError();
+  charge1=MuonMap[0].charge();
+  phi1=MuonMap[0].phi();
+  pt1=MuonMap[0].pt();
+  px1=MuonMap[0].px();
+  py1=MuonMap[0].py();
+  pz1=MuonMap[0].pz();
+  p1=MuonMap[0].p();
+  P1=MuonMap[0].p4();
+  eta1=MuonMap[0].eta();
+  isolation3_1=MuonMap[0].isolationR03().sumPt;
+  isolation5_1=MuonMap[0].isolationR05().sumPt;
+  isoR03_1_emEt=MuonMap[0].isolationR03().emEt;
+  isoR03_1_hadEt=MuonMap[0].isolationR03().hadEt;
+  isoR03_1_nTracks=MuonMap[0].isolationR03().nTracks;
+  vertex_x_1=MuonMap[0].vertex().X();
+  vertex_y_1=MuonMap[0].vertex().Y();
+  vertex_z_1=MuonMap[0].vertex().Z();
+
+  //fill info about the second muon
+  chi2_2=MuonMap[1].innerTrack()->chi2();
+  dxy2=MuonMap[1].innerTrack()->dxy();
+  dxy2_error=MuonMap[1].innerTrack()->dxyError();
+  charge2=MuonMap[1].charge();
+  phi2=MuonMap[1].phi();
+  pt2=MuonMap[1].pt();
+  px2=MuonMap[1].px();
+  py2=MuonMap[1].py();
+  pz2=MuonMap[1].pz();
+  p2=MuonMap[1].p();
+  P2=MuonMap[1].p4();
+  eta2=MuonMap[1].eta();
+  isolation3_2=MuonMap[1].isolationR03().sumPt;
+  isolation5_2=MuonMap[1].isolationR05().sumPt;
+  isoR03_2_emEt=MuonMap[1].isolationR03().emEt;
+  isoR03_2_hadEt=MuonMap[1].isolationR03().hadEt;
+  isoR03_2_nTracks=MuonMap[1].isolationR03().nTracks;
+  vertex_x_2=MuonMap[1].vertex().X();
+  vertex_y_2=MuonMap[1].vertex().Y();
+  vertex_z_2=MuonMap[1].vertex().Z();
+      
+  //calculate Z momentum
+  P=P1+P2;
+  Phi = fabs(phi1-phi2);
+      
+  Mt=sqrt(2*(pt1*pt2*(1-cos(Phi))));
+      
+  MR=P.mass();
+  //PTZrec=sqrt(pow(px1+px2,2)+pow(py1+py2,2));
+  PTZrec = P.pt();
+
+  //now look at the generated quantities for leptons
+  if(MuonMap[0].genLepton() && MuonMap[1].genLepton()){
+
+    pt1gen=MuonMap[0].genLepton()->pt();
+    pt2gen=MuonMap[1].genLepton()->pt();
+
+
+    p1xgen=MuonMap[0].genLepton()->px();
+    p2xgen=MuonMap[1].genLepton()->px();
+
+    p1ygen=MuonMap[0].genLepton()->py();
+    p2ygen=MuonMap[1].genLepton()->py();
+    P1gen=MuonMap[0].genLepton()->p4();
+    P2gen=MuonMap[1].genLepton()->p4();
+    //PTZgen=sqrt(pow(p1xgen+p2xgen,2)+pow(p1ygen+p2ygen,2));
+    PG=P1gen+P2gen;
+    MZgen=PG.mass();
+    PTZgen=PG.pt();
+    resPTrec=(PTZ-PTZrec)/PTZ;  ///COME FA A FUNZIONARE??? PTZ non e' stato ancora settato
+
+    nmam=0;
+    if(!MuonMap[0].genLepton()->mother()){
+      cout<<"il muone generato non non ha mamma"<<endl;
+    }else{
+      const reco::Candidate *mam=MuonMap[0].genLepton()->mother();
+      while (abs(mam->pdgId())!=23 && mam->mother()){
+        cout<<"il muone e figlio di = "<<mam->pdgId()<<endl;
+        const reco::Candidate *newmam=mam->mother();
+        mam=newmam;
+        nmam++;
+      }
+      if(abs(mam->pdgId())!=23){
+        cout<<"errore"<<endl;
+      } else {
+        cout<<"ho ricostruito la Z"<<endl;
+
+        MZ=mam->mass();
+        PX=mam->px();
+        PY=mam->py();
+        PZ=mam->pz();
+        EZ=mam->energy();
+        PTZ=mam->pt();
+        ETAZ=mam->eta();
+        cout<<"la particella e'= "<<mam->pdgId();
+        cout<<" il PTZ vale= "<<PTZ<<endl;
+        absP=pow(PX,2)+pow(PY,2)+pow(PZ,2);
+        MASSAZ=sqrt(pow(EZ,2)-absP);
+        // cout << "Genealogia " << nmam++ <<"tipo "<<mam->pdgId()<< endl;
+        resMZ_MZgen=(MZ-MZgen)/MZ;
+      }
     }
+  }
+
+  
+  // now look at the jets...    
+  float newDeltaR;
+  DeltaR_leadJet_leadLep=100;
+  for(edm::View<pat::Jet>::const_iterator jet_iter = jets.begin(); jet_iter!=jets.end(); ++jet_iter){
+    if(jet_iter->pt()>30 && abs(jet_iter->eta())<3){
+      njetscounter++;
+      jetPhi=jet_iter->phi();
+      jet_eta=jet_iter->eta();
+      newDeltaR=sqrt(pow(phi1-jetPhi,2)+pow(eta1-jet_eta,2));
+        
+      if(newDeltaR<DeltaR_leadJet_leadLep){
+        DeltaR_leadJet_leadLep=newDeltaR;
+      }
+      if(njetscounter==1){
+        jetpt=jet_iter->pt();
+        jeteta=jet_iter->eta();
+        if(jet_iter->genJet()){
+          jetptGen_match = jet_iter->genJet()->pt();
+          res_ptGenJet_ptJet_match=(jetptGen_match-jetpt)/jetptGen_match;
+        }
+      }
+        if(njetscounter==2){
+          jetpt_second=jet_iter->pt();
+          jeteta_second=jet_iter->eta();
+        }
+    }
+  }
     
-  }    
-	        
+    
+  
+  for(reco::GenJetCollection::const_iterator jetGen_iter = jetsGen.begin(); jetGen_iter!=jetsGen.end(); ++jetGen_iter){ 
+    if(jetGen_iter->pt()>30 && abs(jetGen_iter->eta())<3){
+
+      bool hasMuon = false;
+      
+      std::vector< const reco::GenParticle * > numeroparticelle= jetGen_iter->getGenConstituents();
+
+      for(std::vector< const reco::GenParticle * >::const_iterator jet_particle=numeroparticelle.begin();jet_particle!=numeroparticelle.end();jet_particle++){
+        cout<<"che particelle sono "<<(*jet_particle)->pdgId()<<endl;
+        if (abs((*jet_particle)->pdgId())==13 && (*jet_particle)->pt()>20){
+          hasMuon = true;
+        }
+      }
+      if (!hasMuon ||  numeroparticelle.size() > 15) njetscounterGen++;
+        
+      if(njetscounterGen==1){
+        jetptGen=jetGen_iter->pt();
+        jetetaGen=jetGen_iter->eta();
+      }
+      if(njetscounterGen==2){
+        jetptGen_second=jetGen_iter->pt();
+        jetetaGen_second=jetGen_iter->eta();
+      }
+    }
+  }
+                    
+  ZMM_PYT1->Fill(); 
+              
 }  
-    
+  
       
    
 
@@ -464,11 +364,10 @@ ZjetsNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
 void ZjetsNtupleMaker::beginJob(const edm::EventSetup&)
 { 
- n2mu=0;
 
  ZMM_PYT1=fs->make<TTree>("ZMM_PYT1","albero");
  ZMM_PYT1->Branch("particelle_jet",&particelle_jet,"particelle_jet/I");
- ZMM_PYT1->Branch("n2mu",&n2mu,"n2mu/I");
+ ZMM_PYT1->Branch("n2mu",&nmuonscounter,"n2mu/I");
  ZMM_PYT1->Branch("whisto",&whisto,"whisto/F");
  ZMM_PYT1->Branch("vertex_x_1",&vertex_x_1,"vertex_x_1/F");
  ZMM_PYT1->Branch("vertex_y_1",&vertex_y_1,"vertex_y_1/F");
@@ -547,7 +446,7 @@ void ZjetsNtupleMaker::beginJob(const edm::EventSetup&)
  ZMM_PYT1->Branch("jetpt_second",&jetpt_second,"jetpt_second/F");
  ZMM_PYT1->Branch("jeteta_second",&jeteta_second,"jeteta_second/F");
  ZMM_PYT1->Branch("resMZ_MZgen",&resMZ_MZgen,"resMZ_MZgen/F");
- ZMM_PYT1->Branch("DeltaR",&DeltaR,"DeltaR/F");
+ ZMM_PYT1->Branch("DeltaR_leadJet_leadLep",&DeltaR_leadJet_leadLep,"DeltaR_leadJet_leadLep/F");
  ZMM_PYT1->Branch("dxy1",&dxy1,"dxy1/F");
  ZMM_PYT1->Branch("dxy2",&dxy2,"dxy2/F");
  ZMM_PYT1->Branch("dxy1_error",&dxy1_error,"dxy1_error/F");
@@ -559,6 +458,85 @@ void ZjetsNtupleMaker::beginJob(const edm::EventSetup&)
 // ------------ method called once each job just after ending the event loop  ------------
 void 
 ZjetsNtupleMaker::endJob() {
+}
+
+/// Reset all variables in the tree
+
+void ZjetsNtupleMaker::resetVariables() {
+  EventRun=0;
+  EventNumber=0;
+  PTZ=-1000;
+  PTZgen=-1000;
+  MZ=-1000;
+  MR=-1000;
+  Phi=0;
+  pt1=0;
+  pt2=0;
+  MASSAZ=-1000;
+  PTZrec=800;
+  resPTrec=-50;
+  resPTgen=-50;
+  MZgen=-1000;
+  eta1=-100;
+  eta2=-100;
+  pt1gen=0;
+  pt2gen=0;
+  p1xgen=0;
+  p1ygen=0;
+  p2xgen=0;
+  p2ygen=0;
+  px1=0;
+  px2=0;
+  py1=0;
+  py2=0;
+  PX=-1000;
+  PY=-1000;
+  phi1=0;
+  phi2=0;
+  Mt=0;
+  pz1=0;
+  pz2=0;
+  PZ=-1000;
+  EZ=0;
+  mamphoton=-1000;
+  njetscounter=0;
+  njetscounterGen=0;
+  ETAZ=-1000;
+  isolation3_1=-1;
+  isolation5_1=-1;
+  isolation3_2=-1;
+  isolation5_2=-1;
+  jetptGen=0;
+  jetptGen_match=0;
+  jetetaGen=-10;
+  jetptGen_second=0;
+  jetetaGen_second=-10;
+  jetpt=0;
+  jeteta=-10;
+  jetpt_second=0;
+  jeteta_second=-10;
+  res_ptGenJet_ptJet=-20;
+  res_ptGenJet_ptJet_match=-20;
+  resMZ_MZgen=-10;
+  charge1=-10;
+  charge2=-10;
+  isoR03_1_emEt=-20;
+  isoR03_1_nTracks=-10;
+  isoR03_1_hadEt=-10;
+  particelle_jet=-10;
+  isoR03_2_emEt=-20;
+  isoR03_2_nTracks=-10;
+  isoR03_2_hadEt=-10;
+  vertex_x_1=-10;
+  vertex_y_1=-10;
+  vertex_z_1=-10;
+  vertex_x_2=-10;
+  vertex_y_2=-10;
+  vertex_z_2=-10;
+  chi2_2=-10;
+  chi2_1=-10;
+  nhits_1=-10;
+  nhits_2=-10;
 }
 
 //define this as a plug-in

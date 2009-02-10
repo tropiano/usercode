@@ -13,14 +13,16 @@ process.source = cms.Source("PoolSource",
     # replace 'myfile.root' with the source file you want to use
     fileNames = cms.untracked.vstring(
         #'file:/home/lenzip/CMSSW/CMSSW_2_2_3/src/SHERPA112_Zll_0j1incl_10TeV_QCUT20_cff_py_GEN_SIM_DIGI_L1_DIGI2RAW_HLT.root'
-        'file:/home/lenzip/CMSSW/CMSSW_2_2_3/src/SHERPA112_Zll_0j1incl_10TeV_QCUT20_cff_py_RAW2DIGI_RECO.root'
+        'file:/cms/data01/lenzip/CMSSW/ZjetsAnalysis/CMSSW_2_2_4/src/Firenze/Utilities/test/PATLayer1_Output.fromAOD_sisConegenMadgraphBS_full_82.root'
     )
 )
 
 process.tracer = cms.EDAnalyzer('ProvenanceTracer',
-  Products = cms.InputTag("selectedLayer1Jets"),
+  Products = cms.InputTag("sisCone5GenJets"),
+  #Products = cms.InputTag("selectedLayer1Jets"),
   #Products = cms.InputTag("sisCone5PFJets"),
   ParentIdentifiers = cms.vstring("src", "jetSource", "blocks")
+  #ParentIdentifiers = cms.vstring("src", "genJetMatch")
 )
 
 
