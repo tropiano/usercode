@@ -21,9 +21,23 @@ process.TFileService = cms.Service('TFileService',
                                    fileName = cms.string('zjetsplots.root')
 )
 
+##select jets according to these criteria
+import PhysicsTools.PatAlgos.selectionLayer1.jetSelector_cfi
+process.newJetSelector = PhysicsTools.PatAlgos.selectionLayer1.jetSelector_cfi.selectedLayer1Jets.clone()
+process.newJetSelector.src = cms.InputTag("selectedLayer1Jets")
+process.newJetSelector.cut = cms.string('pt > 30. & abs(eta) < 5. & nConstituents > 0')
+
+##select muons according to these criteria
+import PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi
+process.newMuonSelector = PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi.selectedLayer1Muons.clone()
+process.newMuonSelector.src = cms.InputTag("selectedLayer1Muons")
+process.newMuonSelector.cut = cms.string("pt > 20. & abs(eta) < 2.4 & isGood('GlobalMuonPromptTight') & globalTrack().found()>11 & abs(globalTrack().d0())<0.2 & (trackIso()+caloIso()+ecalIso())/globalTrack().pt()<0.3")
+
+
 #Z candidate combiner
 process.zmumu = cms.EDFilter('NamedCandViewShallowCloneCombiner',
-                              decay = cms.string('selectedLayer1Muons@+ selectedLayer1Muons@-'),
+                              #decay = cms.string('selectedLayer1Muons@+ selectedLayer1Muons@-'),
+                              decay = cms.string('newMuonSelector@+ newMuonSelector@-'),
                               cut   = cms.string('50 < mass < 150'),
                               name  = cms.string('Zmumu'),
                               roles = cms.vstring('mu+', 'mu-')
@@ -41,7 +55,7 @@ process.zee = cms.EDFilter('NamedCandViewShallowCloneCombiner',
 process.zjetsanalysis = cms.EDAnalyzer('ZjetsPlots',
                                        ZMuMuSource   = cms.InputTag('zmumu'), 
                                        ZEESource     = cms.InputTag('zee'), 
-                                       JetSource     = cms.InputTag('selectedLayer1Jets'), 
+                                       JetSource     = cms.InputTag('newJetSelector'), 
                                        DiffJetRate10 = cms.InputTag('diffCaloJetRate10', 'DiffJetRate10'), 
                                        DiffJetRate21 = cms.InputTag('diffCaloJetRate21', 'DiffJetRate21'), 
                                        DiffJetRate32 = cms.InputTag('diffCaloJetRate32', 'DiffJetRate32'),
@@ -95,4 +109,4 @@ process.zjetsanalysis = cms.EDAnalyzer('ZjetsPlots',
                                                                 ) 
 )
 
-process.p = cms.Path(process.zmumu*process.zee*process.zjetsanalysis) 
+process.p = cms.Path(process.newJetSelector*process.newMuonSelector*process.zmumu*process.zee*process.zjetsanalysis) 
