@@ -13,7 +13,7 @@
 //
 // Original Author:  Piergiulio Lenzi
 //         Created:  Wed Apr 30 17:58:51 CEST 2008
-// $Id$
+// $Id: ZjetsPlots.cc,v 1.1 2009/02/12 16:43:39 lenzip Exp $
 //
 //
 
@@ -29,7 +29,8 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include "DataFormats/Common/interface/Handle.h"
-#include "DataFormats/Candidate/interface/NamedCompositeCandidate.h"
+//#include "DataFormats/Candidate/interface/NamedCompositeCandidate.h"
+#include "DataFormats/Candidate/interface/CompositeCandidate.h"
 #include "DataFormats/Candidate/interface/ShallowCloneCandidate.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
@@ -66,14 +67,16 @@ class ZjetsPlots : public edm::EDAnalyzer {
 
       template <class T> T* createHistograms(std::string dir, std::string name, std::string title, const PhysicsHistograms::KinAxisLimits& axis) const;
 
-      reco::NamedCompositeCandidate fixRoles(const reco::NamedCompositeCandidate& orig, std::string baserole) const;
+      //reco::NamedCompositeCandidate fixRoles(const reco::NamedCompositeCandidate& orig, std::string baserole) const;
+      reco::CompositeCandidate fixRoles(const reco::CompositeCandidate& orig, std::string baserole) const;
 
       template <class T> void 
       AddHistoGroupVsMulti(unsigned int njet, std::vector<T*>& vGroup, 
                            std::string dir, std::string title, std::string name,
                            const PhysicsHistograms::KinAxisLimits& axis);
 
-      template<class T> bool checkIsolation(const reco::NamedCompositeCandidate& cand) const;
+      //template<class T> bool checkIsolation(const reco::NamedCompositeCandidate& cand) const;
+      template<class T> bool checkIsolation(const reco::CompositeCandidate& cand) const;
 
       template<class T> bool isIsolated(const T* ) const;
       
@@ -124,7 +127,8 @@ template <class T> T* ZjetsPlots::createHistograms(std::string dir, std::string 
 }
 
 template<> bool ZjetsPlots::isIsolated(const pat::Muon* muon ) const {
-  return (muon->trackIso()<2 && muon->ecalIso() < 2 && muon->hcalIso() < 2 );
+  //return (muon->trackIso()<2 && muon->ecalIso() < 2 && muon->hcalIso() < 2 );
+  return (muon->trackIso()+muon->ecalIso()+muon->hcalIso())/muon->pt() < 0.1;
 }
 
 template<> bool ZjetsPlots::isIsolated(const pat::Electron* elec ) const {
@@ -132,7 +136,8 @@ template<> bool ZjetsPlots::isIsolated(const pat::Electron* elec ) const {
 }
 
 
-template<class T> bool ZjetsPlots::checkIsolation(const reco::NamedCompositeCandidate& cand) const {
+//template<class T> bool ZjetsPlots::checkIsolation(const reco::NamedCompositeCandidate& cand) const {
+template<class T> bool ZjetsPlots::checkIsolation(const reco::CompositeCandidate& cand) const {
   const reco::Candidate* c0 = cand.daughter(0);
   const reco::ShallowCloneCandidate * pshallow0 = dynamic_cast<const reco::ShallowCloneCandidate *>(c0);
   if (pshallow0 && pshallow0->hasMasterClone()) c0 = pshallow0->masterClone().get();
@@ -203,23 +208,33 @@ ZjetsPlots::ZjetsPlots(const edm::ParameterSet& iConfig) : _configHelper(iConfig
 {
 
    //now do what ever initialization is needed
-   _histoZ_mumu = createHistograms<pat::HistoComposite>("ZmumuHistos", "Z (#mu channel)", "Zmumu", _configHelper.getAxisLimits("muon"));
-   _histoJet_mumu = createHistograms<pat::HistoJet>("jetmumuHistos", "Jet (#mu channel)", "Jetmumu", _configHelper.getAxisLimits("muonJet"));
+   _histoZ_mumu = createHistograms<pat::HistoComposite>("ZmumuHistos","Z (#mu channel)", "Zmumu", 
+                                                         _configHelper.getAxisLimits("muon"));
+   _histoJet_mumu = createHistograms<pat::HistoJet>("jetmumuHistos", "Jet (#mu channel)", "Jetmumu", 
+                                                         _configHelper.getAxisLimits("muonJet"));
 
-   _histoZ_ee = createHistograms<pat::HistoComposite>("ZeeHistos", "Z (e channel)", "Zee", _configHelper.getAxisLimits("electron"));
-   _histoJet_ee = createHistograms<pat::HistoJet>("jeteeHistos", "Jet (e channel)", "Jetee", _configHelper.getAxisLimits("electronJet"));
+   _histoZ_ee = createHistograms<pat::HistoComposite>("ZeeHistos", "Z (e channel)", "Zee", 
+                                                         _configHelper.getAxisLimits("electron"));
+   _histoJet_ee = createHistograms<pat::HistoJet>("jeteeHistos", "Jet (e channel)", "Jetee", 
+                                                         _configHelper.getAxisLimits("electronJet"));
 
    TFileDirectory misc1 = TFileDirectory(fs->mkdir("jetmumuHistos"));
    PhysicsHistograms::KinAxisLimits djrMuonAxis = _configHelper.getAxisLimits("diffJetRateMuon");
-   _djr_mumu_10 = misc1.make<TH1D>("diffjetrate10mumu", "Diff Jet Rate 1->0 (#mu channel)", djrMuonAxis.nBinsPt, djrMuonAxis.pt1, djrMuonAxis.pt2);   
-   _djr_mumu_21 = misc1.make<TH1D>("diffjetrate21mumu", "Diff Jet Rate 2->1 (#mu channel)", djrMuonAxis.nBinsPt, djrMuonAxis.pt1, djrMuonAxis.pt2);   
-   _djr_mumu_32 = misc1.make<TH1D>("diffjetrate32mumu", "Diff Jet Rate 3->2 (#mu channel)", djrMuonAxis.nBinsPt, djrMuonAxis.pt1, djrMuonAxis.pt2);   
+   _djr_mumu_10 = misc1.make<TH1D>("diffjetrate10mumu", "Diff Jet Rate 1->0 (#mu channel)", 
+                                    djrMuonAxis.nBinsPt, djrMuonAxis.pt1, djrMuonAxis.pt2);   
+   _djr_mumu_21 = misc1.make<TH1D>("diffjetrate21mumu", "Diff Jet Rate 2->1 (#mu channel)", 
+                                    djrMuonAxis.nBinsPt, djrMuonAxis.pt1, djrMuonAxis.pt2);   
+   _djr_mumu_32 = misc1.make<TH1D>("diffjetrate32mumu", "Diff Jet Rate 3->2 (#mu channel)", 
+                                    djrMuonAxis.nBinsPt, djrMuonAxis.pt1, djrMuonAxis.pt2);   
 
    TFileDirectory misc2 = TFileDirectory(fs->mkdir("jeteeHistos"));
    PhysicsHistograms::KinAxisLimits djrElectronAxis = _configHelper.getAxisLimits("diffJetRateElectron");
-   _djr_ee_10 = misc2.make<TH1D>("diffjetrate10ee", "Diff Jet Rate 1->0 (e channel)", djrElectronAxis.nBinsPt, djrElectronAxis.pt1, djrElectronAxis.pt2);      
-   _djr_ee_21 = misc2.make<TH1D>("diffjetrate21ee", "Diff Jet Rate 2->1 (e channel)", djrElectronAxis.nBinsPt, djrElectronAxis.pt1, djrElectronAxis.pt2);      
-   _djr_ee_32 = misc2.make<TH1D>("diffjetrate32ee", "Diff Jet Rate 3->2 (e channel)", djrElectronAxis.nBinsPt, djrElectronAxis.pt1, djrElectronAxis.pt2);
+   _djr_ee_10 = misc2.make<TH1D>("diffjetrate10ee", "Diff Jet Rate 1->0 (e channel)",
+                                  djrElectronAxis.nBinsPt, djrElectronAxis.pt1, djrElectronAxis.pt2);      
+   _djr_ee_21 = misc2.make<TH1D>("diffjetrate21ee", "Diff Jet Rate 2->1 (e channel)", 
+                                  djrElectronAxis.nBinsPt, djrElectronAxis.pt1, djrElectronAxis.pt2);      
+   _djr_ee_32 = misc2.make<TH1D>("diffjetrate32ee", "Diff Jet Rate 3->2 (e channel)", 
+                                  djrElectronAxis.nBinsPt, djrElectronAxis.pt1, djrElectronAxis.pt2);
 
    _zmumutag  = iConfig.getParameter<edm::InputTag>("ZMuMuSource");
    _zeetag    = iConfig.getParameter<edm::InputTag>("ZEESource");
@@ -282,13 +297,17 @@ ZjetsPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    using namespace reco;
 
    // get the Z candidates
-   Handle<reco::NamedCompositeCandidateCollection> zmumuHandle;
+   //Handle<reco::NamedCompositeCandidateCollection> zmumuHandle;
+   Handle<reco::CompositeCandidateCollection> zmumuHandle;
    iEvent.getByLabel(_zmumutag, zmumuHandle);
-   const reco::NamedCompositeCandidateCollection& Zmumus = *zmumuHandle;
+   //const reco::NamedCompositeCandidateCollection& Zmumus = *zmumuHandle;
+   const reco::CompositeCandidateCollection& Zmumus = *zmumuHandle;
 
-   Handle<reco::NamedCompositeCandidateCollection> zeeHandle;
+   //Handle<reco::NamedCompositeCandidateCollection> zeeHandle;
+   Handle<reco::CompositeCandidateCollection> zeeHandle;
    iEvent.getByLabel(_zeetag, zeeHandle);
-   const reco::NamedCompositeCandidateCollection& Zees = *zeeHandle;
+   //const reco::NamedCompositeCandidateCollection& Zees = *zeeHandle;
+   const reco::CompositeCandidateCollection& Zees = *zeeHandle;
 
    double weight = 1.;
    Handle<double> eventWeight;
@@ -348,16 +367,23 @@ ZjetsPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    unsigned int jetsize = jets.size(); 
     
    if (Zmumus.size() == 1){
-     NamedCompositeCandidate cand = fixRoles(Zmumus.front(), "#mu");
+     //NamedCompositeCandidate cand = fixRoles(Zmumus.front(), "#mu");
+     CompositeCandidate cand = fixRoles(Zmumus.front(), "#mu");
 
-     bool isolatedMuons = checkIsolation<pat::Muon>(cand); 
+
+
+     bool isolatedMuons = checkIsolation<pat::Muon>(cand);
+
+     if (!isolatedMuons) throw cms::Exception("ZjetsPlots") << "ERROR: isolation check failed " << std::endl;
 
      if (isolatedMuons){
       // fill Z histos
       //_histoZ_mumu->fillCollection(Zmumus);
       _histoZ_mumu->fill(cand);
 
-      AddHistoGroupVsMulti<pat::HistoComposite>(jets.size(), _histoZ_mumuVsMulti, "ZmumuHistos", "Z (#mu channel)", "Zmumu", _configHelper.getAxisLimits("muon"));
+      AddHistoGroupVsMulti<pat::HistoComposite>(jets.size(), _histoZ_mumuVsMulti, 
+                                                "ZmumuHistos", "Z (#mu channel)", "Zmumu", 
+                                                _configHelper.getAxisLimits("muon"));
       _histoZ_mumuVsMulti[jetsize]->fill(cand);
 
       // fill the jet histos
@@ -365,12 +391,20 @@ ZjetsPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     
 
-      AddHistoGroupVsMulti<pat::HistoJet>(jets.size(), _histoJet_mumuVsMulti, "jetmumuHistos", "Jet (#mu channel)", "Jetmumu", _configHelper.getAxisLimits("muonJet"));
+      AddHistoGroupVsMulti<pat::HistoJet>(jets.size(), _histoJet_mumuVsMulti, 
+                                          "jetmumuHistos", "Jet (#mu channel)", "Jetmumu", 
+                                          _configHelper.getAxisLimits("muonJet"));
   
       PhysicsHistograms::KinAxisLimits djrMuonAxis = _configHelper.getAxisLimits("diffJetRateMuon");
-      AddHistoGroupVsMulti<TH1D>(jets.size(), _djr_mumu_10VsMulti, "jetmumuHistos", "diffjetrate10mumu", "Diff Jet Rate 1->0 (#mu channel)", djrMuonAxis);
-      AddHistoGroupVsMulti<TH1D>(jets.size(), _djr_mumu_21VsMulti, "jetmumuHistos", "diffjetrate21mumu", "Diff Jet Rate 2->1 (#mu channel)", djrMuonAxis);
-      AddHistoGroupVsMulti<TH1D>(jets.size(), _djr_mumu_32VsMulti, "jetmumuHistos", "diffjetrate32mumu", "Diff Jet Rate 3->2 (#mu channel)", djrMuonAxis);
+      AddHistoGroupVsMulti<TH1D>(jets.size(), _djr_mumu_10VsMulti, 
+                                 "jetmumuHistos", "diffjetrate10mumu", "Diff Jet Rate 1->0 (#mu channel)", 
+                                 djrMuonAxis);
+      AddHistoGroupVsMulti<TH1D>(jets.size(), _djr_mumu_21VsMulti, 
+                                 "jetmumuHistos", "diffjetrate21mumu", "Diff Jet Rate 2->1 (#mu channel)", 
+                                 djrMuonAxis);
+      AddHistoGroupVsMulti<TH1D>(jets.size(), _djr_mumu_32VsMulti, "jetmumuHistos", "diffjetrate32mumu", 
+                                 "Diff Jet Rate 3->2 (#mu channel)", 
+                                 djrMuonAxis);
       _histoJet_mumuVsMulti[jets.size()]->fillCollection(jets, weight); 
       if (found10) {
         _djr_mumu_10->Fill(rate10, weight);
@@ -388,7 +422,8 @@ ZjetsPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    }
 
    if (Zees.size() == 1){
-     NamedCompositeCandidate cand = fixRoles(Zees.front(), "e"); 
+     CompositeCandidate cand = fixRoles(Zees.front(), "e"); 
+     //NamedCompositeCandidate cand = fixRoles(Zees.front(), "e"); 
  
      // fill Z histos
      _histoZ_ee->fill(cand);
@@ -402,18 +437,28 @@ ZjetsPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
      
      if (isolatedElectrons){
-      AddHistoGroupVsMulti<pat::HistoComposite>(jets.size(), _histoZ_eeVsMulti, "ZeeHistos", "Z (e channel)", "Zee", _configHelper.getAxisLimits("electron"));
+      AddHistoGroupVsMulti<pat::HistoComposite>(jets.size(), _histoZ_eeVsMulti, 
+                                                "ZeeHistos", "Z (e channel)", "Zee", 
+                                                _configHelper.getAxisLimits("electron"));
       _histoZ_eeVsMulti[jets.size()]->fill(cand);
 
       // fill the jet histos
       _histoJet_ee->fillCollection(jets, weight);
 
-      AddHistoGroupVsMulti<pat::HistoJet>(jets.size(), _histoJet_eeVsMulti, "jeteeHistos", "Jet (e channel)", "Jetee", _configHelper.getAxisLimits("electronJet"));
+      AddHistoGroupVsMulti<pat::HistoJet>(jets.size(), _histoJet_eeVsMulti, 
+                                          "jeteeHistos", "Jet (e channel)", "Jetee", 
+                                          _configHelper.getAxisLimits("electronJet"));
 
       PhysicsHistograms::KinAxisLimits djrElectronAxis = _configHelper.getAxisLimits("diffJetRateElectron");
-      AddHistoGroupVsMulti<TH1D>(jets.size(), _djr_ee_10VsMulti, "jeteeHistos", "diffjetrate10ee", "Diff Jet Rate 1->0 (e channel)", djrElectronAxis);
-      AddHistoGroupVsMulti<TH1D>(jets.size(), _djr_ee_21VsMulti, "jeteeHistos", "diffjetrate21ee", "Diff Jet Rate 2->1 (e channel)", djrElectronAxis);
-      AddHistoGroupVsMulti<TH1D>(jets.size(), _djr_ee_32VsMulti, "jeteeHistos", "diffjetrate32ee", "Diff Jet Rate 3->2 (e channel)", djrElectronAxis);
+      AddHistoGroupVsMulti<TH1D>(jets.size(), _djr_ee_10VsMulti, 
+                                 "jeteeHistos", "diffjetrate10ee", "Diff Jet Rate 1->0 (e channel)", 
+                                 djrElectronAxis);
+      AddHistoGroupVsMulti<TH1D>(jets.size(), _djr_ee_21VsMulti, 
+                                 "jeteeHistos", "diffjetrate21ee", "Diff Jet Rate 2->1 (e channel)", 
+                                 djrElectronAxis);
+      AddHistoGroupVsMulti<TH1D>(jets.size(), _djr_ee_32VsMulti, 
+                                 "jeteeHistos", "diffjetrate32ee", "Diff Jet Rate 3->2 (e channel)", 
+                                 djrElectronAxis);
       _histoJet_eeVsMulti[jets.size()]->fillCollection(jets, weight);
       if (found10) {
         _djr_ee_10->Fill(rate10, weight);
@@ -445,9 +490,13 @@ ZjetsPlots::endJob() {
 }
 
 
-reco::NamedCompositeCandidate ZjetsPlots::fixRoles(const reco::NamedCompositeCandidate& orig, std::string baserole) const{
-  reco::NamedCompositeCandidate::role_collection roles;
-  reco::NamedCompositeCandidate cand = orig;
+//reco::NamedCompositeCandidate ZjetsPlots::fixRoles(const reco::NamedCompositeCandidate& orig, std::string baserole) const{
+reco::CompositeCandidate ZjetsPlots::fixRoles(const reco::CompositeCandidate& orig, std::string baserole) const{
+  //reco::NamedCompositeCandidate::role_collection roles;
+  reco::CompositeCandidate::role_collection roles;
+  //reco::NamedCompositeCandidate cand = orig;
+  reco::CompositeCandidate cand = orig;
+  //std::cout << "threeCharge " << cand.daughter(0)->threeCharge() << std::endl;
   if (cand.daughter(0)->threeCharge() > 0) {
     roles.push_back(baserole + "^{+}");
     roles.push_back(baserole + "^{-}");

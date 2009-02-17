@@ -31,23 +31,26 @@ process.newJetSelector.cut = cms.string('pt > 30. & abs(eta) < 5. & nConstituent
 import PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi
 process.newMuonSelector = PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi.selectedLayer1Muons.clone()
 process.newMuonSelector.src = cms.InputTag("selectedLayer1Muons")
-process.newMuonSelector.cut = cms.string("pt > 20. & abs(eta) < 2.4 & isGood('GlobalMuonPromptTight') & globalTrack().found()>11 & abs(globalTrack().d0())<0.2 & (trackIso()+caloIso()+ecalIso())/globalTrack().pt()<0.3")
+#process.newMuonSelector.cut = cms.string("pt > 20. & abs(eta) < 2.4 & isGood('GlobalMuonPromptTight') & innerTrack().found()>=11 & abs(globalTrack().d0()/globalTrack().error(3))<3 & (trackIso()+caloIso()+ecalIso())/pt<0.1")
+process.newMuonSelector.cut = cms.string("pt > 20. & abs(eta) < 2.4 & isGood('GlobalMuonPromptTight') & innerTrack().found()>=11 & abs(globalTrack().d0())<0.2 & (trackIso()+caloIso()+ecalIso())/pt<0.1")
 
 
 #Z candidate combiner
-process.zmumu = cms.EDFilter('NamedCandViewShallowCloneCombiner',
+#process.zmumu = cms.EDFilter('NamedCandViewShallowCloneCombiner',
+process.zmumu = cms.EDFilter('CandViewShallowCloneCombiner',
                               #decay = cms.string('selectedLayer1Muons@+ selectedLayer1Muons@-'),
                               decay = cms.string('newMuonSelector@+ newMuonSelector@-'),
                               cut   = cms.string('50 < mass < 150'),
                               name  = cms.string('Zmumu'),
-                              roles = cms.vstring('mu+', 'mu-')
+                              roles = cms.vstring('mu1', 'mu2')
 )
 
-process.zee = cms.EDFilter('NamedCandViewShallowCloneCombiner',
+#process.zee = cms.EDFilter('NamedCandViewShallowCloneCombiner',
+process.zee = cms.EDFilter('CandViewShallowCloneCombiner',
                               decay = cms.string('selectedLayer1Electrons@+ selectedLayer1Electrons@-'),
                               cut   = cms.string('50 < mass < 150'),
                               name  = cms.string('Zee'),
-                              roles = cms.vstring('e+', 'e-')
+                              roles = cms.vstring('e1', 'e2')
 )
 
 #plots
@@ -65,9 +68,9 @@ process.zjetsanalysis = cms.EDAnalyzer('ZjetsPlots',
                                                                 mBins   = cms.int32(100),
                                                                 m1      = cms.double(50.),
                                                                 m2      = cms.double(150.),
-                                                                etaBins = cms.int32(100),
-                                                                eta1    = cms.double(-2.5),
-                                                                eta2    = cms.double(2.5) 
+                                                                etaBins = cms.int32(200),
+                                                                eta1    = cms.double(-10.),
+                                                                eta2    = cms.double(10.) 
                                                                 ),
                                        muonJet       = cms.PSet(ptBins  = cms.int32(300),
                                                                 pt1     = cms.double(0.),
@@ -76,8 +79,8 @@ process.zjetsanalysis = cms.EDAnalyzer('ZjetsPlots',
                                                                 m1      = cms.double(50.),
                                                                 m2      = cms.double(150.),
                                                                 etaBins = cms.int32(100),
-                                                                eta1    = cms.double(-5.),
-                                                                eta2    = cms.double(5.)
+                                                                eta1    = cms.double(-10.),
+                                                                eta2    = cms.double(10.)
                                                                 ),                          
                                        electron      = cms.PSet(ptBins  = cms.int32(300),
                                                                 pt1     = cms.double(0.),
@@ -86,8 +89,8 @@ process.zjetsanalysis = cms.EDAnalyzer('ZjetsPlots',
                                                                 m1      = cms.double(50.),
                                                                 m2      = cms.double(150.),
                                                                 etaBins = cms.int32(100),
-                                                                eta1    = cms.double(-2.5),
-                                                                eta2    = cms.double(2.5) 
+                                                                eta1    = cms.double(-10.),
+                                                                eta2    = cms.double(10.) 
                                                                 ),
                                        electronJet   = cms.PSet(ptBins  = cms.int32(300),
                                                                 pt1     = cms.double(0.),
@@ -96,8 +99,8 @@ process.zjetsanalysis = cms.EDAnalyzer('ZjetsPlots',
                                                                 m1      = cms.double(50.),
                                                                 m2      = cms.double(150.),
                                                                 etaBins = cms.int32(100),
-                                                                eta1    = cms.double(-5.),
-                                                                eta2    = cms.double(5.)
+                                                                eta1    = cms.double(-10.),
+                                                                eta2    = cms.double(10.)
                                                                 ),
                                 diffJetRateMuon      = cms.PSet(ptBins  = cms.int32(100),
                                                                 pt1     = cms.double(-1.),
