@@ -6,9 +6,12 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
  
 process.source = cms.Source('PoolSource',
                             fileNames = cms.untracked.vstring(
+                            'file:/cms/data01/lenzip/CMSSW/ZjetsAnalysis/CMSSW_2_2_4/src/Firenze/JetUtilities/test/test.root'
+                            ),
+                            secondaryFileNames = cms.untracked.vstring(
                             'file:/cms/data01/lenzip/testdata/04561ADB-38E3-DD11-AA7D-00E08178C035.root'
                             )
-)
+)                            
 #keep the logging output to a nice level
 process.MessageLogger = cms.Service('MessageLogger')
 
