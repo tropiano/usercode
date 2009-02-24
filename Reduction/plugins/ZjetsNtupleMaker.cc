@@ -42,7 +42,7 @@
 
 
 //
-// class decleration
+// class declaration
 //
 
 class ZjetsNtupleMaker : public edm::EDAnalyzer {
@@ -59,14 +59,49 @@ private:
   void resetVariables();
   
   edm::Service<TFileService> fs;
-  float PTZ,MZ,MR,Phi,pt1,pt2,MASSAZ,PTZrec,resPTrec,resPTgen,eta1,eta2,pt1gen,pt2gen,p1xgen,p1ygen,p2xgen,p2ygen,px1,py1,px2,resMZ_MZgen,DeltaR_leadJet_leadLep;   
-  float x2,py2, PX,PY,PTZgen,phi1,phi2,Mt,pz1,pz2,PZ,EZ,MZgen,jetpt,jeteta,ETAZ,isolation3_1,isolation5_1,isolation3_2,isolation5_2,whisto,jetptGen,res_ptGenJet_ptJet,jetetaGen,jetpt_second,jeteta_second,jetptGen_second,jetetaGen_second,jetptGen_match,res_ptGenJet_ptJet_match,isoR03_1_emEt, isoR03_1_nTracks,isoR03_1_hadEt,isoR03_2_emEt, isoR03_2_nTracks,isoR03_2_hadEt,vertex_x_1,	vertex_y_1,vertex_z_1,vertex_x_2,vertex_y_2,vertex_z_2,dxy1,dxy2,dxy1_error,dxy2_error,chi2_2,chi2_1 ; 
-  //seconJetPt,secondJetEta;
-  size_t nphotonscounter;
-  int njetscounter, njetscounterGen, nmuonscounter, particelle_jet,nhits_1, nhits_2;
+  float whisto;
   int EventNumber,EventRun,EventSelect;
-  int mamphoton,charge1,charge2,nmam;
-  TTree *ZMM_PYT1;
+
+// Cuts and counters
+float minPtjet,    // Minimum jet Pt [GeV]
+      minPtmu,    // Minimum mu Pt [GeV]
+      etajetcut,  // Eta jet cut
+      etamucut,  // Eta mu cut
+      Mmumu1,     // Z mass cut lower
+      Mmumu2;    // Z mass cut higher
+int nevents, neventsmu, neventsError, nevents1,nevents2,nevents3;
+int njetsall, njetsall1,njetsall2,njetsall3;
+
+  // Ntuple variable declaration  
+
+  // muons in a vector
+  // nmuonscounter are all mu with Pt>20, nmu are also global muons etc.
+  int nmuonscounter, nmu;
+  // const int nmuMax=10;  non funziona
+  int nhits[10],charge[10];
+  float pt[10],phi[10],eta[10],px[10],py[10],pz[10];
+  float isolation3[10],isolation5[10],isoR03_emEt[10],isoR03_hadEt[10],isoR03_nTracks[10],
+  vertex_x[10],vertex_y[10],vertex_z[10],dxy[10],dxy_error[10],chi2[10];
+  // reconstructed and generated Z
+  float MZrec,PTZrec,ETAZrec;
+  float MZgen,PTZgen,pt1gen,pt2gen,resMZrec,resPTZrec,ptmugen[10];
+  // not used for the moment float x2, PX,PY,PTZgen,Mt,PZ,EZ,MZgen,ETAZ;
+  // jets in a vector
+  // const njetsMax=100;   non funziona
+ float jetptGen[100], jetetaGen[100], jetphiGen[100],
+        jetpt[100], jetphi[100], jeteta[100], jetptGen_match[100],
+        res_ptGenJet_ptJet[100],res_ptGenJet_ptJet_match[100],
+        jetDeltaR1[100],jetDeltaR2[100]; 
+  size_t nphotonscounter;
+  int njetscounter, njetscounterGen, particelle_jet[100];
+
+  int mamphoton,nmam;
+  TTree *ZMM;
+ // histograms
+ // TH1F *hEff1 = new TH1F("hEff1", "Efficiency 1 jet rec/all", 100, 0., 1.);
+ // TH1F *hEff2 = new TH1F("hEff2", "Efficiency 2 jets rec/all", 100, 0., 1.);
+ // TH1F *hEff3 = new TH1F("hEff3", "Efficiency 3 jets rec/all", 100, 0., 1.);
+
   std::map<std::string,TH1D*> histocontainer_; // simple map to contain all histograms. Histograms are booked in the beginJob() method
  
   edm::InputTag eleLabel_;
@@ -153,12 +188,37 @@ ZjetsNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   //  cout << "beamSpot position" << recoBeamSpotHandle->position() << endl;
   reco::TrackBase::Point beamSpot(0,0,0);
 
+
+  // double p1=0;     // all this needed?
+  // double p2=0;
+  // double absP=-1000;
+   
+  reco::Particle::LorentzVector Pmu[10], Pmugen[10], P, P1, P2, P1gen,P2gen,PG;
+
   EventNumber = iEvent.id().event();
-
   EventRun=iEvent.id().run();
-
- 
+  nevents++;
+  if( (nevents%5000)==0) cout<<"Event being analyzed = "<<nevents<<endl;
   
+
+  //count jets here, without muon selection
+  njetsall=0;
+      for(edm::View<pat::Jet>::const_iterator jet_iter = jets.begin(); jet_iter!=jets.end(); ++jet_iter){
+	if(jet_iter->pt()>minPtjet && abs(jet_iter->eta())<etajetcut){
+	  njetsall++;
+	}}
+
+          if(njetsall==1){
+            njetsall1++;
+          }
+          if(njetsall==2){
+            njetsall2++;
+          }
+          if(njetsall==3){
+            njetsall3++;
+          }
+
+
   //std::map<int,pat::Muon> MuonMap;
   std::vector<pat::Muon> MuonMap;
   for(edm::View<pat::Muon>::const_iterator muon_iter = muons.begin(); muon_iter!=muons.end(); ++muon_iter){
@@ -166,81 +226,75 @@ ZjetsNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       //MuonMap[nmuonscounter]=*muon_iter;
       MuonMap.push_back(*muon_iter);
     }
-    
-  }
+      }
   nmuonscounter=MuonMap.size();
   //cout<<"il numero di muoni è: "<<nmuonscounter<<endl;
  
  
  
-  double p1=0; 
-  double p2=0;
-  double absP=-1000;
-  double jetPhi=-20;
-  double jet_eta=-20;
-   
-  reco::Particle::LorentzVector P1, P2, P,P1gen,P2gen,PG;
-   
-  //cout<<"Numero di evento = "<<EventNumber<<endl;
+  // do stuff only if at least 2 muons are present and cut on 10 muons for safety
+  // if (nmuonscounter < 2 || nmuonscounter>10) return;
+  if(nmuonscounter>10) return; 
+  neventsmu++;
+  nmu=0;
+  for(int i=0; i<nmuonscounter;i++){
+    if((MuonMap[i].isGlobalMuon())) {     // fill for good muons
   
-  // do stuff only if 2 mouns are present
-  if (nmuonscounter != 2) return;
-  // if the two muons are not global muons do nothing
-  if(! (MuonMap[0].isGlobalMuon() && MuonMap[1].isGlobalMuon()) ) return;
-  
-  // fill info about the leading muon
-  chi2_1=MuonMap[0].innerTrack()->chi2();
-  dxy1=MuonMap[0].innerTrack()->dxy(beamSpot);
-  dxy1_error=MuonMap[0].innerTrack()->dxyError();
-  charge1=MuonMap[0].charge();
-  phi1=MuonMap[0].phi();
-  pt1=MuonMap[0].pt();
-  px1=MuonMap[0].px();
-  py1=MuonMap[0].py();
-  pz1=MuonMap[0].pz();
-  p1=MuonMap[0].p();
-  P1=MuonMap[0].p4();
-  eta1=MuonMap[0].eta();
-  isolation3_1=MuonMap[0].isolationR03().sumPt;
-  isolation5_1=MuonMap[0].isolationR05().sumPt;
-  isoR03_1_emEt=MuonMap[0].isolationR03().emEt;
-  isoR03_1_hadEt=MuonMap[0].isolationR03().hadEt;
-  isoR03_1_nTracks=MuonMap[0].isolationR03().nTracks;
-  vertex_x_1=MuonMap[0].vertex().X();
-  vertex_y_1=MuonMap[0].vertex().Y();
-  vertex_z_1=MuonMap[0].vertex().Z();
+  // fill info about the muons
+      // note: need to take global normalized chi2 and nvalidhits
+    chi2[nmu]=MuonMap[i].globalTrack()->normalizedChi2();
+    nhits[nmu]=MuonMap[i].globalTrack()->numberOfValidHits();
+    charge[nmu]=MuonMap[i].charge();
+    pt[nmu]=MuonMap[i].pt();
+    phi[nmu]=MuonMap[i].phi();
+    eta[nmu]=MuonMap[i].eta();
+    px[nmu]=MuonMap[i].px();
+    py[nmu]=MuonMap[i].py();
+    pz[nmu]=MuonMap[i].pz();
+    isolation3[nmu]=MuonMap[i].isolationR03().sumPt;
+    isolation5[nmu]=MuonMap[i].isolationR05().sumPt;
+    isoR03_emEt[nmu]=MuonMap[i].isolationR03().emEt;
+    isoR03_hadEt[nmu]=MuonMap[i].isolationR03().hadEt;
+    isoR03_nTracks[nmu]=MuonMap[i].isolationR03().nTracks;
+    vertex_x[nmu]=MuonMap[i].vertex().X();
+    vertex_y[nmu]=MuonMap[i].vertex().Y();
+    vertex_z[nmu]=MuonMap[i].vertex().Z();
+    dxy[nmu]=MuonMap[i].innerTrack()->dxy(beamSpot);
+    dxy_error[nmu]=MuonMap[i].innerTrack()->dxyError();
+    Pmu[nmu]=MuonMap[i].p4();        // for reconstructed Z
 
-  //fill info about the second muon
-  chi2_2=MuonMap[1].innerTrack()->chi2();
-  dxy2=MuonMap[1].innerTrack()->dxy();
-  dxy2_error=MuonMap[1].innerTrack()->dxyError();
-  charge2=MuonMap[1].charge();
-  phi2=MuonMap[1].phi();
-  pt2=MuonMap[1].pt();
-  px2=MuonMap[1].px();
-  py2=MuonMap[1].py();
-  pz2=MuonMap[1].pz();
-  p2=MuonMap[1].p();
-  P2=MuonMap[1].p4();
-  eta2=MuonMap[1].eta();
-  isolation3_2=MuonMap[1].isolationR03().sumPt;
-  isolation5_2=MuonMap[1].isolationR05().sumPt;
-  isoR03_2_emEt=MuonMap[1].isolationR03().emEt;
-  isoR03_2_hadEt=MuonMap[1].isolationR03().hadEt;
-  isoR03_2_nTracks=MuonMap[1].isolationR03().nTracks;
-  vertex_x_2=MuonMap[1].vertex().X();
-  vertex_y_2=MuonMap[1].vertex().Y();
-  vertex_z_2=MuonMap[1].vertex().Z();
+    if(MuonMap[i].genLepton()){     // for generated Z
+      Pmugen[nmu]=MuonMap[i].genLepton()->p4();
+      ptmugen[nmu]=MuonMap[i].genLepton()->pt();
+      }
+    nmu++;
+    } // endif for requirements on muons
+  } // end loop on muons
       
-  //calculate Z momentum
+
+// reconstruct the Z from two highest pt selected muons
+
+  P1=Pmu[0];
+  P2=Pmu[1];
   P=P1+P2;
-  Phi = fabs(phi1-phi2);
-      
-  Mt=sqrt(2*(pt1*pt2*(1-cos(Phi))));
-      
-  MR=P.mass();
+  MZrec=P.mass();
   //PTZrec=sqrt(pow(px1+px2,2)+pow(py1+py2,2));
   PTZrec = P.pt();
+
+  // now the generated Z
+    P1gen=Pmugen[0];
+    P2gen=Pmugen[1];
+    pt1gen=ptmugen[0];
+    pt2gen=ptmugen[1];
+    PG=P1gen+P2gen;
+    MZgen=PG.mass();
+    PTZgen=PG.pt();
+    resMZrec=(MZrec-MZgen)/MZgen;
+    resPTZrec=(PTZrec-PTZgen)/PTZgen;  
+
+
+
+    /*   all this below commented out for the moment
 
   //now look at the generated quantities for leptons
   if(MuonMap[0].genLepton() && MuonMap[1].genLepton()){
@@ -257,10 +311,7 @@ ZjetsNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     P1gen=MuonMap[0].genLepton()->p4();
     P2gen=MuonMap[1].genLepton()->p4();
     //PTZgen=sqrt(pow(p1xgen+p2xgen,2)+pow(p1ygen+p2ygen,2));
-    PG=P1gen+P2gen;
-    MZgen=PG.mass();
-    PTZgen=PG.pt();
-    resPTrec=(PTZ-PTZrec)/PTZ;  ///COME FA A FUNZIONARE??? PTZ non e' stato ancora settato
+
 
     nmam=0;
     if(!MuonMap[0].genLepton()->mother()){
@@ -290,69 +341,103 @@ ZjetsNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         absP=pow(PX,2)+pow(PY,2)+pow(PZ,2);
         MASSAZ=sqrt(pow(EZ,2)-absP);
         // cout << "Genealogia " << nmam++ <<"tipo "<<mam->pdgId()<< endl;
-        resMZ_MZgen=(MZ-MZgen)/MZ;
       }
     }
   }
+
+
+    */
+
+
+
 
   
-  // now look at the jets...    
-  float newDeltaR;
-  DeltaR_leadJet_leadLep=100;
-  for(edm::View<pat::Jet>::const_iterator jet_iter = jets.begin(); jet_iter!=jets.end(); ++jet_iter){
-    if(jet_iter->pt()>30 && abs(jet_iter->eta())<3){
-      njetscounter++;
-      jetPhi=jet_iter->phi();
-      jet_eta=jet_iter->eta();
-      newDeltaR=sqrt(pow(phi1-jetPhi,2)+pow(eta1-jet_eta,2));
-        
-      if(newDeltaR<DeltaR_leadJet_leadLep){
-        DeltaR_leadJet_leadLep=newDeltaR;
-      }
-      if(njetscounter==1){
-        jetpt=jet_iter->pt();
-        jeteta=jet_iter->eta();
-        if(jet_iter->genJet()){
-          jetptGen_match = jet_iter->genJet()->pt();
-          res_ptGenJet_ptJet_match=(jetptGen_match-jetpt)/jetptGen_match;
-        }
-      }
-        if(njetscounter==2){
-          jetpt_second=jet_iter->pt();
-          jeteta_second=jet_iter->eta();
-        }
-    }
-  }
-    
+
+  // now start loop with the jets, fill them in a vector
+      float newDeltaR1;
+      float newDeltaR2;
+      for(edm::View<pat::Jet>::const_iterator jet_iter = jets.begin(); jet_iter!=jets.end(); ++jet_iter){
+	  
+	  
+	if(jet_iter->pt()>minPtjet && abs(jet_iter->eta())<etajetcut){
+          jetDeltaR1[njetscounter]=100.;
+          jetDeltaR2[njetscounter]=100.;
+	  float jetPhi=jet_iter->phi();
+	  float jet_eta=jet_iter->eta();
+          if(nmu>=2){  
+            float dphi1=phi[0]-jetPhi;                        // distance from first muon
+            // if(dphi1<-1.*TMath::Pi())dphi1=dphi1+2.*TMath::Pi();
+            // if(dphi1>1.*TMath::Pi()) dphi1=dphi1-2.*TMath::Pi();    
+            float dphi2=phi[1]-jetPhi;                       // distance from second muon
+            // if(dphi2<-1.*TMath::Pi())dphi2=dphi2+2.*TMath::Pi();
+            // if(dphi2>1.*TMath::Pi()) dphi2=dphi2-2.*TMath::Pi();
+	    newDeltaR1=sqrt(pow(dphi1,2)+pow(eta[0]-jet_eta,2)); // distance from first muon
+	    newDeltaR2=sqrt(pow(dphi2,2)+pow(eta[1]-jet_eta,2)); // distance frm second muon
+            if(newDeltaR1<jetDeltaR1[njetscounter]){
+	      jetDeltaR1[njetscounter]=newDeltaR1;}
+	    if(newDeltaR2<jetDeltaR2[njetscounter]){
+	      jetDeltaR2[njetscounter]=newDeltaR2;}
+          }
+
+	    jetpt[njetscounter]=jet_iter->pt();
+	    jeteta[njetscounter]=jet_iter->eta();
+	    jetphi[njetscounter]=jet_iter->phi();
+	    if(jet_iter->genJet()){
+	      jetptGen_match[njetscounter] = jet_iter->genJet()->pt();
+	      res_ptGenJet_ptJet_match[njetscounter]=(jetptGen_match[njetscounter]-jetpt[njetscounter])/jetptGen_match[njetscounter];
+	    }  
+
+	  njetscounter++;
+	}  // endif on jet cuts
+      }    // end loop on jets
     
   
-  for(reco::GenJetCollection::const_iterator jetGen_iter = jetsGen.begin(); jetGen_iter!=jetsGen.end(); ++jetGen_iter){ 
-    if(jetGen_iter->pt()>30 && abs(jetGen_iter->eta())<3){
 
-      bool hasMuon = false;
-      
-      std::vector< const reco::GenParticle * > numeroparticelle= jetGen_iter->getGenConstituents();
+// now generated jets, test for the PATtuples 
 
-      for(std::vector< const reco::GenParticle * >::const_iterator jet_particle=numeroparticelle.begin();jet_particle!=numeroparticelle.end();jet_particle++){
-        cout<<"che particelle sono "<<(*jet_particle)->pdgId()<<endl;
-        if (abs((*jet_particle)->pdgId())==13 && (*jet_particle)->pt()>20){
-          hasMuon = true;
-        }
-      }
-      if (!hasMuon ||  numeroparticelle.size() > 15) njetscounterGen++;
-        
-      if(njetscounterGen==1){
-        jetptGen=jetGen_iter->pt();
-        jetetaGen=jetGen_iter->eta();
-      }
-      if(njetscounterGen==2){
-        jetptGen_second=jetGen_iter->pt();
-        jetetaGen_second=jetGen_iter->eta();
-      }
-    }
-  }
-                    
-  ZMM_PYT1->Fill(); 
+
+      for(reco::GenJetCollection::const_iterator jetGen_iter = jetsGen.begin(); jetGen_iter!=jetsGen.end(); ++jetGen_iter){ 
+	if(jetGen_iter->pt()>minPtjet && abs(jetGen_iter->eta())<etajetcut){
+
+
+
+	    jetptGen[njetscounterGen]=jetGen_iter->pt();
+	    jetetaGen[njetscounterGen]=jetGen_iter->eta();
+	    jetphiGen[njetscounterGen]=jetGen_iter->phi();
+
+ 	  bool hasMuon = false;
+	  	  std::vector< const reco::GenParticle * > numeroparticelle= jetGen_iter->getGenConstituents();
+                  particelle_jet[njetscounterGen]=numeroparticelle.size();
+	  // these are the 2 muons from Z misidentified as jets
+	 	  for(std::vector< const reco::GenParticle * >::const_iterator jet_particle=numeroparticelle.begin();jet_particle!=numeroparticelle.end();jet_particle++){
+		    // cout<<"che particelle sono "<<(*jet_particle)->pdgId()<<endl;
+	    if (abs((*jet_particle)->pdgId())==13 && (*jet_particle)->pt()>20){
+	      hasMuon = true;
+	    }
+	  }
+	  if (!hasMuon ||  numeroparticelle.size() > 15) njetscounterGen++; 
+	    
+
+	}   // endif on generator jets cuts
+      }    // end loop on generated jets
+
+
+
+
+      // Counters
+
+          if(njetscounter>=1){
+            nevents1++;
+          }
+          if(njetscounter>=2){
+            nevents2++;
+          }
+          if(njetscounter>=3){
+            nevents3++;
+          }
+
+                   
+  ZMM->Fill(); 
               
 }  
   
@@ -365,92 +450,89 @@ ZjetsNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 void ZjetsNtupleMaker::beginJob(const edm::EventSetup&)
 { 
 
- ZMM_PYT1=fs->make<TTree>("ZMM_PYT1","albero");
- ZMM_PYT1->Branch("particelle_jet",&particelle_jet,"particelle_jet/I");
- ZMM_PYT1->Branch("n2mu",&nmuonscounter,"n2mu/I");
- ZMM_PYT1->Branch("whisto",&whisto,"whisto/F");
- ZMM_PYT1->Branch("vertex_x_1",&vertex_x_1,"vertex_x_1/F");
- ZMM_PYT1->Branch("vertex_y_1",&vertex_y_1,"vertex_y_1/F");
- ZMM_PYT1->Branch("vertex_z_1",&vertex_z_1,"vertex_z_1/F");
- ZMM_PYT1->Branch("vertex_x_2",&vertex_x_2,"vertex_x_2/F");
- ZMM_PYT1->Branch("vertex_y_2",&vertex_y_2,"vertex_y_2/F");
- ZMM_PYT1->Branch("vertex_z_2",&vertex_z_2,"vertex_z_2/F");
- // ZMM_PYT1->Branch("nhits_1",&nhits_1,"nhits_1/I");
- // ZMM_PYT1->Branch("nhits_2",&nhits_2,"nhits_2/I");
+  nevents=0;      // number of events read
+  neventsmu=0;   // number of events with two muons
+  nevents1=0;     // number of events with 2mu+>=1 jet
+  nevents2=0;     // number of events with 2mu+>=2 jets
+  nevents3=0;     // number of events with 2mu+>=3 jets
+  njetsall1=0;   // all events and exactly 1 jet
+  njetsall2=0;    // all events and exactly 2 jets
+  njetsall3=0;    // all events and exactly 3 jets
+  minPtjet = 30.;   // Minimum jet Pt [GeV]
+  minPtmu = 20.;    // Minimum mu Pt [GeV]
+  etajetcut= 3.0;  // Eta jet cut
+  etamucut = 2.5 ;  // Eta mu cut
+  Mmumu1 = 60.;     // Z mass cut lower
+  Mmumu2 = 120.;    // Z mass cut higher
+  std::cout << "Minimum pt mu cut is  (in GeV) " << minPtmu <<  std::endl;
+  std::cout << "Minimum pt jet cut is  (in GeV) " << minPtjet <<  std::endl;
+  std::cout << "Minimum etajet cut is   " << etajetcut <<  std::endl;
+ 
+ 
 
- ZMM_PYT1->Branch("isoR03_1_emEt",&isoR03_1_emEt,"isoR03_1_emEt/F");
- ZMM_PYT1->Branch("isoR03_1_hadEt",&isoR03_1_hadEt,"isoR03_1_hadEt/F");
- ZMM_PYT1->Branch("isoR03_1_nTracks",&isoR03_1_nTracks,"isoR03_1_nTracks/F");
- ZMM_PYT1->Branch("isoR03_2_emEt",&isoR03_2_emEt,"isoR03_2_emEt/F");
- ZMM_PYT1->Branch("isoR03_2_hadEt",&isoR03_2_hadEt,"isoR03_2_hadEt/F");
- ZMM_PYT1->Branch("isoR03_2_nTracks",&isoR03_2_nTracks,"isoR03_2_nTracks/F");
- ZMM_PYT1->Branch("chi2_2",&chi2_2,"chi2_2/F");
- ZMM_PYT1->Branch("chi2_1",&chi2_1,"chi2_1/F");
 
- ZMM_PYT1->Branch("charge1",&charge1,"charge1/I");
- ZMM_PYT1->Branch("charge2",&charge2,"charge2/I");
- ZMM_PYT1->Branch("EventNumber",&EventNumber,"EventNumber/I");
- ZMM_PYT1->Branch("EventRun",&EventRun,"EventRun/I");
- ZMM_PYT1->Branch("isolation3_1",&isolation3_1,"isolation3_1/F");
- ZMM_PYT1->Branch("isolation5_1",&isolation5_1,"isolation5_1/F");
- ZMM_PYT1->Branch("isolation3_2",&isolation3_2,"isolation3_2/F");
- ZMM_PYT1->Branch("isolation5_2",&isolation5_2,"isolation5_2/F");
- ZMM_PYT1->Branch("mamphoton",&mamphoton,"mamphoton/I");
- ZMM_PYT1->Branch("PTZ",&PTZ,"PTZ/F");
- ZMM_PYT1->Branch("ETAZ",&ETAZ,"ETAZ/F");
- ZMM_PYT1->Branch("PTZgen",&PTZgen,"PTZgen/F");
- ZMM_PYT1->Branch("MZ",&MZ,"MZ/F");
- // ZMM->Branch("MASSAZ",&MASSAZ,"MASSAZ/F");
- ZMM_PYT1->Branch("MZgen",&MZgen,"MZgen/F");
- ZMM_PYT1->Branch("MR",&MR,"MR/F");
- ZMM_PYT1->Branch("Mt",&Mt,"Mt/F");
- ZMM_PYT1->Branch("Phi",&Phi,"Phi/F");
- ZMM_PYT1->Branch("phi1",&phi1,"phi1/F");
- ZMM_PYT1->Branch("phi2",&phi2,"phi2/F");
- ZMM_PYT1->Branch("pt1",&pt1,"pt1/F");
- //ZMM->1Brah("ptinner1",&ptinner1,"ptinner1/F");
- ZMM_PYT1->Branch("pt2",&pt2,"pt2/F");
- ZMM_PYT1->Branch("pt1gen",&pt1gen,"pt1gen/F");
- ZMM_PYT1->Branch("pt2gen",&pt2gen,"pt2gen/F");
- ZMM_PYT1->Branch("p1xgen",&p1xgen,"p1xgen/F");
- ZMM_PYT1->Branch("p2xgen",&p2xgen,"p2xgen/F");
- ZMM_PYT1->Branch("p1ygen",&p1ygen,"p1ygen/F");
- ZMM_PYT1->Branch("p2ygen",&p2ygen,"p2ygen/F");
- ZMM_PYT1->Branch("px1",&px1,"px1/F");
- ZMM_PYT1->Branch("px2",&px2,"px2/F");
- ZMM_PYT1->Branch("py1",&py1,"py1/F");
- ZMM_PYT1->Branch("py2",&py2,"py2/F");
- ZMM_PYT1->Branch("pz1",&pz1,"pz1/F");
- ZMM_PYT1->Branch("pz2",&pz2,"pz2/F");
- ZMM_PYT1->Branch("PTZrec",&PTZrec,"PTZrec/F");
- ZMM_PYT1->Branch("eta1",&eta1,"eta1/F");
- ZMM_PYT1->Branch("eta2",&eta2,"eta2/F");
- ZMM_PYT1->Branch("PX",&PX,"PX/F");
- ZMM_PYT1->Branch("PY",&PY,"PY/F");
- ZMM_PYT1->Branch("PZ",&PZ,"PZ/F");
- ZMM_PYT1->Branch("EZ",&EZ,"EZ/F");
- ZMM_PYT1->Branch("jeteta",&jeteta,"jeteta/F");
- ZMM_PYT1->Branch("jetpt",&jetpt,"jetpt/F");
- ZMM_PYT1->Branch("jetptGen",&jetptGen,"jetptGen/F");
- ZMM_PYT1->Branch("jetptGen_match",&jetptGen_match,"jetptGen_match/F");
- ZMM_PYT1->Branch("jetetaGen",&jetetaGen,"jetetaGen/F");
- ZMM_PYT1->Branch("jetptGen_second",&jetptGen_second,"jetptGen_second/F");
- ZMM_PYT1->Branch("jetetaGen_second",&jetetaGen_second,"jetetaGen_second/F");
- ZMM_PYT1->Branch("res_ptGenJet_ptJet",&res_ptGenJet_ptJet,"res_ptGenJet_ptJet/F");
- ZMM_PYT1->Branch("res_ptGenJet_ptJet_match",&res_ptGenJet_ptJet_match,"res_ptGenJet_ptJet_match/F");
- ZMM_PYT1->Branch("resPTrec",&resPTrec,"resPTrec/F");
- ZMM_PYT1->Branch("resPTgen",&resPTgen,"resPTgen/F");
- ZMM_PYT1->Branch("nphotonscounter",&nphotonscounter,"nphotonscounter/I");
- ZMM_PYT1->Branch("njetscounter",&njetscounter,"njetscounter/I");
- ZMM_PYT1->Branch("njetscounterGen",&njetscounterGen,"njetscounterGen/I");
- ZMM_PYT1->Branch("jetpt_second",&jetpt_second,"jetpt_second/F");
- ZMM_PYT1->Branch("jeteta_second",&jeteta_second,"jeteta_second/F");
- ZMM_PYT1->Branch("resMZ_MZgen",&resMZ_MZgen,"resMZ_MZgen/F");
- ZMM_PYT1->Branch("DeltaR_leadJet_leadLep",&DeltaR_leadJet_leadLep,"DeltaR_leadJet_leadLep/F");
- ZMM_PYT1->Branch("dxy1",&dxy1,"dxy1/F");
- ZMM_PYT1->Branch("dxy2",&dxy2,"dxy2/F");
- ZMM_PYT1->Branch("dxy1_error",&dxy1_error,"dxy1_error/F");
- ZMM_PYT1->Branch("dxy2_error",&dxy2_error,"dxy2_error/F");
+ ZMM=fs->make<TTree>("ZMM","ZMM Firenze tree");
+ ZMM->Branch("particelle_jet",&particelle_jet,"particelle_jet/I");
+ // general quantities
+ ZMM->Branch("EventNumber",&EventNumber,"EventNumber/I");
+ ZMM->Branch("EventRun",&EventRun,"EventRun/I");
+ ZMM->Branch("whisto",&whisto,"whisto/F");
+
+ // muons
+ ZMM->Branch("nmu",&nmu,"nmu/I");
+ ZMM->Branch("chi2",&chi2,"chi2[nmu]/F");
+ ZMM->Branch("nhits",&nhits,"nhits[nmu]/I");
+ ZMM->Branch("charge",&charge,"charge[nmu]/I");
+ ZMM->Branch("pt",&pt,"pt[nmu]/F");
+ ZMM->Branch("phi",&phi,"phi[nmu]/F");
+ ZMM->Branch("eta",&eta,"eta[nmu]/F");
+ ZMM->Branch("px",&px,"px[nmu]/F");
+ ZMM->Branch("py",&py,"py[nmu]/F");
+ ZMM->Branch("pz",&pz,"pz[nmu]/F");
+ ZMM->Branch("isolation3",&isolation3,"isolation3[nmu]/F");
+ ZMM->Branch("isolation5",&isolation5,"isolation5[nmu]/F");
+ ZMM->Branch("isoR03_emEt",&isoR03_emEt,"isoR03__emEt[nmu]/F");
+ ZMM->Branch("isoR03_hadEt",&isoR03_hadEt,"isoR03_hadEt[nmu]/F");
+ ZMM->Branch("isoR03_nTracks",&isoR03_nTracks,"isoR03_nTracks[nmu]/F");
+ ZMM->Branch("dxy",&dxy,"dxy[nmu]/F");
+ ZMM->Branch("dxy_error",&dxy_error,"dxy_error[nmu]/F");
+ ZMM->Branch("vertex_x",&vertex_x,"vertex_x[nmu]/F");
+ ZMM->Branch("vertex_y",&vertex_y,"vertex_y[nmu]/F");
+ ZMM->Branch("vertex_z",&vertex_z,"vertex_z[nmu]/F");
+
+ // Z reconstructed quantities
+ ZMM->Branch("MZrec",&MZrec,"MZrec/F");
+ ZMM->Branch("PTZrec",&PTZrec,"PTZrec/F");
+ ZMM->Branch("ETAZrec",&ETAZrec,"ETAZrec/F");
+
+
+ // generator quantities
+ ZMM->Branch("mamphoton",&mamphoton,"mamphoton/I");
+ ZMM->Branch("MZgen",&MZgen,"MZgen/F");
+ ZMM->Branch("PTZgen",&PTZgen,"PTZgen/F");
+ ZMM->Branch("pt1gen",&pt1gen,"pt1gen/F");
+ ZMM->Branch("pt2gen",&pt2gen,"pt2gen/F");
+ ZMM->Branch("resMZrec",&resMZrec,"resMZrec/F");
+ ZMM->Branch("resPTZrec",&resPTZrec,"resPTZrec/F");
+
+ //jets
+
+ ZMM->Branch("njetscounter",&njetscounter,"njetscounter/I");
+ ZMM->Branch("njetscounterGen",&njetscounterGen,"njetscounterGen/I");
+ ZMM->Branch("jetpt",&jetpt,"jetpt[njetscounter]/F");
+ ZMM->Branch("jeteta",&jeteta,"jeteta[njetscounter]/F");
+ ZMM->Branch("jetphi",&jetphi,"jetphi[njetscounter]/F");
+ ZMM->Branch("jetDeltaR1",&jetDeltaR1,"jetDeltaR1[njetscounter]/F");
+ ZMM->Branch("jetDeltaR2",&jetDeltaR2,"jetDeltaR2[njetscounter]/F");
+ ZMM->Branch("jetptGen",&jetptGen,"jetptGen[njetscounterGen]/F");
+ ZMM->Branch("jetetaGen",&jetetaGen,"jetetaGen[njetscounterGen]/F");
+ ZMM->Branch("jetphiGen",&jetphiGen,"jetphiGen[njetscounterGen]/F"); 
+ ZMM->Branch("particelle_jet",&particelle_jet,"particelle_jet[njetscounterGen]/I");
+ ZMM->Branch("jetptGen_match",&jetptGen_match,"jetptGen_match[njetscounter]/F");
+ ZMM->Branch("res_ptGenJet_ptJet",&res_ptGenJet_ptJet,"res_ptGenJet_ptJet[njetscounter]/F");
+ ZMM->Branch("res_ptGenJet_ptJet_match",&res_ptGenJet_ptJet_match,"res_ptGenJet_ptJet_match[njetscounter]/F");
+
+
 
 }
 
@@ -458,86 +540,91 @@ void ZjetsNtupleMaker::beginJob(const edm::EventSetup&)
 // ------------ method called once each job just after ending the event loop  ------------
 void 
 ZjetsNtupleMaker::endJob() {
+
+
+  std::cout << "Number of events read " << nevents << std::endl;
+  std::cout << "Number of events with 1 jet " << njetsall1 << std::endl;
+  std::cout << "Number of events with 2 jets " << njetsall2 << std::endl;
+  std::cout << "Number of events with 3 jets " << njetsall3 << std::endl;
+
+  std::cout << "Number of events read with >=2 muons" << neventsmu << std::endl;
+  std::cout << "Number of events with 2mu+>=1 jet " << nevents1 << std::endl;
+  std::cout << "Number of events with 2mu+>=2 jets " << nevents2 << std::endl;
+  std::cout << "Number of events with 2mu+>=3 jets " << nevents3 << std::endl;
+  
+  float eff1= (float)njetsall1/(float)njetsall;
+  // hEff1->Fill(eff1);
+  float eff2= (float)njetsall2/(float)njetsall;
+  // hEff2->Fill(eff2);
+  float eff3= (float)njetsall3/(float)njetsall;
+  // hEff3->Fill(eff3);
+
 }
 
 /// Reset all variables in the tree
 
 void ZjetsNtupleMaker::resetVariables() {
+
+
+
+
   EventRun=0;
   EventNumber=0;
-  PTZ=-1000;
-  PTZgen=-1000;
-  MZ=-1000;
-  MR=-1000;
-  Phi=0;
-  pt1=0;
-  pt2=0;
-  MASSAZ=-1000;
-  PTZrec=800;
-  resPTrec=-50;
-  resPTgen=-50;
-  MZgen=-1000;
-  eta1=-100;
-  eta2=-100;
-  pt1gen=0;
-  pt2gen=0;
-  p1xgen=0;
-  p1ygen=0;
-  p2xgen=0;
-  p2ygen=0;
-  px1=0;
-  px2=0;
-  py1=0;
-  py2=0;
-  PX=-1000;
-  PY=-1000;
-  phi1=0;
-  phi2=0;
-  Mt=0;
-  pz1=0;
-  pz2=0;
-  PZ=-1000;
-  EZ=0;
-  mamphoton=-1000;
+  for(int i=0; i<10; i++){
+    pt[i]=0.;
+    phi[i]=-100.;
+    eta[i]=-100.;
+    px[i]=0.;
+    py[i]=0.;
+    pz[i]=0.;
+    isolation3[i]=-1.;
+    isolation5[i]=-1.;
+    isolation3[i]=-1.;
+    isolation5[i]=-1.;
+    isoR03_emEt[i]=-10;
+    isoR03_nTracks[i]=-10;
+    isoR03_hadEt[i]=-10;
+    charge[i]=-10;
+    chi2[i]=-10.;
+    nhits[i]=-10;
+    vertex_x[i]=-10;
+    vertex_y[i]=-10;
+    vertex_z[i]=-10;
+    dxy[i]=-10.;
+    dxy_error[i]=-10.;
+  }
+
+  PTZgen=-1.;
+  MZgen=-1.;
+  mamphoton=-1;
+  MZrec=-1.;
+  PTZrec=-1.;
+  ETAZrec=-1.;
+  pt1gen=-1.;
+  pt2gen=-1.;
+  resPTZrec=-50.;
+  resMZrec=-50.;
+
   njetscounter=0;
   njetscounterGen=0;
-  ETAZ=-1000;
-  isolation3_1=-1;
-  isolation5_1=-1;
-  isolation3_2=-1;
-  isolation5_2=-1;
-  jetptGen=0;
-  jetptGen_match=0;
-  jetetaGen=-10;
-  jetptGen_second=0;
-  jetetaGen_second=-10;
-  jetpt=0;
-  jeteta=-10;
-  jetpt_second=0;
-  jeteta_second=-10;
-  res_ptGenJet_ptJet=-20;
-  res_ptGenJet_ptJet_match=-20;
-  resMZ_MZgen=-10;
-  charge1=-10;
-  charge2=-10;
-  isoR03_1_emEt=-20;
-  isoR03_1_nTracks=-10;
-  isoR03_1_hadEt=-10;
-  particelle_jet=-10;
-  isoR03_2_emEt=-20;
-  isoR03_2_nTracks=-10;
-  isoR03_2_hadEt=-10;
-  vertex_x_1=-10;
-  vertex_y_1=-10;
-  vertex_z_1=-10;
-  vertex_x_2=-10;
-  vertex_y_2=-10;
-  vertex_z_2=-10;
-  chi2_2=-10;
-  chi2_1=-10;
-  nhits_1=-10;
-  nhits_2=-10;
+  // for(int i=0; i++; i<maxJets){
+  for(int i=0; i<100; i++){
+    jetptGen[i]=0;
+    jetetaGen[i]=-10.;
+    jetphiGen[i]=-10.;
+    jetpt[i]=0;
+    jeteta[i]=-10;
+    jetphi[i]=-10.;
+    jetDeltaR1[i]=-10.;
+    jetDeltaR2[i]=-10.;
+    jetptGen_match[i]=0.; 
+    res_ptGenJet_ptJet[i]=-20.;
+    res_ptGenJet_ptJet_match[i]=-20.;
+    particelle_jet[i]=-10; 
+ }
 }
+
+
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(ZjetsNtupleMaker);
