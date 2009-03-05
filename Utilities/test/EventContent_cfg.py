@@ -27,7 +27,7 @@ process.maxEvents = cms.untracked.PSet(
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-              'file:/cms/data01/lenzip/CMSSW/ZjetsAnalysis/CMSSW_2_2_4/src/Firenze/Utilities/test/PATLayer1_Output.fromAOD_sisConegenMadgraphBS_full_82.root')
+              'file:/cms/data01/datasets/ZJets-madgraph/Fall08_IDEAL_V9_reco-v2/GEN-SIM-RECO/02A17B0C-6BF3-DD11-B4E5-00151715BB94.root')
 ) 
 
 process.options = cms.untracked.PSet(     wantSummary = cms.untracked.bool(True) )

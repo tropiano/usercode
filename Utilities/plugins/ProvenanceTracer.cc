@@ -14,7 +14,7 @@
 //
 // Original Author:  Piergiulio Lenzi,,,
 //         Created:  Mon Jan 26 16:02:23 CET 2009
-// $Id: ProvenanceTracer.cc,v 1.1 2009/01/26 19:35:30 lenzip Exp $
+// $Id: ProvenanceTracer.cc,v 1.2 2009/01/27 08:08:59 lenzip Exp $
 //
 //
 
@@ -35,6 +35,8 @@
 #include "FWCore/ParameterSet/interface/Entry.h"
 #include "DataFormats/Provenance/interface/ProductRegistry.h"
 #include "DataFormats/Provenance/interface/ProcessHistoryRegistry.h"
+
+
 //
 // class decleration
 //
@@ -50,10 +52,14 @@ class ProvenanceTracer : public edm::EDAnalyzer {
       virtual void analyze(const edm::Event&, const edm::EventSetup&);
       virtual void endJob() ;
 
+      void getProvenanceHistory(const edm::Provenance& prov, const edm::Event& iEvent);
       // ----------member data ---------------------------
       //std::vector<InputTag> _VinputTag;
       edm::InputTag _inputTag;
-      std::vector<std::string> _vSrcNames;
+      std::vector<std::string> _vVetoProcess;
+      const edm::pset::Registry * _registry;
+      std::string spacer;
+      std::vector<std::string> _scannedProducts;
 };
 
 //
@@ -72,7 +78,7 @@ ProvenanceTracer::ProvenanceTracer(const edm::ParameterSet& iConfig)
 {
   //now do what ever initialization is needed
   _inputTag  = iConfig.getParameter<edm::InputTag>("Products"); 
-  _vSrcNames = iConfig.getParameter<std::vector<std::string> >("ParentIdentifiers");
+  _vVetoProcess = iConfig.getParameter<std::vector<std::string> >("ExcludeProcesses");
 
 }
 
@@ -114,6 +120,8 @@ ProvenanceTracer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
            ( _inputTag.instance() == "" ? true : _inputTag.instance() == prodinst) &&
            ( _inputTag.process()  == "" ? true : _inputTag.process()  == process)    ) ) continue;
 
+    cout << "product is " << modlabel << ":" << prodinst << ":" << process << endl;       
+
     GenericHandle pIn((*itProv)->className());
     iEvent.getByLabel(_inputTag, pIn);
 
@@ -121,88 +129,60 @@ ProvenanceTracer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       edm::LogWarning("ProvenanceTracer") << "Could not find product " << _inputTag ;
       return;
     }
+    _registry = edm::pset::Registry::instance();
 
-    //track jet provenance
-    edm::Provenance const* prov = pIn.provenance();
-    //std::cout << prov->product() << std::endl;
-    edm::ParameterSetID const& psetid = prov->product().psetID();
+    getProvenanceHistory(**itProv, iEvent);  
+  
+  }     
+}
+
+void ProvenanceTracer::getProvenanceHistory(const edm::Provenance& prov, const edm::Event& iEvent) {
+    using namespace edm;
+    using namespace std;
+    //write out the parameters
+    cout << spacer << "product: " << prov.moduleLabel() << ":" << prov.productInstanceName() << ":" << prov.processName() << endl;
+    edm::ParameterSetID const& psetid = prov.product().psetID();
     edm::ParameterSet pset;
-    //pset registry
-    const edm::pset::Registry * registry = edm::pset::Registry::instance();
-    bool found = registry->getMapped(psetid, pset);
+    bool found = _registry->getMapped(psetid, pset);
     if (!found) {
       throw cms::Exception("ProvenanceTracer") << "Unable to retrieve original pSet " << endl;
     }
+    LogInfo("ProvenanceTracer") << pset << endl;
+    string fullname=prov.moduleLabel()+":"+prov.productInstanceName()+":"+prov.processName();
+    //cout << "registering " << fullname << endl;
+    _scannedProducts.push_back(fullname);
+    //look for parents
+    std::vector<BranchID> const& parents = prov.parents();
+    if (parents.empty()) return;
+    cout << spacer << "-->" << endl;
+    //spacer += "  ";
+    for (std::vector<BranchID>::const_iterator ibID = parents.begin(); ibID != parents.end(); ++ibID){
+      edm::Provenance parentProv = iEvent.getProvenance(*ibID);
+      //if (parentProv.processName()=="RECO" || parentProv.processName()=="HLT") continue;
+      //if (parentProv.processName()=="HLT") continue;
+      //exclude selected processes 
+      std::vector<string>::const_iterator posProc = std::find(_vVetoProcess.begin(), _vVetoProcess.end(),
+                                                                 (string)parentProv.processName());
+      if (posProc != _vVetoProcess.end()){
+        //cout << "vetoing " << *posProc << endl;
+        continue;
+      }  
+      
+      string parentfullname = parentProv.moduleLabel()+":"+parentProv.productInstanceName()+":"+parentProv.processName();
 
-    ProcessHistoryRegistry* phr = ProcessHistoryRegistry::instance();
-    ProcessHistory ph;
-    if (!phr->getMapped(iEvent.processHistoryID(), ph)){
-      throw cms::Exception("ProvenanceTracer") << "Unable to find process history ";
-    }
+      std::vector<string>::const_iterator posParent = std::find(_scannedProducts.begin(), _scannedProducts.end(),
+                                                                       (string)parentfullname);
 
-
-    LogInfo("ProvenanceTracer") << pset << std::endl;
-    bool hasParentSource = true;
-    while (hasParentSource){
-      //check the possible src names, and take the first for the moment
-      string src_name = "none";
-      for (vector<string>::const_iterator iName = _vSrcNames.begin(); iName != _vSrcNames.end(); ++iName){
-        if (pset.exists(*iName)) {
-          src_name = *iName;
-          break;
-        }
-
-      }
-      /*if (!pset.exists("src")) {
-        hasParentSource = false; 
-        break;
-      }*/
-      if (src_name == "none") {
-        hasParentSource = false; 
-        break;
-      }
-      cout << "Parent source for " << pset.getParameter<string>("@module_label") << " exists with name ..." ;
-      InputTag parentTag;
-      try {
-        parentTag = pset.getParameter<InputTag>(src_name);
-        cout << parentTag.label() << endl;
-      } catch (cms::Exception&) {
-        throw cms::Exception("ProvenanceTracer") << "src parameter is not an InputTag, cannot handle this for the moment ";
-        break;
-      }
-      bool foundParent = false;
-      ParameterSet parentPset;
-      //loop on all processes
-      for (ProcessHistory::const_iterator iproc = ph.begin(); iproc != ph.end() && foundParent == false; ++iproc){
-        //get the current process Config
-        ProcessConfiguration currentProc = *iproc;  
-        //get the current process whole Pset
-        ParameterSet WholeProcessPset;
-        bool foundwppset = registry->getMapped(currentProc.parameterSetID(), WholeProcessPset);
-        if (!foundwppset){
-          throw cms::Exception("ProvenanceTracer") << "Unable to find the process config for process " << currentProc.processName(); 
-        }
-        //get the parent module pset
-        //ParameterSetEntry const* parentModulePSet = WholeProcessPset.retrieveParameterSet(parentTag.label());
-        //if (parentModulePSet == 0) continue;
-        if (!WholeProcessPset.exists(parentTag.label())) continue;
-
-        parentPset = WholeProcessPset.retrieve(parentTag.label()).getPSet();
-
-        cout << "Found parent Provenance info" << endl;
-        foundParent = true; 
-      }
-      if (!foundParent) {
-        throw cms::Exception("ProvenanceTracer") << "Unable to find parent configuation for module " << parentTag.label() << endl;
-        break;
-      }
-      LogInfo("ProvenanceTracer") << "\nCorresponding source was generated according to: " << endl;
-      LogInfo("ProvenanceTracer") << parentPset;
-      pset = parentPset;
-    }
-  }  
+      if (posParent != _scannedProducts.end()) {
+        //cout << "already considered " << parentfullname << endl;
+        continue;
+      }         
+      
+      
+      getProvenanceHistory(parentProv, iEvent);
+      //spacer.erase(spacer.end()-3, spacer.end());
+    } 
 }
-
 
 // ------------ method called once each job just before starting event loop  ------------
 void 
