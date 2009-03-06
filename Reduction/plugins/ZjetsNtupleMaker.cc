@@ -243,7 +243,7 @@ ZjetsNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   // fill info about the muons
       // note: need to take global normalized chi2 and nvalidhits
     chi2[nmu]=MuonMap[i].globalTrack()->normalizedChi2();
-    nhits[nmu]=MuonMap[i].globalTrack()->numberOfValidHits();
+    nhits[nmu]=MuonMap[i].innerTrack()->numberOfValidHits();
     charge[nmu]=MuonMap[i].charge();
     pt[nmu]=MuonMap[i].pt();
     phi[nmu]=MuonMap[i].phi();
