@@ -92,6 +92,7 @@ class NewGenJetsParticleSelector : public edm::EDProducer {
   bool                  excludeFromStatus3Mother;
   bool 	                checkForStatus3Mother_sameflavour;
   double		ptMin;
+  bool                  reverseAllSelections;
   
   
   

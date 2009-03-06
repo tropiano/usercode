@@ -13,7 +13,7 @@
 //
 // Original Author:  Piergiulio Lenzi
 //         Created:  Wed Apr 30 17:58:51 CEST 2008
-// $Id: ZjetsPlots.cc,v 1.1 2009/02/12 16:43:39 lenzip Exp $
+// $Id: ZjetsPlots.cc,v 1.2 2009/02/17 14:33:42 lenzip Exp $
 //
 //
 
@@ -350,18 +350,25 @@ ZjetsPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    //std::cout << "weight is " << weight << std::endl;
 
    // get the jets
-   Handle<std::vector<pat::Jet> > jetHandle;
+   //Handle<std::vector<pat::Jet> > jetHandle;
+   Handle<edm::View<reco::Jet> > jetHandle;
    iEvent.getByLabel(_jettag, jetHandle);   
-   const std::vector<pat::Jet>& alljets = *jetHandle;
+   //const std::vector<pat::Jet>& alljets = *jetHandle;
+   const edm::View<reco::Jet>& alljets = *jetHandle;
 
    //remove jets overlapping with electrons
-   std::vector<pat::Jet> jets;
-   std::vector<pat::Jet>::const_iterator ijet;
+   //std::vector<pat::Jet> jets;
+   std::vector<const reco::Jet*> jets;
+   //std::vector<pat::Jet>::const_iterator ijet;
+   edm::View<reco::Jet>::const_iterator ijet;
    for (ijet = alljets.begin(); ijet != alljets.end(); ++ijet){
-     if (pat::Flags::test(*ijet, pat::Flags::Overlap::Electrons)){
-       //std::cout << "Removing jet overlapping with electron" << std::endl;  
-       jets.push_back(*ijet); 
-     }
+     const pat::Jet* patjet = dynamic_cast<const pat::Jet*>(&*ijet); 
+     if (patjet){
+      if (pat::Flags::test(*ijet, pat::Flags::Overlap::Electrons)){
+        //std::cout << "Removing jet overlapping with electron" << std::endl;  
+        jets.push_back(&*ijet); 
+      }
+     } else jets.push_back(&*ijet); 
    } 
 
    unsigned int jetsize = jets.size(); 
@@ -372,7 +379,8 @@ ZjetsPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
 
-     bool isolatedMuons = checkIsolation<pat::Muon>(cand);
+     //bool isolatedMuons = checkIsolation<pat::Muon>(cand);
+     bool isolatedMuons = true;
 
      if (!isolatedMuons) throw cms::Exception("ZjetsPlots") << "ERROR: isolation check failed " << std::endl;
 
@@ -428,7 +436,8 @@ ZjetsPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      // fill Z histos
      _histoZ_ee->fill(cand);
 
-     bool isolatedElectrons = checkIsolation<pat::Electron>(cand);
+     //bool isolatedElectrons = checkIsolation<pat::Electron>(cand);
+     bool isolatedElectrons = true;
 
      //debug
      //if (cand.p4().mass()>120 && cand.p4().mass()<140){

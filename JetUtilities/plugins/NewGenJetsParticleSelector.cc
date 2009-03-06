@@ -47,7 +47,8 @@ NewGenJetsParticleSelector::NewGenJetsParticleSelector(const edm::ParameterSet &
   tausAsJets(params.getParameter<bool>("tausAsJets")),
   excludeFromStatus3Mother(params.exists("checkForStatus3Mother")),
   checkForStatus3Mother_sameflavour(false),
-  ptMin(0.0){
+  ptMin(0.0),
+  reverseAllSelections(params.getParameter<bool>("reverseAllSelections")){
   if (params.exists("ignoreParticleIDs"))
     setIgnoredParticles(params.getParameter<std::vector<unsigned int> >
 			("ignoreParticleIDs"));
@@ -324,9 +325,11 @@ void NewGenJetsParticleSelector::produce (edm::Event &evt, const edm::EventSetup
     if (!selected[idx] || invalid[idx]){
       continue;
     }
-	
-    if (excludeResonances &&
-	fromResonance(invalid, particles, particle)) {
+
+    bool selected = excludeResonances && fromResonance(invalid, particles, particle);
+    //if (excludeResonances &&
+//	fromResonance(invalid, particles, particle)) {
+    if (reverseAllSelections ? !selected : selected){
       invalid[idx] = true;
       //cout<<"[INPUTSELECTOR] Invalidates FROM RESONANCE!: ["<<setw(4)<<idx<<"] "<<particle->pdgId()<<" "<<particle->pt()<<endl;
       continue;
@@ -334,7 +337,9 @@ void NewGenJetsParticleSelector::produce (edm::Event &evt, const edm::EventSetup
     
     if (excludeFromStatus3Mother){ 	  
       if (checkForStatus3Mother_sameflavour) {
-        if (isCheckForStatus3Mother(particle->pdgId()) && hasStatus3Mother(particle)) {
+        selected = isCheckForStatus3Mother(particle->pdgId()) && hasStatus3Mother(particle);
+        //if (isCheckForStatus3Mother(particle->pdgId()) && hasStatus3Mother(particle)) {
+        if (reverseAllSelections ? !selected : selected) {
           //cout << "Particle with id " << particle->pdgId() << " needs to be checked " << endl;	
           //if (hasStatus3Mother(particle)){
           //cout << "Particle id " << particle->pdgId() << " has a status 3 Mother with same flavour" << endl;
@@ -344,7 +349,9 @@ void NewGenJetsParticleSelector::produce (edm::Event &evt, const edm::EventSetup
         }
       } else {
         //cout << "Mail loop: should not be here" << endl;
-        if (hasStatus3Mother(particle)){
+        selected = hasStatus3Mother(particle);
+        //if (hasStatus3Mother(particle)){
+        if (reverseAllSelections ? !selected : selected){
           //cout << "Particle id " << particle->pdgId() << " has a status 3 Mother" << endl;
           invalid[idx] = true;
           continue; 	
@@ -352,12 +359,17 @@ void NewGenJetsParticleSelector::produce (edm::Event &evt, const edm::EventSetup
       }	
     }
 
+    selected = isIgnored(particle->pdgId());
+    
     if (isIgnored(particle->pdgId())){
+    //if (reverseAllSelections ? !selected : selected){
       continue;
     }
 
-   
+    selected = particle->pt() >= ptMin;
+  
     if (particle->pt() >= ptMin){
+    //if (reverseAllSelections ? !selected : selected){
       edm::Ref<reco::GenParticleCollection> particleRef(genParticles,idx);
       selected_->push_back(particleRef);
       //cout<<"Finally we have: ["<<setw(4)<<idx<<"] "<<setw(4)<<particle->pdgId()<<" "<<particle->pt()<<endl;
