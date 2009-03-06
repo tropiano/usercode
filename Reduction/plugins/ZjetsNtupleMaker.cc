@@ -1,6 +1,3 @@
-
-
-
 // system include files
 #include <memory>
 
@@ -182,11 +179,11 @@ ZjetsNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   iEvent.getByLabel(tauLabel_,tauHandle);
   edm::View<pat::Tau> taus = *tauHandle;
 
-  //edm::Handle<reco::BeamSpot> recoBeamSpotHandle;
-  //iEvent.getByLabel(beamspotLabel_, recoBeamSpotHandle);
-  //iEvent.getByType(recoBeamSpotHandle);
-  //  cout << "beamSpot position" << recoBeamSpotHandle->position() << endl;
-  reco::TrackBase::Point beamSpot(0,0,0);
+  edm::Handle<reco::BeamSpot> recoBeamSpotHandle;
+  iEvent.getByLabel(beamspotLabel_, recoBeamSpotHandle);
+  iEvent.getByType(recoBeamSpotHandle);
+  reco::TrackBase::Point beamSpot(recoBeamSpotHandle->position());
+  //  cout << "beamSpot position" << beamSpot << endl;
 
 
   // double p1=0;     // all this needed?
