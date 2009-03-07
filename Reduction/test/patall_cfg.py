@@ -18,7 +18,7 @@ process.source = cms.Source("PoolSource",
      'file:/cms/data01/datasets/ZJets-madgraph/Fall08_IDEAL_V9_reco-v2/GEN-SIM-RECO/02A17B0C-6BF3-DD11-B4E5-00151715BB94.root'
      )
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 ####REREconstruct gen jets
 import PhysicsTools.PatAlgos.selectionLayer1.jetSelector_cfi
@@ -48,7 +48,7 @@ from PhysicsTools.PatAlgos.tools.jetTools import *
 switchJetCollection(process,
         'sisCone5CaloJets',   # Jet collection; must be already in the event when patLayer0 sequence is executed
         layers=[0,1],          # If you're not runnint patLayer1, set 'layers=[0]'
-        runCleaner="BasicJet", # =None if not to clean
+        runCleaner="CaloJet", # =None if not to clean
         doJTA=True,            # Run Jet-Track association & JetCharge
         doBTagging=True,       # Run b-tagging
         jetCorrLabel=None,     # Turn this off, do it by hand. This tool doesn't work with new JEC
@@ -63,6 +63,7 @@ process.jetCorrFactors.L4EMF     = cms.string('none')
 process.jetCorrFactors.L5Flavor  = cms.string('none')
 process.jetCorrFactors.L6UE      = cms.string('none')
 process.jetCorrFactors.L7Parton  = cms.string('none')
+process.allLayer1Jets.addJetCorrFactors = True
 
 
 #manually change the jet collection to be used in the genJetMatching        
@@ -76,7 +77,9 @@ process.p = cms.Path(
                 ## process.iterativeCone5BasicJets +  ## Turn on this to run tests on BasicJets
                 + process.patLayer0  
                 #process.patLayer0_patTuple_withoutPFTau  
-                #+ process.content    # uncomment to get a dump 
+                #+ process.content    # uncomment to get a dump
+                + process.jetCorrFactors
+                * process.layer0JetCorrFactors
                 + process.patLayer1
                 #+ process.layer1Muons*process.layer1Electrons*process.countLayer1Leptons*process.layer1Photons*process.layer1Jets*process.layer1METs*process.layer1Hemispheres
 )
@@ -84,7 +87,7 @@ process.p = cms.Path(
 
 # Output module configuration
 process.out = cms.OutputModule("PoolOutputModule",
-    fileName = cms.untracked.string('DATASETNAME_PATLayer1_sisCone_full.root'),
+    fileName = cms.untracked.string('ZJets-madgraph_PATLayer1_sisCone_full.root'),
     SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
     outputCommands = cms.untracked.vstring('drop *')
 )
