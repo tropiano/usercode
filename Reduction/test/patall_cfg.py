@@ -48,7 +48,7 @@ from PhysicsTools.PatAlgos.tools.jetTools import *
 switchJetCollection(process,
         'sisCone5CaloJets',   # Jet collection; must be already in the event when patLayer0 sequence is executed
         layers=[0,1],          # If you're not runnint patLayer1, set 'layers=[0]'
-        runCleaner="CaloJet", # =None if not to clean
+        runCleaner="BasicJet", # =None if not to clean
         doJTA=True,            # Run Jet-Track association & JetCharge
         doBTagging=True,       # Run b-tagging
         jetCorrLabel=None,     # Turn this off, do it by hand. This tool doesn't work with new JEC
