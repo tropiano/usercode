@@ -1,22 +1,22 @@
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process('ZjetsPlots')
+process = cms.Process('PATAddOns')
  
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
 
-#process.load('Firenze.Reduction.pattuples_ZJetsMadgraph_cff')
+process.load('Firenze.Reduction.pattuples_ZJetsMadgraph_cff')
 
-process.source = cms.Source('PoolSource',
-                            fileNames = cms.untracked.vstring(
+#process.source = cms.Source('PoolSource',
+#                            fileNames = cms.untracked.vstring(
 #'file:/cms/data01/datasets/ZJets-madgraph/Summer08_IDEAL_V9_PAT_v3/USER/1402F759-5EE7-DD11-ADE5-0015170AB26C.root',
 #'file:/cms/data01/datasets/ZJets-madgraph/Summer08_IDEAL_V9_PAT_v3/USER/1E7D9992-34E3-DD11-85F4-00E08178C069.root',
 #'file:/cms/data01/datasets/ZJets-madgraph/Summer08_IDEAL_V9_PAT_v3/USER/744CBFDE-38E3-DD11-90EF-00E08179189F.root' 
-'file:/cms/data01/lenzip/CMSSW/PattuplesProduction/CMSSW_2_2_4/src/production/ZJets-madgraph_PATLayer1_sisCone_full.root'
-                            )
+#'file:/cms/data01/lenzip/CMSSW/PattuplesProduction/CMSSW_2_2_4/src/production/ZJets-madgraph_PATLayer1_sisCone_full.root'
+#                            )
 #                            secondaryFileNames = cms.untracked.vstring(
 #                            'file:/cms/data01/lenzip/testdata/04561ADB-38E3-DD11-AA7D-00E08178C035.root'
 #                            )
-)                            
+#)                            
 #keep the logging output to a nice level
 process.MessageLogger = cms.Service('MessageLogger')
 
@@ -29,6 +29,12 @@ process.TFileService = cms.Service('TFileService',
                                    fileName = cms.string('zjetsplots_fixcorrections.root')
 )
 
+process.load('Configuration.StandardSequences.GeometryECALHCAL_cff')
+
+process.load('Firenze.JetUtilities.NewGenJetParticles_cff')
+process.load('Firenze.JetUtilities.exclusiveJets_cff')
+process.load('Firenze.JetUtilities.diffJetRates_cff')
+
 ####################
 ######GEN###########
 ####################
@@ -38,7 +44,9 @@ process.genJetSelector = cms.EDFilter('GenJetSelector',
                                       src = cms.InputTag('sisCone5GenJets'),
                                       cut = cms.string('pt > 30. & abs(eta) < 5. & nConstituents > 0')
                                       )
-process.genjets = cms.Sequence(process.genJetSelector)
+process.diffGenJets = cms.Sequence(process.newGenParticlesForJets*process.allGenExclusiveJets*process.diffGenJetRates) 
+process.genjets = cms.Sequence(process.genJetSelector+process.diffGenJets)
+
 
 ##select gen muons from Z
 import Firenze.Reduction.genZleptonSelector_cff
@@ -78,18 +86,6 @@ process.genZmumu = cms.Sequence(process.genMuonsFromZ*process.genMuonSelector*pr
 process.genZee   = cms.Sequence(process.genElectronFromZ*process.genElectronSelector*process.zeegen)
 process.genZ     = cms.Sequence(process.genZmumu+process.genZee)
 
-## build plots about gen Z
-import Firenze.Reduction.ZJetsPlots_cff
-process.zjetsGEN = Firenze.Reduction.ZJetsPlots_cff.zjetsanalysis.clone()
-process.zjetsGEN.ZMuMuSource   = cms.InputTag('zmumugen')
-process.zjetsGEN.ZEESource     = cms.InputTag('zeegen')
-process.zjetsGEN.JetSource     = cms.InputTag('genJetSelector')
-process.zjetsGEN.DiffJetRate10 = cms.InputTag('diffGenJetRate10', 'DiffJetRate10')
-process.zjetsGEN.DiffJetRate21 = cms.InputTag('diffGenJetRate21', 'DiffJetRate21')
-process.zjetsGEN.DiffJetRate32 = cms.InputTag('diffGenJetRate32', 'DiffJetRate32')
-
-process.genLevelPlots = cms.Sequence(process.genjets*process.genZ*process.zjetsGEN)
-
 ####################
 ######RECO##########
 ####################
@@ -100,6 +96,9 @@ import PhysicsTools.PatAlgos.selectionLayer1.jetSelector_cfi
 process.newJetSelector = PhysicsTools.PatAlgos.selectionLayer1.jetSelector_cfi.selectedLayer1Jets.clone()
 process.newJetSelector.src = cms.InputTag("selectedLayer1Jets")
 process.newJetSelector.cut = cms.string('pt > 30. & abs(eta) < 5. & nConstituents > 0')
+
+process.diffRecoJets = cms.Sequence(process.allCaloExclusiveJets*process.diffCaloJetRates)
+process.recojets = cms.Sequence(process.newJetSelector+process.diffRecoJets)
 
 ##select muons according to these criteria
 import PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi
@@ -123,17 +122,20 @@ process.zee = cms.EDFilter('CandViewShallowCloneCombiner',
                               roles = cms.vstring('e1', 'e2')
 )
 
-# reco plot
-import Firenze.Reduction.ZJetsPlots_cff
-process.zjetsRECO = Firenze.Reduction.ZJetsPlots_cff.zjetsanalysis.clone()
-process.zjetsRECO.ZMuMuSource   = cms.InputTag('zmumu')
-process.zjetsRECO.ZEESource     = cms.InputTag('zee')
-process.zjetsRECO.JetSource     = cms.InputTag('newJetSelector')
-process.zjetsRECO.DiffJetRate10 = cms.InputTag('diffCaloJetRate10', 'DiffJetRate10')
-process.zjetsRECO.DiffJetRate21 = cms.InputTag('diffCaloJetRate21', 'DiffJetRate21')
-process.zjetsRECO.DiffJetRate32 = cms.InputTag('diffCaloJetRate32', 'DiffJetRate32')
+process.out = cms.OutputModule("PoolOutputModule",
+  fileName = cms.untracked.string('pataddons_RUN.root'),
+  #SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
+  outputCommands = cms.untracked.vstring('drop *',
+                                         'keep *_*_*_PATAddOns')
+)
 
-process.recLevelPlots = cms.Sequence(process.newJetSelector*process.newMuonSelector*process.zmumu*process.zee*process.zjetsRECO)
+process.recZmumu = cms.Sequence(process.newMuonSelector*process.zmumu)
+process.recZee   = cms.Sequence(process.zee)
+process.recZ     = cms.Sequence(process.recZmumu+process.recZee)
 
-process.p1 = cms.Path(process.genLevelPlots) 
-process.p2 = cms.Path(process.recLevelPlots) 
+process.p1 = cms.Path(process.genjets+process.genZ) 
+process.p2 = cms.Path(process.recojets+process.recZ)
+
+process.e  = cms.EndPath(process.out)
+
+
