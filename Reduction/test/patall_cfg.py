@@ -87,7 +87,7 @@ process.p = cms.Path(
 
 # Output module configuration
 process.out = cms.OutputModule("PoolOutputModule",
-    fileName = cms.untracked.string('ZJets-madgraph_PATLayer1_sisCone_full.root'),
+    fileName = cms.untracked.string('DATASET_PATLayer1_sisCone_full.root'),
     SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
     outputCommands = cms.untracked.vstring('drop *')
 )
