@@ -1,0 +1,13 @@
+<export></export>
+<library name=FirenzeBosonUtilities_plugins file=*.cc>
+    <use name=Firenze/BosonUtilities>
+    <use name=FWCore/Framework>
+    <use name=FWCore/ParameterSet>
+    <use name=PhysicsTools/PatUtils>
+    <use name=PhysicsTools/UtilAlgos>
+    <use name=PhysicsTools/CandAlgos>
+    <use name=PhysicsTools/HepMCCandAlgos>
+    <flags EDM_PLUGIN=1>
+</library>
+
+
