@@ -109,7 +109,7 @@ int njetsall, njetsall1,njetsall2,njetsall3;
   edm::InputTag phoLabel_;
   edm::InputTag jetGenLabel_;
   edm::InputTag beamspotLabel_;
-  
+  bool saveAll_;
 };
 
 
@@ -123,7 +123,9 @@ ZjetsNtupleMaker::ZjetsNtupleMaker(const edm::ParameterSet& iConfig):
   metLabel_(iConfig.getParameter<edm::InputTag>("metTag")),
   phoLabel_(iConfig.getParameter<edm::InputTag>("photonTag")),
   jetGenLabel_(iConfig.getParameter<edm::InputTag>("jetGenTag")),
-  beamspotLabel_(iConfig.getParameter<edm::InputTag>("beamSpotTag"))
+  beamspotLabel_(iConfig.getParameter<edm::InputTag>("beamSpotTag")),
+  saveAll_(iConfig.getParameter<bool>("saveAll"))
+
 {
   //
 }
@@ -434,7 +436,7 @@ ZjetsNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
           }
 
                    
-  ZMM->Fill(); 
+  if ( saveAll_ || nmu >= 2) ZMM->Fill(); 
               
 }  
   
