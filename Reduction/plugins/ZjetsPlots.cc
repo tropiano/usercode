@@ -13,7 +13,7 @@
 //
 // Original Author:  Piergiulio Lenzi
 //         Created:  Wed Apr 30 17:58:51 CEST 2008
-// $Id: ZjetsPlots.cc,v 1.1 2009/03/12 18:46:01 lenzip Exp $
+// $Id: ZjetsPlots.cc,v 1.4 2009/03/24 08:33:28 lenzip Exp $
 //
 //
 
@@ -46,6 +46,7 @@
 //root file utilities
 #include "PhysicsTools/UtilAlgos/interface/TFileService.h"
 #include "PhysicsTools/UtilAlgos/interface/TFileDirectory.h"
+#include "Firenze/Utilities/interface/TTreeService.h"
 
 // root
 #include "TH1D.h"
@@ -83,6 +84,7 @@ class ZjetsPlots : public edm::EDAnalyzer {
       // ----------member data ---------------------------
       // Histogram server
       edm::Service<TFileService> fs;
+      edm::Service<edm::TTreeService> trees;
 
       // Histogram objects that make "standard" plots for each object
       pat::HistoComposite* _histoZ;
@@ -90,12 +92,15 @@ class ZjetsPlots : public edm::EDAnalyzer {
       std::vector<pat::HistoComposite*> _histoZVsMulti;
       std::vector<pat::HistoJet*> _histoJetVsMulti;
 
+
       TH1D* _djr_10;
       TH1D* _djr_21;
       TH1D* _djr_32;
       std::vector<TH1D*> _djr_10VsMulti;
       std::vector<TH1D*> _djr_21VsMulti;
       std::vector<TH1D*> _djr_32VsMulti;
+
+      //TTree* _tree;
 
       //TH1D* h_nJets;
 
@@ -107,11 +112,13 @@ class ZjetsPlots : public edm::EDAnalyzer {
       edm::InputTag _tagrate32;
       edm::InputTag _weightTag;
       edm::InputTag _jettag;
-      bool     _hasWeightProducer;  
+      bool     _hasWeightProducer; 
+
+      std::string _modLabel;
 };
 
 template <class T> T* ZjetsPlots::createHistograms(std::string dir, std::string name, std::string title, const PhysicsHistograms::KinAxisLimits& axis) const{
-  return new T(dir, name, title, axis.nBinsPt, axis.pt1, axis.pt2, axis.nBinsMass, axis.m1, axis.m2, axis.nBinsEta, axis.eta1, axis.eta2);
+  return new T(dir, name, title, axis.nBinsPt, axis.pt1, axis.pt2, axis.nBinsMass, axis.m1, axis.m2, axis.nBinsEta, axis.eta1, axis.eta2, trees->tree());
 }
 
 template<> bool ZjetsPlots::isIsolated(const pat::Muon* muon ) const {
@@ -194,6 +201,12 @@ template <class T> void ZjetsPlots::AddHistoGroupVsMulti(unsigned int njet, std:
 //
 ZjetsPlots::ZjetsPlots(const edm::ParameterSet& iConfig) : _configHelper(iConfig) 
 {
+   //fs->file().cd("..");
+   fs->file().ls();
+   fs->file().pwd();
+   //_tree = fs->make<TTree>("tree", "tree"); 
+   fs->file().cd();
+   //_tree = new TTree("tree", "tree");
 
    //now do what ever initialization is needed
    _ztag  = iConfig.getParameter<edm::InputTag>("ZSource");
@@ -202,13 +215,18 @@ ZjetsPlots::ZjetsPlots(const edm::ParameterSet& iConfig) : _configHelper(iConfig
    _tagrate32 = iConfig.getParameter<edm::InputTag>("DiffJetRate32");
    _jettag    = iConfig.getParameter<edm::InputTag>("JetSource");
 
-   
-   _histoZ = createHistograms<pat::HistoComposite>("ZHistos", "Z " + _ztag.label(), "Z", 
+   _modLabel = iConfig.getParameter<std::string>("@module_label");
+  
+   _histoZ = createHistograms<pat::HistoComposite>("Z"+_modLabel, "Z " + _ztag.label(), "Z", 
                                                          _configHelper.getAxisLimits("Z"));
-   _histoJet = createHistograms<pat::HistoJet>("jetHistos", "Jet " + _ztag.label(), "Jet", 
+   fs->file().pwd();                                                      
+   _histoJet = createHistograms<pat::HistoJet>("jet"+_modLabel, "Jet " + _ztag.label(), "Jet", 
                                                          _configHelper.getAxisLimits("Jet"));
+   fs->file().pwd();                                                      
 
-   TFileDirectory misc1 = TFileDirectory(fs->mkdir("jetHistos"));
+   std::string name = "jet"+_modLabel;
+
+   TFileDirectory misc1 = TFileDirectory(fs->mkdir(name.c_str()));
    PhysicsHistograms::KinAxisLimits djrAxis = _configHelper.getAxisLimits("diffJetRate");
    _djr_10 = misc1.make<TH1D>("diffjetrate10", "Diff Jet Rate 1->0 ", 
                                     djrAxis.nBinsPt, djrAxis.pt1, djrAxis.pt2);   
@@ -217,11 +235,14 @@ ZjetsPlots::ZjetsPlots(const edm::ParameterSet& iConfig) : _configHelper(iConfig
    _djr_32 = misc1.make<TH1D>("diffjetrate32", "Diff Jet Rate 3->2 ", 
                                     djrAxis.nBinsPt, djrAxis.pt1, djrAxis.pt2);   
 
+
    if (iConfig.exists("WeightProducer")) {
      _hasWeightProducer = true;
      _weightTag = iConfig.getParameter<edm::InputTag>("WeightProducer");
    } 
    else _hasWeightProducer  = false;  
+
+   fs->file().ls();
 
 }
 
@@ -257,6 +278,9 @@ ZjetsPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
    using namespace reco;
+
+   _histoZ->clearTreeVariables();
+   _histoJet->clearTreeVariables();
 
    // get the W candidates
    Handle<reco::CompositeCandidateCollection> ZHandle;
@@ -343,7 +367,7 @@ ZjetsPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       _histoZ->fill(cand);
 
       AddHistoGroupVsMulti<pat::HistoComposite>(jets.size(), _histoZVsMulti, 
-                                                "ZHistos", "Z " + _ztag.label() , "Z", 
+                                                "Z"+_modLabel, "Z " + _ztag.label() , "Z", 
                                                 _configHelper.getAxisLimits("Z"));
       _histoZVsMulti[jetsize]->fill(cand);
 
@@ -353,7 +377,7 @@ ZjetsPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     
 
       AddHistoGroupVsMulti<pat::HistoJet>(jets.size(), _histoJetVsMulti, 
-                                          "jetHistos", "Jet " + _ztag.label(), "Jet", 
+                                          "jet"+_modLabel, "Jet " + _ztag.label(), "Jet", 
                                           _configHelper.getAxisLimits("Jet"));
   
       PhysicsHistograms::KinAxisLimits djrAxis = _configHelper.getAxisLimits("diffJetRate");
@@ -380,6 +404,7 @@ ZjetsPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         _djr_32VsMulti[jetsize]->Fill(rate32, weight);
       }
      }
+     //_tree->Fill();
    }
 }
 
@@ -393,6 +418,7 @@ ZjetsPlots::beginJob(const edm::EventSetup&)
 // ------------ method called once each job just after ending the event loop  ------------
 void 
 ZjetsPlots::endJob() {
+  //_tree->Write();
 }
 
 
@@ -400,12 +426,14 @@ ZjetsPlots::endJob() {
 reco::CompositeCandidate ZjetsPlots::fixRoles(const reco::CompositeCandidate& orig) const{
   reco::CompositeCandidate::role_collection roles;
   reco::CompositeCandidate cand = orig;
+  std::string namep = "lp"+_modLabel;
+  std::string namem = "lm"+_modLabel;
   if (cand.daughter(0)->threeCharge()> 0) {
-    roles.push_back("l^{+}");
-    roles.push_back("l^{-}");
+    roles.push_back(namep);
+    roles.push_back(namem);
   } else {
-    roles.push_back("l^{-}");
-    roles.push_back("l^{+}");
+    roles.push_back(namem);
+    roles.push_back(namep);
   }
   //std::cout << typeid(*(cand.daughter(0)->masterClone())).name() << std::endl;
   //const pat::Electron* ele = dynamic_cast<const pat::Electron*>(cand.daughter(0)->masterClone().get());
