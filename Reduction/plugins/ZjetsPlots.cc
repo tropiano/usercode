@@ -13,7 +13,7 @@
 //
 // Original Author:  Piergiulio Lenzi
 //         Created:  Wed Apr 30 17:58:51 CEST 2008
-// $Id: ZjetsPlots.cc,v 1.4 2009/03/24 08:33:28 lenzip Exp $
+// $Id: ZjetsPlots.cc,v 1.5 2009/03/30 08:35:06 lenzip Exp $
 //
 //
 
@@ -27,14 +27,16 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/Framework/interface/TriggerNames.h"
 
 #include "DataFormats/Common/interface/Handle.h"
-//#include "DataFormats/Candidate/interface/NamedCompositeCandidate.h"
 #include "DataFormats/Candidate/interface/CompositeCandidate.h"
 #include "DataFormats/Candidate/interface/ShallowCloneCandidate.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Flags.h"
+#include "DataFormats/Common/interface/TriggerResults.h"
+#include "DataFormats/BeamSpot/interface/BeamSpot.h"
 
 // pat histogram classes 
 #include "PhysicsTools/StarterKit/interface/HistoComposite.h"
@@ -80,25 +82,38 @@ class ZjetsPlots : public edm::EDAnalyzer {
       template<class T> bool checkIsolation(const reco::CompositeCandidate& cand) const;
 
       template<class T> bool isIsolated(const T* ) const;
+
+      template <class T> std::vector<T> vectorFromView(const edm::View<reco::Candidate>& candidates);
+      
+      void fillLeptons(const edm::View<reco::Candidate>& candidates);
+
+      reco::CompositeCandidate chooseZ(const reco::CompositeCandidateCollection& Zs) const;
       
       // ----------member data ---------------------------
       // Histogram server
       edm::Service<TFileService> fs;
       edm::Service<edm::TTreeService> trees;
 
+      // mode: can be electron, muon or gen
+      std::string _mode;
+
       // Histogram objects that make "standard" plots for each object
-      pat::HistoComposite* _histoZ;
-      pat::HistoJet      * _histoJet;
-      std::vector<pat::HistoComposite*> _histoZVsMulti;
-      std::vector<pat::HistoJet*> _histoJetVsMulti;
+      pat::HistoElectron*    _histoE;
+      pat::HistoMuon*        _histoMu;
+      pat::HistoGenParticle* _histoGen;
+      pat::HistoComposite*   _histoZ;
+      pat::HistoJet      *   _histoJet;
+      //std::vector<pat::HistoComposite*> _histoZVsMulti;
+      //std::vector<pat::HistoJet*> _histoJetVsMulti;
+      std::vector<std::string>* _triggers; 
 
 
-      TH1D* _djr_10;
-      TH1D* _djr_21;
-      TH1D* _djr_32;
-      std::vector<TH1D*> _djr_10VsMulti;
-      std::vector<TH1D*> _djr_21VsMulti;
-      std::vector<TH1D*> _djr_32VsMulti;
+      //TH1D* _djr_10;
+      //TH1D* _djr_21;
+      //TH1D* _djr_32;
+      //std::vector<TH1D*> _djr_10VsMulti;
+      //std::vector<TH1D*> _djr_21VsMulti;
+      //std::vector<TH1D*> _djr_32VsMulti;
 
       //TTree* _tree;
 
@@ -106,13 +121,20 @@ class ZjetsPlots : public edm::EDAnalyzer {
 
       //configuration   
       pat::PatKitHelper _configHelper;
+      edm::InputTag _leptontag ;
       edm::InputTag _ztag ;
       edm::InputTag _tagrate10;
       edm::InputTag _tagrate21;
       edm::InputTag _tagrate32;
       edm::InputTag _weightTag;
       edm::InputTag _jettag;
+      edm::InputTag _trigLabel;
+      edm::InputTag _beamspottag;
       bool     _hasWeightProducer; 
+      bool     _hasTriggerResults;
+      bool     _fillLeptons;
+      bool     _hasBeamSpot;
+      double _massmin, _massmax;
 
       std::string _modLabel;
 };
@@ -130,6 +152,34 @@ template<> bool ZjetsPlots::isIsolated(const pat::Electron* elec ) const {
   return (elec->trackIso()<3 );
 }
 
+template <class T> std::vector<T> ZjetsPlots::vectorFromView(const edm::View<reco::Candidate>& candidates){
+  edm::View<reco::Candidate>::const_iterator icand;
+  std::vector<T> output;
+  for (icand = candidates.begin(); icand != candidates.end(); ++icand){
+    const T* current = dynamic_cast<const T*>(&*icand);
+    if (!current) {
+      throw cms::Exception("ZjetsPlots") << "cannot cast to the concrete type predicted by mode!! ";  
+    }
+    //std::cout << "Ciao" << std::endl;
+    output.push_back(*current);
+  }
+  return output;
+}
+
+void ZjetsPlots::fillLeptons(const edm::View<reco::Candidate>& candidates){
+  if (_mode == "muon") {
+    std::vector<pat::Muon> muons = vectorFromView<pat::Muon>(candidates);
+    //std::cout << "about to fill" << std::endl;
+    _histoMu->fillCollection(muons);
+    //std::cout << "filled" << std::endl;
+  } else if (_mode == "electron") {
+    std::vector<pat::Electron> electrons = vectorFromView<pat::Electron>(candidates);
+    _histoE->fillCollection(electrons);
+  } else {
+    std::vector<reco::GenParticle> genparticles = vectorFromView<reco::GenParticle>(candidates);
+    _histoGen->fillCollection(genparticles);
+  }
+}
 
 //template<class T> bool ZjetsPlots::checkIsolation(const reco::NamedCompositeCandidate& cand) const {
 template<class T> bool ZjetsPlots::checkIsolation(const reco::CompositeCandidate& cand) const {
@@ -202,6 +252,7 @@ template <class T> void ZjetsPlots::AddHistoGroupVsMulti(unsigned int njet, std:
 ZjetsPlots::ZjetsPlots(const edm::ParameterSet& iConfig) : _configHelper(iConfig) 
 {
    //fs->file().cd("..");
+   _mode = iConfig.getParameter<std::string>("mode");
    fs->file().ls();
    fs->file().pwd();
    //_tree = fs->make<TTree>("tree", "tree"); 
@@ -209,13 +260,48 @@ ZjetsPlots::ZjetsPlots(const edm::ParameterSet& iConfig) : _configHelper(iConfig
    //_tree = new TTree("tree", "tree");
 
    //now do what ever initialization is needed
-   _ztag  = iConfig.getParameter<edm::InputTag>("ZSource");
+   if (iConfig.exists("LeptonSource")){
+    _leptontag = iConfig.getParameter<edm::InputTag>("LeptonSource");
+    _fillLeptons = true;
+   } else {
+    _fillLeptons = false;
+   }
+   _ztag      = iConfig.getParameter<edm::InputTag>("ZSource");
    _tagrate10 = iConfig.getParameter<edm::InputTag>("DiffJetRate10");
    _tagrate21 = iConfig.getParameter<edm::InputTag>("DiffJetRate21");
    _tagrate32 = iConfig.getParameter<edm::InputTag>("DiffJetRate32");
    _jettag    = iConfig.getParameter<edm::InputTag>("JetSource");
+   
+   if (iConfig.exists("BeamSpot")){
+    _beamspottag = iConfig.getParameter<edm::InputTag>("BeamSpot");
+    _hasBeamSpot = true;
+   } else {
+    _hasBeamSpot = false;  
+   }
 
    _modLabel = iConfig.getParameter<std::string>("@module_label");
+
+   if (_fillLeptons) {
+    if (_mode=="muon"){
+      _histoMu = createHistograms<pat::HistoMuon>("Mu"+_modLabel, "Mu " + _ztag.label(), "Mu", _configHelper.getAxisLimits("Z"));
+      _histoE = 0;
+      _histoGen = 0;
+    } else if (_mode=="electron") {
+      _histoE = createHistograms<pat::HistoElectron>("E"+_modLabel, "E " + _ztag.label(), "E", _configHelper.getAxisLimits("Z")); 
+      _histoMu = 0;
+      _histoGen = 0;
+    } else if (_mode=="gen") {
+      _histoGen = createHistograms<pat::HistoGenParticle>("genLep"+_modLabel, "genLep " + _ztag.label(), "genLep", _configHelper.getAxisLimits("Z"));
+      _histoMu = 0;
+      _histoE = 0;
+    } else {
+      throw cms::Exception("ZjetsPlots") << "Wrong mode!, mode can be: muon, electron, gen ";
+    }
+   } else {
+     _histoMu = 0;
+     _histoE = 0;
+     _histoGen = 0;
+   }
   
    _histoZ = createHistograms<pat::HistoComposite>("Z"+_modLabel, "Z " + _ztag.label(), "Z", 
                                                          _configHelper.getAxisLimits("Z"));
@@ -225,7 +311,7 @@ ZjetsPlots::ZjetsPlots(const edm::ParameterSet& iConfig) : _configHelper(iConfig
    fs->file().pwd();                                                      
 
    std::string name = "jet"+_modLabel;
-
+/*
    TFileDirectory misc1 = TFileDirectory(fs->mkdir(name.c_str()));
    PhysicsHistograms::KinAxisLimits djrAxis = _configHelper.getAxisLimits("diffJetRate");
    _djr_10 = misc1.make<TH1D>("diffjetrate10", "Diff Jet Rate 1->0 ", 
@@ -234,6 +320,20 @@ ZjetsPlots::ZjetsPlots(const edm::ParameterSet& iConfig) : _configHelper(iConfig
                                     djrAxis.nBinsPt, djrAxis.pt1, djrAxis.pt2);   
    _djr_32 = misc1.make<TH1D>("diffjetrate32", "Diff Jet Rate 3->2 ", 
                                     djrAxis.nBinsPt, djrAxis.pt1, djrAxis.pt2);   
+*/
+   //dedicated branch for trigger names
+   if (iConfig.exists("TriggerResults")){
+    _trigLabel = iConfig.getParameter<edm::InputTag>("TriggerResults");
+    _triggers = new std::vector<std::string>();
+    std::string branchname = "triggers" + _modLabel; 
+    std::cout << "Adding branch " << branchname << std::endl;
+    trees->tree()->Bronch(branchname.c_str(), "std::vector<std::string>", &_triggers, 8000, 1);
+    _hasTriggerResults = true;
+   } else {
+    _triggers = 0; 
+    _hasTriggerResults = false;
+   }
+
 
 
    if (iConfig.exists("WeightProducer")) {
@@ -254,7 +354,7 @@ ZjetsPlots::~ZjetsPlots()
    // (e.g. close files, deallocate resources etc.)
    delete _histoZ;
    delete _histoJet;
-
+/*
     for (std::vector<pat::HistoComposite*>::const_iterator i = _histoZVsMulti.begin(); 
         i != _histoZVsMulti.end(); ++i){
       delete *i; 
@@ -263,7 +363,7 @@ ZjetsPlots::~ZjetsPlots()
         i != _histoJetVsMulti.end(); ++i){
       delete *i;
     }               
-
+*/
 }
 
 
@@ -281,63 +381,63 @@ ZjetsPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    _histoZ->clearTreeVariables();
    _histoJet->clearTreeVariables();
+   if (_histoMu) _histoMu->clearTreeVariables();
+   if (_histoE) _histoE->clearTreeVariables();
+   if (_histoGen) _histoGen->clearTreeVariables();
 
-   // get the W candidates
+   // if the beams pot is pecified we use it
+   //otherwise (0,0,0) is used
+   if (_hasBeamSpot){
+     edm::Handle<reco::BeamSpot> recoBeamSpotHandle;
+     iEvent.getByLabel(_beamspottag, recoBeamSpotHandle);
+     reco::TrackBase::Point beamSpot(recoBeamSpotHandle->position());
+     _histoZ->setBeamSpot(beamSpot);
+     if (_histoMu) _histoMu->setBeamSpot(beamSpot);
+     if (_histoE)  _histoE ->setBeamSpot(beamSpot);
+   }  
+
+   //get the lepton candidates
+   //if we fill the leptons info 
+   // we fill the whole tree only if 
+   // there is at least one lepton
+   if (_fillLeptons){
+    Handle<edm::View<reco::Candidate> > lepHandle;
+    iEvent.getByLabel(_leptontag, lepHandle);
+    const edm::View<reco::Candidate>& leptons = *lepHandle;
+    if (leptons.size() == 0) return;
+    fillLeptons(leptons);
+   } 
+
+   double weight = 1.;
+   
+
+   //fill trigger info
+   if (_hasTriggerResults){
+    _triggers->clear();
+    edm::Handle<edm::TriggerResults> HLTR;
+    iEvent.getByLabel(_trigLabel, HLTR);
+    TriggerNames nameservice(*HLTR);
+    for ( unsigned int iHlt=0; iHlt < HLTR->size(); iHlt++ ) {
+     // if the trigegr is passed store the info
+     if (HLTR->accept(iHlt)==1){
+       _triggers->push_back(nameservice.triggerName(iHlt));
+     }
+    }
+   } 
+
+
+   // get the Z candidates
    Handle<reco::CompositeCandidateCollection> ZHandle;
    iEvent.getByLabel(_ztag, ZHandle);
    const reco::CompositeCandidateCollection& Zs = *ZHandle;
-
-   double weight = 1.;
-   Handle<double> eventWeight;
-   if (_hasWeightProducer){
-    iEvent.getByLabel(_weightTag, eventWeight);
-    weight = *eventWeight;
-   }
-
-   double rate10 = -9999;
-   double rate21 = -9999;
-   double rate32 = -9999;
-   bool found10=false, found21=false, found32=false;
-   Handle<double> hrate10, hrate21, hrate32;
-   try {
-    iEvent.getByLabel(_tagrate10, hrate10);
-    found10=true;
-    rate10=*hrate10;
-   } catch (cms::Exception& e){
-     LogDebug("ZplusJet") << "DiffJetRate10 not found for this event" << std::endl;
-     //std::cout << "DiffJetRate10 not found for this event" << std::endl;
-   }
-   try{
-    iEvent.getByLabel(_tagrate21, hrate21);
-    found21=true;
-    rate21=*hrate21;
-   } catch (cms::Exception& e) {
-     LogDebug("ZplusJet") << "DiffJetRate21 not found for this event" << std::endl; 
-     //std::cout << "DiffJetRate21 not found for this event" << std::endl; 
-   }
-   try {
-    iEvent.getByLabel(_tagrate32, hrate32);
-    found32=true;
-    rate32=*hrate32;
-   } catch (cms::Exception& e) {
-    LogDebug("ZplusJet") << "DiffJetRate32 not found for this event" << std::endl;
-    //std::cout << "DiffJetRate32 not found for this event" << std::endl;
-   }
    
-
-   //std::cout << "weight is " << weight << std::endl;
-
    // get the jets
-   //Handle<std::vector<pat::Jet> > jetHandle;
    Handle<edm::View<reco::Jet> > jetHandle;
    iEvent.getByLabel(_jettag, jetHandle);   
-   //const std::vector<pat::Jet>& alljets = *jetHandle;
    const edm::View<reco::Jet>& alljets = *jetHandle;
 
    //remove jets overlapping with electrons
-   //std::vector<pat::Jet> jets;
    std::vector<const reco::Jet*> jets;
-   //std::vector<pat::Jet>::const_iterator ijet;
    edm::View<reco::Jet>::const_iterator ijet;
    for (ijet = alljets.begin(); ijet != alljets.end(); ++ijet){
      const pat::Jet* patjet = dynamic_cast<const pat::Jet*>(&*ijet); 
@@ -351,61 +451,18 @@ ZjetsPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    unsigned int jetsize = jets.size(); 
     
-   if (Zs.size() == 1){
-     CompositeCandidate cand = fixRoles(Zs.front());
-     //std::cout << "Z pt " << cand.pt() << std::endl;
-
-
-
-     //bool isolatedMuons = checkIsolation<pat::Muon>(cand);
+   if (Zs.size() > 0){
+     CompositeCandidate cand = chooseZ(Zs);
      bool isolatedMuons = true;
 
      if (!isolatedMuons) throw cms::Exception("ZjetsPlots") << "ERROR: isolation check failed " << std::endl;
 
      if (isolatedMuons){
-      // fill W histos
-      _histoZ->fill(cand);
-
-      AddHistoGroupVsMulti<pat::HistoComposite>(jets.size(), _histoZVsMulti, 
-                                                "Z"+_modLabel, "Z " + _ztag.label() , "Z", 
-                                                _configHelper.getAxisLimits("Z"));
-      _histoZVsMulti[jetsize]->fill(cand);
-
-      // fill the jet histos
-      _histoJet->fillCollection(jets, weight);
-
-    
-
-      AddHistoGroupVsMulti<pat::HistoJet>(jets.size(), _histoJetVsMulti, 
-                                          "jet"+_modLabel, "Jet " + _ztag.label(), "Jet", 
-                                          _configHelper.getAxisLimits("Jet"));
-  
-      PhysicsHistograms::KinAxisLimits djrAxis = _configHelper.getAxisLimits("diffJetRate");
-      AddHistoGroupVsMulti<TH1D>(jets.size(), _djr_10VsMulti, 
-                                 "jetHistos", "diffjetrate10", "Diff Jet Rate 1->0", 
-                                 djrAxis);
-      AddHistoGroupVsMulti<TH1D>(jets.size(), _djr_21VsMulti, 
-                                 "jetHistos", "diffjetrate21", "Diff Jet Rate 2->1", 
-                                 djrAxis);
-      AddHistoGroupVsMulti<TH1D>(jets.size(), _djr_32VsMulti, 
-                                 "jetHistos", "diffjetrate32", "Diff Jet Rate 3->2", 
-                                 djrAxis);
-      _histoJetVsMulti[jets.size()]->fillCollection(jets, weight); 
-      if (found10) {
-        _djr_10->Fill(rate10, weight);
-        _djr_10VsMulti[jetsize]->Fill(rate10, weight);   
-      }
-      if (found21) {
-        _djr_21->Fill(rate21, weight);
-        _djr_21VsMulti[jetsize]->Fill(rate21, weight);
-      }
-      if (found32) {
-        _djr_32->Fill(rate32, weight);
-        _djr_32VsMulti[jetsize]->Fill(rate32, weight);
-      }
-     }
-     //_tree->Fill();
+       _histoZ->fill(cand);
+     }   
    }
+    // fill the jet histos
+    _histoJet->fillCollection(jets, weight);
 }
 
 
@@ -442,6 +499,20 @@ reco::CompositeCandidate ZjetsPlots::fixRoles(const reco::CompositeCandidate& or
   cand.applyRoles();
   return cand;
 }
+
+reco::CompositeCandidate ZjetsPlots::chooseZ(const reco::CompositeCandidateCollection& Zs) const {
+  reco::CompositeCandidate chosen;
+  reco::CompositeCandidateCollection::const_iterator iter;
+  double distance = 10000;
+  for (iter = Zs.begin(); iter != Zs.end(); ++iter){
+    if (fabs(iter->mass()-91.1876) < distance){
+      distance = fabs(iter->mass()-91.1876);
+      chosen = *iter;
+    }
+  }
+  return chosen;
+}
+
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(ZjetsPlots);
