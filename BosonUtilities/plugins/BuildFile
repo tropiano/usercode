@@ -5,7 +5,7 @@
     <use name=FWCore/ParameterSet>
     <use name=PhysicsTools/PatUtils>
     <use name=PhysicsTools/UtilAlgos>
-    <use name=PhysicsTools/CandAlgos>
+    <use name=CommonTools/CandAlgos>
     <use name=PhysicsTools/HepMCCandAlgos>
     <flags EDM_PLUGIN=1>
 </library>

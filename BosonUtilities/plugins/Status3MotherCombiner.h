@@ -19,7 +19,7 @@
 #include "DataFormats/Common/interface/EDProductfwd.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "PhysicsTools/CandUtils/interface/AddFourMomenta.h"
-#include "PhysicsTools/Utilities/interface/PtComparator.h"
+#include "CommonTools/Utils/interface/PtComparator.h"
 
 
 class Status3MotherCombiner : public edm::EDProducer {
