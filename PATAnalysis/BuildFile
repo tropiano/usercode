@@ -1,0 +1,15 @@
+<use name=root>
+<use name=FWCore/Framework>
+<use name=DataFormats/FWLite>
+<use name=DataFormats/PatCandidates>
+<use name=FWCore/TFWLiteSelector>
+<use name=rootrflx>
+<lib name=ProofPlayer>
+<export>
+  <use name=root>
+  <use name=FWCore/Framework>
+  <use name=DataFormats/FWLite>
+  <use name=DataFormats/PatCandidates>
+  <use name=FWCore/TFWLiteSelector>
+  <lib name=FirenzePATAnalysis>
+</export>

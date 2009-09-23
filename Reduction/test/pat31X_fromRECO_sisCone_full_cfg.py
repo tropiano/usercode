@@ -12,7 +12,7 @@ process.load("Firenze.Reduction.recJetPatAddOns_cff")
 
 from PhysicsTools.PatAlgos.tools.jetTools import *
 
-process.source.fileNames = [ 'file:zmumu-test-reco.root' ]
+process.source.fileNames = [ 'file:/raid/lenzip/CMSSW/CMSSW_3_1_2/src/PhysicsTools/PatAlgos/test/zmumu-test-reco.root' ]
 
 process.eleIsoDepositEcalFromHits.ExtractorPSet.barrelEcalHits = cms.InputTag("reducedEcalRecHitsEB", "", "RECO")
 process.eleIsoDepositEcalFromHits.ExtractorPSet.endcapEcalHits = cms.InputTag("reducedEcalRecHitsEE", "", "RECO")
@@ -76,7 +76,7 @@ process.out.dropMetaData = cms.untracked.string('DROPPED')
 print 'Current Event content is:'
 print process.out.outputCommands
 
-process.out.fileName = 'test_neweventcontent.root'
+process.out.fileName = 'test_pat.root'
 
 # In addition you usually want to change the following parameters:
 #
