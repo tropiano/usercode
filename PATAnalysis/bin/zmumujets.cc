@@ -35,14 +35,19 @@ int main(){
 
   //TTree* train = (TTree*) trainFile.Get("Events");
 
-  //TFile outtrain("train.root", "RECREATE");
+  //TFile* outtrain = new TFile("train.root", "RECREATE");
+  TNamed* outtrain = new TNamed("OutputFile", "train.root");
 
-  //TList config;
-  //TParameter<double> csec("CrossSection", 1200);
-  //TParameter<double> lumi("Luminosity", 100);
-  //config.Add(&csec);
-  //config.Add(&lumi);
-  //config.Add(&outtrain);
+  TList config;
+  TParameter<double>* csec = new TParameter<double>("CrossSection", 1200);
+  TParameter<double>* lumi = new TParameter<double>("Luminosity", 100);
+  config.Add(csec);
+  config.Add(lumi);
+  config.Add(outtrain);
+
+  p->AddInput(csec);
+  p->AddInput(lumi);
+  p->AddInput(outtrain);
 
   //processing signal
   //Background trainsignal; //517 is the target luminosity and actually the real lumy of one of the two samples
@@ -50,6 +55,7 @@ int main(){
   //p->Process(&train, "FWLiteTSelector", "", 500, 2000);//&trainsignal);
   p->Process(&train, "Background", "");//&trainsignal);
   //train.Process("FWLiteTSelector");
+  p->ClearInput();
   p->Close();
   //train->Process(&trainsignal);
 

@@ -20,7 +20,7 @@ using namespace std;
 using namespace edm;
 
 Background::Background(){
-  _output = new TFile("ciao.root", "RECREATE");
+  //_output = new TFile("ciao.root", "RECREATE");
   cout << "Background built" << endl;
 }
 
@@ -32,7 +32,8 @@ void Background::begin(TList*& list){
   TIter next(list);
   while (TObject* obj = next()){
     const TParameter<double>* parDouble = dynamic_cast<const TParameter<double>* >(obj);
-    TFile* parFile   = dynamic_cast<TFile*>(obj);
+    //TFile* parFile   = dynamic_cast<TFile*>(obj);
+    TNamed* parFile   = dynamic_cast<TNamed*>(obj);
     if (parDouble){
       if (!strcmp(parDouble->GetName(), "Luminosity")) {
         _targetLumi = parDouble->GetVal();
@@ -42,9 +43,11 @@ void Background::begin(TList*& list){
         _xsec = parDouble->GetVal();
         cout << "set cross section to " << _xsec << endl;
       }
-    } else if (parFile) {     
-      _output = parFile;
-      cout << "set output file to " << _output << endl;
+    } else if (parFile) {
+      if (!strcmp(parFile->GetName(), "OutputFile")){
+        _output = new TFile(parFile->GetTitle(), "RECREATE");
+        cout << "set output file to " << _output << endl;
+      }  
     }  
   }
 }
