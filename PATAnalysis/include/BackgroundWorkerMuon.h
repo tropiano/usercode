@@ -1,23 +1,16 @@
-//////////////////////////////////////////////////////////
-// This class has been automatically generated on
-// Mon May 18 15:24:15 2009 by ROOT version 5.18/00b
-// from TTree Background/tree
-// found on file: ../data/ZMM_M20Pythia_full.root
-//////////////////////////////////////////////////////////
-
-#ifndef BackgroundWorker_h
-#define BackgroundWorker_h
+#ifndef BackgroundWorkerMuon_h
+#define BackgroundWorkerMuon_h
 
 #include "TH1D.h"
 
 #include "FWCore/TFWLiteSelector/interface/TFWLiteSelector.h"
 #include "TH1D.h"
 
-class BackgroundWorker {
+class BackgroundWorkerMuon {
 public :
-   BackgroundWorker(const TList*, TList&);
+   BackgroundWorkerMuon(const TList*, TList&);
 
-   ~BackgroundWorker();
+   ~BackgroundWorkerMuon();
 
    void  process(const edm::Event& iEvent);
 

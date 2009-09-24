@@ -1,5 +1,5 @@
 
-#include "Firenze/PATAnalysis/include/Background.h"
+#include "Firenze/PATAnalysis/include/BackgroundWorkerMuon.h"
 #include <TH2.h>
 #include <TStyle.h>
 #include <math.h>
@@ -20,7 +20,7 @@ using namespace std;
 using namespace edm;
 
 
-BackgroundWorker::BackgroundWorker(const TList* in , TList& out): 
+BackgroundWorkerMuon::BackgroundWorkerMuon(const TList* in , TList& out): 
 recPtZ(0), recEtaZ(0), recMulti(0), recMassZ(0), recTrackIsoLead(0), recEcalIsoLead(0), recHcalIsoLead(0), recRelIsoLead(0),
 recTrackIsoSec(0), recEcalIsoSec(0), recHcalIsoSec(0), recRelIsoSec(0),
 recLeadMuPt(0), recSecMuPt(0), recLeadMuEta(0), recSecMuEta(0),
@@ -66,7 +66,7 @@ recLeadJetPt(0), recLeadJetEta(0)
   cout << "Background Worker built." << endl;   
 }
 
-BackgroundWorker::~BackgroundWorker(){
+BackgroundWorkerMuon::~BackgroundWorkerMuon(){
 /*  delete recPtZ;
   delete recEtaZ;
   delete recMulti;
@@ -98,18 +98,18 @@ BackgroundWorker::~BackgroundWorker(){
   destroyHistosVector(recMu2EtaVsExclMulti);*/
 }
 
-void  BackgroundWorker::process(const edm::Event& iEvent)
+void  BackgroundWorkerMuon::process(const edm::Event& iEvent)
 {
    //cout << "fChain "<< fChain << " with " << fChain->GetEntriesFast() << " entries" << endl;
 
    //if (!(entry%100000)) cout << ">>>>>>>>Processing Event " << entry << endl;
 
-   cout << "Processing event" << endl;
+   //cout << "Processing event" << endl;
 
    edm::Handle<std::vector<pat::Muon> > muonHandle;
    iEvent.getByLabel("selectedMuons", muonHandle);
 
-   cout << "collection taken" << endl;
+   //cout << "collection taken" << endl;
 
    if (muonHandle->size()){
     recLeadMuPt->Fill((*muonHandle)[0].pt()); 
