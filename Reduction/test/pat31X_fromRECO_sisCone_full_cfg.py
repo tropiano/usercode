@@ -10,6 +10,8 @@ process.load("Firenze.Reduction.recZmumuPatAddOns_cff")
 process.load("Firenze.Reduction.recZeePatAddOns_cff")
 process.load("Firenze.Reduction.recJetPatAddOns_cff")
 
+process.load("PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff")
+
 from PhysicsTools.PatAlgos.tools.jetTools import *
 
 process.source.fileNames = [ 'file:/raid/lenzip/CMSSW/CMSSW_3_1_2/src/PhysicsTools/PatAlgos/test/zmumu-test-reco.root' ]
@@ -49,6 +51,7 @@ process.allLayer1Muons.embedTpfmsMuon = cms.bool(False)
 
 process.p = cms.Path(
                 process.patDefaultSequence+
+                process.patTriggerSequence+
                 process.zmumugenSequence+
                 process.zeegenSequence+
                 process.genjetsSequence+
@@ -62,6 +65,8 @@ from Firenze.Reduction.genJetPatAddOns_cff import jetgenEventContent
 from Firenze.Reduction.recZmumuPatAddOns_cff import zmumurecEventContent
 from Firenze.Reduction.recZeePatAddOns_cff import zeerecEventContent
 from Firenze.Reduction.recJetPatAddOns_cff import jetrecEventContent
+from PhysicsTools.PatAlgos.patEventContent_cff import patTriggerEventContent
+
 process.out.outputCommands=cms.untracked.vstring('drop *')
 process.out.outputCommands.extend(zmumugenEventContent)
 process.out.outputCommands.extend(zeegenEventContent)
@@ -69,14 +74,14 @@ process.out.outputCommands.extend(jetgenEventContent)
 process.out.outputCommands.extend(zmumurecEventContent)
 process.out.outputCommands.extend(zeerecEventContent)
 process.out.outputCommands.extend(jetrecEventContent)
-
+process.out.outputCommands.extend(patTriggerEventContent)
 process.out.dropMetaData = cms.untracked.string('DROPPED')
 #process.out.dropMetaData = cms.untracked.string('ALL')
 
 print 'Current Event content is:'
 print process.out.outputCommands
 
-process.out.fileName = 'test_pat.root'
+process.out.fileName = 'test_pat_withtrigger.root'
 
 # In addition you usually want to change the following parameters:
 #
