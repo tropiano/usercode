@@ -7,6 +7,7 @@
 #include "DataFormats/PatCandidates/interface/Isolation.h"
 #include "DataFormats/Candidate/interface/CompositeCandidate.h"
 #include "DataFormats/RecoCandidate/interface/IsoDeposit.h"
+#include "DataFormats/Candidate/interface/ShallowCloneCandidate.h"
 
 #include <vector>
 #include <math.h>
@@ -212,17 +213,38 @@ inline std::pair<bool, std::vector<pat::Muon> > RecSelected_Isolation(const std:
 
 inline bool RecSelected(const std::vector<reco::CompositeCandidate>& ZREC, double isocut){
   //"@ZzjetsRECO.size()==1 && @ZzjetsRECODauMuon.size()==2 && ZzjetsRECO._mass>60. && ZzjetsRECO._mass<120. && ZzjetsRECODauMuon[0]._pt>20 && abs(ZzjetsRECODauMuon[0]._eta)<2.4 && ZzjetsRECODauMuon[1]._pt>20 && abs(ZzjetsRECODauMuon[1]._eta)<2.4 && (ZzjetsRECODauMuon[0]._hcalIso+ZzjetsRECODauMuon[0]._ecalIso+ZzjetsRECODauMuon[0]._trackIso)/ZzjetsRECODauMuon[0]._pt<0.3 && (ZzjetsRECODauMuon[1]._hcalIso+ZzjetsRECODauMuon[1]._ecalIso+ZzjetsRECODauMuon[1]._trackIso)/ZzjetsRECODauMuon[1]._pt<0.3 && ZzjetsRECODauMuon[0]._nhit>11 && ZzjetsRECODauMuon[1]._nhit>11"
+  if (ZREC.size() == 0) return false;
   if (ZREC.size() > 1){
     std::cout << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! " << std::endl;
     throw cms::Exception("PATAnalysis:RecSelectedTwoMuonsOppositeCharge_Mass") << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! ";
     return false;
   }
-  const pat::Muon* dau0 = (const pat::Muon*) ZREC[0].daughter(0);
-  const pat::Muon* dau1 = (const pat::Muon*) ZREC[0].daughter(1);
+  std::cout << ZREC[0].daughter(0) << " " << ZREC[0].daughter(1) << std::endl;
+  std::cout << typeid(*ZREC[0].daughter(0)).name() << " " << typeid(*ZREC[0].daughter(1)).name() << std::endl;
+  const pat::Muon* dau0 = dynamic_cast<const pat::Muon*>(ZREC[0].daughter(0));
+  const pat::Muon* dau1 = dynamic_cast<const pat::Muon*>(ZREC[0].daughter(1));
+  if (!dau0) {
+     //maybe a shallow clone
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (ZREC[0].daughter(0));
+     if (scc && scc->hasMasterClone()){
+       dau0 = dynamic_cast<const pat::Muon*>(scc->masterClone().get()); 
+     }
+  }
+  if (!dau1) {
+     //maybe a shallow clone
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (ZREC[0].daughter(1));
+     if (scc && scc->hasMasterClone()){
+       dau1 = dynamic_cast<const pat::Muon*>(scc->masterClone().get());
+     }
+  }
+  
+  assert(dau0 && dau1);
   const pat::IsoDeposit* hcalIso0 = dau0->isoDeposit(pat::HCalIso);
   const pat::IsoDeposit* ecalIso0 = dau0->isoDeposit(pat::ECalIso);
   const pat::IsoDeposit* hcalIso1 = dau1->isoDeposit(pat::HCalIso);
   const pat::IsoDeposit* ecalIso1 = dau1->isoDeposit(pat::ECalIso);
+  assert(hcalIso0 && hcalIso1);
+  assert(ecalIso0 && ecalIso1);
 
   
   return ZREC.size()==1 && ZREC[0].mass()>zmassmin && ZREC[0].mass()<zmassmax &&

@@ -1,19 +1,20 @@
 #ifndef BackgroundMuon_h
 #define BackgroundMuon_h
 
-#include "FWCore/TFWLiteSelector/interface/TFWLiteSelector.h"
+//#include "FWCore/TFWLiteSelector/interface/TFWLiteSelector.h"
+#include "Firenze/PATAnalysis/include/FWLiteTSelector.h"
 #include "TH1D.h"
 
 #include "Firenze/PATAnalysis/include/BackgroundWorkerMuon.h"
 
-class BackgroundMuon : public TFWLiteSelector<BackgroundWorkerMuon> {
+class BackgroundMuon : public FWLiteTSelector<BackgroundWorkerMuon> {
 
 private:
    //Efficiency histogram
    //Efficiency _efficiency;
 
    // output file
-   TFile* _output;
+   //TFile* _output;
 
    //normalization
    double _norm;
@@ -35,9 +36,10 @@ public:
   BackgroundMuon();
   virtual ~BackgroundMuon();
 
-  void begin(TList*&);
+  void Begin(TTree * iTree);
 
-  void terminate(TList&);
+  //void terminate(TList&);
+  void Terminate();
 
 private:
   BackgroundMuon(BackgroundMuon const&);

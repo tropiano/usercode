@@ -9,29 +9,33 @@
 #include "TList.h"
 #include "TParameter.h"
 #include "TFile.h"
+#include "TProofOutputFile.h"
 
 #include <iostream>
 
 //CMSSW headers
-#include "FWCore/Framework/interface/Event.h"
-#include "DataFormats/Common/interface/Handle.h"
+#include "DataFormats/FWLite/interface/ChainEvent.h"
+#include "DataFormats/FWLite/interface/Handle.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 #include "DataFormats/Candidate/interface/CompositeCandidate.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
+#include "DataFormats/FWLite/interface/ChainEvent.h"
+
+
 
 using namespace std;
 using namespace edm;
 
 
-BackgroundWorkerMuon::BackgroundWorkerMuon(const TList* in , TList& out): 
+BackgroundWorkerMuon::BackgroundWorkerMuon(TProofOutputFile* proofFile, const TList* fInput): 
 recPtZ(0), recEtaZ(0), recMulti(0), recMassZ(0), recTrackIsoLead(0), recEcalIsoLead(0), recHcalIsoLead(0), recRelIsoLead(0),
 recTrackIsoSec(0), recEcalIsoSec(0), recHcalIsoSec(0), recRelIsoSec(0),
 recLeadMuPt(0), recSecMuPt(0), recLeadMuEta(0), recSecMuEta(0),
 recLeadJetPt(0), recLeadJetEta(0), _ptjetmin(30.), _etajetmax(3.), _isocut(0.3)
 //_efficiency(out, "EfficienciesTotalVsRecMulti", 10, -0.5, 9.5, 0.3, false),
 {       
-   TIter next(in);
+   TIter next(fInput);
    while (TObject* obj = next()){
     const TParameter<double>* parDouble = dynamic_cast<const TParameter<double>* >(obj);
     if (parDouble){
@@ -48,62 +52,49 @@ recLeadJetPt(0), recLeadJetEta(0), _ptjetmin(30.), _etajetmax(3.), _isocut(0.3)
     }
    }  
 
+   _file = proofFile->OpenFile("RECREATE");
+   _file->cd();
    recPtZ   = new TH1D("recPtZ", "Reconstructed Z p_{T}", 200, 0, 200);
-   out.Add(recPtZ); 
    recEtaZ  = new TH1D("recEtaZ", "Reconstructed Z #eta", 100, -10, 10);
-   out.Add(recEtaZ);
    recMulti = new TH1D("recMulti", "Reconstructed jet multiplicity", 10, -0.5, 9.5);
-   out.Add(recMulti);
    recMassZ = new TH1D("recMassZ", "Reconstructed Z mass", 200, 50, 150);
-   out.Add(recMassZ);
    recTrackIsoLead = new TH1D("recTrackIsoLead", "Lead Track Isolation SumPt", 30, 0, 30);
-   out.Add(recTrackIsoLead);
    recEcalIsoLead  = new TH1D("recEcalIsoLead", "Lead ECAL Isolation SumPt", 30, 0, 30);
-   out.Add(recEcalIsoLead);
    recHcalIsoLead  = new TH1D("recHcalIsoLead", "Lead HCAL Isolation SumPt", 30, 0, 30);
-   out.Add(recHcalIsoLead);
    recRelIsoLead   = new TH1D("recRelIsoLead", "Lead Comb Relative Isolation", 30, 0, 30);
-   out.Add(recRelIsoLead);
    recTrackIsoSec = new TH1D("recTrackIsoSec", "Sec Track Isolation SumPt", 30, 0, 30);
-   out.Add(recTrackIsoSec);
    recEcalIsoSec  = new TH1D("recEcalIsoSec", "Sec ECAL Isolation SumPt", 30, 0, 30);
-   out.Add(recEcalIsoSec);
    recHcalIsoSec  = new TH1D("recHcalIsoSec", "Sec HCAL Isolation SumPt", 30, 0, 30); 
-   out.Add(recHcalIsoSec);
    recRelIsoSec   = new TH1D("recRelIsoSec", "Sec Comb Relative Isolation", 30, 0, 30);
-   out.Add(recRelIsoSec);
    recLeadMuPt = new TH1D("recLeadMuPt", "Reconstructed Leading #mu p_{T}", 200, 0, 200);
-   out.Add(recLeadMuPt);
    recSecMuPt  = new TH1D("recSecMuPt", "Reconstructed Second #mu p_{T}", 200, 0, 200);
-   out.Add(recSecMuPt);
    recLeadMuEta = new TH1D("recLeadMuEta", "Reconstructed Leading #mu #eta", 50, -2.5, 2.5);
-   out.Add(recLeadMuEta);
    recSecMuEta  = new TH1D("recSecMuEta", "Reconstructed Second #mu #eta", 50, 2.5, 2.5);
-   out.Add(recSecMuEta);
    recLeadJetPt = new TH1D("recLeadJetPt", "Reconstructed Leading Jet p_{T}", 200, 0, 200);
-   out.Add(recLeadJetPt);
    recLeadJetEta = new TH1D("recLeadJetEta", "Reconstructed Leading Jet #eta", 100, -5, 5); 
-   out.Add(recLeadJetEta);
   cout << "Background Worker built." << endl;   
 }
 
 BackgroundWorkerMuon::~BackgroundWorkerMuon(){
+  _file->ls();
+  //_file->Write();
+  //_file->Close();
 }
 
-void  BackgroundWorkerMuon::process(const edm::Event& iEvent)
+void  BackgroundWorkerMuon::process(const fwlite::ChainEvent& iEvent)
 {
 
-   edm::Handle<std::vector<pat::Muon> > muonHandle;
-   iEvent.getByLabel("selectedMuons", muonHandle);
+   fwlite::Handle<std::vector<pat::Muon> > muonHandle;
+   muonHandle.getByLabel(iEvent, "selectedMuons");
 
-   edm::Handle<std::vector<reco::CompositeCandidate> > zHandle;
-   iEvent.getByLabel("zmumurec", zHandle);
+   fwlite::Handle<std::vector<reco::CompositeCandidate> > zHandle;
+   zHandle.getByLabel(iEvent, "zmumurec");
 
-   edm::Handle<std::vector<pat::Jet> > jetHandle;
-   iEvent.getByLabel("selectedJets", jetHandle);
+   fwlite::Handle<std::vector<pat::Jet> > jetHandle;
+   jetHandle.getByLabel(iEvent, "selectedJets");
 
-   edm::Handle<pat::TriggerEvent> triggerHandle;
-   iEvent.getByLabel("patTriggerEvent", triggerHandle);
+   fwlite::Handle<pat::TriggerEvent> triggerHandle;
+   triggerHandle.getByLabel(iEvent, "patTriggerEvent");
 
    
    //cout << "collection taken" << endl;
@@ -113,7 +104,9 @@ void  BackgroundWorkerMuon::process(const edm::Event& iEvent)
       
    }*/
    //we need to add the piece of code that select the Z candidate in case of multiple candidates
-   
+   if (zHandle->size() > 1) return; 
+
+
    //if (RecSelected(zHandle, zHandleDauMuon, _isocut)){
    if (RecSelectedWithTrigger(*zHandle, *triggerHandle, _isocut)){
       recPtZ->Fill((*zHandle)[0].pt());

@@ -19,7 +19,7 @@
 using namespace std;
 using namespace edm;
 
-BackgroundMuon::BackgroundMuon() : _output(0), _norm(1.)/*, _ptjetmin(30.), _etajetmax(3.), _isocut(0.3)*/ {
+BackgroundMuon::BackgroundMuon() : _norm(1.)/*, _ptjetmin(30.), _etajetmax(3.), _isocut(0.3)*/ {
   //_output = new TFile("ciao.root", "RECREATE");
   cout << "BackgroundMuon built" << endl;
 }
@@ -28,8 +28,8 @@ BackgroundMuon::~BackgroundMuon(){
 
 }
 
-void BackgroundMuon::begin(TList*& list){
-  TIter next(list);
+void BackgroundMuon::Begin(TTree* iTree){
+  TIter next(fInput);
   bool factorSet(false), fileSet(false);
   while (TObject* obj = next()){
     const TParameter<double>* parDouble = dynamic_cast<const TParameter<double>* >(obj);
@@ -50,13 +50,13 @@ void BackgroundMuon::begin(TList*& list){
         _etajetmax = parDouble->GetVal();
         cout << "set maximim eta for jets to: " << _etajetmax << endl;
       }*/
-    } else if (parFile) {
+    } /*else if (parFile) {
       if (!strcmp(parFile->GetName(), "OutputFile")){
         _output = new TFile(parFile->GetTitle(), "RECREATE");
         cout << "set output file to: " << _output << endl;
         fileSet = true;
       }  
-    }
+    }*/
   }
   //check that everything was set       
   if (!factorSet) {
@@ -65,7 +65,7 @@ void BackgroundMuon::begin(TList*& list){
   }
   if (!fileSet) {
     cout << "You did not set the output file! " << endl;
-    assert(fileSet);
+    //assert(fileSet);
   }
   //sleep(2);
 }
@@ -75,16 +75,18 @@ void BackgroundMuon::begin(TList*& list){
    //norm has been provided when filling the histograms
    //_efficiency.finalize(1.);//norm);
 
-void BackgroundMuon::terminate(TList& out){
+void BackgroundMuon::Terminate(){
 
-   cout << "list size " << out.GetSize() << endl;
-   _output->cd();
-   TIter next(&out);
+   //cout << "list size " << out.GetSize() << endl;
+   //_output->cd();
+   TIter next(fOutput);
    while (TObject* obj = next()){
       cout << "object name " << obj->GetName() << endl;
-      obj->Write();
+      //obj->Write();
+      TH1* h = dynamic_cast<TH1*>(obj);
+      if (h) h->Scale(_norm);
    }
 
-   _output->Close();
+   //_output->Close();
 
 }

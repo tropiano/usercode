@@ -1,20 +1,26 @@
 #ifndef BackgroundWorkerMuon_h
 #define BackgroundWorkerMuon_h
 
-#include "TH1D.h"
+#include "TFile.h"
 
-#include "FWCore/TFWLiteSelector/interface/TFWLiteSelector.h"
+//#include "FWCore/TFWLiteSelector/interface/TFWLiteSelector.h"
+#include "DataFormats/FWLite/interface/ChainEvent.h"
 #include "TH1D.h"
+#include "TList.h"
+#include "TProofOutputFile.h"
 
 class BackgroundWorkerMuon {
 public :
-   BackgroundWorkerMuon(const TList*, TList&);
+   BackgroundWorkerMuon(TProofOutputFile* out, const TList* fInput);
 
    ~BackgroundWorkerMuon();
 
-   void  process(const edm::Event& iEvent);
+   void  process(const fwlite::ChainEvent& iEvent);
 
-   void postProcess(TList&) {};
+   void finalize() {
+     _file->Write();
+     _file->Close();
+   }
 
    //Histograms
    TH1D *recPtZ, *recEtaZ, *recMulti, *recMassZ, *recTrackIsoLead, *recEcalIsoLead, *recHcalIsoLead, *recRelIsoLead,
@@ -27,6 +33,8 @@ private:
   double _etajetmax;
   
   double _isocut;
+
+  TFile* _file;  
 
 
 };
