@@ -80,7 +80,7 @@ int main(){
   //Background trainsignal; //517 is the target luminosity and actually the real lumy of one of the two samples
   //trainsignal.SetInputList(&config);
   //p->Process(&train, "FWLiteTSelector", "", 500, 2000);//&trainsignal);
-  p->Process(&train, "BackgroundMuon", "");//&trainsignal);
+  p->Process(&train, "BackgroundMuon", "", 500);//&trainsignal);
   //train.Process("FWLiteTSelector");
   p->ClearInput();
   p->Close();

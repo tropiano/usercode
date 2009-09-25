@@ -17,13 +17,13 @@ private:
 
    //normalization
    double _norm;
-
+/*
    //jet definition
    double _ptjetmin, _etajetmax;
 
    //isolation
    double _isocut;
-
+*/
    void destroyHistosVector(std::vector<TH1D*>& t){
      std::vector<TH1D*>::iterator i;
      for (i = t.begin(); i != t.end(); ++i) delete *i;

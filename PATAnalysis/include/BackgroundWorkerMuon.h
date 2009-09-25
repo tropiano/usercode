@@ -21,6 +21,13 @@ public :
         *recTrackIsoSec, *recEcalIsoSec, *recHcalIsoSec, *recRelIsoSec,
         *recLeadMuPt, *recSecMuPt, *recLeadMuEta, *recSecMuEta,
         *recLeadJetPt, *recLeadJetEta;
+private:
+  double _ptjetmin;
+
+  double _etajetmax;
+  
+  double _isocut;
+
 
 };
 #endif

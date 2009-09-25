@@ -1,5 +1,6 @@
 
 #include "Firenze/PATAnalysis/include/BackgroundWorkerMuon.h"
+#include "Firenze/PATAnalysis/include/Utilities.h"
 #include <TH2.h>
 #include <TStyle.h>
 #include <math.h>
@@ -15,6 +16,9 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "DataFormats/Common/interface/Handle.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/PatCandidates/interface/TriggerEvent.h"
+#include "DataFormats/Candidate/interface/CompositeCandidate.h"
+#include "DataFormats/PatCandidates/interface/Jet.h"
 
 using namespace std;
 using namespace edm;
@@ -24,9 +28,26 @@ BackgroundWorkerMuon::BackgroundWorkerMuon(const TList* in , TList& out):
 recPtZ(0), recEtaZ(0), recMulti(0), recMassZ(0), recTrackIsoLead(0), recEcalIsoLead(0), recHcalIsoLead(0), recRelIsoLead(0),
 recTrackIsoSec(0), recEcalIsoSec(0), recHcalIsoSec(0), recRelIsoSec(0),
 recLeadMuPt(0), recSecMuPt(0), recLeadMuEta(0), recSecMuEta(0),
-recLeadJetPt(0), recLeadJetEta(0)
+recLeadJetPt(0), recLeadJetEta(0), _ptjetmin(30.), _etajetmax(3.), _isocut(0.3)
 //_efficiency(out, "EfficienciesTotalVsRecMulti", 10, -0.5, 9.5, 0.3, false),
 {       
+   TIter next(in);
+   while (TObject* obj = next()){
+    const TParameter<double>* parDouble = dynamic_cast<const TParameter<double>* >(obj);
+    if (parDouble){
+      if (!strcmp(parDouble->GetName(), "MinPtJet")){
+        _ptjetmin = parDouble->GetVal();
+        cout << "set minimum pt for jets to: " << _ptjetmin << endl;
+      } else if (!strcmp(parDouble->GetName(), "IsoCut")){
+        _isocut = parDouble->GetVal();
+        cout << "set isolation cut to: " << _isocut << endl;
+      } else if (!strcmp(parDouble->GetName(), "MaxEtaJet")) {
+        _etajetmax = parDouble->GetVal();
+        cout << "set maximim eta for jets to: " << _etajetmax << endl;
+      }
+    }
+   }  
+
    recPtZ   = new TH1D("recPtZ", "Reconstructed Z p_{T}", 200, 0, 200);
    out.Add(recPtZ); 
    recEtaZ  = new TH1D("recEtaZ", "Reconstructed Z #eta", 100, -10, 10);
@@ -67,118 +88,74 @@ recLeadJetPt(0), recLeadJetEta(0)
 }
 
 BackgroundWorkerMuon::~BackgroundWorkerMuon(){
-/*  delete recPtZ;
-  delete recEtaZ;
-  delete recMulti;
-  delete recMassZ; 
-  delete recTrackIsoLead; 
-  delete recEcalIsoLead;  
-  delete recHcalIsoLead;  
-  delete recRelIsoLead ;  
-  delete recTrackIsoSec;
-  delete recEcalIsoSec;
-  delete recHcalIsoSec;
-  delete recRelIsoSec ;
-  delete recLeadMuPt; 
-  delete recSecMuPt;  
-  delete recLeadMuEta; 
-  delete recSecMuEta;  
-  delete recLeadJetPt; 
-  delete recLeadJetEta;
-*/
-  /*destroyHistosVector(recJetPtVsInclMulti);
-  destroyHistosVector(recJetEtaVsInclMulti);
-  destroyHistosVector(recZPtVsInclMulti);
-  destroyHistosVector(recZEtaVsInclMulti);
-  destroyHistosVector(recZPtVsExclMulti);
-  destroyHistosVector(recZEtaVsExclMulti);
-  destroyHistosVector(recMu1PtVsExclMulti);
-  destroyHistosVector(recMu1EtaVsExclMulti);
-  destroyHistosVector(recMu2PtVsExclMulti);
-  destroyHistosVector(recMu2EtaVsExclMulti);*/
 }
 
 void  BackgroundWorkerMuon::process(const edm::Event& iEvent)
 {
-   //cout << "fChain "<< fChain << " with " << fChain->GetEntriesFast() << " entries" << endl;
-
-   //if (!(entry%100000)) cout << ">>>>>>>>Processing Event " << entry << endl;
-
-   //cout << "Processing event" << endl;
 
    edm::Handle<std::vector<pat::Muon> > muonHandle;
    iEvent.getByLabel("selectedMuons", muonHandle);
 
+   edm::Handle<std::vector<reco::CompositeCandidate> > zHandle;
+   iEvent.getByLabel("zmumurec", zHandle);
+
+   edm::Handle<std::vector<pat::Jet> > jetHandle;
+   iEvent.getByLabel("selectedJets", jetHandle);
+
+   edm::Handle<pat::TriggerEvent> triggerHandle;
+   iEvent.getByLabel("patTriggerEvent", triggerHandle);
+
+   
    //cout << "collection taken" << endl;
 
-   if (muonHandle->size()){
-    recLeadMuPt->Fill((*muonHandle)[0].pt()); 
-   }
-/*   
-   if (MuREC->size() > 0){
-      //_efficiency.init(*MuREC, *ZREC, *ZRECDauMuon, *triggersREC);
-
-      //_efficiency.fill(jetREC->size(), norm);
-   }   
-
-   //if (RecSelected(ZREC, ZRECDauMuon, _isocut)){
-   if (RecSelectedWithTrigger(ZREC, ZRECDauMuon, triggersREC, _isocut)){
-      recPtZ->Fill((*ZREC)[0]._pt);
-      recEtaZ->Fill((*ZREC)[0]._eta);
-      recMassZ->Fill((*ZREC)[0]._mass);
-      recLeadMuPt->Fill((*ZRECDauMuon)[0]._pt);
-      recLeadMuEta->Fill((*ZRECDauMuon)[0]._eta);
-      recSecMuPt->Fill((*ZRECDauMuon)[1]._pt);
-      recSecMuEta->Fill((*ZRECDauMuon)[1]._eta);
+   /*if (muonHandle->size()){
+      recLeadMuPt->Fill((*muonHandle)[0].pt());
+      
+   }*/
+   //we need to add the piece of code that select the Z candidate in case of multiple candidates
+   
+   //if (RecSelected(zHandle, zHandleDauMuon, _isocut)){
+   if (RecSelectedWithTrigger(*zHandle, *triggerHandle, _isocut)){
+      recPtZ->Fill((*zHandle)[0].pt());
+      recEtaZ->Fill((*zHandle)[0].eta());
+      recMassZ->Fill((*zHandle)[0].mass());
+      recLeadMuPt->Fill((*zHandle)[0].daughter(0)->pt());
+      recLeadMuEta->Fill((*zHandle)[0].daughter(0)->eta());
+      recSecMuPt->Fill((*zHandle)[0].daughter(1)->pt());
+      recSecMuEta->Fill((*zHandle)[0].daughter(1)->eta());
       //std::vector<PhysVarTreeJet> selectedjets = GetJets(jetREC, _ptjetmin, _etajetmax);
-      std::vector<PhysVarTreeJet> recjets = GetJets(jetREC, _ptjetmin, _etajetmax);
-      addHistosVsMulti(recjets.size(), "recJetPtIncl", " reconstructed jet p_{T} spectrum", 200, 0, 200, recJetPtVsInclMulti);
-      addHistosVsMulti(recjets.size(), "recJetEtaIncl", " reconstructed jet #eta spectrum", 100, -5., 5., recJetEtaVsInclMulti);
-      addHistosVsMulti(recjets.size(), "recZPtIncl", " reconstructed Z p_{T} spectrum", 200., 0., 200., recZPtVsInclMulti);
-      addHistosVsMulti(recjets.size(), "recZEtaIncl", " reconstructed Z #eta spectrum", 100, -5., 5., recZEtaVsInclMulti);
-      addHistosVsMulti(recjets.size(), "recZPtExcl", " reconstructed Z p_{T} spectrum", 200, 0., 200., recZPtVsExclMulti);
-      addHistosVsMulti(recjets.size(), "recZEtaExcl", " reconstructed Z #eta spectrum", 100, -5., 5., recZEtaVsExclMulti);
-      addHistosVsMulti(recjets.size(), "recZPtExcl", " reconstructed Z p_{T} spectrum", 200, 0., 200., recZPtVsExclMulti);
-      addHistosVsMulti(recjets.size(), "recMu1PtExcl", " reconstructed lead #mu p_{T} spectrum", 200, 0., 200., recMu1PtVsExclMulti);
-      addHistosVsMulti(recjets.size(), "recMu1EtaExcl", " reconstructed lead #mu #eta spectrum", 100, -5., 5., recMu1EtaVsExclMulti);
-      addHistosVsMulti(recjets.size(), "recMu2PtExcl", " reconstructed sec #mu p_{T} spectrum", 200, 0., 200., recMu2PtVsExclMulti);
-      addHistosVsMulti(recjets.size(), "recMu2EtaExcl", " reconstructed sec #mu #eta spectrum", 100, -5., 5., recMu2EtaVsExclMulti);
-      recMulti->Fill(recjets.size());
-
+      //std::vector<pat::Jet> recjets = GetJets(*jetHandle, _ptjetmin, _etajetmax);
+      /*
       for (int i = 0; i < recjets.size()+1; ++i){
-        recZPtVsInclMulti[i]->Fill((*ZREC)[0]._pt);
-        recZEtaVsInclMulti[i]->Fill((*ZREC)[0]._eta);
+        recZPtVsInclMulti[i]->Fill((*zHandle)[0]._pt);
+        recZEtaVsInclMulti[i]->Fill((*zHandle)[0]._eta);
       }
+      */
 
-      //fill exclusive histograms
-      recZPtVsExclMulti[recjets.size()]->Fill((*ZREC)[0]._pt);
-      recZEtaVsExclMulti[recjets.size()]->Fill((*ZREC)[0]._eta);
-      recMu1PtVsExclMulti[recjets.size()]->Fill((*ZRECDauMuon)[0]._pt);
-      recMu1EtaVsExclMulti[recjets.size()]->Fill((*ZRECDauMuon)[0]._eta);
-      recMu2PtVsExclMulti[recjets.size()]->Fill((*ZRECDauMuon)[1]._pt);
-      recMu2EtaVsExclMulti[recjets.size()]->Fill((*ZRECDauMuon)[1]._eta);
-
-      if (recjets.size()){
-        recLeadJetPt->Fill(recjets[0]._pt);
-        recLeadJetEta->Fill(recjets[0]._eta);
+      //if (recjets.size()){
+      //  recLeadJetPt->Fill(recjets[0]._pt);
+      //  recLeadJetEta->Fill(recjets[0]._eta);
+        /*
         for (int i = 0; i < recjets.size(); ++i){
           recJetPtVsInclMulti[i+1]->Fill(recjets[i]._pt);
           recJetEtaVsInclMulti[i+1]->Fill(recjets[i]._eta);
-        }
-      }
+        }*/
+      //}
    }
+/*
+   const pat::Muon* dau0 = (const pat::Muon*) zHandle->daughter(0);  
+   const pat::Muon* dau1 = (const pat::Muon*) zHandle->daughter(1);  
 
-   if (RecSelectedNoIso(ZREC, ZRECDauMuon)){
-      recTrackIsoLead->Fill((*ZRECDauMuon)[0]._trackIso);
-      recEcalIsoLead->Fill((*ZRECDauMuon)[0]._ecalIso);
-      recHcalIsoLead->Fill((*ZRECDauMuon)[0]._hcalIso);
-      recRelIsoLead->Fill(( (*ZRECDauMuon)[0]._trackIso+(*ZRECDauMuon)[0]._ecalIso+(*ZRECDauMuon)[0]._hcalIso )/(*ZRECDauMuon)[0]._pt);
-      recTrackIsoSec->Fill((*ZRECDauMuon)[1]._trackIso);
-      recEcalIsoSec->Fill((*ZRECDauMuon)[1]._ecalIso);
-      recHcalIsoSec->Fill((*ZRECDauMuon)[1]._hcalIso);
-      recRelIsoSec->Fill(( (*ZRECDauMuon)[1]._trackIso+(*ZRECDauMuon)[1]._ecalIso+(*ZRECDauMuon)[1]._hcalIso )/(*ZRECDauMuon)[1]._pt);
+   if (RecSelectedNoIso(zHandle, zHandleDauMuon)){
+      recTrackIsoLead->Fill(dau0->trackIso());
+      recEcalIsoLead->Fill(dau0->ecalIso());
+      recHcalIsoLead->Fill(dau0->hcalIso());
+      recRelIsoLead->Fill( (dau0->trackIso() + dau0->ecalIso() + dau0->hcalIso()) / dau0->pt());
+      recTrackIsoSec->Fill(dau1->trackIso());
+      recEcalIsoSec->Fill(dau1->ecalIso());
+      recHcalIsoSec->Fill(dau1->hcalIso());
+      recRelIsoSec->Fill( (dau1->trackIso() + dau1->ecalIso() + dau1->hcalIso()) / dau1->pt());
    }
+*/
 
-
-   return kTRUE;*/
 }

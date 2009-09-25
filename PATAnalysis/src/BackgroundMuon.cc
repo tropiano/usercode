@@ -19,7 +19,7 @@
 using namespace std;
 using namespace edm;
 
-BackgroundMuon::BackgroundMuon() : _output(0), _norm(1.), _ptjetmin(30.), _etajetmax(3.), _isocut(0.3) {
+BackgroundMuon::BackgroundMuon() : _output(0), _norm(1.)/*, _ptjetmin(30.), _etajetmax(3.), _isocut(0.3)*/ {
   //_output = new TFile("ciao.root", "RECREATE");
   cout << "BackgroundMuon built" << endl;
 }
@@ -40,7 +40,7 @@ void BackgroundMuon::begin(TList*& list){
         _norm = parDouble->GetVal();
         cout << "set scale factor to: " << _norm << endl;  
         factorSet = true;
-      } else if (!strcmp(parDouble->GetName(), "MinPtJet")){
+      } /*else if (!strcmp(parDouble->GetName(), "MinPtJet")){
         _ptjetmin = parDouble->GetVal();
         cout << "set minimum pt for jets to: " << _ptjetmin << endl;
       } else if (!strcmp(parDouble->GetName(), "IsoCut")){
@@ -49,7 +49,7 @@ void BackgroundMuon::begin(TList*& list){
       } else if (!strcmp(parDouble->GetName(), "MaxEtaJet")) { 
         _etajetmax = parDouble->GetVal();
         cout << "set maximim eta for jets to: " << _etajetmax << endl;
-      }
+      }*/
     } else if (parFile) {
       if (!strcmp(parFile->GetName(), "OutputFile")){
         _output = new TFile(parFile->GetTitle(), "RECREATE");
@@ -67,6 +67,7 @@ void BackgroundMuon::begin(TList*& list){
     cout << "You did not set the output file! " << endl;
     assert(fileSet);
   }
+  //sleep(2);
 }
 
 //norm = _targetLumi/lumi;
