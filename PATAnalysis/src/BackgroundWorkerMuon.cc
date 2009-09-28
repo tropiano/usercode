@@ -32,10 +32,11 @@ BackgroundWorkerMuon::BackgroundWorkerMuon(TProofOutputFile* proofFile, const TL
 recPtZ(0), recEtaZ(0), recMulti(0), recMassZ(0), recTrackIsoLead(0), recEcalIsoLead(0), recHcalIsoLead(0), recRelIsoLead(0),
 recTrackIsoSec(0), recEcalIsoSec(0), recHcalIsoSec(0), recRelIsoSec(0),
 recLeadMuPt(0), recSecMuPt(0), recLeadMuEta(0), recSecMuEta(0),
-recLeadJetPt(0), recLeadJetEta(0), _ptjetmin(30.), _etajetmax(3.), _isocut(0.3)
+recLeadJetPt(0), recLeadJetEta(0), _ptjetmin(30.), _etajetmax(3.), _isocut(0.3), _norm(1.)
 //_efficiency(out, "EfficienciesTotalVsRecMulti", 10, -0.5, 9.5, 0.3, false),
 {       
    TIter next(fInput);
+   bool factorSet = false;  
    while (TObject* obj = next()){
     const TParameter<double>* parDouble = dynamic_cast<const TParameter<double>* >(obj);
     if (parDouble){
@@ -48,9 +49,18 @@ recLeadJetPt(0), recLeadJetEta(0), _ptjetmin(30.), _etajetmax(3.), _isocut(0.3)
       } else if (!strcmp(parDouble->GetName(), "MaxEtaJet")) {
         _etajetmax = parDouble->GetVal();
         cout << "set maximim eta for jets to: " << _etajetmax << endl;
+      } else if (!strcmp(parDouble->GetName(), "ScaleFactor")) {
+        _norm = parDouble->GetVal();
+        cout << "set scale factor to: " << _norm << endl;
+        factorSet = true;
       }
     }
    }  
+
+   if (!factorSet) {
+     cout << "You did not set the scale factor! " << endl;
+     assert(factorSet);
+   }
 
    _file = proofFile->OpenFile("RECREATE");
    _file->cd();
@@ -109,6 +119,7 @@ void  BackgroundWorkerMuon::process(const fwlite::ChainEvent& iEvent)
 
    //if (RecSelected(zHandle, zHandleDauMuon, _isocut)){
    if (RecSelectedWithTrigger(*zHandle, *triggerHandle, _isocut)){
+      cout << "PASSED!" << endl;
       recPtZ->Fill((*zHandle)[0].pt());
       recEtaZ->Fill((*zHandle)[0].eta());
       recMassZ->Fill((*zHandle)[0].mass());

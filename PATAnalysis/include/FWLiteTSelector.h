@@ -102,8 +102,24 @@ template <class Worker> void FWLiteTSelector<Worker>::SlaveBegin(TTree *iTree) {
 
 
   Init(iTree);
+  TIter next(fInput);
+  bool fileSet(false);
+  while (TObject* obj = next()){
+    TNamed* parFile   = dynamic_cast<TNamed*>(obj);
+    if (parFile) {
+      if (!strcmp(parFile->GetName(), "OutputFile")){
+        _fProofFile = new TProofOutputFile(parFile->GetTitle(),"LOCAL");
+        std::cout << "set output file to: " << parFile->GetTitle() << std::endl;
+        fileSet = true;
+      }  
+    }
+  }
+  //check that everything was set       
+  if (!fileSet) {
+    std::cout << "You did not set the output file! " << std::endl;
+    assert(fileSet);
+  }
 
-  _fProofFile = new TProofOutputFile("SimpleNtuple.root","LOCAL");
 
   //_fwLiteTreeAnalyser =  new BackgroundWorker(_fProofFile);
    _fwLiteWorker.reset(new Worker(_fProofFile, fInput));

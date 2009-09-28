@@ -4,8 +4,8 @@
 #include "DataFormats/FWLite/interface/Handle.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 
-#include "PhysicsTools/FWLite/interface/EventContainer.h"
-#include "PhysicsTools/FWLite/interface/CommandLineParser.h" 
+//#include "PhysicsTools/FWLite/interface/EventContainer.h"
+//#include "PhysicsTools/FWLite/interface/CommandLineParser.h" 
 
 // Root includes
 #include "TROOT.h"
@@ -20,7 +20,7 @@ using namespace std;
 ///////////////////////////
 
 int main (int argc, char* argv[]) 
-{
+{/*
    ////////////////////////////////
    // ////////////////////////// //
    // // Command Line Options // //
@@ -98,5 +98,6 @@ int main (int argc, char* argv[])
    // specificed by command line options.
 
    // All done!  Bye bye.
+*/   
    return 0;
 }

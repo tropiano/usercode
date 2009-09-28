@@ -34,6 +34,8 @@ private:
   
   double _isocut;
 
+  double _norm;
+
   TFile* _file;  
 
 
