@@ -82,19 +82,35 @@ inline bool singleMu_Isolation(const pat::Muon& muon){//, double isocut = 0.3){
            hcalIso->depositWithin(hcalIso->veto().dR, pat::IsoDeposit::Vetos(), true) < maxhcaletinveto;
 }
 
-/*
-inline bool GenSelected(const std::vector<PhysVarTree>* ZGEN, const std::vector<PhysVarTreeGenParticle>* ZGENDauGenParticle){
-  return ZGEN->size()==1 && ZGENDauGenParticle->size() == 2 && (*ZGEN)[0]._mass > zmassgenmin;
+
+inline bool GenSelected(const std::vector<reco::CompositeCandidate>& ZGEN){
+  if (ZGEN.size() == 0) return false;
+  if (ZGEN.size() > 1){
+    std::cout << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! " << std::endl;
+    throw cms::Exception("PATAnalysis:RecSelectedTwoMuonsOppositeCharge_Mass") << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! ";
+    return false;
+  }  
+  return ZGEN.size()==1 && ZGEN[0].mass() > zmassgenmin;
   //cout << "ZGEN " << ZGEN << endl; 
 }
 
-inline bool GenSelectedInAcceptance(const std::vector<PhysVarTree>* ZGEN, const std::vector<PhysVarTreeGenParticle>* ZGENDauGenParticle){
-  return ZGEN->size()==1 && ZGENDauGenParticle->size() == 2 && (*ZGEN)[0]._mass > zmassmin && (*ZGEN)[0]._mass < zmassmax 
-         && (*ZGENDauGenParticle)[0]._pt>ptmucut && fabs((*ZGENDauGenParticle)[0]._eta)<etamucut
-         && (*ZGENDauGenParticle)[1]._pt>ptmucut && fabs((*ZGENDauGenParticle)[1]._eta)<etamucut;
-    //cout << "ZGEN " << ZGEN << endl; 
+inline bool GenSelectedInAcceptance(const std::vector<reco::CompositeCandidate>& ZGEN){
+  if (ZGEN.size() == 0) return false;
+  if (ZGEN.size() > 1){
+    std::cout << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! " << std::endl;
+    throw cms::Exception("PATAnalysis:RecSelectedTwoMuonsOppositeCharge_Mass") << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! ";
+    return false;
+  }
+  
+
+  const reco::Candidate* dau0 = ZGEN[0].daughter(0);
+  const reco::Candidate* dau1 = ZGEN[0].daughter(1);
+
+  return ZGEN.size()==1 && ZGEN[0].mass() > zmassmin && ZGEN[0].mass() < zmassmax 
+         && dau0->pt() > ptmucut && fabs(dau0->eta()) < etamucut
+         && dau1->pt() > ptmucut && fabs(dau1->eta()) < etamucut;
 }
-*/
+
 
 
 inline bool isTriggered(const pat::TriggerEvent& triggers, std::string triggername){
@@ -219,8 +235,8 @@ inline bool RecSelected(const std::vector<reco::CompositeCandidate>& ZREC, doubl
     throw cms::Exception("PATAnalysis:RecSelectedTwoMuonsOppositeCharge_Mass") << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! ";
     return false;
   }
-  std::cout << ZREC[0].daughter(0) << " " << ZREC[0].daughter(1) << std::endl;
-  std::cout << typeid(*ZREC[0].daughter(0)).name() << " " << typeid(*ZREC[0].daughter(1)).name() << std::endl;
+  //std::cout << ZREC[0].daughter(0) << " " << ZREC[0].daughter(1) << std::endl;
+  //std::cout << typeid(*ZREC[0].daughter(0)).name() << " " << typeid(*ZREC[0].daughter(1)).name() << std::endl;
   const pat::Muon* dau0 = dynamic_cast<const pat::Muon*>(ZREC[0].daughter(0));
   const pat::Muon* dau1 = dynamic_cast<const pat::Muon*>(ZREC[0].daughter(1));
   if (!dau0) {
@@ -268,45 +284,80 @@ inline bool RecSelectedWithTrigger(const std::vector<reco::CompositeCandidate>& 
   if (!isTriggered) return false;
   return RecSelected(ZREC, isocut);
 }
-/*
-inline bool RecSelectedNoIso(const std::vector<PhysVarTree>* ZREC, const std::vector<PhysVarTreeMuon>* ZRECDauMuon){
-  //"@ZzjetsRECO.size()==1 && @ZzjetsRECODauMuon.size()==2 && ZzjetsRECO._mass>60. && ZzjetsRECO._mass<120. && ZzjetsRECODauMuon[0]._pt>20 && abs(ZzjetsRECODauMuon[0]._eta)<2.4 && ZzjetsRECODauMuon[1]._pt>20 && abs(ZzjetsRECODauMuon[1]._eta)<2.4 && (ZzjetsRECODauMuon[0]._hcalIso+ZzjetsRECODauMuon[0]._ecalIso+ZzjetsRECODauMuon[0]._trackIso)/ZzjetsRECODauMuon[0]._pt<0.3 && (ZzjetsRECODauMuon[1]._hcalIso+ZzjetsRECODauMuon[1]._ecalIso+ZzjetsRECODauMuon[1]._trackIso)/ZzjetsRECODauMuon[1]._pt<0.3 && ZzjetsRECODauMuon[0]._nhit>11 && ZzjetsRECODauMuon[1]._nhit>11"
 
-  return ZREC->size()==1 && ZRECDauMuon->size() == 2 && (*ZREC)[0]._mass>60. && (*ZREC)[0]._mass<120. &&
-         (*ZRECDauMuon)[0]._pt>20. && fabs((*ZRECDauMuon)[0]._eta)<2.4 && (*ZRECDauMuon)[1]._pt>20. && fabs((*ZRECDauMuon)[1]._eta)<2.4 &&
-         (*ZRECDauMuon)[0]._leptonID == 1 && (*ZRECDauMuon)[1]._leptonID == 1 && 
-         (*ZRECDauMuon)[0]._nhit>11 && (*ZRECDauMuon)[1]._nhit>11;
+inline bool RecSelectedNoIso(const std::vector<reco::CompositeCandidate>& ZREC){
+  if (ZREC.size() == 0) return false;
+  if (ZREC.size() > 1){
+    std::cout << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! " << std::endl;
+    throw cms::Exception("PATAnalysis:RecSelectedTwoMuonsOppositeCharge_Mass") << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! ";
+    return false;
+  }
+  //std::cout << ZREC[0].daughter(0) << " " << ZREC[0].daughter(1) << std::endl;
+  //std::cout << typeid(*ZREC[0].daughter(0)).name() << " " << typeid(*ZREC[0].daughter(1)).name() << std::endl;
+  const pat::Muon* dau0 = dynamic_cast<const pat::Muon*>(ZREC[0].daughter(0));
+  const pat::Muon* dau1 = dynamic_cast<const pat::Muon*>(ZREC[0].daughter(1));
+  if (!dau0) {
+     //maybe a shallow clone
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (ZREC[0].daughter(0));
+     if (scc && scc->hasMasterClone()){
+       dau0 = dynamic_cast<const pat::Muon*>(scc->masterClone().get());
+     }
+  }
+  if (!dau1) {
+     //maybe a shallow clone
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (ZREC[0].daughter(1));
+     if (scc && scc->hasMasterClone()){
+       dau1 = dynamic_cast<const pat::Muon*>(scc->masterClone().get());
+     }
+  }
+
+  assert(dau0 && dau1);
+  
+  return ZREC.size()==1 && ZREC[0].mass()>zmassmin && ZREC[0].mass()<zmassmax &&
+         dau0->pt() > ptmucut && fabs(dau0->eta()) < etamucut &&
+         dau1->pt() > ptmucut && fabs(dau1->eta()) < etamucut &&
+         dau0->numberOfValidHits() > minnhit && dau1->numberOfValidHits() > minnhit &&
+         dau0->normChi2() < maxchi2 && dau1->normChi2() < maxchi2 &&
+         dau0->dB() < dxycut && dau1->dB() < dxycut; 
+ 
+  
 }
-
-inline bool GenAndRecSelected(const std::vector<PhysVarTree>* ZGEN, const std::vector<PhysVarTreeGenParticle>* ZGENGenParticle,
+/*
+inline bool GenAndRecSelected(const std::vector<ee>* ZGEN, const std::vector<PhysVarTreeGenParticle>* ZGENGenParticle,
                        const std::vector<PhysVarTree>* ZREC, const std::vector<PhysVarTreeMuon>* ZRECDauMuon, double isocut) {
   return GenSelected(ZGEN, ZGENGenParticle) && RecSelected(ZREC, ZRECDauMuon, isocut);
 } 
+*/
 
-inline std::vector<PhysVarTreeJet> GetJets(const std::vector<PhysVarTreeJet>* jets, double ptmin, double etamax){
-  std::vector<PhysVarTreeJet> selectedjets;
-  std::vector<PhysVarTreeJet>::const_iterator ijet;
-  for (ijet = jets->begin(); ijet != jets->end(); ++ijet){
-    if (ijet->_pt > ptmin && fabs(ijet->_eta) < etamax) selectedjets.push_back(*ijet);
+template<class JET> 
+std::vector<const JET*> 
+GetJets(const std::vector<JET>& jets, double ptmin, double etamax){
+  std::vector<const JET*> selectedjets;
+  for (unsigned int i = 0; i < jets.size();  ++i){
+    if (jets[i].pt() > ptmin && fabs(jets[i].eta()) < etamax) selectedjets.push_back(&jets[i]);
   }
   return selectedjets;
 }
 
-inline double deltaYFwdBwd(const std::vector<PhysVarTreeJet>& jets){
+
+template<class JET> double deltaYFwdBwd(const std::vector<const JET*>& jets){
   assert(jets.size()>1);
   double maxy = -999999;
   double miny =  999999;
-  for (int i = 0; i < jets.size(); ++i){
-    if (jets[i]._y > maxy){
-      maxy = jets[i]._y;
+  for (unsigned int i = 0; i < jets.size(); ++i){
+    if (jets[i]->rapidity() > maxy){
+      maxy = jets[i]->rapidity();
     }
-    if (jets[i]._y < miny){
-      miny = jets[i]._y;
+    if (jets[i]->rapidity() < miny){
+      miny = jets[i]->rapidity();
     }
   }
   return maxy-miny ;   
 }
 
+
+
+/*
 inline TMatrixD createInclusiveTransform(int nrows){
   //create matrix with 1 in the upper triangle
   TMatrixD transform(nrows, nrows);

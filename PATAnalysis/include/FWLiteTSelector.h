@@ -1,5 +1,5 @@
-#ifndef PFAnalyses_VBFHTauTau_FWLiteTSelector_h
-#define PFAnalyses_VBFHTauTau_FWLiteTSelector_h
+#ifndef Firenze_PATAnalysis_FWLiteTSelector_h
+#define Firenze_PATAnalysis_FWLiteTSelector_h
 // -*- C++ -*-
 //
 // Class  : FWLiteTSelector    
@@ -19,6 +19,9 @@
 //
 
 
+
+
+
 #include <string>
 
 // system include files
@@ -26,6 +29,7 @@
 
 // user include files
 #include "boost/shared_ptr.hpp"
+#include "DataFormats/FWLite/interface/ChainEvent.h"
 
 // forward declarations
 class TFile;
@@ -33,11 +37,21 @@ class TList;
 class TTree;
 class TProofOutputFile;
 
-class BackgroundWorker;
+class DoNothingWorker {
+  public:
+  DoNothingWorker(TFile* file, const TList* fInput){}
+   ~DoNothingWorker(){};
 
-#include "DataFormats/FWLite/interface/ChainEvent.h"
+   void  process(const fwlite::ChainEvent& iEvent){};
 
-template <class Worker>
+   void finalize() {}
+
+};
+
+
+
+
+template <class Worker1, class Worker2=DoNothingWorker, class Worker3=DoNothingWorker, class Worker4=DoNothingWorker, class Worker5=DoNothingWorker >
 class FWLiteTSelector : public TSelector
 {
 
@@ -67,7 +81,11 @@ class FWLiteTSelector : public TSelector
       boost::shared_ptr<fwlite::ChainEvent> event_;
       TTree *tree_;
 
-      boost::shared_ptr<Worker> _fwLiteWorker;
+      boost::shared_ptr<Worker1> _fwLiteWorker1;
+      boost::shared_ptr<Worker2> _fwLiteWorker2;
+      boost::shared_ptr<Worker3> _fwLiteWorker3;
+      boost::shared_ptr<Worker4> _fwLiteWorker4;
+      boost::shared_ptr<Worker5> _fwLiteWorker5;
       //boost::shared_ptr<BackgroundWorker> _fwLiteTreeAnalyser;
       TProofOutputFile *_fProofFile;
       //TFile *_fFile;
@@ -86,19 +104,30 @@ class FWLiteTSelector : public TSelector
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-template <class Worker> FWLiteTSelector<Worker>::FWLiteTSelector() : 
-  everythingOK_(false), _fwLiteWorker() { std::cout << "Building a FWLiteTSelector " << std::endl;}
+template <class Worker1, class Worker2, class Worker3, class Worker4, class Worker5> 
+FWLiteTSelector<Worker1, Worker2, Worker3, Worker4, Worker5>::
+FWLiteTSelector() : 
+  everythingOK_(false), _fwLiteWorker1(), _fwLiteWorker2(), _fwLiteWorker3(), _fwLiteWorker4(), _fwLiteWorker5() 
+{ std::cout << "Building a FWLiteTSelector " << std::endl;}
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-template <class Worker> FWLiteTSelector<Worker>::~FWLiteTSelector(){}
+template <class Worker1, class Worker2, class Worker3, class Worker4, class Worker5> 
+FWLiteTSelector<Worker1, Worker2, Worker3, Worker4, Worker5>::
+~FWLiteTSelector(){}
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-template <class Worker> void FWLiteTSelector<Worker>::Begin(TTree * iTree) {   
+template <class Worker1, class Worker2, class Worker3, class Worker4, class Worker5>
+void
+FWLiteTSelector<Worker1, Worker2, Worker3, Worker4, Worker5>::
+Begin(TTree * iTree) {   
   Init(iTree); 
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-template <class Worker> void FWLiteTSelector<Worker>::SlaveBegin(TTree *iTree) { 
+template <class Worker1, class Worker2, class Worker3, class Worker4, class Worker5> 
+void
+FWLiteTSelector<Worker1, Worker2, Worker3, Worker4, Worker5>::
+SlaveBegin(TTree *iTree) { 
 
 
   Init(iTree);
@@ -120,23 +149,34 @@ template <class Worker> void FWLiteTSelector<Worker>::SlaveBegin(TTree *iTree) {
     assert(fileSet);
   }
 
+  TFile* unique = _fProofFile->OpenFile("RECREATE");
 
   //_fwLiteTreeAnalyser =  new BackgroundWorker(_fProofFile);
-   _fwLiteWorker.reset(new Worker(_fProofFile, fInput));
+   _fwLiteWorker1.reset(new Worker1(unique, fInput));
+   _fwLiteWorker2.reset(new Worker2(unique, fInput));
+   _fwLiteWorker3.reset(new Worker3(unique, fInput));
+   _fwLiteWorker4.reset(new Worker4(unique, fInput));
+   _fwLiteWorker5.reset(new Worker5(unique, fInput));
    
   //_fwLiteTreeAnalyser->init(myAnalysers);
 
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-template <class Worker> void FWLiteTSelector<Worker>::Init(TTree *iTree) { 
+template <class Worker1, class Worker2, class Worker3, class Worker4, class Worker5> 
+void
+FWLiteTSelector<Worker1, Worker2, Worker3, Worker4, Worker5>::
+Init(TTree *iTree) { 
   std::cout<<"FWLiteTSelector::Init() "<<iTree<<std::endl;
   if(iTree==0) return;
   tree_ = iTree;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-template <class Worker> Bool_t FWLiteTSelector<Worker>::Notify() { 
+template <class Worker1, class Worker2, class Worker3, class Worker4, class Worker5> 
+Bool_t
+FWLiteTSelector<Worker1, Worker2, Worker3, Worker4, Worker5>::
+Notify() { 
 
   TFile* file = tree_->GetCurrentFile();
   setupNewFile(*file);
@@ -144,9 +184,12 @@ template <class Worker> Bool_t FWLiteTSelector<Worker>::Notify() {
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-template <class Worker> Bool_t FWLiteTSelector<Worker>::Process(Long64_t iEntry) { 
+template <class Worker1, class Worker2, class Worker3, class Worker4, class Worker5> 
+Bool_t
+FWLiteTSelector<Worker1, Worker2, Worker3, Worker4, Worker5>::
+Process(Long64_t iEntry) { 
 
-  std::cout<<"iEntry: "<<iEntry<<std::endl;
+  //std::cout<<"iEntry: "<<iEntry<<std::endl;
   //float miliseconds = rand()/100000000.0;
   //std::cout<<"Will wait: "<<miliseconds<<" ms"<<std::endl;
   //sleep(miliseconds);
@@ -159,7 +202,11 @@ template <class Worker> Bool_t FWLiteTSelector<Worker>::Process(Long64_t iEntry)
   
   //std::cout<<test.id()<<std::endl;
   //if(test.id().run()>0) _fwLiteTreeAnalyser->process(const_cast<fwlite::ChainEvent&>(test));
-  _fwLiteWorker->process(const_cast<fwlite::ChainEvent&>(*event_));
+  _fwLiteWorker1->process(const_cast<fwlite::ChainEvent&>(*event_));
+  _fwLiteWorker2->process(const_cast<fwlite::ChainEvent&>(*event_));
+  _fwLiteWorker3->process(const_cast<fwlite::ChainEvent&>(*event_));
+  _fwLiteWorker4->process(const_cast<fwlite::ChainEvent&>(*event_));
+  _fwLiteWorker5->process(const_cast<fwlite::ChainEvent&>(*event_));
   _lastEntry = iEntry;
 
   //_fwLiteTreeAnalyser->analyse(const_cast<fwlite::ChainEvent&>(event_->to(iEntry)));
@@ -169,20 +216,33 @@ template <class Worker> Bool_t FWLiteTSelector<Worker>::Process(Long64_t iEntry)
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-template <class Worker> void FWLiteTSelector<Worker>::SlaveTerminate() { 
+template <class Worker1, class Worker2, class Worker3, class Worker4, class Worker5> 
+void
+FWLiteTSelector<Worker1, Worker2, Worker3, Worker4, Worker5>::
+SlaveTerminate() { 
 
   std::cout<<"ThingsTSelector::postProcessing()"<<std::endl;
-  _fwLiteWorker->finalize();
+  _fwLiteWorker1->finalize();
+  _fwLiteWorker2->finalize();
+  _fwLiteWorker3->finalize();
+  _fwLiteWorker4->finalize();
+  _fwLiteWorker5->finalize();
   //delete _fwLiteTreeAnalyser;
  // Write the ntuple to the file
   fOutput->Add(_fProofFile);
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-template <class Worker> void FWLiteTSelector<Worker>::Terminate() {}
+template <class Worker1, class Worker2, class Worker3, class Worker4, class Worker5> 
+void
+FWLiteTSelector<Worker1, Worker2, Worker3, Worker4, Worker5>::
+Terminate() {}
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-template <class Worker> void FWLiteTSelector<Worker>::setupNewFile(TFile& iFile) { 
+template <class Worker1, class Worker2, class Worker3, class Worker4, class Worker5> 
+void
+FWLiteTSelector<Worker1, Worker2, Worker3, Worker4, Worker5>::
+setupNewFile(TFile& iFile) { 
 
   std::vector<std::string> fileVector;
   fileVector.push_back(iFile.GetName());

@@ -1,5 +1,5 @@
 
-#include "Firenze/PATAnalysis/include/BackgroundWorkerMuon.h"
+#include "Firenze/PATAnalysis/include/RecoMuon.h"
 #include "Firenze/PATAnalysis/include/Utilities.h"
 #include <TH2.h>
 #include <TStyle.h>
@@ -28,11 +28,13 @@ using namespace std;
 using namespace edm;
 
 
-BackgroundWorkerMuon::BackgroundWorkerMuon(TProofOutputFile* proofFile, const TList* fInput): 
+RecoMuon::RecoMuon(TFile* proofFile, const TList* fInput): 
 recPtZ(0), recEtaZ(0), recMulti(0), recMassZ(0), recTrackIsoLead(0), recEcalIsoLead(0), recHcalIsoLead(0), recRelIsoLead(0),
 recTrackIsoSec(0), recEcalIsoSec(0), recHcalIsoSec(0), recRelIsoSec(0),
 recLeadMuPt(0), recSecMuPt(0), recLeadMuEta(0), recSecMuEta(0),
-recLeadJetPt(0), recLeadJetEta(0), _ptjetmin(30.), _etajetmax(3.), _isocut(0.3), _norm(1.)
+recLeadJetPt(0), recLeadJetEta(0), 
+_ptjetmin(30.), _etajetmax(3.), _isocut(0.3), _norm(1.),
+_file(proofFile)
 //_efficiency(out, "EfficienciesTotalVsRecMulti", 10, -0.5, 9.5, 0.3, false),
 {       
    TIter next(fInput);
@@ -62,7 +64,8 @@ recLeadJetPt(0), recLeadJetEta(0), _ptjetmin(30.), _etajetmax(3.), _isocut(0.3),
      assert(factorSet);
    }
 
-   _file = proofFile->OpenFile("RECREATE");
+   //_file = proofFile->OpenFile("RECREATE");
+   cout << "RecoMuon file name : " << _file->GetName() << endl;
    _file->cd();
    recPtZ   = new TH1D("recPtZ", "Reconstructed Z p_{T}", 200, 0, 200);
    recEtaZ  = new TH1D("recEtaZ", "Reconstructed Z #eta", 100, -10, 10);
@@ -82,16 +85,16 @@ recLeadJetPt(0), recLeadJetEta(0), _ptjetmin(30.), _etajetmax(3.), _isocut(0.3),
    recSecMuEta  = new TH1D("recSecMuEta", "Reconstructed Second #mu #eta", 50, 2.5, 2.5);
    recLeadJetPt = new TH1D("recLeadJetPt", "Reconstructed Leading Jet p_{T}", 200, 0, 200);
    recLeadJetEta = new TH1D("recLeadJetEta", "Reconstructed Leading Jet #eta", 100, -5, 5); 
-  cout << "Background Worker built." << endl;   
+  cout << "RecoMuon Worker built." << endl;   
 }
 
-BackgroundWorkerMuon::~BackgroundWorkerMuon(){
+RecoMuon::~RecoMuon(){
   _file->ls();
   //_file->Write();
   //_file->Close();
 }
 
-void  BackgroundWorkerMuon::process(const fwlite::ChainEvent& iEvent)
+void  RecoMuon::process(const fwlite::ChainEvent& iEvent)
 {
 
    fwlite::Handle<std::vector<pat::Muon> > muonHandle;
@@ -107,12 +110,6 @@ void  BackgroundWorkerMuon::process(const fwlite::ChainEvent& iEvent)
    triggerHandle.getByLabel(iEvent, "patTriggerEvent");
 
    
-   //cout << "collection taken" << endl;
-
-   /*if (muonHandle->size()){
-      recLeadMuPt->Fill((*muonHandle)[0].pt());
-      
-   }*/
    //we need to add the piece of code that select the Z candidate in case of multiple candidates
    if (zHandle->size() > 1) return; 
 
@@ -127,30 +124,41 @@ void  BackgroundWorkerMuon::process(const fwlite::ChainEvent& iEvent)
       recLeadMuEta->Fill((*zHandle)[0].daughter(0)->eta());
       recSecMuPt->Fill((*zHandle)[0].daughter(1)->pt());
       recSecMuEta->Fill((*zHandle)[0].daughter(1)->eta());
-      //std::vector<PhysVarTreeJet> selectedjets = GetJets(jetREC, _ptjetmin, _etajetmax);
-      //std::vector<pat::Jet> recjets = GetJets(*jetHandle, _ptjetmin, _etajetmax);
-      /*
-      for (int i = 0; i < recjets.size()+1; ++i){
-        recZPtVsInclMulti[i]->Fill((*zHandle)[0]._pt);
-        recZEtaVsInclMulti[i]->Fill((*zHandle)[0]._eta);
-      }
-      */
+   
+   
+      std::vector<const pat::Jet*> recjets = GetJets<pat::Jet>(*jetHandle, _ptjetmin, _etajetmax);
 
-      //if (recjets.size()){
-      //  recLeadJetPt->Fill(recjets[0]._pt);
-      //  recLeadJetEta->Fill(recjets[0]._eta);
-        /*
-        for (int i = 0; i < recjets.size(); ++i){
-          recJetPtVsInclMulti[i+1]->Fill(recjets[i]._pt);
-          recJetEtaVsInclMulti[i+1]->Fill(recjets[i]._eta);
-        }*/
-      //}
+
+      recMulti->Fill(recjets.size());
+
+      if (recjets.size()){
+        recLeadJetPt->Fill(recjets[0]->pt());
+        recLeadJetEta->Fill(recjets[0]->eta());
+      }
    }
 /*
-   const pat::Muon* dau0 = (const pat::Muon*) zHandle->daughter(0);  
-   const pat::Muon* dau1 = (const pat::Muon*) zHandle->daughter(1);  
+   const pat::Muon* dau0 = dynamic_cast<const pat::Muon*>((*zHandle)[0].daughter(0));
+   const pat::Muon* dau1 = dynamic_cast<const pat::Muon*>((*zHandle)[0].daughter(1));
+   if (!dau0) {
+     //maybe a shallow clone
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> ((*zHandle)[0].daughter(0));
+     if (scc && scc->hasMasterClone()){
+       dau0 = dynamic_cast<const pat::Muon*>(scc->masterClone().get());
+     }
+   }
+   if (!dau1) {
+     //maybe a shallow clone
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> ((*zHandle)[0].daughter(1));
+     if (scc && scc->hasMasterClone()){
+       dau1 = dynamic_cast<const pat::Muon*>(scc->masterClone().get());
+     }
+   }
 
-   if (RecSelectedNoIso(zHandle, zHandleDauMuon)){
+   assert(dau0 && dau1);
+
+   cout << "ciao 3" << endl;
+
+   if (RecSelectedNoIso(*zHandle)){
       recTrackIsoLead->Fill(dau0->trackIso());
       recEcalIsoLead->Fill(dau0->ecalIso());
       recHcalIsoLead->Fill(dau0->hcalIso());

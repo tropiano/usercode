@@ -5,6 +5,7 @@
 <use name=FWCore/TFWLiteSelector>
 <use name=rootrflx>
 <lib name=ProofPlayer>
+<Flags CXXFLAGS="-g">
 <export>
   <use name=root>
   <use name=FWCore/Framework>

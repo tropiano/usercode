@@ -1,5 +1,5 @@
-#ifndef BackgroundWorkerMuon_h
-#define BackgroundWorkerMuon_h
+#ifndef RecoMuon_h
+#define RecoMuon_h
 
 #include "TFile.h"
 
@@ -7,13 +7,14 @@
 #include "DataFormats/FWLite/interface/ChainEvent.h"
 #include "TH1D.h"
 #include "TList.h"
-#include "TProofOutputFile.h"
+//#include "TProofOutputFile.h"
+#include "TFile.h"
 
-class BackgroundWorkerMuon {
+class RecoMuon {
 public :
-   BackgroundWorkerMuon(TProofOutputFile* out, const TList* fInput);
+   RecoMuon(TFile* out, const TList* fInput);
 
-   ~BackgroundWorkerMuon();
+   ~RecoMuon();
 
    void  process(const fwlite::ChainEvent& iEvent);
 

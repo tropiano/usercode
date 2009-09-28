@@ -1,10 +1,8 @@
 #include "Firenze/PATAnalysis/include/FWLiteTSelector.h"
-#include "Firenze/PATAnalysis/include/BackgroundWorkerMuon.h"
-#ifdef __GCCXML__
-template class FWLiteTSelector<BackgroundWorkerMuon>;
-#endif
+#include "Firenze/PATAnalysis/include/RecoMuon.h"
+#include "Firenze/PATAnalysis/include/GenMuon.h"
 
-typedef FWLiteTSelector<BackgroundWorkerMuon> BackgroundMuon;
+struct SignalMuon : public FWLiteTSelector<RecoMuon, GenMuon> {};
 
 namespace {
   namespace {
