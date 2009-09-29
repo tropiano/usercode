@@ -18,15 +18,33 @@ public :
 
    void  process(const fwlite::ChainEvent& iEvent);
 
-   void finalize() {
-     _file->Write();
-     _file->Close();
-   }
+   void finalize(); 
 
    //Histograms
    TH1D *genPtZ, *genEtaZ, *genMulti, *genMassZ, *genLeadMuPt, *genSecMuPt, *genLeadMuEta, *genSecMuEta,
         *genLeadJetPt, *genLeadJetEta, *genDeltayJfwdJbwd;
-        //*genDjr0, *genDjr1, *genDjr2; 
+        //*genDjr0, *genDjr1, *genDjr2;
+
+   std::vector<TH1D*> genJetPtVsInclMulti;
+   std::vector<TH1D*> genJetEtaVsInclMulti;
+
+   std::vector<TH1D*> genZPtVsInclMulti;
+   std::vector<TH1D*> genZEtaVsInclMulti;
+
+   std::vector<TH1D*> genMu1PtVsInclMulti;
+   std::vector<TH1D*> genMu1EtaVsInclMulti;
+
+   std::vector<TH1D*> genMu2PtVsInclMulti;
+   std::vector<TH1D*> genMu2EtaVsInclMulti;
+
+   std::vector<TH1D*> genZPtVsExclMulti;
+   std::vector<TH1D*> genZEtaVsExclMulti;
+
+   std::vector<TH1D*> genMu1PtVsExclMulti;
+   std::vector<TH1D*> genMu1EtaVsExclMulti;
+
+   std::vector<TH1D*> genMu2PtVsExclMulti;
+   std::vector<TH1D*> genMu2EtaVsExclMulti;
    
 private:
   double _ptjetmin;
@@ -37,6 +55,7 @@ private:
 
   TFile* _file;  
 
+  std::vector<TH1D*> _histovector;
 
 };
 #endif

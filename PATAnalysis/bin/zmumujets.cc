@@ -18,6 +18,7 @@ using namespace std;
 
 int main(){
   TProof * p = TProof::Open("");
+  //p->SetParallel(1);
   
   double targetLumi = 100.;
   

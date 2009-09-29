@@ -227,7 +227,7 @@ inline std::pair<bool, std::vector<pat::Muon> > RecSelected_Isolation(const std:
 */
 
 
-inline bool RecSelected(const std::vector<reco::CompositeCandidate>& ZREC, double isocut){
+inline bool RecSelected(const std::vector<reco::CompositeCandidate>& ZREC, double isocut, const pat::Muon* extdau0 = 0,  const pat::Muon* estdau1 = 0){
   //"@ZzjetsRECO.size()==1 && @ZzjetsRECODauMuon.size()==2 && ZzjetsRECO._mass>60. && ZzjetsRECO._mass<120. && ZzjetsRECODauMuon[0]._pt>20 && abs(ZzjetsRECODauMuon[0]._eta)<2.4 && ZzjetsRECODauMuon[1]._pt>20 && abs(ZzjetsRECODauMuon[1]._eta)<2.4 && (ZzjetsRECODauMuon[0]._hcalIso+ZzjetsRECODauMuon[0]._ecalIso+ZzjetsRECODauMuon[0]._trackIso)/ZzjetsRECODauMuon[0]._pt<0.3 && (ZzjetsRECODauMuon[1]._hcalIso+ZzjetsRECODauMuon[1]._ecalIso+ZzjetsRECODauMuon[1]._trackIso)/ZzjetsRECODauMuon[1]._pt<0.3 && ZzjetsRECODauMuon[0]._nhit>11 && ZzjetsRECODauMuon[1]._nhit>11"
   if (ZREC.size() == 0) return false;
   if (ZREC.size() > 1){
@@ -237,22 +237,29 @@ inline bool RecSelected(const std::vector<reco::CompositeCandidate>& ZREC, doubl
   }
   //std::cout << ZREC[0].daughter(0) << " " << ZREC[0].daughter(1) << std::endl;
   //std::cout << typeid(*ZREC[0].daughter(0)).name() << " " << typeid(*ZREC[0].daughter(1)).name() << std::endl;
-  const pat::Muon* dau0 = dynamic_cast<const pat::Muon*>(ZREC[0].daughter(0));
-  const pat::Muon* dau1 = dynamic_cast<const pat::Muon*>(ZREC[0].daughter(1));
-  if (!dau0) {
+  const pat::Muon* dau0 = 0;
+  const pat::Muon* dau1 = 0;
+  if (extdau0 && estdau1){
+    dau0 = extdau0;
+    dau1 = estdau1;
+  } else {
+    dau0 = dynamic_cast<const pat::Muon*>(ZREC[0].daughter(0));
+    dau1 = dynamic_cast<const pat::Muon*>(ZREC[0].daughter(1));
+    if (!dau0) {
      //maybe a shallow clone
      const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (ZREC[0].daughter(0));
      if (scc && scc->hasMasterClone()){
        dau0 = dynamic_cast<const pat::Muon*>(scc->masterClone().get()); 
      }
-  }
-  if (!dau1) {
+    }
+    if (!dau1) {
      //maybe a shallow clone
      const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (ZREC[0].daughter(1));
      if (scc && scc->hasMasterClone()){
        dau1 = dynamic_cast<const pat::Muon*>(scc->masterClone().get());
      }
-  }
+    }
+  }  
   
   assert(dau0 && dau1);
   const pat::IsoDeposit* hcalIso0 = dau0->isoDeposit(pat::HCalIso);
@@ -277,39 +284,46 @@ inline bool RecSelected(const std::vector<reco::CompositeCandidate>& ZREC, doubl
          hcalIso1->depositWithin(hcalIso1->veto().dR, pat::IsoDeposit::Vetos(), true) < maxhcaletinveto ; 
 }
 
-inline bool RecSelectedWithTrigger(const std::vector<reco::CompositeCandidate>& ZREC, const pat::TriggerEvent& triggers, double isocut){
+inline bool RecSelectedWithTrigger(const std::vector<reco::CompositeCandidate>& ZREC, const pat::TriggerEvent& triggers, double isocut, 
+                                   const pat::Muon* extdau0 = 0, const pat::Muon* extdau1 = 0){
   //"@ZzjetsRECO.size()==1 && @ZzjetsRECODauMuon.size()==2 && ZzjetsRECO._mass>60. && ZzjetsRECO._mass<120. && ZzjetsRECODauMuon[0]._pt>20 && abs(ZzjetsRECODauMuon[0]._eta)<2.4 && ZzjetsRECODauMuon[1]._pt>20 && abs(ZzjetsRECODauMuon[1]._eta)<2.4 && (ZzjetsRECODauMuon[0]._hcalIso+ZzjetsRECODauMuon[0]._ecalIso+ZzjetsRECODauMuon[0]._trackIso)/ZzjetsRECODauMuon[0]._pt<0.3 && (ZzjetsRECODauMuon[1]._hcalIso+ZzjetsRECODauMuon[1]._ecalIso+ZzjetsRECODauMuon[1]._trackIso)/ZzjetsRECODauMuon[1]._pt<0.3 && ZzjetsRECODauMuon[0]._nhit>11 && ZzjetsRECODauMuon[1]._nhit>11"
   
   bool isTriggered = isMuonTriggered(triggers);
   if (!isTriggered) return false;
-  return RecSelected(ZREC, isocut);
+  return RecSelected(ZREC, isocut, extdau0, extdau1);
 }
 
-inline bool RecSelectedNoIso(const std::vector<reco::CompositeCandidate>& ZREC){
+inline bool RecSelectedNoIso(const std::vector<reco::CompositeCandidate>& ZREC, const pat::Muon* extdau0 = 0, const pat::Muon* extdau1 = 0 ){
   if (ZREC.size() == 0) return false;
   if (ZREC.size() > 1){
     std::cout << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! " << std::endl;
     throw cms::Exception("PATAnalysis:RecSelectedTwoMuonsOppositeCharge_Mass") << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! ";
     return false;
   }
-  //std::cout << ZREC[0].daughter(0) << " " << ZREC[0].daughter(1) << std::endl;
-  //std::cout << typeid(*ZREC[0].daughter(0)).name() << " " << typeid(*ZREC[0].daughter(1)).name() << std::endl;
-  const pat::Muon* dau0 = dynamic_cast<const pat::Muon*>(ZREC[0].daughter(0));
-  const pat::Muon* dau1 = dynamic_cast<const pat::Muon*>(ZREC[0].daughter(1));
-  if (!dau0) {
+
+  const pat::Muon* dau0 = 0;
+  const pat::Muon* dau1 = 0;
+  if (extdau0 && extdau1){
+    dau0 = extdau0;
+    dau1 = extdau1;
+  } else {
+    dau0 = dynamic_cast<const pat::Muon*>(ZREC[0].daughter(0));
+    dau1 = dynamic_cast<const pat::Muon*>(ZREC[0].daughter(1));
+    if (!dau0) {
      //maybe a shallow clone
      const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (ZREC[0].daughter(0));
      if (scc && scc->hasMasterClone()){
        dau0 = dynamic_cast<const pat::Muon*>(scc->masterClone().get());
      }
-  }
-  if (!dau1) {
+    }
+    if (!dau1) {
      //maybe a shallow clone
      const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (ZREC[0].daughter(1));
      if (scc && scc->hasMasterClone()){
        dau1 = dynamic_cast<const pat::Muon*>(scc->masterClone().get());
      }
-  }
+    }
+  }  
 
   assert(dau0 && dau1);
   
@@ -436,11 +450,12 @@ inline TVectorD systematicErrors(const TVectorD& orig, const TVectorD& varied){
   return error;
 }
 
+*/
 
 //book histograms according to multiplicity
-inline void addHistosVsMulti(int multi, std::string name, std::string title, int nbin, double min, double max, std::vector<TH1D*>& array){
+inline void addHistosVsMulti(unsigned int multi, std::string name, std::string title, int nbin, double min, double max, std::vector<TH1D*>& array){
   if (array.size() < multi+1){
-    for (int i = array.size(); i < multi+1; ++i){
+    for (unsigned int i = array.size(); i < multi+1; ++i){
       std::stringstream fullname;
       fullname << name << i << "jets";
       std::stringstream fulltitle;
@@ -451,12 +466,16 @@ inline void addHistosVsMulti(int multi, std::string name, std::string title, int
       else ext = "th";
       fulltitle << i << "^{" << ext << "} jet " << title;
 
-      array.push_back(new TH1D(fullname.str().c_str(), fulltitle.str().c_str(), nbin, min, max));
+      TH1D* newhisto = new TH1D(fullname.str().c_str(), fulltitle.str().c_str(), nbin, min, max);
+      newhisto->Sumw2();
+
+      array.push_back(newhisto);
 
     }
   }
 }
 
+/*
 inline TGraphAsymmErrors multiplyTGraphs(const std::vector<TGraphAsymmErrors*>& graphs, const char* name) {
   if (graphs.empty()){
     cout << "ERROR!!!!! in multiplyTGraphs: no graphs to add" << endl;

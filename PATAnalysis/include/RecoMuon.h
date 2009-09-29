@@ -18,16 +18,35 @@ public :
 
    void  process(const fwlite::ChainEvent& iEvent);
 
-   void finalize() {
-     _file->Write();
-     _file->Close();
-   }
+   void finalize(); 
 
    //Histograms
    TH1D *recPtZ, *recEtaZ, *recMulti, *recMassZ, *recTrackIsoLead, *recEcalIsoLead, *recHcalIsoLead, *recRelIsoLead,
         *recTrackIsoSec, *recEcalIsoSec, *recHcalIsoSec, *recRelIsoSec,
         *recLeadMuPt, *recSecMuPt, *recLeadMuEta, *recSecMuEta,
         *recLeadJetPt, *recLeadJetEta;
+
+   std::vector<TH1D*> recJetPtVsInclMulti;
+   std::vector<TH1D*> recJetEtaVsInclMulti;
+
+   std::vector<TH1D*> recZPtVsInclMulti;
+   std::vector<TH1D*> recZEtaVsInclMulti;
+
+   std::vector<TH1D*> recMu1PtVsInclMulti;
+   std::vector<TH1D*> recMu1EtaVsInclMulti;
+
+   std::vector<TH1D*> recMu2PtVsInclMulti;
+   std::vector<TH1D*> recMu2EtaVsInclMulti;
+
+   std::vector<TH1D*> recZPtVsExclMulti;
+   std::vector<TH1D*> recZEtaVsExclMulti;
+
+   std::vector<TH1D*> recMu1PtVsExclMulti;
+   std::vector<TH1D*> recMu1EtaVsExclMulti;
+
+   std::vector<TH1D*> recMu2PtVsExclMulti;
+   std::vector<TH1D*> recMu2EtaVsExclMulti;    
+ 
 private:
   double _ptjetmin;
 
@@ -39,6 +58,7 @@ private:
 
   TFile* _file;  
 
+  std::vector<TH1D*> _histoVector;
 
 };
 #endif
