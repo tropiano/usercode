@@ -118,7 +118,8 @@ RecoMuon::~RecoMuon(){
   //_file->Close();
 }
 
-void  RecoMuon::process(const fwlite::ChainEvent& iEvent)
+//void  RecoMuon::process(const fwlite::ChainEvent& iEvent)
+void  RecoMuon::process(const fwlite::Event& iEvent)
 {
 
    double weight = 1.;

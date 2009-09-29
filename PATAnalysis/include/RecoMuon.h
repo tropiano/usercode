@@ -4,7 +4,8 @@
 #include "TFile.h"
 
 //#include "FWCore/TFWLiteSelector/interface/TFWLiteSelector.h"
-#include "DataFormats/FWLite/interface/ChainEvent.h"
+//#include "DataFormats/FWLite/interface/ChainEvent.h"
+#include "DataFormats/FWLite/interface/Event.h"
 #include "TH1D.h"
 #include "TList.h"
 //#include "TProofOutputFile.h"
@@ -16,7 +17,8 @@ public :
 
    ~RecoMuon();
 
-   void  process(const fwlite::ChainEvent& iEvent);
+   //void  process(const fwlite::ChainEvent& iEvent);
+   void  process(const fwlite::Event& iEvent);
 
    void finalize(); 
 

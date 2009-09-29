@@ -99,7 +99,8 @@ GenMuon::~GenMuon(){
   //_file->Close();
 }
 
-void  GenMuon::process(const fwlite::ChainEvent& iEvent)
+//void  GenMuon::process(const fwlite::ChainEvent& iEvent)
+void  GenMuon::process(const fwlite::Event& iEvent)
 {
 
    _file->cd();

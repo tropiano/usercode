@@ -29,7 +29,8 @@
 
 // user include files
 #include "boost/shared_ptr.hpp"
-#include "DataFormats/FWLite/interface/ChainEvent.h"
+//#include "DataFormats/FWLite/interface/ChainEvent.h"
+#include "DataFormats/FWLite/interface/Event.h"
 
 // forward declarations
 class TFile;
@@ -42,7 +43,8 @@ class DoNothingWorker {
   DoNothingWorker(TFile* file, const TList* fInput){}
    ~DoNothingWorker(){};
 
-   void  process(const fwlite::ChainEvent& iEvent){};
+   //void  process(const fwlite::ChainEvent& iEvent){};
+   void  process(const fwlite::Event& iEvent){};
 
    void finalize() {}
 
@@ -78,7 +80,8 @@ class FWLiteTSelector : public TSelector
       int tmp;
       int _lastEntry;
       bool everythingOK_;
-      boost::shared_ptr<fwlite::ChainEvent> event_;
+      //boost::shared_ptr<fwlite::ChainEvent> event_;
+      boost::shared_ptr<fwlite::Event> event_;
       TTree *tree_;
 
       boost::shared_ptr<Worker1> _fwLiteWorker1;
@@ -188,18 +191,14 @@ template <class Worker1, class Worker2, class Worker3, class Worker4, class Work
 Bool_t
 FWLiteTSelector<Worker1, Worker2, Worker3, Worker4, Worker5>::
 Process(Long64_t iEntry) { 
-
-  //std::cout<<"iEntry: "<<iEntry<<std::endl;
-  //float miliseconds = rand()/100000000.0;
-  //std::cout<<"Will wait: "<<miliseconds<<" ms"<<std::endl;
-  //sleep(miliseconds);
-  //std::cout<<"Event valid?: "<<event_->isValid()<<std::endl;
-  //const fwlite::ChainEvent& test = event_->to(iEntry);
+/*
   for(int i=_lastEntry;i<iEntry;++i){
      ++(*event_);
      //++tmp; 
   }
-  
+*/  
+  const fwlite::Event& test = event_->to(iEntry);
+/*  
   //std::cout<<test.id()<<std::endl;
   //if(test.id().run()>0) _fwLiteTreeAnalyser->process(const_cast<fwlite::ChainEvent&>(test));
   _fwLiteWorker1->process(const_cast<fwlite::ChainEvent&>(*event_));
@@ -208,7 +207,13 @@ Process(Long64_t iEntry) {
   _fwLiteWorker4->process(const_cast<fwlite::ChainEvent&>(*event_));
   _fwLiteWorker5->process(const_cast<fwlite::ChainEvent&>(*event_));
   _lastEntry = iEntry;
-
+*/
+  _fwLiteWorker1->process(const_cast<fwlite::Event&>(test));
+  _fwLiteWorker2->process(const_cast<fwlite::Event&>(test));
+  _fwLiteWorker3->process(const_cast<fwlite::Event&>(test));
+  _fwLiteWorker4->process(const_cast<fwlite::Event&>(test));
+  _fwLiteWorker5->process(const_cast<fwlite::Event&>(test)); 
+  
   //_fwLiteTreeAnalyser->analyse(const_cast<fwlite::ChainEvent&>(event_->to(iEntry)));
   //_fwLiteTreeAnalyser->analyse(const_cast<fwlite::ChainEvent&>(++(*event_)));
 
@@ -244,11 +249,12 @@ void
 FWLiteTSelector<Worker1, Worker2, Worker3, Worker4, Worker5>::
 setupNewFile(TFile& iFile) { 
 
-  std::vector<std::string> fileVector;
-  fileVector.push_back(iFile.GetName());
+  //std::vector<std::string> fileVector;
+  //fileVector.push_back(iFile.GetName());
 
   std::cout<<"fileName: "<<iFile.GetName()<<std::endl;
-  event_ = boost::shared_ptr<fwlite::ChainEvent>( new fwlite::ChainEvent(fileVector));
+  //event_ = boost::shared_ptr<fwlite::ChainEvent>( new fwlite::ChainEvent(fileVector));
+  event_ = boost::shared_ptr<fwlite::Event>( new fwlite::Event(&iFile));
   std::cout<<"size: "<<event_->size()<<std::endl;
   everythingOK_ = true;
 
