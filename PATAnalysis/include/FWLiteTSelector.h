@@ -26,6 +26,8 @@
 
 // system include files
 #include "TSelector.h"
+#include "TFileMerger.h"
+//#include "TFileCollection.h"
 
 // user include files
 #include "boost/shared_ptr.hpp"
@@ -241,7 +243,8 @@ SlaveTerminate() {
 template <class Worker1, class Worker2, class Worker3, class Worker4, class Worker5> 
 void
 FWLiteTSelector<Worker1, Worker2, Worker3, Worker4, Worker5>::
-Terminate() {}
+Terminate() {
+}
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 template <class Worker1, class Worker2, class Worker3, class Worker4, class Worker5> 

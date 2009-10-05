@@ -28,6 +28,44 @@ static double maxchi2 = 10.;
 static double maxecaletinveto = 4.;
 static double maxhcaletinveto = 6.;
 static double dxycut = 0.02;
+
+inline int nocase_cmp(const std::string & s1, const std::string & s2)
+{
+  std::string::const_iterator it1 = s1.begin();
+  std::string::const_iterator it2 = s2.begin();
+  while ((it1 != s1.end()) && (it2 != s2.end())) {
+    if (::toupper(*it1) !=::toupper(*it2)) {  // < Letters differ?
+      // Return -1 to indicate smaller than, 1 otherwise
+      return (::toupper(*it1) < ::toupper(*it2)) ? -1 : 1;
+    }
+    // Proceed to the next character in each string
+    ++it1;
+    ++it2;
+  }
+  size_t size1 = s1.size(), size2 = s2.size();  // Cache lengths
+  // Return -1,0 or 1 according to strings' lengths
+  if (size1 == size2)
+    return 0;
+  return (size1 < size2) ? -1 : 1;
+}
+
+template < typename T > inline T as(const std::string & value)
+{
+  std::istringstream ss(value);
+  T out = T();
+  ss >> out;
+  return out;
+}
+
+template <> inline bool as < bool > (const std::string & value) {
+  if (nocase_cmp(value, "true") == 0 || nocase_cmp(value, "yes") == 0 || nocase_cmp(value, "on") == 0)
+    return true;
+  if (nocase_cmp(value, "false") == 0 || nocase_cmp(value, "no") == 0 || nocase_cmp(value, "off") == 0)
+    return false;
+  return as < int >(value);
+}
+
+
 /*
 inline bool applyCuts(const PhysVarTreeMuon& muon, const std::vector<bool (*)(const PhysVarTreeMuon&)>& cuts) {
   std::vector<bool (*)(const PhysVarTreeMuon&)>::const_iterator begin = cuts.begin();
@@ -131,17 +169,18 @@ inline bool isMuonTriggered(const pat::TriggerEvent& triggers){
 inline bool isJetTriggered(const pat::TriggerEvent& triggersREC){
   return isTriggered(triggersREC, "HLT_Jet30");
 }
-/*
+
 //to do: try to avoid the copy 
-inline std::pair<bool, std::vector<pat::Muon> > RecSelected_GlobalMuons(const std::vector<pat::Muon>& MuREC, int cut) {
-  std::vector<pat::Muon> output;
+//inline std::pair<bool, std::vector<pat::Muon> > RecSelected_GlobalMuons(const std::vector<pat::Muon>& MuREC, int cut) {
+inline std::pair<bool, std::vector<const pat::Muon*> > RecSelected_GlobalMuons(const std::vector<const pat::Muon*>& MuREC, unsigned int cut) {
+  std::vector<const pat::Muon*> output;
   //at least two muons in the acceptance with pt > 20  
   if (MuREC.size() < cut) return std::make_pair(false, output);
   unsigned int count = 0; 
-  std::vector<pat::Muon>::const_iterator imu;
+  std::vector<const pat::Muon*>::const_iterator imu;
   for (imu = MuREC.begin(); imu != MuREC.end(); ++imu){
     //if (imu->_pt > ptmucut && fabs(imu->_eta)<etamucut) {
-    if (singleMu_PtEta(*imu)){
+    if (singleMu_PtEta(**imu)){
       count++;
       output.push_back(*imu);
     }  
@@ -150,16 +189,16 @@ inline std::pair<bool, std::vector<pat::Muon> > RecSelected_GlobalMuons(const st
   else return std::make_pair(true, output);
 }
 
-inline std::pair<bool, std::vector<pat::Muon> > RecSelected_OppositeCharge(const std::vector<pat::Muon>& MuREC) {
+inline std::pair<bool, std::vector<const pat::Muon*> > RecSelected_OppositeCharge(const std::vector<const pat::Muon*>& MuREC) {
   //if (!RecSelectedTwoMuons(MuREC)) return false;
-  std::vector<pat::Muon> output;
+  std::vector<const pat::Muon*> output;
   if (MuREC.size() == 0) return std::make_pair(false, output);
-  std::vector<pat::Muon>::const_iterator imu;
+  std::vector<const pat::Muon*>::const_iterator imu;
   //collections are ordered so the first element is in acceptance as selected by RecSelectedTwoMuons
-  double charge0 = MuREC.front().charge(); 
+  double charge0 = MuREC.front()->charge(); 
   for (imu = MuREC.begin()+1; imu != MuREC.end(); ++imu){
     //among the others, that are still in acceptance, check for opposite charge
-    if (imu->pt() > ptmucut && fabs(imu->eta()) < etamucut && imu->charge() * charge0 < 0) {
+    if ((*imu)->pt() > ptmucut && fabs((*imu)->eta()) < etamucut && (*imu)->charge() * charge0 < 0) {
       output = MuREC;
       return std::make_pair(true, output);
     }  
@@ -170,61 +209,52 @@ inline std::pair<bool, std::vector<pat::Muon> > RecSelected_OppositeCharge(const
 //////////////////////////////////////////////
 //Warning! this includes the two previous cuts
 //////////////////////////////////////////////
-inline bool RecSelectedTwoMuonsOppositeCharge_Mass(const std::vector<reco::CompositeCandidate>& ZREC){
+inline bool RecSelected_Mass(const std::vector<reco::CompositeCandidate>& ZREC){
   if (! ZREC.size()) return false;
   if (ZREC.size() != 1){
     std::cout << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! " << std::endl;
     throw cms::Exception("PATAnalysis:RecSelectedTwoMuonsOppositeCharge_Mass") << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! ";
     return false;
   }
-  if ( !(ZREC[0].mass() > zmassmin && ZREC[0].mass() < zmassmax) ) return false;
-  std::vector<pat::Muon> daughters;
-  daughters.push_back(*((const pat::Muon*) ZREC[0].daughter(0)));
-  daughters.push_back(*((const pat::Muon*) ZREC[0].daughter(1)));
-  return RecSelected_GlobalMuons(daughters, 2).first && RecSelected_OppositeCharge(daughters).first;
+  if ( ZREC[0].mass() > zmassmin && ZREC[0].mass() < zmassmax ) return true;
+  return false;
 }
 
-inline std::pair<bool, std::vector<pat::Muon> > RecSelected_QualityCuts(const std::vector<pat::Muon>& MuREC, int cut){
+inline std::pair<bool, std::vector<const pat::Muon*> > RecSelected_QualityCuts(const std::vector<const pat::Muon*>& MuREC, unsigned int cut){
   //if (!RecSelectedTM_OppositeCharge(MuREC)) return false;
-  std::vector<pat::Muon>::const_iterator imu;
-  std::vector<pat::Muon> selected;
+  std::vector<const pat::Muon*>::const_iterator imu;
+  std::vector<const pat::Muon*> selected;
   for (imu = MuREC.begin(); imu != MuREC.end(); ++imu){
     //if (imu->_nhit > minnhit && imu->_chi2 < maxchi2) selected.push_back(*imu);     
-    if (singleMu_QualityCuts(*imu)) selected.push_back(*imu);     
+    if (singleMu_QualityCuts(**imu)) selected.push_back(*imu);     
   }
   if (selected.size() < cut) return std::make_pair(false, selected);
   else return std::make_pair(true, selected);
 }
 
-inline std::pair<bool, std::vector<pat::Muon> > RecSelected_DXY(const std::vector<pat::Muon>& MuREC, int cut){
+inline std::pair<bool, std::vector<const pat::Muon*> > RecSelected_DXY(const std::vector<const pat::Muon*>& MuREC, unsigned int cut){
   //if (!RecSelectedTM_OC_QualityCuts(MuREC)) return false;
-  std::vector<pat::Muon>::const_iterator imu;
-  std::vector<pat::Muon> selected;
+  std::vector<const pat::Muon*>::const_iterator imu;
+  std::vector<const pat::Muon*> selected;
   for (imu = MuREC.begin(); imu != MuREC.end(); ++imu){
     //if (imu->_dxy<dxycut) selected.push_back(*imu);
-    if (singleMu_DXY(*imu)) selected.push_back(*imu);
+    if (singleMu_DXY(**imu)) selected.push_back(*imu);
   }
   if (selected.size() < cut) return std::make_pair(false, selected);
   else return std::make_pair(true, selected);
 }
 
-//here we have to put the daughters?
 //we have to check the size
-inline std::pair<bool, std::vector<pat::Muon> > RecSelected_Isolation(const std::vector<reco::CompositeCandidate>& ZREC, double isocut, int cut){
-  std::vector<pat::Muon> selected;
-  reco::CompositeCandidate::const_iterator imu;
-  for (imu = ZREC[0].begin(); imu < ZREC[0].end(); ++imu){
-    //if ( (imu->_hcalIso + imu->_ecalIso + imu->_trackIso)/imu->_pt < isocut && 
-    //     imu->_etInEcalVeto < maxecaletinveto &&
-    //     imu->_etInHcalVeto < maxhcaletinveto ) selected.push_back(*imu);
-    //if (singleMu_Isolation(*imu,  isocut)) selected.push_back(*imu);
-    if (singleMu_Isolation(*((const pat::Muon*) *imu)) ) selected.push_back(*((const pat::Muon*) *imu));
+inline std::pair<bool, std::vector<const pat::Muon*> > RecSelected_Isolation(const std::vector<const pat::Muon*>& Muons, double isocut, unsigned int cut){
+  std::vector<const pat::Muon*> selected;
+  std::vector<const pat::Muon*>::const_iterator imu;
+  for (imu = Muons.begin(); imu != Muons.end(); ++imu){
+    if ( singleMu_Isolation(**imu) ) selected.push_back(*imu);
   }
   if (selected.size() < cut) return std::make_pair(false, selected);
   else return std::make_pair(true, selected);
 }
 
-*/
 
 
 inline bool RecSelected(const std::vector<reco::CompositeCandidate>& ZREC, double isocut, const pat::Muon* extdau0 = 0,  const pat::Muon* estdau1 = 0){

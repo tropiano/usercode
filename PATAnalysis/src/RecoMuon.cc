@@ -122,6 +122,7 @@ RecoMuon::~RecoMuon(){
 void  RecoMuon::process(const fwlite::Event& iEvent)
 {
 
+
    double weight = 1.;
    _file->cd();
 
