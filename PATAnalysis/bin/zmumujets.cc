@@ -42,7 +42,7 @@ int main(){
 
   //process the background
   TDSet* muDS = getDS("mudata.txt") ;
-  TNamed* configbg = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/test/CMSSW_3_1_4/src/Firenze/PATAnalysis/bin/config_Mu.py");
+  TNamed* configbg = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/CMSSW_3_1_4/src/Firenze/PATAnalysis/bin/config_Mu.py");
   p->AddInput(configbg);
   p->Process(muDS, "FWLiteTSelector");
   p->ClearInput();
@@ -50,7 +50,7 @@ int main(){
 
   //process the signal
   TDSet* signalDS = getDS("signaldata.txt");
-  TNamed* configsignal = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/test/CMSSW_3_1_4/src/Firenze/PATAnalysis/bin/config_signal.py");
+  TNamed* configsignal = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/CMSSW_3_1_4/src/Firenze/PATAnalysis/bin/config_signal.py");
   p->AddInput(configsignal);       
   p->Process(signalDS, "FWLiteTSelector");
   delete signalDS;

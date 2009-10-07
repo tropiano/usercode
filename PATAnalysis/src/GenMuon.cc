@@ -20,14 +20,12 @@
 #include "DataFormats/Candidate/interface/CompositeCandidate.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
 #include "DataFormats/FWLite/interface/ChainEvent.h"
-#include "Firenze/PATAnalysis/include/tclap/CmdLine.h"
 #include "FWCore/ParameterSet/interface/ProcessDesc.h"
 #include "FWCore/ParameterSet/interface/PythonProcessDesc.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 using namespace std;
 using namespace edm;
-using namespace TCLAP;
 
 GenMuon::GenMuon(/*TFile* proofFile, const TList* fInput*/):  
 genPtZ(0), genEtaZ(0), genMulti(0), genMassZ(0), genLeadMuPt(0), genSecMuPt(0), genLeadMuEta(0), genSecMuEta(0),

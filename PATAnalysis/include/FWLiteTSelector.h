@@ -34,7 +34,6 @@
 //#include "DataFormats/FWLite/interface/ChainEvent.h"
 #include "DataFormats/FWLite/interface/Event.h"
 #include "RegisteredAnalyses.h"
-#include "Firenze/PATAnalysis/include/tclap/CmdLine.h"
 #include "Utilities.h"
 
 // forward declarations
