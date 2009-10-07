@@ -20,21 +20,31 @@
 #include "DataFormats/Candidate/interface/CompositeCandidate.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
 #include "DataFormats/FWLite/interface/ChainEvent.h"
-
-
+#include "Firenze/PATAnalysis/include/tclap/CmdLine.h"
+#include "FWCore/ParameterSet/interface/ProcessDesc.h"
+#include "FWCore/ParameterSet/interface/PythonProcessDesc.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 using namespace std;
 using namespace edm;
+using namespace TCLAP;
 
-
-GenMuon::GenMuon(TFile* proofFile, const TList* fInput):  
+GenMuon::GenMuon(/*TFile* proofFile, const TList* fInput*/):  
 genPtZ(0), genEtaZ(0), genMulti(0), genMassZ(0), genLeadMuPt(0), genSecMuPt(0), genLeadMuEta(0), genSecMuEta(0),
 genLeadJetPt(0), genLeadJetEta(0), genDeltayJfwdJbwd(0),
 //genDjr0(0), genDjr1(0), genDjr2(0),
 _ptjetmin(30.), _etajetmax(3.), _norm(1.),
-_file(proofFile),  _histovector()
+_file(0), _dir(0), _histovector()
 //_efficiency(out, "EfficienciesTotalVsRecMulti", 10, -0.5, 9.5, 0.3, false),
-{       
+{   }
+
+void GenMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
+   _file = out;
+/*
+   CmdLine cmd;
+   vector<Arg*> genArgs;
+   ValueArg<double> minpt("", "MinPtJet", )  
+   
    TIter next(fInput);
    bool factorSet = false;  
    while (TObject* obj = next()){
@@ -58,10 +68,17 @@ _file(proofFile),  _histovector()
      cout << "You did not set the scale factor! " << endl;
      assert(factorSet);
    }
-
+*/
+   std::string dirname = iConfig.getParameter<std::string>("Name"); 
+   _ptjetmin  = iConfig.getParameter<double>("MinPtJet");
+   _etajetmax = iConfig.getParameter<double>("MaxEtaJet");
+   _norm      = iConfig.getParameter<double>("ScaleFactor");
    //_file = proofFile->OpenFile("UPDATE");
    cout << "GenMuon file name : " << _file->GetName() << endl;
    _file->cd();
+   _dir = _file->mkdir(dirname.c_str(), dirname.c_str());
+   _dir->cd();
+   
    genPtZ   = new TH1D("genPtZ", "Generated Z p_{T}", 200, 0, 200);
    _histovector.push_back(genPtZ);
    genEtaZ  = new TH1D("genEtaZ", "Generated Z #eta", 100, -10, 10);
@@ -89,8 +106,9 @@ _file(proofFile),  _histovector()
    for (std::vector<TH1D*>::const_iterator i = ibeg; i != iend; ++i){
     (*i)->Sumw2();
    }
+   _dir->cd("-");
 
-   cout << "GenMuon Worker built." << endl;   
+   cout << "GenMuon Worker configured." << endl;   
 }
 
 GenMuon::~GenMuon(){
@@ -153,6 +171,7 @@ void  GenMuon::process(const fwlite::Event& iEvent)
       std::vector<const reco::GenJet*> genjets = GetJets<reco::GenJet>(*jetHandle, _ptjetmin, _etajetmax);   
 
       genMulti->Fill(genjets.size(), weight);
+      _dir->cd();
       addHistosVsMulti(genjets.size(), "genJetPtIncl", " generated jet p_{T} spectrum", 200, 0, 200, genJetPtVsInclMulti);
       addHistosVsMulti(genjets.size(), "genJetEtaIncl", " generated jet #eta spectrum", 100, -5., 5., genJetEtaVsInclMulti);
       addHistosVsMulti(genjets.size(), "genZPtIncl", " generated Z p_{T} spectrum", 200, 0., 200., genZPtVsInclMulti);
@@ -163,6 +182,7 @@ void  GenMuon::process(const fwlite::Event& iEvent)
       addHistosVsMulti(genjets.size(), "genMu1EtaExcl", " generated lead #mu #eta spectrum", 100, -5., 5., genMu1EtaVsExclMulti);
       addHistosVsMulti(genjets.size(), "genMu2PtExcl", " generated sec #mu p_{T} spectrum", 200, 0., 200., genMu2PtVsExclMulti);
       addHistosVsMulti(genjets.size(), "genMu2EtaExcl", " generated sec #mu #eta spectrum", 100, -5., 5., genMu2EtaVsExclMulti);
+      _dir->cd("-");
 
       if (genjets.size()){
         genLeadJetPt->Fill(genjets[0]->pt(), weight);

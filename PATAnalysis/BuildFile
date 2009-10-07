@@ -1,9 +1,11 @@
 <use name=root>
 <use name=FWCore/Framework>
+<use name=FWCore/ParameterSet>
 <use name=DataFormats/FWLite>
 <use name=DataFormats/PatCandidates>
 <use name=FWCore/TFWLiteSelector>
 <use name=rootrflx>
+<use name=boost>
 <lib name=ProofPlayer>
 <Flags CXXFLAGS="-g">
 <export>

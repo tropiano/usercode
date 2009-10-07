@@ -8,23 +8,29 @@
 #include <TList.h>
 #include <string>
 
+#include "MyPatAnalysis.h"
+
 //#include "TagAndProbe.h"
 
 
-class EfficiencyMuon {
+class EfficiencyMuon : public MyPatAnalysis {
 public :
 
     enum cuts {TwoMuonsCut, TM_OppositeChargeCut, TM_OC_MassCut, TM_OC_M_QualityCutsCut, TM_OC_M_QC_DXYCut, TM_OC_M_QC_DXY_IsoCut};
   
     //constructor with the name of output file the extenzion to be added to the titles off all histograms
     //bins, xmin, xmax and the normalization factor.
-    EfficiencyMuon(TFile* out, TList* fInput);
+    EfficiencyMuon();
 
-    ~EfficiencyMuon();
+    static MyPatAnalysis* create() {return new EfficiencyMuon(); }
+    
+    virtual ~EfficiencyMuon();
 
-    void process(const fwlite::Event& iEvent);
+    virtual void begin(TFile* out, const edm::ParameterSet&);
 
-    void finalize();
+    virtual void process(const fwlite::Event& iEvent);
+
+    virtual void finalize();
 
    ///////DEFINITIONS//////////
    /*

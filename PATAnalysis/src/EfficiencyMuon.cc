@@ -15,8 +15,12 @@ using namespace std;
 
 //ClassImp(EfficiencyMuon)
 
-EfficiencyMuon::EfficiencyMuon(TFile* outputfile, TList* fInput) : 
-_initiated(false), _outputfile(outputfile), _dirname("EfficiencyMuon"), _isocut(0.3), _ptjetmin(30.), _etajetmax(3.), _nbin(10), _xmin(-0.5), _xmax(9.5)/*, _performfits(performfits), _isocut(isocut)*/{
+EfficiencyMuon::EfficiencyMuon() : 
+_initiated(false), _outputfile(0), _dirname("EfficiencyMuon"), _isocut(0.3), _ptjetmin(30.), _etajetmax(3.), _nbin(10), _xmin(-0.5), _xmax(9.5)/*, _performfits(performfits), _isocut(isocut)*/{}
+
+void EfficiencyMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
+  _outputfile = out;
+  /*
   TIter next(fInput);
   bool factorSet = false;
   bool requireGenSet = false; 
@@ -69,10 +73,20 @@ _initiated(false), _outputfile(outputfile), _dirname("EfficiencyMuon"), _isocut(
     cout << "You must set if you require gen in aceptance or not" << endl;
     assert (requireGenSet);
   }
-
+  */
+  std::string dirname = iConfig.getParameter<std::string>("Name");
+  _isocut    = iConfig.getParameter<double>("IsoCut");
+  _ptjetmin  = iConfig.getParameter<double>("MinPtJet");
+  _etajetmax = iConfig.getParameter<double>("MaxEtaJet");
+  _norm      = iConfig.getParameter<double>("ScaleFactor");
+  _nbin      = iConfig.getParameter<int>("NBin");
+  _xmin      = iConfig.getParameter<double>("XMin");
+  _xmax      = iConfig.getParameter<double>("XMax");
+  _requireGenInAcceptance = iConfig.getParameter<bool>("RequireGenInAcceptance");
+  
 
   _outputfile->cd();
-  TDirectory* dir = _outputfile->mkdir(_dirname.c_str(), _dirname.c_str());
+  TDirectory* dir = _outputfile->mkdir(dirname.c_str(), dirname.c_str());
   dir->cd();
   generalefficiency_numerator   = new TH1D("efficiency_numerator", "efficiency Vs #jets", _nbin, _xmin, _xmax);
   _vectorHistos.push_back(generalefficiency_numerator);
@@ -96,6 +110,7 @@ _initiated(false), _outputfile(outputfile), _dirname("EfficiencyMuon"), _isocut(
   _vectorHistos.push_back(TM_MuJetTriggered);
   TM_JetTriggered               = new TH1D("TM_JetTriggered", "TM_JetTriggered", _nbin, _xmin, _xmax);
   _vectorHistos.push_back(TM_JetTriggered);
+  dir->cd("-");
 /*
   std::vector<bool (*)(const PhysVarTreeMuon&)> tag_cuts;
   tag_cuts.push_back(singleMu_Tag);

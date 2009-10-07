@@ -10,17 +10,22 @@
 #include "TList.h"
 //#include "TProofOutputFile.h"
 #include "TFile.h"
+#include "MyPatAnalysis.h"
 
-class RecoMuon {
+class RecoMuon : public MyPatAnalysis{
 public :
-   RecoMuon(TFile* out, const TList* fInput);
+   RecoMuon();
+   
+   virtual ~RecoMuon();
 
-   ~RecoMuon();
+   virtual void begin(TFile* out, const edm::ParameterSet&);
+
+   static MyPatAnalysis* create() {return new RecoMuon(); } 
 
    //void  process(const fwlite::ChainEvent& iEvent);
-   void  process(const fwlite::Event& iEvent);
+   virtual void  process(const fwlite::Event& iEvent);
 
-   void finalize(); 
+   virtual void finalize(); 
 
    //Histograms
    TH1D *recPtZ, *recEtaZ, *recMulti, *recMassZ, *recTrackIsoLead, *recEcalIsoLead, *recHcalIsoLead, *recRelIsoLead,
@@ -58,7 +63,9 @@ private:
 
   double _norm;
 
-  TFile* _file;  
+  TFile* _file; 
+
+  TDirectory* _dir;
 
   std::vector<TH1D*> _histoVector;
 

@@ -16,6 +16,17 @@
 
 using namespace std;
 
+TDSet* getDS(const char* filename){
+  TDSet* out = new TDSet( "dataset", "Events");
+  ifstream infile;
+  infile.open(filename);
+  string datafile;
+  while(getline ( infile, datafile )){
+    out->Add(datafile.c_str());
+  }
+  return out; 
+}
+
 
 int main(){
   TProof * p = TProof::Open("");
@@ -29,46 +40,24 @@ int main(){
 
   p->Exec( ".x remote.C" ); 
 
-  TDSet train( "ciao", "Events");
-  ifstream infile; 
-  infile.open("files.txt");
-  string filename;
-  double nevents = 0;
-  while(getline ( infile, filename )){
-    cout << filename << endl;
-    train.Add(filename.c_str());
-  }  
-  cout << "total entries: " << nevents << endl;
-  train.Print();
-  TNamed* outtrain = new TNamed("OutputFile", "train.root");
-  TNamed* boolopt = new TNamed("RequireGenInAccepance", "true");
-  double factor = targetLumi / 1837456 * 1200.;
-  TParameter<double>* parfactor = new TParameter<double>("ScaleFactor", factor);
-  p->AddInput(parfactor);
-  p->AddInput(outtrain);
-  p->AddInput(boolopt);
-
-  p->Process(&train, "SignalMuon");
+  //process the background
+  TDSet* muDS = getDS("mudata.txt") ;
+  TNamed* configbg = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/test/CMSSW_3_1_4/src/Firenze/PATAnalysis/bin/config_Mu.py");
+  p->AddInput(configbg);
+  p->Process(muDS, "FWLiteTSelector");
   p->ClearInput();
+  delete muDS;
 
+  //process the signal
+  TDSet* signalDS = getDS("signaldata.txt");
+  TNamed* configsignal = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/test/CMSSW_3_1_4/src/Firenze/PATAnalysis/bin/config_signal.py");
+  p->AddInput(configsignal);       
+  p->Process(signalDS, "FWLiteTSelector");
+  delete signalDS;
 
-  TDSet signal( "ciao", "Events");
-  ifstream infile2;
-  infile2.open("files_other.txt");
-  while(getline ( infile2, filename )){
-    cout << filename << endl;
-    signal.Add(filename.c_str());
-  }
-  signal.Print();
-  TNamed* outsignal = new TNamed("OutputFile", "signal.root");
-  p->AddInput(parfactor);
-  p->AddInput(outsignal);
-  p->AddInput(boolopt);
-
-  p->Process(&signal, "SignalMuon");
-
+  //merge results
   TFileMerger fm(true);
-  fm.AddFile("train.root");
+  fm.AddFile("Mu.root");
   fm.AddFile("signal.root");
   fm.OutputFile("total.root");
   fm.Merge();

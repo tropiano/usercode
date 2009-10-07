@@ -28,16 +28,19 @@ using namespace std;
 using namespace edm;
 
 
-RecoMuon::RecoMuon(TFile* proofFile, const TList* fInput): 
+RecoMuon::RecoMuon(): 
 recPtZ(0), recEtaZ(0), recMulti(0), recMassZ(0), recTrackIsoLead(0), recEcalIsoLead(0), recHcalIsoLead(0), recRelIsoLead(0),
 recTrackIsoSec(0), recEcalIsoSec(0), recHcalIsoSec(0), recRelIsoSec(0),
 recLeadMuPt(0), recSecMuPt(0), recLeadMuEta(0), recSecMuEta(0),
 recLeadJetPt(0), recLeadJetEta(0), 
 _ptjetmin(30.), _etajetmax(3.), _isocut(0.3), _norm(1.),
-_file(proofFile), _histoVector()
+_file(0), _dir(0), _histoVector()
 //_efficiency(out, "EfficienciesTotalVsRecMulti", 10, -0.5, 9.5, 0.3, false),
-{       
-   TIter next(fInput);
+{ }
+
+void RecoMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
+   _file = out; 
+   /*TIter next(fInput);
    bool factorSet = false;  
    while (TObject* obj = next()){
     const TParameter<double>* parDouble = dynamic_cast<const TParameter<double>* >(obj);
@@ -62,11 +65,19 @@ _file(proofFile), _histoVector()
    if (!factorSet) {
      cout << "You did not set the scale factor! " << endl;
      assert(factorSet);
-   }
+   }*/
+   std::string dirname = iConfig.getParameter<std::string>("Name");
+
+   _ptjetmin  = iConfig.getParameter<double>("MinPtJet");
+   _isocut    = iConfig.getParameter<double>("IsoCut");
+   _etajetmax = iConfig.getParameter<double>("MaxEtaJet");
+   _norm      = iConfig.getParameter<double>("ScaleFactor");
 
    //_file = proofFile->OpenFile("RECREATE");
    cout << "RecoMuon file name : " << _file->GetName() << endl;
    _file->cd();
+   _dir = _file->mkdir(dirname.c_str(), dirname.c_str());
+   _dir->cd();
    recPtZ   = new TH1D("recPtZ", "Reconstructed Z p_{T}", 200, 0, 200);
    _histoVector.push_back(recPtZ);
    recEtaZ  = new TH1D("recEtaZ", "Reconstructed Z #eta", 100, -10, 10);
@@ -108,6 +119,7 @@ _file(proofFile), _histoVector()
   for (std::vector<TH1D*>::const_iterator i = ibeg; i != iend; ++i){
     (*i)->Sumw2();
   }
+  _dir->cd("-");
    
   cout << "RecoMuon Worker built." << endl;   
 }
@@ -182,6 +194,7 @@ void  RecoMuon::process(const fwlite::Event& iEvent)
    
       std::vector<const pat::Jet*> recjets = GetJets<pat::Jet>(*jetHandle, _ptjetmin, _etajetmax);
 
+      _dir->cd();
       addHistosVsMulti(recjets.size(), "recJetPtIncl", " reconstructed jet p_{T} spectrum", 200, 0, 200, recJetPtVsInclMulti);
       addHistosVsMulti(recjets.size(), "recJetEtaIncl", " reconstructed jet #eta spectrum", 100, -5., 5., recJetEtaVsInclMulti);
       addHistosVsMulti(recjets.size(), "recZPtIncl", " reconstructed Z p_{T} spectrum", 200, 0., 200., recZPtVsInclMulti);
@@ -193,7 +206,7 @@ void  RecoMuon::process(const fwlite::Event& iEvent)
       addHistosVsMulti(recjets.size(), "recMu1EtaExcl", " reconstructed lead #mu #eta spectrum", 100, -5., 5., recMu1EtaVsExclMulti);
       addHistosVsMulti(recjets.size(), "recMu2PtExcl", " reconstructed sec #mu p_{T} spectrum", 200, 0., 200., recMu2PtVsExclMulti);
       addHistosVsMulti(recjets.size(), "recMu2EtaExcl", " reconstructed sec #mu #eta spectrum", 100, -5., 5., recMu2EtaVsExclMulti);   
-
+      _dir->cd("-");
 
       recMulti->Fill(recjets.size());
 

@@ -65,6 +65,58 @@ template <> inline bool as < bool > (const std::string & value) {
   return as < int >(value);
 }
 
+inline void handleConfigStream(std::istream& in, std::map<std::string, std::vector<std::string> >& pmap) {
+   std::string currentModule = "none"; 
+   std::cout << "In handleConfigStream" << std::endl; 
+   while(in) {
+     std::string line;
+     getline(in, line);
+     const std::string origline = line;
+     std::cout << "Input param line: " << line << std::endl;
+
+     // Chop line after a # character
+     size_t commentPosn = line.find_first_of("#");
+     if (commentPosn != std::string::npos) {
+       line = line.substr(0, commentPosn);
+     }
+
+     //if the line contains the keyword ANALYSIS, the config of a module begins 
+     // ANALYSIS name=type 
+     if (line.find("ANALYSIS") != std::string::npos){
+        std::cout << "FOUND ana ANALYSIS!!!!" << std::endl; 
+        size_t start = line.find_first_of(' ');
+        line = line.substr(start, std::string::npos-start+1);
+        std::cout << "line.substr(start, std::string::npos-start+1) " << line << std::endl;
+        size_t start1 = line.find_first_of('='); 
+        if (start1 == std::string::npos){
+          std::cout << "Cannot get module name and type from " << line << std::endl; 
+          assert(0);
+        }
+        line.replace(start1, 1, " ");
+        const size_t first = line.find_first_not_of(' ');
+        const size_t last = line.find_last_not_of(' ');
+        line = line.substr(first, last-first+1);
+        const size_t firstgap = line.find(' ');
+        const size_t lastgap = line.rfind(' ');
+        const std::string mname = line.substr(first, firstgap-first);
+        const std::string mval  = line.substr(lastgap+1, last-lastgap);  
+        pmap[mname].push_back(mval);
+        std::cout << "name " << mname << " type " << mval << std::endl;
+        currentModule=mname;
+        continue;
+     }
+
+     if (currentModule == "none"){
+        std::cout << "config file MUST start with the keyword ANALYSIS" << std::endl;
+        assert(0);
+     }  
+     // Replace = signs with spaces
+     if (line.find("=") != std::string::npos){
+        pmap[currentModule].push_back(line);
+     }  
+   }
+}
+
 
 /*
 inline bool applyCuts(const PhysVarTreeMuon& muon, const std::vector<bool (*)(const PhysVarTreeMuon&)>& cuts) {
