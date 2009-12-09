@@ -15,12 +15,14 @@
 </bin>
 
 <bin name=zeejets.exe file=zeejets.cc>
- <use name=root>
+ <use name=rootphysics>
  <use name=FWCore/FWLite>
  <use name=FWCore/Framework>
  <use name=DataFormats/FWLite>
  <use name=DataFormats/PatCandidates>
  <use name=PhysicsTools/FWLite>
+ <use name=Firenze/PATAnalysis>
+ <lib name=Proof>
 </bin>
 
 </environment>

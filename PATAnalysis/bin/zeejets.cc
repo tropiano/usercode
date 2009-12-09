@@ -1,103 +1,75 @@
-// -*- C++ -*-
+#include <iostream>
+#include <fstream>
 
-// CMS includes
-#include "DataFormats/FWLite/interface/Handle.h"
-#include "DataFormats/PatCandidates/interface/Jet.h"
-
-//#include "PhysicsTools/FWLite/interface/EventContainer.h"
-//#include "PhysicsTools/FWLite/interface/CommandLineParser.h" 
-
-// Root includes
+#include "TFile.h"
+#include "TTree.h"
+#include "TParameter.h"
+#include "TFileMerger.h"
+#include "TDSet.h"
+#include "TChain.h"
+#include "TSystem.h"
+#include "TEnv.h"
 #include "TROOT.h"
+#include "TProof.h"
+#include "TProofLog.h"
+#include "Firenze/PATAnalysis/include/ZeeMainUtilities.h"
+#include "FWCore/FWLite/interface/AutoLibraryLoader.h"
 
 using namespace std;
 
+int main() {
 
-///////////////////////////
-// ///////////////////// //
-// // Main Subroutine // //
-// ///////////////////// //
-///////////////////////////
+/*  string cfgName = "config_Zee.py";
+  string sourceList = "files_Zee.txt";
+  string outputName = "Signal_NewSel_RobustLoose_Iso03";
+  string electronID = "eidRobustLoose";
+  double xsec = 1944.;
+  double targetLumi = 100.;
+  string Norm = "True";
+  string Sumw2= "False";
+  bool Log = false; */
 
-int main (int argc, char* argv[]) 
-{/*
-   ////////////////////////////////
-   // ////////////////////////// //
-   // // Command Line Options // //
-   // ////////////////////////// //
-   ////////////////////////////////
+  string cfgName = "config_TTbar.py";
+  string sourceList = "TTbar_list.txt";
+  string outputName = "TTbar_NewSel_RobustLoose_Iso01_PlotIso";
+  string electronID = "eidRobustLoose";
+  double xsec = 242.8;
+  double targetLumi = 100.;
+  string Norm = "True";
+  string Sumw2= "False";
+  bool Log = false; 
 
-   // Tell people what this analysis code does and setup default options.
-   optutl::CommandLineParser parser ("Plots Jet Pt");
+  makeCfg(cfgName.c_str(), sourceList.c_str(), outputName.c_str(), Norm.c_str(), Sumw2.c_str(), electronID.c_str(), xsec, targetLumi);
 
-   ////////////////////////////////////////////////
-   // Change any defaults or add any new command //
-   //      line options you would like here.     //
-   ////////////////////////////////////////////////
-   parser.stringValue ("outputFile") = "jetPt"; // .root added automatically
+  gEnv->SetValue("Proof.Sandbox", "/raid/sfrosali/.proof");
 
-   // Parse the command line arguments
-   parser.parseArguments (argc, argv);
+  TProof * p = TProof::Open("");
+  
+  gSystem->Load("libFWCoreFWLite");
+  AutoLibraryLoader::enable();
+  gSystem->Load("libFirenzePATAnalysis");
 
-   //////////////////////////////////
-   // //////////////////////////// //
-   // // Create Event Container // //
-   // //////////////////////////// //
-   //////////////////////////////////
+  p->Exec(".x remote.C");
 
-   // This object 'event' is used both to get all information from the
-   // event as well as to store histograms, etc.
-   fwlite::EventContainer eventCont (parser);
+  TDSet* SignalDS = getDS(sourceList.c_str());
+  
+  string cfgPath = "/afs/cern.ch/user/s/sfrosali/scratch0/Zjets/CMSSW_3_1_4/src/Firenze/PATAnalysis/bin/python/";
+  cfgPath += cfgName.c_str();
+  
+  TNamed* configsignal = new TNamed("ConfigFile", cfgPath.c_str());
+  p->AddInput(configsignal);
+  p->Process(SignalDS, "FWLiteTSelector");
+  
+ if(Log){ 
+ TProofLog *pl = TProof::Mgr("")->GetSessionLogs();
+ pl->Save("0.0","/afs/cern.ch/user/s/sfrosali/scratch0/Zjets/CMSSW_3_1_4/src/Firenze/PATAnalysis/bin/Log.txt");
+ }
+  
+  p->ClearInput();
+  delete SignalDS;
 
-   ////////////////////////////////////////
-   // ////////////////////////////////// //
-   // //         Begin Run            // //
-   // // (e.g., book histograms, etc) // //
-   // ////////////////////////////////// //
-   ////////////////////////////////////////
+  p->Close();
+   
+return 0;
 
-   // Setup a style
-   gROOT->SetStyle ("Plain");
-
-   // Book those histograms!
-   eventCont.add( new TH1F( "jetPt", "jetPt", 1000, 0, 1000) );
-
-   //////////////////////
-   // //////////////// //
-   // // Event Loop // //
-   // //////////////// //
-   //////////////////////
-
-   for (eventCont.toBegin(); ! eventCont.atEnd(); ++eventCont) 
-   {
-      //////////////////////////////////
-      // Take What We Need From Event //
-      //////////////////////////////////
-      fwlite::Handle< vector< pat::Jet > > jetHandle;
-      jetHandle.getByLabel (eventCont, "selectedLayer1Jets");
-      assert ( jetHandle.isValid() );
-						
-      // Loop over the jets
-      const vector< pat::Jet >::const_iterator kJetEnd = jetHandle->end();
-      for (vector< pat::Jet >::const_iterator jetIter = jetHandle->begin();
-           kJetEnd != jetIter; 
-           ++jetIter) 
-      {         
-         eventCont.hist("jetPt")->Fill (jetIter->pt());
-      } // for jetIter
-   } // for eventCont
-
-      
-   ////////////////////////
-   // ////////////////// //
-   // // Clean Up Job // //
-   // ////////////////// //
-   ////////////////////////
-
-   // Histograms will be automatically written to the root file
-   // specificed by command line options.
-
-   // All done!  Bye bye.
-*/   
-   return 0;
 }
