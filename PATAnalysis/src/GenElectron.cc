@@ -37,7 +37,7 @@ GenIsoJetPt_Acc(0), GenJetPt_Acc(0), GenIsoJetCounter_Acc(0), GenJetCounter_Acc(
 genLeadElPt(0), genSecElPt(0), genLeadElEta(0), genSecElEta(0),
 genLeadElPt_Acc(0), genSecElPt_Acc(0), genLeadElEta_Acc(0), genSecElEta_Acc(0),
 
-_ptjetmin(30.), _etajetmax(3.), _norm(1.), _Norm(true), _Sumw2(false),
+_ptjetmin(30.), _etajetmax(3.), _norm(1.), _Norm(true),
 _file(0), _dir(0),  _histovector()
 {   }
 
@@ -49,7 +49,6 @@ void GenElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _targetLumi= iConfig.getParameter<double>("targetLumi");
    _xsec      = iConfig.getParameter<double>("CrossSection");
    _Norm      = iConfig.getParameter<bool>("Norm");
-   _Sumw2      = iConfig.getParameter<bool>("Sumw2");
    _ReportName = iConfig.getParameter<std::string>("ReportName");
 
     cout << "GenElectron file name : " << _file->GetName() << endl;
@@ -114,12 +113,6 @@ void GenElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 
    std::vector<TH1D*>::const_iterator ibeg = _histovector.begin();
    std::vector<TH1D*>::const_iterator iend = _histovector.end();
-   
-   if(_Sumw2){
-   for (std::vector<TH1D*>::const_iterator i = ibeg; i != iend; ++i){
-    (*i)->Sumw2();
-   }
-   }
    
    TChain *ch = new TChain("Events");
   

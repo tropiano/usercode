@@ -45,7 +45,7 @@ genLeadElPtEff_Acc(0), genLeadElPtEff_Acc_Qual(0), genLeadElPtEff_Acc_Qual_Imp(0
 AccDenom_genPtZ(0), AccDenom_genMassZ(0), AccDenom_genEtaZ(0), AccDenom_genLeadElEta(0), AccDenom_genLeadElPt(0), AccDenom_GenIsoJetNumber(0),
 EffDenom_genPtZ(0), EffDenom_genMassZ(0), EffDenom_genEtaZ(0), EffDenom_genLeadElEta(0), EffDenom_genLeadElPt(0), EffDenom_GenIsoJetNumber(0),
 
-_dir(0), _Sumw2(false), _electronID("eidRobustTight"), _file(0), _histoVector()
+_dir(0), _electronID("eidRobustTight"), _file(0), _histoVector()
 
 { }
 
@@ -55,8 +55,7 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
     std::string dirname = iConfig.getParameter<std::string>("Name");
     std::string sourceFileList = iConfig.getParameter<std::string>("sourceFileList");
     _electronID = iConfig.getParameter<std::string>("electronID");
-   _Sumw2     = iConfig.getParameter<bool>("Sumw2");
-
+  
     cout << "EfficiencyElectron file name : " << _file->GetName() << endl;
    _file->cd();
    _dir = _file->mkdir(dirname.c_str(), dirname.c_str());
@@ -158,12 +157,6 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
  
    std::vector<TH1D*>::const_iterator i1beg = _histoVector.begin(); 
    std::vector<TH1D*>::const_iterator i1end = _histoVector.end(); 
-
-   if(_Sumw2){
-   for (std::vector<TH1D*>::const_iterator i = i1beg; i != i1end; ++i){
-    (*i)->Sumw2();
-   }
-   } 
    
   cout << "EfficiencyElectron Worker built." << endl;   
 }

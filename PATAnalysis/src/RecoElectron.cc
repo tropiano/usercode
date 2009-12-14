@@ -46,7 +46,7 @@ recLeadElPt_Acc_Qual_Imp_Iso_EiD(0), recSecElPt_Acc_Qual_Imp_Iso_EiD(0), recLead
 DeltaRvsCharge_JetRec(0), DeltaRvsCharge_JetRec_Iso(0), DeltaRvsCharge_JetRec_NotIso(0),
 HEnergy_IsoJet_ElType(0), EMEnergy_IsoJet_ElType(0), Jet_EMEnergy(0), Jet_HEnergy(0), MinDeltaR_ZDau(0), AllJetCharge(0), IsoJetCharge(0), NotIsoJetCharge(0), DeltaR_IsoJet(0), DeltaR_NotIsoJet(0), DeltaR_IsoJet_ElType(0),
 
-_norm(1.), _dir(0), _Norm(true), _Sumw2(false), _electronID("eidRobustTight"), _file(0), _histoVector()
+_norm(1.), _dir(0), _Norm(true), _electronID("eidRobustTight"), _file(0), _histoVector()
 
 { }
 
@@ -59,7 +59,6 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _targetLumi= iConfig.getParameter<double>("targetLumi");
    _xsec      = iConfig.getParameter<double>("CrossSection");
    _Norm      = iConfig.getParameter<bool>("Norm");
-   _Sumw2      = iConfig.getParameter<bool>("Sumw2");
 
    cout << "RecoElectron file name : " << _file->GetName() << endl;
    _file->cd();
@@ -232,12 +231,6 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    
    std::vector<TH1D*>::const_iterator ibeg = _histoVector.begin(); 
    std::vector<TH1D*>::const_iterator iend = _histoVector.end();
-   
-  if(_Sumw2){ 
-  for (std::vector<TH1D*>::const_iterator i = ibeg; i != iend; ++i){
-    (*i)->Sumw2();
-  }
-  }
    
   TChain *ch = new TChain("Events");
   

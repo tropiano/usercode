@@ -42,8 +42,6 @@ public :
   
 private:
   
-  bool _Sumw2;
-  
   std::string _electronID;
 
   TFile* _file;  
