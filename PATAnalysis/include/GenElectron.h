@@ -67,7 +67,7 @@ private:
   
   bool _Norm;
 
-  int _entries;
+  int _entries, _fileCounter, _EventsPerFile;
 
   TFile* _file;  
 

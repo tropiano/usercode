@@ -76,7 +76,7 @@ private:
   
   bool _Norm;
   
-  int _entries;
+  int _entries, _EventsPerFile;
   
   std::string _electronID;
 

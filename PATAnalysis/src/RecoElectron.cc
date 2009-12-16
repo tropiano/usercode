@@ -46,7 +46,7 @@ recLeadElPt_Acc_Qual_Imp_Iso_EiD(0), recSecElPt_Acc_Qual_Imp_Iso_EiD(0), recLead
 DeltaRvsCharge_JetRec(0), DeltaRvsCharge_JetRec_Iso(0), DeltaRvsCharge_JetRec_NotIso(0),
 HEnergy_IsoJet_ElType(0), EMEnergy_IsoJet_ElType(0), Jet_EMEnergy(0), Jet_HEnergy(0), MinDeltaR_ZDau(0), AllJetCharge(0), IsoJetCharge(0), NotIsoJetCharge(0), DeltaR_IsoJet(0), DeltaR_NotIsoJet(0), DeltaR_IsoJet_ElType(0),
 
-_norm(1.), _dir(0), _Norm(true), _electronID("eidRobustTight"), _file(0), _histoVector()
+_norm(1.), _dir(0), _Norm(true), _entries(0), _EventsPerFile(0), _electronID("eidRobustTight"), _file(0), _histoVector()
 
 { }
 
@@ -59,6 +59,7 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _targetLumi= iConfig.getParameter<double>("targetLumi");
    _xsec      = iConfig.getParameter<double>("CrossSection");
    _Norm      = iConfig.getParameter<bool>("Norm");
+   _EventsPerFile    = iConfig.getParameter<double>("EventsPerFile");
 
    cout << "RecoElectron file name : " << _file->GetName() << endl;
    _file->cd();
@@ -232,18 +233,27 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    std::vector<TH1D*>::const_iterator ibeg = _histoVector.begin(); 
    std::vector<TH1D*>::const_iterator iend = _histoVector.end();
    
-  TChain *ch = new TChain("Events");
+  int fileCounter = 0;
   
+  TChain *ch = new TChain("Events");
   ifstream infile;
   infile.open(sourceFileList.c_str());
   string datafile;
   while(getline (infile, datafile)){
     ch->Add(datafile.c_str());
+    fileCounter++;
   }
   
-  cout<<"RecoElectron analyzing nr. event = "<<ch->GetEntries()<<endl;
-  
+  if(_Norm==true){
   _entries = ch->GetEntries();
+  cout<<"RecoElectron analyzing nr. file = "<<fileCounter<<endl;
+  cout<<"RecoElectron analyzing nr. event = "<<_entries<<endl;}
+ 
+  if(_Norm==false){
+  _entries = fileCounter*_EventsPerFile;
+  cout<<"RecoElectron analyzing nr. file = "<<fileCounter<<endl;
+  cout<<"RecoElectron analyzing nr. event = "<<_entries<<endl;
+  }
   
   delete ch; 
    
@@ -549,10 +559,8 @@ void RecoElectron::finalize(){
    
    double lumi = _entries/_xsec;
 
-   if(_Norm){
+   if(lumi){
    _norm = _targetLumi/lumi;
-   }else{
-   _norm = 1.;
    }
   
    for (std::vector<TH1D*>::const_iterator i = ibeg; i != iend; ++i){

@@ -37,7 +37,7 @@ GenIsoJetPt_Acc(0), GenJetPt_Acc(0), GenIsoJetCounter_Acc(0), GenJetCounter_Acc(
 genLeadElPt(0), genSecElPt(0), genLeadElEta(0), genSecElEta(0),
 genLeadElPt_Acc(0), genSecElPt_Acc(0), genLeadElEta_Acc(0), genSecElEta_Acc(0),
 
-_ptjetmin(30.), _etajetmax(3.), _norm(1.), _Norm(true),
+_ptjetmin(30.), _etajetmax(3.), _norm(1.), _Norm(true), _EventsPerFile(0),
 _file(0), _dir(0),  _histovector()
 {   }
 
@@ -49,6 +49,7 @@ void GenElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _targetLumi= iConfig.getParameter<double>("targetLumi");
    _xsec      = iConfig.getParameter<double>("CrossSection");
    _Norm      = iConfig.getParameter<bool>("Norm");
+   _EventsPerFile      = iConfig.getParameter<double>("EventsPerFile");
    _ReportName = iConfig.getParameter<std::string>("ReportName");
 
     cout << "GenElectron file name : " << _file->GetName() << endl;
@@ -110,24 +111,31 @@ void GenElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    JetMinDeltaRZDau_GEN = new TH1D("JetMinDeltaRZDau_GEN", "Min Delta R Z Daughters All Gen Jets", 100, 0, 10);
    _histovector.push_back(JetMinDeltaRZDau_GEN);
    
-
    std::vector<TH1D*>::const_iterator ibeg = _histovector.begin();
    std::vector<TH1D*>::const_iterator iend = _histovector.end();
    
+   _fileCounter = 0;
+   
    TChain *ch = new TChain("Events");
-  
   ifstream infile;
   infile.open(sourceFileList.c_str());
   string datafile;
   while(getline (infile, datafile)){
     ch->Add(datafile.c_str());
+    _fileCounter++;
   }
   
-  cout<<"GenElectron analyzing nr. event = "<<ch->GetEntries()<<endl;
-  
+  if(_Norm==true){
   _entries = ch->GetEntries();
+  cout<<"RecoElectron analyzing nr. file = "<<_fileCounter<<endl;
+  cout<<"GenElectron analyzing nr. event = "<<_entries<<endl;}
   
-  delete ch; 
+  if(_Norm==false){
+  _entries = _fileCounter*_EventsPerFile;
+  cout<<"GenElectron analyzing nr. file = "<<_fileCounter<<endl;
+  cout<<"GenElectron analyzing nr. event = "<<_entries<<endl;}
+  
+  delete ch;
 
    cout << "GenElectron Worker configured." << endl;   
 }
@@ -329,10 +337,8 @@ void GenElectron::finalize(){
    
    double lumi = _entries/_xsec;
 
-   if(_Norm){
+   if(lumi){
    _norm = _targetLumi/lumi;
-   }else{
-   _norm = 1.;
    }
    
    for (std::vector<TH1D*>::const_iterator i = ibeg; i != iend; ++i){     
@@ -343,7 +349,13 @@ void GenElectron::finalize(){
    Report.open(_ReportName.c_str());
    
    Report<<endl<<endl<<"----- Sample Info -----"<<endl<<endl;
-   Report<<"Event number = "<<_entries<<endl;
+   Report<<"File number = "<<_fileCounter<<endl;
+   if(_Norm){
+   Report<<"Event number by TChain = "<<_entries<<endl;
+   }else{
+   Report<<"Events per File = "<<_EventsPerFile<<endl;
+   Report<<"Event number by #File*#EventsPerFile = "<<_entries<<endl;
+   }
    Report<<"Normalized to "<<_targetLumi<<" pb-1"<<endl;
    Report<<"Cross section = "<<_xsec<<" pb"<<endl;
    Report<<"Normalization factor = "<<_norm<<endl<<endl;
