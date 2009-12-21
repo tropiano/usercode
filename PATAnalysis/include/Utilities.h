@@ -165,8 +165,8 @@ inline bool singleMu_DXY(const pat::Muon& muon){
 }
 
 inline bool singleMu_Isolation(const pat::Muon& muon){//, double isocut = 0.3){
-  const pat::IsoDeposit* hcalIso = muon.isoDeposit(pat::HCalIso);
-  const pat::IsoDeposit* ecalIso = muon.isoDeposit(pat::ECalIso);
+  const pat::IsoDeposit* hcalIso = muon.isoDeposit(pat::HcalIso);
+  const pat::IsoDeposit* ecalIso = muon.isoDeposit(pat::EcalIso);
   return (muon.hcalIso() + muon.ecalIso() + muon.trackIso())/muon.pt() < 0.3 &&
            ecalIso->depositWithin(ecalIso->veto().dR, pat::IsoDeposit::Vetos(), true) < maxecaletinveto &&
            hcalIso->depositWithin(hcalIso->veto().dR, pat::IsoDeposit::Vetos(), true) < maxhcaletinveto;
@@ -344,10 +344,10 @@ inline bool RecSelected(const std::vector<reco::CompositeCandidate>& ZREC, doubl
   }  
   
   assert(dau0 && dau1);
-  const pat::IsoDeposit* hcalIso0 = dau0->isoDeposit(pat::HCalIso);
-  const pat::IsoDeposit* ecalIso0 = dau0->isoDeposit(pat::ECalIso);
-  const pat::IsoDeposit* hcalIso1 = dau1->isoDeposit(pat::HCalIso);
-  const pat::IsoDeposit* ecalIso1 = dau1->isoDeposit(pat::ECalIso);
+  const pat::IsoDeposit* hcalIso0 = dau0->isoDeposit(pat::HcalIso);
+  const pat::IsoDeposit* ecalIso0 = dau0->isoDeposit(pat::EcalIso);
+  const pat::IsoDeposit* hcalIso1 = dau1->isoDeposit(pat::HcalIso);
+  const pat::IsoDeposit* ecalIso1 = dau1->isoDeposit(pat::EcalIso);
   assert(hcalIso0 && hcalIso1);
   assert(ecalIso0 && ecalIso1);
 

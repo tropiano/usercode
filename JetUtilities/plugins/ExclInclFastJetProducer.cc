@@ -3,7 +3,7 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "ExclInclFastJetProducer.h"
 
-
+#include "RecoParticleFlow/PFRootEvent/interface/ProtoJet.h"
 #include "DataFormats/Common/interface/EDProduct.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
@@ -16,10 +16,9 @@
 #include "DataFormats/JetReco/interface/GenJetCollection.h"
 #include "DataFormats/JetReco/interface/PFJetCollection.h"
 #include "DataFormats/JetReco/interface/BasicJetCollection.h"
-#include "RecoJets/JetAlgorithms/interface/JetRecoTypes.h"
 #include "RecoJets/JetAlgorithms/interface/JetAlgoHelper.h"
-#include "RecoJets/JetAlgorithms/interface/JetMaker.h"
-#include "RecoJets/JetAlgorithms/interface/ProtoJet.h"
+#include "RecoParticleFlow/PFRootEvent/interface/JetMaker.h"
+#include "RecoParticleFlow/PFRootEvent/interface/JetRecoTypes.h"
 #include "DataFormats/Candidate/interface/CandidateFwd.h"
 #include "DataFormats/Candidate/interface/LeafCandidate.h"
 #include "FWCore/Framework/interface/ESHandle.h"

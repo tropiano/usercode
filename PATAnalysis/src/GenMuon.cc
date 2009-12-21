@@ -20,8 +20,6 @@
 #include "DataFormats/Candidate/interface/CompositeCandidate.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
 #include "DataFormats/FWLite/interface/ChainEvent.h"
-#include "FWCore/ParameterSet/interface/ProcessDesc.h"
-#include "FWCore/ParameterSet/interface/PythonProcessDesc.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 using namespace std;

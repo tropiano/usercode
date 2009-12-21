@@ -9,7 +9,7 @@ Later releases cannot do Exclusive jets
 */
 
 
-#include "RecoJets/JetAlgorithms/interface/ProtoJet.h"
+#include "RecoParticleFlow/PFRootEvent/interface/ProtoJet.h"
 #include "DataFormats/Candidate/interface/CandidateFwd.h"
 #include "DataFormats/Math/interface/LorentzVector.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"

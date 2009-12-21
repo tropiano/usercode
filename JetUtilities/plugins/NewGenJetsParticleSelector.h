@@ -17,7 +17,7 @@
 
 #include "FWCore/Framework/interface/EDProducer.h"
 #include "DataFormats/Common/interface/EDProductfwd.h"
-#include "RecoJets/JetAlgorithms/interface/JetRecoTypes.h"
+#include "RecoParticleFlow/PFRootEvent/interface/JetRecoTypes.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 

@@ -3,10 +3,10 @@ import FWCore.ParameterSet.Config as cms
 from RecoJets.JetProducers.GenJetParameters_cfi import *
 GenJetParameters.src = cms.InputTag("newGenParticlesForJets")
 GenJetParameters.jetPtMin = cms.double(0.)
-from RecoJets.JetProducers.FastjetParameters_cfi import *
+#from RecoJets.JetProducers.FastjetParameters_cfi import *
 from Firenze.JetUtilities.ExclusiveJetsParameters_cfi import *
 exclusive1GenJets10 = cms.EDProducer("ExclInclFastJetProducer",
-    FastjetNoPU,
+    #FastjetNoPU,
     ExclusiveJetParameters,
     GenJetParameters,
     

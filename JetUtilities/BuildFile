@@ -13,6 +13,7 @@
 <use name=Geometry/CaloEventSetup>       
 <use name=Geometry/Records>
 <use name=RecoJets/JetAlgorithms>
+<use name=RecoParticleFlow/PFRootEvent>
 <export>
  <lib name=FirenzeJetUtilities>
  <use name=DataFormats/JetReco>

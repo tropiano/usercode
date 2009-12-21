@@ -1,5 +1,5 @@
 #include "DataFormats/Candidate/interface/Candidate.h"
-#include "RecoJets/JetAlgorithms/interface/ProtoJet.h"
+#include "RecoParticleFlow/PFRootEvent/interface/ProtoJet.h"
 
 #include "Firenze/JetUtilities/interface/ExclInclFastJetWrapper.h"
 #include "fastjet/PseudoJet.hh"

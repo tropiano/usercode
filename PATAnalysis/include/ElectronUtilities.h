@@ -387,10 +387,10 @@ inline bool RecSelected_Acc_Qual_Imp_Iso(const std::vector<reco::CompositeCandid
   const pat::Electron* dau0 = zdaughters[0];
   const pat::Electron* dau1 = zdaughters[1];
 
-  const pat::IsoDeposit* hcalIso0 = dau0->isoDeposit(pat::HCalIso);
-  const pat::IsoDeposit* ecalIso0 = dau0->isoDeposit(pat::ECalIso);
-  const pat::IsoDeposit* hcalIso1 = dau1->isoDeposit(pat::HCalIso);
-  const pat::IsoDeposit* ecalIso1 = dau1->isoDeposit(pat::ECalIso);
+  const pat::IsoDeposit* hcalIso0 = dau0->isoDeposit(pat::HcalIso);
+  const pat::IsoDeposit* ecalIso0 = dau0->isoDeposit(pat::EcalIso);
+  const pat::IsoDeposit* hcalIso1 = dau1->isoDeposit(pat::HcalIso);
+  const pat::IsoDeposit* ecalIso1 = dau1->isoDeposit(pat::EcalIso);
   assert(hcalIso0 && hcalIso1);
   assert(ecalIso0 && ecalIso1);
   

@@ -9,7 +9,9 @@
 #include "TDSet.h"
 #include "TSystem.h"
 #include "TROOT.h"
+#include "TEnv.h"
 #include "TProof.h"
+#include "TProofLog.h"
 #include "FWCore/FWLite/interface/AutoLibraryLoader.h"
 #include <fstream>
 
@@ -38,8 +40,11 @@ int main(){
   AutoLibraryLoader::enable();
   gSystem->Load("libFirenzePATAnalysis");
 
-  p->Exec( ".x remote.C" ); 
+  p->Exec( ".x /raid/lenzip/CMSSW/test/CMSSW_3_3_5/src/Firenze/PATAnalysis/bin/remote.C" );
 
+  TProofLog *pl = TProof::Mgr("")->GetSessionLogs();
+  pl->Save("*","/raid/lenzip/CMSSW/test/CMSSW_3_3_5/src/Firenze/PATAnalysis/bin/Log.txt");
+/*
   //process the background
   TDSet* muDS = getDS("mudata.txt") ;
   TNamed* configbg = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/CMSSW_3_1_4/src/Firenze/PATAnalysis/bin/config_Mu.py");
@@ -61,7 +66,23 @@ int main(){
   fm.AddFile("signal.root");
   fm.OutputFile("total.root");
   fm.Merge();
+*/
 
+
+  TDSet* dsdata = getDS("tracks_data.txt") ;
+  TNamed* configdata = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/config_Dec09_data.py");
+  p->AddInput(configdata);
+  p->Process(dsdata, "FWLiteTSelector");
+  p->ClearInput();
+  delete dsdata;
+
+
+  TDSet* dsmc = getDS("tracks_mc.txt") ;
+  TNamed* configmc = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/config_Dec09_mc.py");
+  p->AddInput(configmc);
+  p->Process(dsmc, "FWLiteTSelector");
+  p->ClearInput();
+  delete dsmc;
   p->Close();
 
 }

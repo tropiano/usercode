@@ -6,6 +6,8 @@
 #include "GenElectron.h"
 #include "RecoMuon.h"
 #include "RecoElectron.h"
+#include "RecoTrack.h"
+#include "RecoJet.h"
 #include "RecoElectronNtuple.h"
 #include "EfficiencyElectron.h"
 #include "EfficiencyMuon.h"
@@ -24,6 +26,8 @@ inline AnalysisBuilders getAnalysisBuilders(){
   symbols["RecoMuon"] = RecoMuon::create;
   symbols["EfficiencyElectron"] = EfficiencyElectron::create;
   symbols["EfficiencyMuon"] = EfficiencyMuon::create;
+  symbols["RecoTrack"] = RecoTrack::create;
+  symbols["RecoJet"] = RecoJet::create;
 
   return symbols;
 }  

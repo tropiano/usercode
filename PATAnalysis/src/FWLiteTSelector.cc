@@ -7,7 +7,7 @@
 #include "boost/shared_ptr.hpp"
 #include "FWCore/Utilities/interface/Algorithms.h"
 #include "FWCore/ParameterSet/interface/ProcessDesc.h"
-#include "FWCore/ParameterSet/interface/PythonProcessDesc.h"
+#include "FWCore/PythonParameterSet/interface/PythonProcessDesc.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 

@@ -1,0 +1,16 @@
+/raid/lenzip/CMSSW/test/CMSSW_3_3_5/src/Firenze/Reduction/test/MC900-STARTUPV8I/res/mc_10.root
+/raid/lenzip/CMSSW/test/CMSSW_3_3_5/src/Firenze/Reduction/test/MC900-STARTUPV8I/res/mc_11.root
+/raid/lenzip/CMSSW/test/CMSSW_3_3_5/src/Firenze/Reduction/test/MC900-STARTUPV8I/res/mc_13.root
+/raid/lenzip/CMSSW/test/CMSSW_3_3_5/src/Firenze/Reduction/test/MC900-STARTUPV8I/res/mc_15.root
+/raid/lenzip/CMSSW/test/CMSSW_3_3_5/src/Firenze/Reduction/test/MC900-STARTUPV8I/res/mc_16.root
+/raid/lenzip/CMSSW/test/CMSSW_3_3_5/src/Firenze/Reduction/test/MC900-STARTUPV8I/res/mc_17.root
+/raid/lenzip/CMSSW/test/CMSSW_3_3_5/src/Firenze/Reduction/test/MC900-STARTUPV8I/res/mc_18.root
+/raid/lenzip/CMSSW/test/CMSSW_3_3_5/src/Firenze/Reduction/test/MC900-STARTUPV8I/res/mc_2.root
+/raid/lenzip/CMSSW/test/CMSSW_3_3_5/src/Firenze/Reduction/test/MC900-STARTUPV8I/res/mc_20.root
+/raid/lenzip/CMSSW/test/CMSSW_3_3_5/src/Firenze/Reduction/test/MC900-STARTUPV8I/res/mc_21.root
+/raid/lenzip/CMSSW/test/CMSSW_3_3_5/src/Firenze/Reduction/test/MC900-STARTUPV8I/res/mc_3.root
+/raid/lenzip/CMSSW/test/CMSSW_3_3_5/src/Firenze/Reduction/test/MC900-STARTUPV8I/res/mc_5.root
+/raid/lenzip/CMSSW/test/CMSSW_3_3_5/src/Firenze/Reduction/test/MC900-STARTUPV8I/res/mc_6.root
+/raid/lenzip/CMSSW/test/CMSSW_3_3_5/src/Firenze/Reduction/test/MC900-STARTUPV8I/res/mc_7.root
+/raid/lenzip/CMSSW/test/CMSSW_3_3_5/src/Firenze/Reduction/test/MC900-STARTUPV8I/res/mc_8.root
+/raid/lenzip/CMSSW/test/CMSSW_3_3_5/src/Firenze/Reduction/test/MC900-STARTUPV8I/res/mc_9.root

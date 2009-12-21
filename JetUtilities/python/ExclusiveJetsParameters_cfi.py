@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 # Standard kT jets parameters
-# $Id: KtJetParameters_cfi.py,v 1.2 2008/04/21 03:28:56 rpw Exp $
+# $Id: ExclusiveJetsParameters_cfi.py,v 1.1 2009/02/19 10:32:18 lenzip Exp $
 ExclusiveJetParameters = cms.PSet(
   JetFinder = cms.string('kt_algorithm'),
   #possible Modes: inclusive, exclusive (dcut/njets), inclusive is default with PtMin [GeV]
@@ -10,6 +10,7 @@ ExclusiveJetParameters = cms.PSet(
   PtMin = cms.double(0.),
   
   #possible Strategies: "Best","N2Plain","N2Tiled","N2MinHeapTiled","NlnN","NlnNCam"
-  Strategy = cms.string('Best')
+  Strategy = cms.string('Best'),
+  UE_Subtraction = cms.string('no')
 )
         
