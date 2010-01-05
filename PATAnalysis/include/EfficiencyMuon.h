@@ -67,7 +67,7 @@ private:
 
    double _norm;
 
-   int _nbin;
+   uint32_t _nbin;
 
    double _xmin;
 

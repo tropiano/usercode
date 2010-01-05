@@ -96,7 +96,10 @@ void  RecoJet::process(const fwlite::Event& iEvent)
    std::vector<pat::Jet>::const_iterator jetend = jetHandle->end();
    int countJet = 0;
    for (ijet = jetbeg; ijet != jetend; ++ijet){
-     if (ijet->pt() > _ptcut && fabs(ijet->eta()) < _etamax  && ijet->emEnergyFraction() > 0.01 && ijet->energyFractionHadronic() < 0.98 ) {
+     if (ijet->pt() > _ptcut && fabs(ijet->eta()) < _etamax  && 
+         ijet->emEnergyFraction() > 0.01 && 
+         ijet->jetID().fHPD < 0.98 &&
+         ijet->jetID().n90Hits > 1) {
         _jetplots.fill(*ijet);
         countJet++;
      }

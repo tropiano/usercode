@@ -215,11 +215,11 @@ inline bool isTriggered(const pat::TriggerEvent& triggers, std::string triggerna
 }
 
 inline bool isMuonTriggered(const pat::TriggerEvent& triggers){
-  return isTriggered(triggers, "HLT_Mu15") || isTriggered(triggers, "HLT_DoubleMu3");
+  return isTriggered(triggers, "HLT_Mu9") || isTriggered(triggers, "HLT_DoubleMu3");
 }
 
 inline bool isJetTriggered(const pat::TriggerEvent& triggersREC){
-  return isTriggered(triggersREC, "HLT_Jet30");
+  return isTriggered(triggersREC, "HLT_Jet30U");
 }
 
 //to do: try to avoid the copy 

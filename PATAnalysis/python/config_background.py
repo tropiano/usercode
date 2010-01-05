@@ -22,8 +22,8 @@ process.zmumueff = cms.PSet (
   MaxEtaJet   = cms.double(3.),
   ScaleFactor = cms.double(1.),
   RequireGenInAcceptance = cms.bool(False),
-  NBin        = cms.int32(10),
+  NBin        = cms.uint32(10),
   XMin        = cms.double(-0.5),
-  XMax        = cms.double(-9.5),
+  XMax        = cms.double(9.5),
   IsoCut      = cms.double(0.3)
 )

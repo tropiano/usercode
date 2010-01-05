@@ -44,18 +44,18 @@ int main(){
 
   TProofLog *pl = TProof::Mgr("")->GetSessionLogs();
   pl->Save("*","/raid/lenzip/CMSSW/test/CMSSW_3_3_5/src/Firenze/PATAnalysis/bin/Log.txt");
-/*
+
   //process the background
   TDSet* muDS = getDS("mudata.txt") ;
-  TNamed* configbg = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/CMSSW_3_1_4/src/Firenze/PATAnalysis/bin/config_Mu.py");
+  TNamed* configbg = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/config_Mu.py");
   p->AddInput(configbg);
   p->Process(muDS, "FWLiteTSelector");
   p->ClearInput();
   delete muDS;
-
+/*
   //process the signal
   TDSet* signalDS = getDS("signaldata.txt");
-  TNamed* configsignal = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/CMSSW_3_1_4/src/Firenze/PATAnalysis/bin/config_signal.py");
+  TNamed* configsignal = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/config_signal.py");
   p->AddInput(configsignal);       
   p->Process(signalDS, "FWLiteTSelector");
   delete signalDS;
@@ -68,7 +68,7 @@ int main(){
   fm.Merge();
 */
 
-
+/*
   TDSet* dsdata = getDS("tracks_data.txt") ;
   TNamed* configdata = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/config_Dec09_data.py");
   p->AddInput(configdata);
@@ -84,5 +84,5 @@ int main(){
   p->ClearInput();
   delete dsmc;
   p->Close();
-
+*/
 }

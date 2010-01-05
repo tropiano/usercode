@@ -79,7 +79,7 @@ void EfficiencyMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
   _ptjetmin  = iConfig.getParameter<double>("MinPtJet");
   _etajetmax = iConfig.getParameter<double>("MaxEtaJet");
   _norm      = iConfig.getParameter<double>("ScaleFactor");
-  _nbin      = iConfig.getParameter<int>("NBin");
+  _nbin      = iConfig.getParameter<uint32_t>("NBin");
   _xmin      = iConfig.getParameter<double>("XMin");
   _xmax      = iConfig.getParameter<double>("XMax");
   _requireGenInAcceptance = iConfig.getParameter<bool>("RequireGenInAcceptance");
