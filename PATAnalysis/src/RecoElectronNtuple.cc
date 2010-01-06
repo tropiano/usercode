@@ -48,6 +48,22 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    _xsec      = iConfig.getParameter<double>("CrossSection");
    _Norm      = iConfig.getParameter<bool>("Norm");
    _EventsPerFile    = iConfig.getParameter<double>("EventsPerFile");
+   
+   //Selections
+   _Acc = iConfig.getParameter<double>("Acc");
+   _Qual = iConfig.getParameter<double>("Qual");
+   _Imp = iConfig.getParameter<double>("Imp");
+   _Iso = iConfig.getParameter<double>("Iso");
+   _EiD = iConfig.getParameter<double>("EiD");
+   
+   for(int i=0; i<6; i++){
+   _RecoCutFlags[i] = "_1";}
+   
+   _RecoCutFlags[_Acc] = "_Acc";
+   _RecoCutFlags[_Qual] = "_Qual";
+   _RecoCutFlags[_Imp] = "_Imp";
+   _RecoCutFlags[_Iso] = "_Iso";
+   _RecoCutFlags[_EiD] = "_EiD";
 
    cout << "RecoElectronNtuple file name : " << _file->GetName() << endl;
    _file->cd();
@@ -99,7 +115,7 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    electrontree->Branch("nelesall",&nelesall,"nelesall/I");
    electrontree->Branch("neles",&neles,"neles/I");
    electrontree->Branch("loosezmass",&loosezmass,"loosezmass/F");
-   electrontree->Branch("zmass",&zmass,"zmass/F");
+   electrontree->Branch("zmass_AllCuts",&zmass_AllCuts,"zmass_AllCuts/F");
    electrontree->Branch("zpt",&zpt,"zpt/F");
    electrontree->Branch("zeta",&zeta,"zeta/F");
    electrontree->Branch("zphi",&zphi,"zphi/F");
@@ -249,7 +265,7 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    acc_jetgencharge3=0.;
 
       loosezmass=0.;
-      zmass=0.;
+      zmass_AllCuts=0.;
       zpt=0.;
       zeta=0.;
       zphi=0.;
@@ -335,6 +351,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
 {
 
    // zero everything
+   
    zero_ntuple();
 
    _file->cd();
@@ -439,7 +456,8 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    } // end selected in acceptance
 
 
-   //reconstructed quantities
+   //Reconstructed quantities
+   
    fwlite::Handle<std::vector<pat::Electron> > electronHandle;
    electronHandle.getByLabel(iEvent, "selectedElectrons");
 
@@ -477,19 +495,21 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
      
      }
 
-  // loose cuts, only acceptance cuts
-   if (RecSelected_Acc(*zrecHandle)){
+   // loose cuts, only acceptance cuts
+   
+   if (RecSelected("_Acc", _electronID.c_str(), *zrecHandle)){
    
    const reco::GsfTrack track0 = *(recdau0->gsfTrack());
    const reco::GsfTrack track1 = *(recdau1->gsfTrack());
    assert(&track0 && &track1);
 
       // fill variables for ntuple
+      
       loosezmass=(*zrecHandle)[0].mass();
       zpt=(*zrecHandle)[0].pt();
       zeta=(*zrecHandle)[0].eta();
       zphi=(*zrecHandle)[0].phi();
-      //
+      
       elept1=recdau0->pt();
       eleeta1=recdau0->eta();
       elephi1=recdau0->phi();
@@ -549,6 +569,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
          njetsele=isorecjets.size();
          
       // fill ntuples for jets
+      
       if (isorecjets.size()>0){
         jetpt1=isorecjets[0]->pt();
         jeteta1=isorecjets[0]->eta();
@@ -577,22 +598,20 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
 	jetEmFrac3=isorecjets[2]->emEnergyFraction();
 
       }
-
-
-      // now starts the stricter cuts
-   if (RecSelected_Acc_Qual_Imp_Iso_EiD(*zrecHandle, _electronID.c_str())){
-  
-      zmass=(*zrecHandle)[0].mass();
       
+      } // endif loose selected Z
 
+
+   // now starts the stricter cuts
+      
+   if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), *zrecHandle)&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), *zrecHandle)&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), *zrecHandle)&&RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), *zrecHandle)&&RecSelected(_RecoCutFlags[5].c_str(), _electronID.c_str(), *zrecHandle)){
+  
+      zmass_AllCuts=(*zrecHandle)[0].mass();
+      
    }  // endif strict selected Z     
       
-   }  // endif loose selected Z
-
-
    electrontree->Fill();   // fill outside any loop
      
-
 }
 
 void RecoElectronNtuple::finalize(){

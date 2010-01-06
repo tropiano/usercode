@@ -23,22 +23,28 @@ TDSet* getDS(const char* filename){
   return out; 
 }
 
-void makeCfg(bool GEN, bool RECO, bool EFF, bool NTUPLE, const char *cfgPath, const char* source, const char *outFile, const char* Norm, int EventsPerFile, const char* electronID, double xsec, double targetLumi){
+void makeCfg(bool GEN, bool RECO, bool EFF, bool NTUPLE, int Acc, int Qual, int Imp, int Iso, int EiD, const char* path, const char *cfgName, const char* sourceList, const char *outFile, const char* Norm, int EventsPerFile, const char* electronID, double xsec, double targetLumi){
 
-string Source = "/afs/cern.ch/user/s/sfrosali/scratch0/Zjets/CMSSW_3_1_4/src/Firenze/PATAnalysis/bin/";
-Source+=source;
+//cfg
+string cfgPath = path;
+cfgPath+=cfgName;
+
+//source
+string Source = path;
+Source+=sourceList;
 
 //Ouput File Name
 string outputFile = outFile;
 outputFile+=".root";
 
 //ReportName
-string RepName = "/afs/cern.ch/user/s/sfrosali/scratch0/Zjets/CMSSW_3_1_4/src/Firenze/PATAnalysis/bin/Report_";
+string RepName = path;
+RepName+="Report_";
 RepName+=outFile;
 RepName+=".txt";
 
 ofstream cfg;
-cfg.open(cfgPath);
+cfg.open(cfgPath.c_str());
 
 cfg<<"import FWCore.ParameterSet.Config as cms"<<std::endl<<std::endl;
 
@@ -65,6 +71,11 @@ cfg<<"type        = cms.string(\"RecoElectron\"),"<<std::endl;
 cfg<<"Name        = cms.string(\"RecoElectron\"),"<<std::endl;
 cfg<<"sourceFileList = cms.string(\""<<Source.c_str()<<"\"),"<<std::endl;
 cfg<<"electronID = cms.string(\""<<electronID<<"\"),"<<std::endl;
+cfg<<"Acc = cms.double("<<Acc<<"),"<<std::endl;
+cfg<<"Qual = cms.double("<<Qual<<"),"<<std::endl;
+cfg<<"Imp = cms.double("<<Imp<<"),"<<std::endl;
+cfg<<"Iso = cms.double("<<Iso<<"),"<<std::endl;
+cfg<<"EiD = cms.double("<<EiD<<"),"<<std::endl;
 cfg<<"CrossSection = cms.double("<<xsec<<"),"<<std::endl;
 cfg<<"targetLumi  = cms.double("<<targetLumi<<"),"<<std::endl;
 cfg<<"Norm        = cms.bool("<<Norm<<"),"<<std::endl;
@@ -77,7 +88,12 @@ cfg<<"process.zeeeff = cms.PSet ("<<std::endl;
 cfg<<"type        = cms.string(\"EfficiencyElectron\"),"<<std::endl;
 cfg<<"Name        = cms.string(\"EfficiencyElectron\"),"<<std::endl;
 cfg<<"sourceFileList = cms.string(\""<<Source.c_str()<<"\"),"<<std::endl;
-cfg<<"electronID = cms.string(\""<<electronID<<"\")"<<std::endl;
+cfg<<"electronID = cms.string(\""<<electronID<<"\"),"<<std::endl;
+cfg<<"Acc = cms.double("<<Acc<<"),"<<std::endl;
+cfg<<"Qual = cms.double("<<Qual<<"),"<<std::endl;
+cfg<<"Imp = cms.double("<<Imp<<"),"<<std::endl;
+cfg<<"Iso = cms.double("<<Iso<<"),"<<std::endl;
+cfg<<"EiD = cms.double("<<EiD<<")"<<std::endl;
 cfg<<")"<<std::endl<<std::endl;
 }
 
@@ -87,6 +103,11 @@ cfg<<"type        = cms.string(\"RecoElectronNtuple\"),"<<std::endl;
 cfg<<"Name        = cms.string(\"RecoElectronNtuple\"),"<<std::endl;
 cfg<<"sourceFileList = cms.string(\""<<Source.c_str()<<"\"),"<<std::endl;
 cfg<<"electronID = cms.string(\""<<electronID<<"\"),"<<std::endl;
+cfg<<"Acc = cms.double("<<Acc<<"),"<<std::endl;
+cfg<<"Qual = cms.double("<<Qual<<"),"<<std::endl;
+cfg<<"Imp = cms.double("<<Imp<<"),"<<std::endl;
+cfg<<"Iso = cms.double("<<Iso<<"),"<<std::endl;
+cfg<<"EiD = cms.double("<<EiD<<"),"<<std::endl;
 cfg<<"CrossSection = cms.double("<<xsec<<"),"<<std::endl;
 cfg<<"targetLumi  = cms.double("<<targetLumi<<"),"<<std::endl;
 cfg<<"Norm        = cms.bool("<<Norm<<"),"<<std::endl;

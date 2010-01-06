@@ -18,28 +18,27 @@ public :
 
    static MyPatAnalysis* create() {return new RecoElectron(); } 
 
-   //void  process(const fwlite::ChainEvent& iEvent);
    virtual void  process(const fwlite::Event& iEvent);
 
    virtual void finalize(); 
 
    //Histograms
-   TH1D *recPtZ_Acc, *recEtaZ_Acc, *recMassZ_Acc,
-   *recPtZ_Acc_Qual, *recEtaZ_Acc_Qual, *recMassZ_Acc_Qual,
-   *recPtZ_Acc_Qual_Imp, *recEtaZ_Acc_Qual_Imp, *recMassZ_Acc_Qual_Imp, 
-   *recPtZ_Acc_Qual_Imp_Iso, *recEtaZ_Acc_Qual_Imp_Iso, *recMassZ_Acc_Qual_Imp_Iso,
-   *recPtZ_Acc_Qual_Imp_Iso_EiD, *recEtaZ_Acc_Qual_Imp_Iso_EiD, *recMassZ_Acc_Qual_Imp_Iso_EiD;
-   
-   TH1D *recTrackIsoLead_Acc_Qual_Imp, *recEcalIsoLead_Acc_Qual_Imp, *recHcalIsoLead_Acc_Qual_Imp, *recRelIsoLead_Acc_Qual_Imp, *recTrackIsoSec_Acc_Qual_Imp, *recEcalIsoSec_Acc_Qual_Imp, *recHcalIsoSec_Acc_Qual_Imp, *recRelIsoSec_Acc_Qual_Imp;
-    
-   TH1D *RecoJetPt_Acc_Qual_Imp_Iso_EiD, *RecoIsoJetPt_Acc_Qual_Imp_Iso_EiD, *recLeadIsoJetPt_Acc_Qual_Imp_Iso_EiD, *recLeadIsoJetEta_Acc_Qual_Imp_Iso_EiD, *JetCounter_Acc_Qual_Imp_Iso_EiD, *IsoJetCounter_Acc, *IsoJetCounter_Acc_Qual, *IsoJetCounter_Acc_Qual_Imp, *IsoJetCounter_Acc_Qual_Imp_Iso, *IsoJetCounter_Acc_Qual_Imp_Iso_EiD, 
-*HoverE_Acc_Qual_Imp_Iso, *DeltaEtaIn_Acc_Qual_Imp_Iso, *DeltaPhiIn_Acc_Qual_Imp_Iso, *SigmaIEtaIEta_Acc_Qual_Imp_Iso, *HoverE_Acc_Qual_Imp_Iso_EiD, *DeltaEtaIn_Acc_Qual_Imp_Iso_EiD, *DeltaPhiIn_Acc_Qual_Imp_Iso_EiD, *SigmaIEtaIEta_Acc_Qual_Imp_Iso_EiD;
+   TH1D *recPtZ_1, *recEtaZ_1, *recMassZ_1,
+   *recPtZ_12, *recEtaZ_12, *recMassZ_12,
+   *recPtZ_123, *recEtaZ_123, *recMassZ_123, 
+   *recPtZ_1234, *recEtaZ_1234, *recMassZ_1234,
+   *recPtZ_12345, *recEtaZ_12345, *recMassZ_12345;
         
-   TH1D *recLeadElPt_Acc, *recSecElPt_Acc, *recLeadElEta_Acc, *recSecElEta_Acc,
-   *recLeadElPt_Acc_Qual, *recSecElPt_Acc_Qual, *recLeadElEta_Acc_Qual, *recSecElEta_Acc_Qual,
-   *recLeadElPt_Acc_Qual_Imp, *recSecElPt_Acc_Qual_Imp, *recLeadElEta_Acc_Qual_Imp, *recSecElEta_Acc_Qual_Imp,
-   *recLeadElPt_Acc_Qual_Imp_Iso, *recSecElPt_Acc_Qual_Imp_Iso, *recLeadElEta_Acc_Qual_Imp_Iso, *recSecElEta_Acc_Qual_Imp_Iso,
-   *recLeadElPt_Acc_Qual_Imp_Iso_EiD, *recSecElPt_Acc_Qual_Imp_Iso_EiD, *recLeadElEta_Acc_Qual_Imp_Iso_EiD, *recSecElEta_Acc_Qual_Imp_Iso_EiD;
+   TH1D *recLeadElPt_1, *recSecElPt_1, *recLeadElEta_1, *recSecElEta_1,
+   *recLeadElPt_12, *recSecElPt_12, *recLeadElEta_12, *recSecElEta_12,
+   *recLeadElPt_123, *recSecElPt_123, *recLeadElEta_123, *recSecElEta_123,
+   *recLeadElPt_1234, *recSecElPt_1234, *recLeadElEta_1234, *recSecElEta_1234,
+   *recLeadElPt_12345, *recSecElPt_12345, *recLeadElEta_12345, *recSecElEta_12345;
+   
+   TH1D *RecoJetPt_12345, *RecoIsoJetPt_12345, *recLeadIsoJetPt_12345, *recLeadIsoJetEta_12345, *JetCounter_12345, *IsoJetCounter_1, *IsoJetCounter_12, *IsoJetCounter_123, *IsoJetCounter_1234, *IsoJetCounter_12345, 
+*HoverE_PreEiD, *DeltaEtaIn_PreEiD, *DeltaPhiIn_PreEiD, *SigmaIEtaIEta_PreEiD, *HoverE_EiD, *DeltaEtaIn_EiD, *DeltaPhiIn_EiD, *SigmaIEtaIEta_EiD;
+   
+   TH1D *recTrackIsoLead_PreIso, *recEcalIsoLead_PreIso, *recHcalIsoLead_PreIso, *recRelIsoLead_PreIso, *recTrackIsoSec_PreIso, *recEcalIsoSec_PreIso, *recHcalIsoSec_PreIso, *recRelIsoSec_PreIso;
    
    TH2D *DeltaRvsCharge_JetRec, *DeltaRvsCharge_JetRec_Iso, *DeltaRvsCharge_JetRec_NotIso;  
    TH1D *HEnergy_IsoJet_ElType, *EMEnergy_IsoJet_ElType, *Jet_HEnergy, *Jet_EMEnergy, *MinDeltaR_ZDau, *AllJetCharge, *IsoJetCharge, *NotIsoJetCharge, *DeltaR_IsoJet, *DeltaR_NotIsoJet, *DeltaR_IsoJet_ElType;
@@ -76,13 +75,15 @@ private:
   
   bool _Norm;
   
-  int _entries, _EventsPerFile;
+  int _entries, _EventsPerFile, _Acc, _Qual, _Imp, _Iso, _EiD;
   
   std::string _electronID;
 
   TFile* _file;  
 
   TDirectory* _dir;
+  
+  std::string _RecoCutFlags[6];
 
   std::vector<TH1D*> _histoVector;
   std::vector<TH2D*> _histoVector2D;

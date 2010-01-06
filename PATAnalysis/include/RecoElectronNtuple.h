@@ -12,7 +12,7 @@ public :
 
    RecoElectronNtuple();
 
-   virtual ~RecoElectronNtuple();
+   ~RecoElectronNtuple();
 
    void  process(const fwlite::Event& iEvent);
    
@@ -34,7 +34,7 @@ public :
    Float_t acc_elegenpt1, acc_elegeneta1, acc_elegenphi1;
    Float_t acc_elegenpt2, acc_elegeneta2, acc_elegenphi2;
    //
-   Float_t loosezmass, zmass, zpt, zeta, zphi;
+   Float_t loosezmass, zmass_AllCuts, zpt, zeta, zphi;
    // loosezmass>0. is a loose recostructed Z, only reconstructed mass cut
    // zmass>0. is a good recostructed Z, all cuts except electron ID
    Int_t numberOfZ, nelesall, neles, njetsele;
@@ -80,9 +80,11 @@ private:
   
   double _xsec;
   
-  bool _Norm;
+  int _entries, _EventsPerFile, _Acc, _Qual, _Imp, _Iso, _EiD;
   
-  int _entries, _EventsPerFile;
+  std::string _RecoCutFlags[6];
+  
+  bool _Norm;
   
   std::string _electronID;
   

@@ -51,8 +51,8 @@ static double eta_el_excl_up = 1.56;               //Excluded Eta region
 static double eta_el_excl_down = 1.4442;           //Excluded Eta region
 static double zmassmin = 50.;   //Gev/c^2
 static double zmassmax = 130.;  //Gev/c^2
-static double minnhit = 0.;
-static double maxchi2 = 99999999999999999.;
+static double minnhit = 11.;
+static double maxchi2 = 10.;
 static double dxycut = 0.02;     //cm
 static double ptjetmin = 30.;   //Gev/c
 static double etajetmax = 3.0;
@@ -205,7 +205,7 @@ const reco::Candidate *dau, *daudau;
   }
   
   if(zdaughters.size()==1 || zdaughters.size()>2){
-  cout<<"ERROR! Wrong Z daughters association. Z daughters number = "<<zdaughters.size()<<endl;
+  std::cout<<"ERROR! Wrong Z daughters association. Z daughters number = "<<zdaughters.size()<<std::endl;
   std::vector<const reco::Candidate*> nullzdaughters;
   return nullzdaughters;
   }else{
@@ -318,26 +318,7 @@ inline bool GenSelectedInAcceptance(const std::vector<reco::CompositeCandidate>&
 
 // REC SELECTION
   
-inline bool RecSelected_Acc(const std::vector<reco::CompositeCandidate>& ZREC){
-  
-  std::vector<const pat::Electron*> zdaughters = ZDaughters(ZREC);
-  
-  if(!zdaughters.size()){
-  return false;
-  }else{
-  
-  const pat::Electron* dau0 = zdaughters[0];
-  const pat::Electron* dau1 = zdaughters[1];
-  
-  return ZREC.size()==1 && ZREC[0].mass()>zmassmin && ZREC[0].mass()<zmassmax
-         && dau0->pt() > ptelcut && fabs(dau0->eta()) < etaelcut 
-         && dau1->pt() > ptelcut && fabs(dau1->eta()) < etaelcut
-         && (fabs(dau0->eta())<eta_el_excl_down || fabs(dau0->eta())>eta_el_excl_up) &&
-            (fabs(dau1->eta())<eta_el_excl_down || fabs(dau1->eta())>eta_el_excl_up);
-}
-}
-
-inline bool RecSelected_Acc_Qual(const std::vector<reco::CompositeCandidate>& ZREC){
+inline bool RecSelected(string Flag, string EID, const std::vector<reco::CompositeCandidate>& ZREC){
   
   std::vector<const pat::Electron*> zdaughters = ZDaughters(ZREC);
   
@@ -352,65 +333,12 @@ inline bool RecSelected_Acc_Qual(const std::vector<reco::CompositeCandidate>& ZR
   const reco::GsfTrack track1 = *(dau1->gsfTrack());
   assert(&track0 && &track1);
   
-  return RecSelected_Acc(ZREC) &&
-         track0.numberOfValidHits() > minnhit && track1.numberOfValidHits() > minnhit &&
-         track0.normalizedChi2() < maxchi2 && track1.normalizedChi2() < maxchi2;
- 
-}
-}
-
-inline bool RecSelected_Acc_Qual_Imp(const std::vector<reco::CompositeCandidate>& ZREC){
-  
-  std::vector<const pat::Electron*> zdaughters = ZDaughters(ZREC);
-  
-  if(!zdaughters.size()){
-  return false;
-  }else{
-  
-  const pat::Electron* dau0 = zdaughters[0];
-  const pat::Electron* dau1 = zdaughters[1];
-  
-  return RecSelected_Acc_Qual(ZREC) &&
-         dau0->dB() < dxycut && dau1->dB() < dxycut; 
- 
-}
-}
-
-inline bool RecSelected_Acc_Qual_Imp_Iso(const std::vector<reco::CompositeCandidate>& ZREC){
-  
-  std::vector<const pat::Electron*> zdaughters = ZDaughters(ZREC);
-  
-  if(!zdaughters.size()){
-  return false;
-  }else{
-  
-  const pat::Electron* dau0 = zdaughters[0];
-  const pat::Electron* dau1 = zdaughters[1];
-
-  const pat::IsoDeposit* hcalIso0 = dau0->isoDeposit(pat::HcalIso);
-  const pat::IsoDeposit* ecalIso0 = dau0->isoDeposit(pat::EcalIso);
-  const pat::IsoDeposit* hcalIso1 = dau1->isoDeposit(pat::HcalIso);
-  const pat::IsoDeposit* ecalIso1 = dau1->isoDeposit(pat::EcalIso);
+  /*const pat::IsoDeposit* hcalIso0 = dau0->isoDeposit(pat::HCalIso);
+  const pat::IsoDeposit* ecalIso0 = dau0->isoDeposit(pat::ECalIso);
+  const pat::IsoDeposit* hcalIso1 = dau1->isoDeposit(pat::HCalIso);
+  const pat::IsoDeposit* ecalIso1 = dau1->isoDeposit(pat::ECalIso);
   assert(hcalIso0 && hcalIso1);
-  assert(ecalIso0 && ecalIso1);
-  
-  return RecSelected_Acc_Qual_Imp(ZREC) &&
-         (dau0->hcalIso() + dau0->ecalIso() + dau0->trackIso()) / dau0->pt() < isocut &&  
-         (dau1->hcalIso() + dau1->ecalIso() + dau1->trackIso()) / dau1->pt() < isocut; 
- 
-}
-}
-
-inline bool RecSelected_Acc_Qual_Imp_Iso_EiD(const std::vector<reco::CompositeCandidate>& ZREC, string EID){
-
-  std::vector<const pat::Electron*> zdaughters = ZDaughters(ZREC);
-  
-  if(!zdaughters.size()){
-  return false;
-  }else{
-  
-  const pat::Electron* dau0 = zdaughters[0];
-  const pat::Electron* dau1 = zdaughters[1];
+  assert(ecalIso0 && ecalIso1);*/
   
   bool electron_ID0 = false;
   bool electron_ID1 = false;
@@ -419,8 +347,34 @@ inline bool RecSelected_Acc_Qual_Imp_Iso_EiD(const std::vector<reco::CompositeCa
   if(dau0->electronID(EID.c_str())==1.0)electron_ID0 = true;
   if(dau1->electronID(EID.c_str())==1.0)electron_ID1 = true;
   }
-  
-  return RecSelected_Acc_Qual_Imp_Iso(ZREC) && electron_ID0 && electron_ID1;
+ 
+  if(Flag=="_Acc"){
+  return ZREC.size()==1 && ZREC[0].mass()>zmassmin && ZREC[0].mass()<zmassmax
+         && dau0->pt() > ptelcut && fabs(dau0->eta()) < etaelcut 
+         && dau1->pt() > ptelcut && fabs(dau1->eta()) < etaelcut
+         && (fabs(dau0->eta())<eta_el_excl_down || fabs(dau0->eta())>eta_el_excl_up) &&
+            (fabs(dau1->eta())<eta_el_excl_down || fabs(dau1->eta())>eta_el_excl_up);
+            }
+  else if(Flag=="_Qual"){
+  return track0.numberOfValidHits() > minnhit && track1.numberOfValidHits() > minnhit &&
+         track0.normalizedChi2() < maxchi2 && track1.normalizedChi2() < maxchi2;
+         }      
+  else if(Flag=="_Imp"){
+  return dau0->dB() < dxycut && dau1->dB() < dxycut;
+  }
+  else if(Flag=="_Iso"){
+  return (dau0->hcalIso() + dau0->ecalIso() + dau0->trackIso()) / dau0->pt() < isocut &&  
+         (dau1->hcalIso() + dau1->ecalIso() + dau1->trackIso()) / dau1->pt() < isocut;
+         }
+  else if(Flag=="_EiD"){
+  return electron_ID0 && electron_ID1;
+  }
+  else if(Flag=="_1"){
+  return true;
+  }
+  else{
+  return false;
+  }
   
   }
   
@@ -428,8 +382,11 @@ inline bool RecSelected_Acc_Qual_Imp_Iso_EiD(const std::vector<reco::CompositeCa
 
 inline bool RecSelectedWithTrigger(const std::vector<reco::CompositeCandidate>& ZREC, string EID, const pat::TriggerEvent& triggers, const pat::Electron* extdau0 = 0, const pat::Electron* extdau1 = 0){
   bool isTriggered = isElectronTriggered(triggers);
-  if (!isTriggered) return false;
-  return RecSelected_Acc_Qual_Imp_Iso_EiD(ZREC, EID);
+  if(!isTriggered){
+  return false;
+  }else{
+  return true;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -491,7 +448,7 @@ inline double MinDeltaRZDau_GEN(const std::vector<reco::CompositeCandidate>& ZGE
 	minDeltaRZDau = (Delta_R_GEN(*dau0,jet) < Delta_R_GEN(*dau1,jet)) ? Delta_R_GEN(*dau0,jet) : Delta_R_GEN(*dau1,jet);		
 	}
 	
-	if(!zdaughters.size())cout<<"### MINDELTARZDAU_GEN::ZDAUGHTERS SIZE = 0"<<endl;
+	if(!zdaughters.size())std::cout<<"### MINDELTARZDAU_GEN::ZDAUGHTERS SIZE = 0"<<std::endl;
 	
 	return minDeltaRZDau;
 	
@@ -574,7 +531,7 @@ inline double MinDeltaRZDau(const std::vector<reco::CompositeCandidate>& ZREC, c
 	minDeltaRZDau = (Delta_R(*dau0,jet) < Delta_R(*dau1,jet)) ? Delta_R(*dau0,jet) : Delta_R(*dau1,jet);		
 	}
 	
-	if(!zdaughters.size())cout<<"### MINDELTARZDAU::ZDAUGHTERS SIZE = 0"<<endl;
+	if(!zdaughters.size())std::cout<<"### MINDELTARZDAU::ZDAUGHTERS SIZE = 0"<<std::endl;
 	
 	return minDeltaRZDau;
 	

@@ -13,8 +13,8 @@ process.zeegen = cms.PSet (
   sourceFileList = cms.string("file.txt"),
   CrossSection = cms.double(1944.),
   targetLumi  = cms.double(100.),
-  Norm        = cms.bool(True),
-  Sumw2        = cms.bool(False)
+  EventsPerFile = cms.double(0),
+  Norm        = cms.bool(True)
 )
 
 process.zeerec = cms.PSet (
@@ -22,10 +22,15 @@ process.zeerec = cms.PSet (
   Name        = cms.string("RecoElectron"),
   sourceFileList = cms.string("file.txt"),
   electronID = cms.string("eidRobustTight"),
+  Acc        = cms.double(1),
+  Qual       = cms.double(2),
+  Imp        = cms.double(3),
+  Iso        = cms.double(4),
+  EiD        = cms.double(5),
   CrossSection = cms.double(1944.),
   targetLumi  = cms.double(100.),
-  Norm        = cms.bool(True),
-  Sumw2        = cms.bool(False)
+  EventsPerFile = cms.double(0),
+  Norm        = cms.bool(True)
 )
 
 process.zeeeff = cms.PSet (
@@ -33,6 +38,26 @@ process.zeeeff = cms.PSet (
   Name        = cms.string("EfficiencyElectron"),
   sourceFileList = cms.string("file.txt"),
   electronID = cms.string("eidRobustTight"),
-  Sumw2        = cms.bool(False)
+  Acc        = cms.double(1),
+  Qual       = cms.double(2),
+  Imp        = cms.double(3),
+  Iso        = cms.double(4),
+  EiD        = cms.double(5)
+)
+
+process.zeentuple = cms.PSet (
+  type        = cms.string("RecoElectronNtuple"),
+  Name        = cms.string("RecoElectronNtuple"),
+  sourceFileList = cms.string("file.txt"),
+  electronID = cms.string("eidRobustTight"),
+  Acc        = cms.double(1),
+  Qual       = cms.double(2),
+  Imp        = cms.double(3),
+  Iso        = cms.double(4),
+  EiD        = cms.double(5),
+  CrossSection = cms.double(1944.),
+  targetLumi  = cms.double(100.),
+  EventsPerFile = cms.double(0),
+  Norm        = cms.bool(True)
 )
 

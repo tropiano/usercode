@@ -32,20 +32,20 @@ using namespace edm;
 
 EfficiencyElectron::EfficiencyElectron(): 
 
-genMassZEff_Acc(0), genPtZEff_Acc(0), genEtaZEff_Acc(0),
-genMassZEff_Acc_Qual(0), genPtZEff_Acc_Qual(0), genEtaZEff_Acc_Qual(0),
-genMassZEff_Acc_Qual_Imp(0), genPtZEff_Acc_Qual_Imp(0), genEtaZEff_Acc_Qual_Imp(0),
-genMassZEff_Acc_Qual_Imp_Iso(0), genPtZEff_Acc_Qual_Imp_Iso(0), genEtaZEff_Acc_Qual_Imp_Iso(0),
-genMassZEff_Acc_Qual_Imp_Iso_EiD(0), genPtZEff_Acc_Qual_Imp_Iso_EiD(0), genEtaZEff_Acc_Qual_Imp_Iso_EiD(0),
-GenIsoJetEff_Acc(0), GenIsoJetEff_Acc_Qual(0), GenIsoJetEff_Acc_Qual_Imp(0), GenIsoJetEff_Acc_Qual_Imp_Iso(0), GenIsoJetEff_Acc_Qual_Imp_Iso_EiD(0),
+genMassZEff_1(0), genPtZEff_1(0), genEtaZEff_1(0),
+genMassZEff_12(0), genPtZEff_12(0), genEtaZEff_12(0),
+genMassZEff_123(0), genPtZEff_123(0), genEtaZEff_123(0),
+genMassZEff_1234(0), genPtZEff_1234(0), genEtaZEff_1234(0),
+genMassZEff_12345(0), genPtZEff_12345(0), genEtaZEff_12345(0),
+GenIsoJetEff_1(0), GenIsoJetEff_12(0), GenIsoJetEff_123(0), GenIsoJetEff_1234(0), GenIsoJetEff_12345(0),
 
-genLeadElEtaEff_Acc(0), genLeadElEtaEff_Acc_Qual(0), genLeadElEtaEff_Acc_Qual_Imp(0), genLeadElEtaEff_Acc_Qual_Imp_Iso(0), genLeadElEtaEff_Acc_Qual_Imp_Iso_EiD(0),
-genLeadElPtEff_Acc(0), genLeadElPtEff_Acc_Qual(0), genLeadElPtEff_Acc_Qual_Imp(0), genLeadElPtEff_Acc_Qual_Imp_Iso(0), genLeadElPtEff_Acc_Qual_Imp_Iso_EiD(0),
+genLeadElEtaEff_1(0), genLeadElEtaEff_12(0), genLeadElEtaEff_123(0), genLeadElEtaEff_1234(0), genLeadElEtaEff_12345(0),
+genLeadElPtEff_1(0), genLeadElPtEff_12(0), genLeadElPtEff_123(0), genLeadElPtEff_1234(0), genLeadElPtEff_12345(0),
 
 AccDenom_genPtZ(0), AccDenom_genMassZ(0), AccDenom_genEtaZ(0), AccDenom_genLeadElEta(0), AccDenom_genLeadElPt(0), AccDenom_GenIsoJetNumber(0),
 EffDenom_genPtZ(0), EffDenom_genMassZ(0), EffDenom_genEtaZ(0), EffDenom_genLeadElEta(0), EffDenom_genLeadElPt(0), EffDenom_GenIsoJetNumber(0),
 
-_dir(0), _electronID("eidRobustTight"), _file(0), _histoVector()
+_dir(0), _electronID("eidRobustTight"), _file(0), _Acc(1), _Qual(2), _Imp(3), _Iso(4), _EiD(5), _histoVector()
 
 { }
 
@@ -55,6 +55,22 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
     std::string dirname = iConfig.getParameter<std::string>("Name");
     std::string sourceFileList = iConfig.getParameter<std::string>("sourceFileList");
     _electronID = iConfig.getParameter<std::string>("electronID");
+    
+    //Selections
+   _Acc = iConfig.getParameter<double>("Acc");
+   _Qual = iConfig.getParameter<double>("Qual");
+   _Imp = iConfig.getParameter<double>("Imp");
+   _Iso = iConfig.getParameter<double>("Iso");
+   _EiD = iConfig.getParameter<double>("EiD");
+   
+   for(int i=0; i<6; i++){
+   _RecoCutFlags[i] = "_1";}
+   
+   _RecoCutFlags[_Acc] = "_Acc";
+   _RecoCutFlags[_Qual] = "_Qual";
+   _RecoCutFlags[_Imp] = "_Imp";
+   _RecoCutFlags[_Iso] = "_Iso";
+   _RecoCutFlags[_EiD] = "_EiD";
   
     cout << "EfficiencyElectron file name : " << _file->GetName() << endl;
    _file->cd();
@@ -90,70 +106,111 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _histoVector.push_back(EffDenom_GenIsoJetNumber);
    
    //Eff vs Z electrons properties
-   genLeadElEtaEff_Acc = new TH1D("genLeadElEtaEff_Acc", "Generated Leading electron #eta, Selections = Acc", 100, -2.5, 2.5);
-   _histoVector.push_back(genLeadElEtaEff_Acc);
-   genLeadElEtaEff_Acc_Qual = new TH1D("genLeadElEtaEff_Acc_Qual", "Generated Leading electron #eta, Selections = Acc+Qual", 100, -2.5, 2.5);
-   _histoVector.push_back(genLeadElEtaEff_Acc_Qual);
-   genLeadElEtaEff_Acc_Qual_Imp = new TH1D("genLeadElEtaEff_Acc_Qual_Imp", "Generated Leading electron #eta, Selections = Acc+Qual+Imp", 100, -2.5, 2.5);
-   _histoVector.push_back(genLeadElEtaEff_Acc_Qual_Imp);
-   genLeadElEtaEff_Acc_Qual_Imp_Iso = new TH1D("genLeadElEtaEff_Acc_Qual_Imp_Iso", "Generated Leading electron #eta, Selections = Acc+Qual+Imp+Iso", 100, -2.5, 2.5);
-   _histoVector.push_back(genLeadElEtaEff_Acc_Qual_Imp_Iso);
-   genLeadElEtaEff_Acc_Qual_Imp_Iso_EiD = new TH1D("genLeadElEtaEff_Acc_Qual_Imp_Iso_EiD", "Generated Leading electron #eta, Selections = Acc+Qual+Imp+Iso+EiD", 100, -2.5, 2.5);
-   _histoVector.push_back(genLeadElEtaEff_Acc_Qual_Imp_Iso_EiD);   
-   genLeadElPtEff_Acc = new TH1D("genLeadElPtEff_Acc", "Generated Leading electron Pt, Selections = Acc", 200, 0, 200);
-   _histoVector.push_back(genLeadElPtEff_Acc);
-   genLeadElPtEff_Acc_Qual = new TH1D("genLeadElPtEff_Acc_Qual", "Generated Leading electron Pt, Selections = Acc+Qual", 200, 0, 200);
-   _histoVector.push_back(genLeadElPtEff_Acc_Qual);
-   genLeadElPtEff_Acc_Qual_Imp = new TH1D("genLeadElPtEff_Acc_Qual_Imp", "Generated Leading electron Pt, Selections = Acc+Qual+Imp", 200, 0, 200);
-   _histoVector.push_back(genLeadElPtEff_Acc_Qual_Imp);
-   genLeadElPtEff_Acc_Qual_Imp_Iso = new TH1D("genLeadElPtEff_Acc_Qual_Imp_Iso", "Generated Leading electron Pt, Selections = Acc+Qual+Imp+Iso", 200, 0, 200);
-   _histoVector.push_back(genLeadElPtEff_Acc_Qual_Imp_Iso);
-   genLeadElPtEff_Acc_Qual_Imp_Iso_EiD = new TH1D("genLeadElPtEff_Acc_Qual_Imp_Iso_EiD", "Generated Leading electron Pt, Selections = Acc+Qual+Imp+Iso+EiD", 200, 0, 200);
-   _histoVector.push_back(genLeadElPtEff_Acc_Qual_Imp_Iso_EiD);
+   
+   string genLeadElEtaEff_name = "genLeadElEtaEff";
+   genLeadElEtaEff_name+=_RecoCutFlags[1].c_str();
+   genLeadElEtaEff_1 = new TH1D(genLeadElEtaEff_name.c_str(), "Generated Leading electron #eta", 100, -2.5, 2.5);
+   _histoVector.push_back(genLeadElEtaEff_1);
+   genLeadElEtaEff_name+=_RecoCutFlags[2].c_str();
+   genLeadElEtaEff_12 = new TH1D(genLeadElEtaEff_name.c_str(), "Generated Leading electron #eta", 100, -2.5, 2.5);
+   _histoVector.push_back(genLeadElEtaEff_12);
+   genLeadElEtaEff_name+=_RecoCutFlags[3].c_str();
+   genLeadElEtaEff_123 = new TH1D(genLeadElEtaEff_name.c_str(), "Generated Leading electron #eta", 100, -2.5, 2.5);
+   _histoVector.push_back(genLeadElEtaEff_123);
+   genLeadElEtaEff_name+=_RecoCutFlags[4].c_str();
+   genLeadElEtaEff_1234 = new TH1D(genLeadElEtaEff_name.c_str(), "Generated Leading electron #eta", 100, -2.5, 2.5);
+   _histoVector.push_back(genLeadElEtaEff_1234);
+   genLeadElEtaEff_name+=_RecoCutFlags[5].c_str();
+   genLeadElEtaEff_12345 = new TH1D(genLeadElEtaEff_name.c_str(), "Generated Leading electron #eta", 100, -2.5, 2.5);
+   _histoVector.push_back(genLeadElEtaEff_12345);   
+   
+   string genLeadElPtEff_name = "genLeadElPtEff";
+   genLeadElPtEff_name+=_RecoCutFlags[1].c_str();
+   genLeadElPtEff_1 = new TH1D(genLeadElPtEff_name.c_str(), "Generated Leading electron Pt", 200, 0, 200);
+   _histoVector.push_back(genLeadElPtEff_1);
+   genLeadElPtEff_name+=_RecoCutFlags[2].c_str();
+   genLeadElPtEff_12 = new TH1D(genLeadElPtEff_name.c_str(), "Generated Leading electron Pt", 200, 0, 200);
+   _histoVector.push_back(genLeadElPtEff_12);
+   genLeadElPtEff_name+=_RecoCutFlags[3].c_str();
+   genLeadElPtEff_123 = new TH1D(genLeadElPtEff_name.c_str(), "Generated Leading electron Pt", 200, 0, 200);
+   _histoVector.push_back(genLeadElPtEff_123);
+   genLeadElPtEff_name+=_RecoCutFlags[4].c_str();
+   genLeadElPtEff_1234 = new TH1D(genLeadElPtEff_name.c_str(), "Generated Leading electron Pt", 200, 0, 200);
+   _histoVector.push_back(genLeadElPtEff_1234);
+   genLeadElPtEff_name+=_RecoCutFlags[5].c_str();
+   genLeadElPtEff_12345 = new TH1D(genLeadElPtEff_name.c_str(), "Generated Leading electron Pt", 200, 0, 200);
+   _histoVector.push_back(genLeadElPtEff_12345);
    
    //Eff vs Z properties
-   genMassZEff_Acc = new TH1D("genMassZEff_Acc", "Generated Z Mass, Selections = Acc", 200, 50, 150);
-   _histoVector.push_back(genMassZEff_Acc);
-   genPtZEff_Acc = new TH1D("genPtZEff_Acc", "Generated Z pt, Selections = Acc",  200, 0, 200);
-   _histoVector.push_back(genPtZEff_Acc);
-   genEtaZEff_Acc = new TH1D("genEtaZEff_Acc", "Generated Z #eta, Selections = Acc",  100, -10, 10);
-   _histoVector.push_back(genEtaZEff_Acc);
-   genMassZEff_Acc_Qual = new TH1D("genMassZEff_Acc_Qual", "Generated Z Mass, Selections = Acc+Qual", 200, 50, 150);
-   _histoVector.push_back(genMassZEff_Acc_Qual);
-   genPtZEff_Acc_Qual = new TH1D("genPtZEff_Acc_Qual", "Generated Z pt, Selections = Acc+Qual",  200, 0, 200);
-   _histoVector.push_back(genPtZEff_Acc_Qual);
-   genEtaZEff_Acc_Qual = new TH1D("genEtaZEff_Acc_Qual", "Generated Z #eta, Selections = Acc+Qual",  100, -10, 10);
-   _histoVector.push_back(genEtaZEff_Acc_Qual);
-   genMassZEff_Acc_Qual_Imp = new TH1D("genMassZEff_Acc_Qual_Imp", "Generated Z Mass, Selections = Acc+Qual+Imp", 200, 50, 150);
-   _histoVector.push_back(genMassZEff_Acc_Qual_Imp);
-   genPtZEff_Acc_Qual_Imp = new TH1D("genPtZEff_Acc_Qual_Imp", "Generated Z pt, Selections = Acc+Qual+Imp",  200, 0, 200);
-   _histoVector.push_back(genPtZEff_Acc_Qual_Imp);
-   genEtaZEff_Acc_Qual_Imp = new TH1D("genEtaZEff_Acc_Qual_Imp", "Generated Z #eta, Selections = Acc+Qual+Imp",  100, -10, 10);
-   _histoVector.push_back(genEtaZEff_Acc_Qual_Imp);
-   genMassZEff_Acc_Qual_Imp_Iso = new TH1D("genMassZEff_Acc_Qual_Imp_Iso", "Generated Z Mass, Selections = Acc+Qual+Imp+Iso", 200, 50, 150);
-   _histoVector.push_back(genMassZEff_Acc_Qual_Imp_Iso);
-   genPtZEff_Acc_Qual_Imp_Iso = new TH1D("genPtZEff_Acc_Qual_Imp_Iso", "Generated Z pt, Selections = Acc+Qual+Imp+Iso",  200, 0, 200);
-   _histoVector.push_back(genPtZEff_Acc_Qual_Imp_Iso);
-   genEtaZEff_Acc_Qual_Imp_Iso = new TH1D("genEtaZEff_Acc_Qual_Imp_Iso", "Generated Z #eta, Selections = Acc+Qual+Imp+Iso",  100, -10, 10);
-   _histoVector.push_back(genEtaZEff_Acc_Qual_Imp_Iso);
-   genMassZEff_Acc_Qual_Imp_Iso_EiD = new TH1D("genMassZEff_Acc_Qual_Imp_Iso_EiD", "Generated Z Mass, Selections = Acc+Qual+Imp+Iso+EiD", 200, 50, 150);
-   _histoVector.push_back(genMassZEff_Acc_Qual_Imp_Iso_EiD);
-   genPtZEff_Acc_Qual_Imp_Iso_EiD = new TH1D("genPtZEff_Acc_Qual_Imp_Iso_EiD", "Generated Z pt, Selections = Acc+Qual+Imp+Iso+EiD",  200, 0, 200);
-   _histoVector.push_back(genPtZEff_Acc_Qual_Imp_Iso_EiD);
-   genEtaZEff_Acc_Qual_Imp_Iso_EiD = new TH1D("genEtaZEff_Acc_Qual_Imp_Iso_EiD", "Generated Z #eta, Selections = Acc+Qual+Imp+Iso+EiD",  100, -10, 10);
-   _histoVector.push_back(genEtaZEff_Acc_Qual_Imp_Iso_EiD);
+   
+   string genMassZEff_name = "genMassZEff";
+   genMassZEff_name+=_RecoCutFlags[1].c_str();   
+   genMassZEff_1 = new TH1D(genMassZEff_name.c_str(), "Generated Z Mass", 200, 50, 150);
+   _histoVector.push_back(genMassZEff_1);
+   genMassZEff_name+=_RecoCutFlags[2].c_str();
+   genMassZEff_12 = new TH1D(genMassZEff_name.c_str(), "Generated Z Mass", 200, 50, 150);
+   _histoVector.push_back(genMassZEff_12);
+   genMassZEff_name+=_RecoCutFlags[3].c_str();
+   genMassZEff_123 = new TH1D(genMassZEff_name.c_str(), "Generated Z Mass", 200, 50, 150);
+   _histoVector.push_back(genMassZEff_123);
+   genMassZEff_name+=_RecoCutFlags[4].c_str();
+   genMassZEff_1234 = new TH1D(genMassZEff_name.c_str(), "Generated Z Mass", 200, 50, 150);
+   _histoVector.push_back(genMassZEff_1234);
+   genMassZEff_name+=_RecoCutFlags[5].c_str();
+   genMassZEff_12345 = new TH1D(genMassZEff_name.c_str(), "Generated Z Mass", 200, 50, 150);
+   _histoVector.push_back(genMassZEff_12345);
+   
+   string genPtZEff_name = "genPtZEff";
+   genPtZEff_name+=_RecoCutFlags[1].c_str();
+   genPtZEff_1 = new TH1D(genPtZEff_name.c_str(), "Generated Z pt",  200, 0, 200);
+   _histoVector.push_back(genPtZEff_1);
+   genPtZEff_name+=_RecoCutFlags[2].c_str();
+   genPtZEff_12 = new TH1D(genPtZEff_name.c_str(), "Generated Z pt",  200, 0, 200);
+   _histoVector.push_back(genPtZEff_12);
+   genPtZEff_name+=_RecoCutFlags[3].c_str();
+   genPtZEff_123 = new TH1D(genPtZEff_name.c_str(), "Generated Z pt",  200, 0, 200);
+   _histoVector.push_back(genPtZEff_123);
+   genPtZEff_name+=_RecoCutFlags[4].c_str();
+   genPtZEff_1234 = new TH1D(genPtZEff_name.c_str(), "Generated Z pt",  200, 0, 200);
+   _histoVector.push_back(genPtZEff_1234);
+   genPtZEff_name+=_RecoCutFlags[5].c_str();
+   genPtZEff_12345 = new TH1D(genPtZEff_name.c_str(), "Generated Z pt",  200, 0, 200);
+   _histoVector.push_back(genPtZEff_12345);
+   
+   string genEtaZEff_name = "genEtaZEff";
+   genEtaZEff_name+=_RecoCutFlags[1].c_str();
+   genEtaZEff_1 = new TH1D(genEtaZEff_name.c_str(), "Generated Z #eta",  100, -10, 10);
+   _histoVector.push_back(genEtaZEff_1);
+   genEtaZEff_name+=_RecoCutFlags[2].c_str();
+   genEtaZEff_12 = new TH1D(genEtaZEff_name.c_str(), "Generated Z #eta",  100, -10, 10);
+   _histoVector.push_back(genEtaZEff_12);
+   genEtaZEff_name+=_RecoCutFlags[3].c_str();
+   genEtaZEff_123 = new TH1D(genEtaZEff_name.c_str(), "Generated Z #eta",  100, -10, 10);
+   _histoVector.push_back(genEtaZEff_123);
+   genEtaZEff_name+=_RecoCutFlags[4].c_str();
+   genEtaZEff_1234 = new TH1D(genEtaZEff_name.c_str(), "Generated Z #eta",  100, -10, 10);
+   _histoVector.push_back(genEtaZEff_1234);
+   genEtaZEff_name+=_RecoCutFlags[5].c_str();
+   genEtaZEff_12345 = new TH1D(genEtaZEff_name.c_str(), "Generated Z #eta",  100, -10, 10);
+   _histoVector.push_back(genEtaZEff_12345);
    
    //Eff vs Jet properties
-   GenIsoJetEff_Acc = new TH1D("GenIsoJetEff_Acc", "Number of Gen Iso Jet, Sel: Acc", 10, 0, 10);
-   _histoVector.push_back(GenIsoJetEff_Acc);
-   GenIsoJetEff_Acc_Qual = new TH1D("GenIsoJetEff_Acc_Qual", "Number of Gen Iso Jet, Sel: Acc+Qual", 10, 0, 10);
-   _histoVector.push_back(GenIsoJetEff_Acc_Qual);
-   GenIsoJetEff_Acc_Qual_Imp = new TH1D("GenIsoJetEff_Acc_Qual_Imp", "Number of Gen Iso Jet, Sel: Acc+Qual+Imp", 10, 0, 10);
-   _histoVector.push_back(GenIsoJetEff_Acc_Qual_Imp);
-   GenIsoJetEff_Acc_Qual_Imp_Iso = new TH1D("GenIsoJetEff_Acc_Qual_Imp_Iso", "Number of Gen Iso Jet, Sel: Acc+Qual+Imp+Iso", 10, 0, 10);
-   _histoVector.push_back(GenIsoJetEff_Acc_Qual_Imp_Iso);
-   GenIsoJetEff_Acc_Qual_Imp_Iso_EiD = new TH1D("GenIsoJetEff_Acc_Qual_Imp_Iso_EiD", "Number of Gen Iso Jet, Sel: Acc+Qual+Imp+Iso+EiD", 10, 0, 10);
-   _histoVector.push_back(GenIsoJetEff_Acc_Qual_Imp_Iso_EiD);
+   string GenIsoJetEff_name = "GenIsoJetEff";
+   GenIsoJetEff_name+=_RecoCutFlags[1].c_str();
+   GenIsoJetEff_1 = new TH1D(GenIsoJetEff_name.c_str(), "Number of Gen Iso Jet", 10, 0, 10);
+   _histoVector.push_back(GenIsoJetEff_1);
+   GenIsoJetEff_name+=_RecoCutFlags[2].c_str();
+   GenIsoJetEff_12 = new TH1D(GenIsoJetEff_name.c_str(), "Number of Gen Iso Jet", 10, 0, 10);
+   _histoVector.push_back(GenIsoJetEff_12);
+   GenIsoJetEff_name+=_RecoCutFlags[3].c_str();
+   GenIsoJetEff_123 = new TH1D(GenIsoJetEff_name.c_str(), "Number of Gen Iso Jet", 10, 0, 10);
+   _histoVector.push_back(GenIsoJetEff_123);
+   GenIsoJetEff_name+=_RecoCutFlags[4].c_str();
+   GenIsoJetEff_1234 = new TH1D(GenIsoJetEff_name.c_str(), "Number of Gen Iso Jet", 10, 0, 10);
+   _histoVector.push_back(GenIsoJetEff_1234);
+   GenIsoJetEff_name+=_RecoCutFlags[5].c_str();
+   GenIsoJetEff_12345 = new TH1D(GenIsoJetEff_name.c_str(), "Number of Gen Iso Jet", 10, 0, 10);
+   _histoVector.push_back(GenIsoJetEff_12345);
  
    std::vector<TH1D*>::const_iterator i1beg = _histoVector.begin(); 
    std::vector<TH1D*>::const_iterator i1end = _histoVector.end(); 
@@ -277,88 +334,88 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent)
      }
      
      //Events with a selected Zee Acc
-     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected_Acc(*zrecHandle)){
+     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), *zrecHandle)){
      
      //Eff vs Z variables
-     genMassZEff_Acc->Fill((*zgenHandle)[0].mass());
-     genPtZEff_Acc->Fill((*zgenHandle)[0].pt());
-     genEtaZEff_Acc->Fill((*zgenHandle)[0].eta());
+     genMassZEff_1->Fill((*zgenHandle)[0].mass());
+     genPtZEff_1->Fill((*zgenHandle)[0].pt());
+     genEtaZEff_1->Fill((*zgenHandle)[0].eta());
      
      //Eff vs Z Electrons variables
-     genLeadElEtaEff_Acc->Fill(genleadeleta);
-     genLeadElPtEff_Acc->Fill(genleadelpt);
+     genLeadElEtaEff_1->Fill(genleadeleta);
+     genLeadElPtEff_1->Fill(genleadelpt);
      
      //Eff vs Jet variables
-     GenIsoJetEff_Acc->Fill(isogenjets.size());
+     GenIsoJetEff_1->Fill(isogenjets.size());
      
      }
      
      //Events with a selected Zee Acc+Qual
-     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected_Acc_Qual(*zrecHandle)){
+     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), *zrecHandle)&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), *zrecHandle)){
      
      //Eff vs Z variables
-     genMassZEff_Acc_Qual->Fill((*zgenHandle)[0].mass());
-     genPtZEff_Acc_Qual->Fill((*zgenHandle)[0].pt());
-     genEtaZEff_Acc_Qual->Fill((*zgenHandle)[0].eta());
+     genMassZEff_12->Fill((*zgenHandle)[0].mass());
+     genPtZEff_12->Fill((*zgenHandle)[0].pt());
+     genEtaZEff_12->Fill((*zgenHandle)[0].eta());
      
      //Eff vs Z Electrons variables
-     genLeadElEtaEff_Acc_Qual->Fill(genleadeleta);
-     genLeadElPtEff_Acc_Qual->Fill(genleadelpt);
+     genLeadElEtaEff_12->Fill(genleadeleta);
+     genLeadElPtEff_12->Fill(genleadelpt);
      
      //Eff vs Jet variables
-     GenIsoJetEff_Acc_Qual->Fill(isogenjets.size());
+     GenIsoJetEff_12->Fill(isogenjets.size());
         
      }
      
      //Events with a selected Zee Acc+Qual+Imp
-     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected_Acc_Qual_Imp(*zrecHandle)){
+     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), *zrecHandle)&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), *zrecHandle)&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), *zrecHandle)){
      
      //Eff vs Z variables
-     genMassZEff_Acc_Qual_Imp->Fill((*zgenHandle)[0].mass());
-     genPtZEff_Acc_Qual_Imp->Fill((*zgenHandle)[0].pt());
-     genEtaZEff_Acc_Qual_Imp->Fill((*zgenHandle)[0].eta());
+     genMassZEff_123->Fill((*zgenHandle)[0].mass());
+     genPtZEff_123->Fill((*zgenHandle)[0].pt());
+     genEtaZEff_123->Fill((*zgenHandle)[0].eta());
      
      //Eff vs Z Electrons variables
-     genLeadElEtaEff_Acc_Qual_Imp->Fill(genleadeleta);
-     genLeadElPtEff_Acc_Qual_Imp->Fill(genleadelpt);
+     genLeadElEtaEff_123->Fill(genleadeleta);
+     genLeadElPtEff_123->Fill(genleadelpt);
      
      //Eff vs Jet variables
-     GenIsoJetEff_Acc_Qual_Imp->Fill(isogenjets.size());
+     GenIsoJetEff_123->Fill(isogenjets.size());
      
      
      }
      
      //Events with a selected Zee Acc+Qual+Imp+Iso
-     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected_Acc_Qual_Imp_Iso(*zrecHandle)){
+     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), *zrecHandle)&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), *zrecHandle)&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), *zrecHandle)&&RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), *zrecHandle)){
      
      //Eff vs Z variables
-     genMassZEff_Acc_Qual_Imp_Iso->Fill((*zgenHandle)[0].mass());
-     genPtZEff_Acc_Qual_Imp_Iso->Fill((*zgenHandle)[0].pt());
-     genEtaZEff_Acc_Qual_Imp_Iso->Fill((*zgenHandle)[0].eta());
+     genMassZEff_1234->Fill((*zgenHandle)[0].mass());
+     genPtZEff_1234->Fill((*zgenHandle)[0].pt());
+     genEtaZEff_1234->Fill((*zgenHandle)[0].eta());
      
      //Eff vs Z Electrons variables
-     genLeadElEtaEff_Acc_Qual_Imp_Iso->Fill(genleadeleta);
-     genLeadElPtEff_Acc_Qual_Imp_Iso->Fill(genleadelpt);
+     genLeadElEtaEff_1234->Fill(genleadeleta);
+     genLeadElPtEff_1234->Fill(genleadelpt);
      
      //Eff vs Jet variables
-     GenIsoJetEff_Acc_Qual_Imp_Iso->Fill(isogenjets.size());
+     GenIsoJetEff_1234->Fill(isogenjets.size());
      
      }
      
      //Events with a selected Zee Acc+Qual+Iso+EiD
-     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected_Acc_Qual_Imp_Iso_EiD(*zrecHandle, _electronID.c_str())){
+     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), *zrecHandle)&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), *zrecHandle)&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), *zrecHandle)&&RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), *zrecHandle)&&RecSelected(_RecoCutFlags[5].c_str(), _electronID.c_str(), *zrecHandle)){
       
       //Eff vs Z variables
-      genMassZEff_Acc_Qual_Imp_Iso_EiD->Fill((*zgenHandle)[0].mass());
-      genPtZEff_Acc_Qual_Imp_Iso_EiD->Fill((*zgenHandle)[0].pt());
-      genEtaZEff_Acc_Qual_Imp_Iso_EiD->Fill((*zgenHandle)[0].eta());
+      genMassZEff_12345->Fill((*zgenHandle)[0].mass());
+      genPtZEff_12345->Fill((*zgenHandle)[0].pt());
+      genEtaZEff_12345->Fill((*zgenHandle)[0].eta());
       
       //Eff vs Z Electrons variables
-      genLeadElEtaEff_Acc_Qual_Imp_Iso_EiD->Fill(genleadeleta);
-      genLeadElPtEff_Acc_Qual_Imp_Iso_EiD->Fill(genleadelpt);
+      genLeadElEtaEff_12345->Fill(genleadeleta);
+      genLeadElPtEff_12345->Fill(genleadelpt);
       
       //Eff vs Jet variables
-      GenIsoJetEff_Acc_Qual_Imp_Iso_EiD->Fill(isogenjets.size());
+      GenIsoJetEff_12345->Fill(isogenjets.size());
       
 }
  

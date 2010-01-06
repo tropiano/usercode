@@ -25,16 +25,15 @@ public :
 
    //Histograms
    
-   TH1D *genLeadElEtaEff_Acc, *genLeadElEtaEff_Acc_Qual, *genLeadElEtaEff_Acc_Qual_Imp, *genLeadElEtaEff_Acc_Qual_Imp_Iso, *genLeadElEtaEff_Acc_Qual_Imp_Iso_EiD,
-   *genLeadElPtEff_Acc, *genLeadElPtEff_Acc_Qual, *genLeadElPtEff_Acc_Qual_Imp, *genLeadElPtEff_Acc_Qual_Imp_Iso, *genLeadElPtEff_Acc_Qual_Imp_Iso_EiD;
+   TH1D *genLeadElEtaEff_1, *genLeadElEtaEff_12, *genLeadElEtaEff_123, *genLeadElEtaEff_12345, *genLeadElEtaEff_1234, *genLeadElPtEff_1, *genLeadElPtEff_12, *genLeadElPtEff_123, *genLeadElPtEff_1234, *genLeadElPtEff_12345;
    
-   TH1D *genMassZEff_Acc, *genPtZEff_Acc, *genEtaZEff_Acc,
-   *genMassZEff_Acc_Qual, *genPtZEff_Acc_Qual, *genEtaZEff_Acc_Qual,
-   *genMassZEff_Acc_Qual_Imp, *genPtZEff_Acc_Qual_Imp, *genEtaZEff_Acc_Qual_Imp,
-   *genMassZEff_Acc_Qual_Imp_Iso, *genPtZEff_Acc_Qual_Imp_Iso, *genEtaZEff_Acc_Qual_Imp_Iso,
-   *genMassZEff_Acc_Qual_Imp_Iso_EiD, *genPtZEff_Acc_Qual_Imp_Iso_EiD, *genEtaZEff_Acc_Qual_Imp_Iso_EiD;
+   TH1D *genMassZEff_1, *genPtZEff_1, *genEtaZEff_1,
+   *genMassZEff_12, *genPtZEff_12, *genEtaZEff_12,
+   *genMassZEff_123, *genPtZEff_123, *genEtaZEff_123,
+   *genMassZEff_1234, *genPtZEff_1234, *genEtaZEff_1234,
+   *genMassZEff_12345, *genPtZEff_12345, *genEtaZEff_12345;
    
-   TH1D *GenIsoJetEff_Acc, *GenIsoJetEff_Acc_Qual, *GenIsoJetEff_Acc_Qual_Imp, *GenIsoJetEff_Acc_Qual_Imp_Iso, *GenIsoJetEff_Acc_Qual_Imp_Iso_EiD;
+   TH1D *GenIsoJetEff_1, *GenIsoJetEff_12, *GenIsoJetEff_123, *GenIsoJetEff_1234, *GenIsoJetEff_12345;
    
    TH1D *AccDenom_genPtZ, *AccDenom_genMassZ, *AccDenom_genEtaZ, *AccDenom_genLeadElEta, *AccDenom_genLeadElPt, *AccDenom_GenIsoJetNumber,
    *EffDenom_genPtZ, *EffDenom_genMassZ, *EffDenom_genEtaZ, *EffDenom_genLeadElEta, *EffDenom_genLeadElPt, *EffDenom_GenIsoJetNumber;
@@ -43,6 +42,10 @@ public :
 private:
   
   std::string _electronID;
+  
+  int _Acc, _Qual, _Imp, _Iso, _EiD;
+  
+  std::string _RecoCutFlags[6];
 
   TFile* _file;  
 
