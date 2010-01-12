@@ -92,7 +92,7 @@ namespace Rivet {
       //create and open the root file
       _treeFile = new TFile("top.root", "recreate");
       //create the tree
-      _TTbarTree = new TTree("TTbar Tree", "Tree for TTbar analysis");
+      _TTbarTree = new TTree("TTbarTree", "Tree for TTbar analysis");
       //event number
       _TTbarTree->Branch("nevt", &_nevt, "nevt/I");
       _TTbarTree->Branch("jetmult", &_jetmult, "jetmult/I");
@@ -267,7 +267,7 @@ namespace Rivet {
       //_h_three_mu->Write();
       //_h_four_mu->Write();
       //_h_five_mu->Write();
-      //_treeFile->close();
+      _treeFile->Close();
       // No histos, so nothing to do!
     }
     //@}
@@ -295,7 +295,7 @@ namespace Rivet {
     float _jetetamu;
     float _jetpt;
     float _jetptmu;
-    float _nevt;
+    int _nevt;
     float _electronETCut;
     float _electronETACut;
     float _jetPtCut;
