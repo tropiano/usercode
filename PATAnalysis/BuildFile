@@ -6,6 +6,7 @@
 <use name=FWCore/TFWLiteSelector>
 <use name=rootrflx>
 <use name=boost>
+<use name=roofit>
 <lib name=ProofPlayer>
 <Flags CXXFLAGS="-g">
 <export>

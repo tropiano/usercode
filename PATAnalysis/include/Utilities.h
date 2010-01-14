@@ -29,118 +29,21 @@ static double maxecaletinveto = 4.;
 static double maxhcaletinveto = 6.;
 static double dxycut = 0.02;
 
-inline int nocase_cmp(const std::string & s1, const std::string & s2)
-{
-  std::string::const_iterator it1 = s1.begin();
-  std::string::const_iterator it2 = s2.begin();
-  while ((it1 != s1.end()) && (it2 != s2.end())) {
-    if (::toupper(*it1) !=::toupper(*it2)) {  // < Letters differ?
-      // Return -1 to indicate smaller than, 1 otherwise
-      return (::toupper(*it1) < ::toupper(*it2)) ? -1 : 1;
-    }
-    // Proceed to the next character in each string
-    ++it1;
-    ++it2;
-  }
-  size_t size1 = s1.size(), size2 = s2.size();  // Cache lengths
-  // Return -1,0 or 1 according to strings' lengths
-  if (size1 == size2)
-    return 0;
-  return (size1 < size2) ? -1 : 1;
+
+inline bool singleMu_Tag(const reco::Candidate& cand){
+  const pat::Muon* muon = dynamic_cast<const pat::Muon*>(&cand);
+  if (!muon) throw cms::Exception("PATAnalysis:singleMu_Tag") << "singleMu_Tag is run on an object which is not a muon "; 
+  const reco::MuonIsolation& iso03 = muon->isolationR03();
+  return muon->pt() > 25 && 
+         fabs(muon->eta())<2.1 && 
+         (iso03.hadEt + iso03.emEt + iso03.sumPt)/muon->pt() < 0.01 && 
+         iso03.emVetoEt < maxecaletinveto &&
+         iso03.hadVetoEt < maxhcaletinveto &&
+         muon->numberOfValidHits() > 15 && 
+         muon->normChi2() < 3 &&
+         muon->dB() < 0.05 ;
 }
-
-template < typename T > inline T as(const std::string & value)
-{
-  std::istringstream ss(value);
-  T out = T();
-  ss >> out;
-  return out;
-}
-
-template <> inline bool as < bool > (const std::string & value) {
-  if (nocase_cmp(value, "true") == 0 || nocase_cmp(value, "yes") == 0 || nocase_cmp(value, "on") == 0)
-    return true;
-  if (nocase_cmp(value, "false") == 0 || nocase_cmp(value, "no") == 0 || nocase_cmp(value, "off") == 0)
-    return false;
-  return as < int >(value);
-}
-
-inline void handleConfigStream(std::istream& in, std::map<std::string, std::vector<std::string> >& pmap) {
-   std::string currentModule = "none"; 
-   std::cout << "In handleConfigStream" << std::endl; 
-   while(in) {
-     std::string line;
-     getline(in, line);
-     const std::string origline = line;
-     std::cout << "Input param line: " << line << std::endl;
-
-     // Chop line after a # character
-     size_t commentPosn = line.find_first_of("#");
-     if (commentPosn != std::string::npos) {
-       line = line.substr(0, commentPosn);
-     }
-
-     //if the line contains the keyword ANALYSIS, the config of a module begins 
-     // ANALYSIS name=type 
-     if (line.find("ANALYSIS") != std::string::npos){
-        std::cout << "FOUND ana ANALYSIS!!!!" << std::endl; 
-        size_t start = line.find_first_of(' ');
-        line = line.substr(start, std::string::npos-start+1);
-        std::cout << "line.substr(start, std::string::npos-start+1) " << line << std::endl;
-        size_t start1 = line.find_first_of('='); 
-        if (start1 == std::string::npos){
-          std::cout << "Cannot get module name and type from " << line << std::endl; 
-          assert(0);
-        }
-        line.replace(start1, 1, " ");
-        const size_t first = line.find_first_not_of(' ');
-        const size_t last = line.find_last_not_of(' ');
-        line = line.substr(first, last-first+1);
-        const size_t firstgap = line.find(' ');
-        const size_t lastgap = line.rfind(' ');
-        const std::string mname = line.substr(first, firstgap-first);
-        const std::string mval  = line.substr(lastgap+1, last-lastgap);  
-        pmap[mname].push_back(mval);
-        std::cout << "name " << mname << " type " << mval << std::endl;
-        currentModule=mname;
-        continue;
-     }
-
-     if (currentModule == "none"){
-        std::cout << "config file MUST start with the keyword ANALYSIS" << std::endl;
-        assert(0);
-     }  
-     // Replace = signs with spaces
-     if (line.find("=") != std::string::npos){
-        pmap[currentModule].push_back(line);
-     }  
-   }
-}
-
-
 /*
-inline bool applyCuts(const PhysVarTreeMuon& muon, const std::vector<bool (*)(const PhysVarTreeMuon&)>& cuts) {
-  std::vector<bool (*)(const PhysVarTreeMuon&)>::const_iterator begin = cuts.begin();
-  std::vector<bool (*)(const PhysVarTreeMuon&)>::const_iterator end = cuts.end();
-  std::vector<bool (*)(const PhysVarTreeMuon&)>::const_iterator i;
-  for (i = begin; i != end; ++i){
-    if ((*i)(muon) == false) return false;
-  }
-  return true;
-}
-
-inline bool singleMu_Tag(const PhysVarTreeMuon& muon){
-  return muon._pt > 25 && 
-         fabs(muon._eta)<2.1 && 
-         (muon._hcalIso + muon._ecalIso + muon._trackIso)/muon._pt < 0.01 && 
-         muon._etInEcalVeto < maxecaletinveto &&
-         muon._etInHcalVeto < maxhcaletinveto &&
-         muon._nhit > 15 && 
-         muon._chi2 < 3 &&
-         muon._dxy < 0.05 &&
-         muon._leptonID == 1;
-}
-
 inline bool singleMu_isPositive(const PhysVarTreeMuon& muon){
   return muon._charge > 0;
 }
@@ -155,28 +58,33 @@ inline bool singleMu_PtEta(const pat::Muon& muon){
   return muon.pt() > ptmucut && fabs(muon.eta())<etamucut;
 }
 
-inline bool singleMu_QualityCuts(const pat::Muon& muon){
+inline bool singleMu_QualityCuts(const reco::Candidate& cand){
+  const pat::Muon* muon = dynamic_cast<const pat::Muon*>(&cand);
+  if (!muon) throw cms::Exception("PATAnalysis:singleMu_QualityCuts") << "singleMu_QualityCuts is run on an object which is not a muon ";
   //is this the same as before? or this is total track hits
-  return muon.numberOfValidHits() > minnhit && muon.normChi2() < maxchi2 ;
+  return muon->numberOfValidHits() > minnhit && muon->normChi2() < maxchi2 ;
 }
 
-inline bool singleMu_DXY(const pat::Muon& muon){
-  return muon.dB()<dxycut;
+inline bool singleMu_DXY(const reco::Candidate& cand){
+  const pat::Muon* muon = dynamic_cast<const pat::Muon*>(&cand);
+  if (!muon) throw cms::Exception("PATAnalysis:singleMu_DXY") << "singleMu_DXY is run on an object which is not a muon ";
+  return muon->dB()<dxycut;
 }
 
-inline bool singleMu_Isolation(const pat::Muon& muon){//, double isocut = 0.3){
-  const pat::IsoDeposit* hcalIso = muon.isoDeposit(pat::HcalIso);
-  const pat::IsoDeposit* ecalIso = muon.isoDeposit(pat::EcalIso);
-  return (muon.hcalIso() + muon.ecalIso() + muon.trackIso())/muon.pt() < 0.3 &&
-           ecalIso->depositWithin(ecalIso->veto().dR, pat::IsoDeposit::Vetos(), true) < maxecaletinveto &&
-           hcalIso->depositWithin(hcalIso->veto().dR, pat::IsoDeposit::Vetos(), true) < maxhcaletinveto;
+inline bool singleMu_Isolation(const reco::Candidate& cand){//, double isocut = 0.3){
+  const pat::Muon* muon = dynamic_cast<const pat::Muon*>(&cand);
+  if (!muon) throw cms::Exception("PATAnalysis:singleMu_Isolation") << "singleMu_Isolation is run on an object which is not a muon ";
+  const reco::MuonIsolation& iso03 = muon->isolationR03(); 
+  return (iso03.hadEt + iso03.emEt + iso03.sumPt)/muon->pt() < 0.3 &&
+           iso03.emVetoEt < maxecaletinveto &&
+           iso03.hadVetoEt < maxhcaletinveto;
 }
 
 
-inline bool GenSelected(const std::vector<reco::CompositeCandidate>& ZGEN){
+inline bool GenSelectedMuon(const std::vector<reco::CompositeCandidate>& ZGEN){
   if (ZGEN.size() == 0) return false;
   if (ZGEN.size() > 1){
-    std::cout << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! " << std::endl;
+    std::cout << "ERROR! Multiple Gen Z candidates found, you have to choose one before arriving here! " << std::endl;
     throw cms::Exception("PATAnalysis:RecSelectedTwoMuonsOppositeCharge_Mass") << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! ";
     return false;
   }  
@@ -184,10 +92,11 @@ inline bool GenSelected(const std::vector<reco::CompositeCandidate>& ZGEN){
   //cout << "ZGEN " << ZGEN << endl; 
 }
 
-inline bool GenSelectedInAcceptance(const std::vector<reco::CompositeCandidate>& ZGEN){
+inline bool GenSelectedInAcceptanceMuon(const std::vector<reco::CompositeCandidate>& ZGEN){
+  //std::cout << "PUPPPPPAAAAAAA" << std::endl;
   if (ZGEN.size() == 0) return false;
   if (ZGEN.size() > 1){
-    std::cout << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! " << std::endl;
+    std::cout << "ERROR! Multiple Gen Z candidates found, you have to choose one before arriving here! " << std::endl;
     throw cms::Exception("PATAnalysis:RecSelectedTwoMuonsOppositeCharge_Mass") << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! ";
     return false;
   }
@@ -196,9 +105,40 @@ inline bool GenSelectedInAcceptance(const std::vector<reco::CompositeCandidate>&
   const reco::Candidate* dau0 = ZGEN[0].daughter(0);
   const reco::Candidate* dau1 = ZGEN[0].daughter(1);
 
+  const reco::Candidate* finaldau0 = 0; //dau0;
+  const reco::Candidate* finaldau1 = 0; //dau1;
+
+  if (dau0->numberOfDaughters()){
+    bool muon0set = false;
+    for (unsigned int i = 0; i < dau0->numberOfDaughters(); ++i ){
+      if (fabs(dau0->daughter(i)->pdgId()) == 13){
+        if (muon0set) {
+          std::cout << "something wrong in GenSelectedInAcceptance: a daughter muon was already found for dau0 " << std::endl; 
+        }
+        finaldau0 = dau0->daughter(i);
+        muon0set = true;
+      }
+    }
+  }
+
+  if (dau1->numberOfDaughters()){
+    bool muon1set = false;
+    for (unsigned int i = 0; i < dau1->numberOfDaughters(); ++i ){
+      if (fabs(dau1->daughter(i)->pdgId()) == 13){
+        if (muon1set) {
+          std::cout << "something wrong in GenSelectedInAcceptance: a daughter muon was already found for dau1 " << std::endl;
+        }
+        finaldau1 = dau1->daughter(i);
+        muon1set = true;
+      }
+    }
+  }
+
+  //std::cout << "finaldau0 pt: " << finaldau0->pt() << "   finaldau1 pt: " << finaldau1->pt() << std::endl;
+
   return ZGEN.size()==1 && ZGEN[0].mass() > zmassmin && ZGEN[0].mass() < zmassmax 
-         && dau0->pt() > ptmucut && fabs(dau0->eta()) < etamucut
-         && dau1->pt() > ptmucut && fabs(dau1->eta()) < etamucut;
+         && finaldau0->pt() > ptmucut && fabs(finaldau0->eta()) < etamucut
+         && finaldau1->pt() > ptmucut && fabs(finaldau1->eta()) < etamucut;
 }
 
 
@@ -310,15 +250,12 @@ inline std::pair<bool, std::vector<const pat::Muon*> > RecSelected_Isolation(con
 
 
 inline bool RecSelected(const std::vector<reco::CompositeCandidate>& ZREC, double isocut, const pat::Muon* extdau0 = 0,  const pat::Muon* estdau1 = 0){
-  //"@ZzjetsRECO.size()==1 && @ZzjetsRECODauMuon.size()==2 && ZzjetsRECO._mass>60. && ZzjetsRECO._mass<120. && ZzjetsRECODauMuon[0]._pt>20 && abs(ZzjetsRECODauMuon[0]._eta)<2.4 && ZzjetsRECODauMuon[1]._pt>20 && abs(ZzjetsRECODauMuon[1]._eta)<2.4 && (ZzjetsRECODauMuon[0]._hcalIso+ZzjetsRECODauMuon[0]._ecalIso+ZzjetsRECODauMuon[0]._trackIso)/ZzjetsRECODauMuon[0]._pt<0.3 && (ZzjetsRECODauMuon[1]._hcalIso+ZzjetsRECODauMuon[1]._ecalIso+ZzjetsRECODauMuon[1]._trackIso)/ZzjetsRECODauMuon[1]._pt<0.3 && ZzjetsRECODauMuon[0]._nhit>11 && ZzjetsRECODauMuon[1]._nhit>11"
   if (ZREC.size() == 0) return false;
-  if (ZREC.size() > 1){
+/*  if (ZREC.size() > 1){
     std::cout << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! " << std::endl;
     throw cms::Exception("PATAnalysis:RecSelectedTwoMuonsOppositeCharge_Mass") << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! ";
     return false;
-  }
-  //std::cout << ZREC[0].daughter(0) << " " << ZREC[0].daughter(1) << std::endl;
-  //std::cout << typeid(*ZREC[0].daughter(0)).name() << " " << typeid(*ZREC[0].daughter(1)).name() << std::endl;
+  }*/
   const pat::Muon* dau0 = 0;
   const pat::Muon* dau1 = 0;
   if (extdau0 && estdau1){
@@ -327,48 +264,35 @@ inline bool RecSelected(const std::vector<reco::CompositeCandidate>& ZREC, doubl
   } else {
     dau0 = dynamic_cast<const pat::Muon*>(ZREC[0].daughter(0));
     dau1 = dynamic_cast<const pat::Muon*>(ZREC[0].daughter(1));
-    if (!dau0) {
-     //maybe a shallow clone
-     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (ZREC[0].daughter(0));
-     if (scc && scc->hasMasterClone()){
-       dau0 = dynamic_cast<const pat::Muon*>(scc->masterClone().get()); 
-     }
-    }
-    if (!dau1) {
-     //maybe a shallow clone
-     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (ZREC[0].daughter(1));
-     if (scc && scc->hasMasterClone()){
-       dau1 = dynamic_cast<const pat::Muon*>(scc->masterClone().get());
-     }
-    }
   }  
   
   assert(dau0 && dau1);
-  const pat::IsoDeposit* hcalIso0 = dau0->isoDeposit(pat::HcalIso);
+  /*const pat::IsoDeposit* hcalIso0 = dau0->isoDeposit(pat::HcalIso);
   const pat::IsoDeposit* ecalIso0 = dau0->isoDeposit(pat::EcalIso);
   const pat::IsoDeposit* hcalIso1 = dau1->isoDeposit(pat::HcalIso);
   const pat::IsoDeposit* ecalIso1 = dau1->isoDeposit(pat::EcalIso);
   assert(hcalIso0 && hcalIso1);
-  assert(ecalIso0 && ecalIso1);
+  assert(ecalIso0 && ecalIso1);*/
+  const reco::MuonIsolation& iso0 = dau0->isolationR03();
+  const reco::MuonIsolation& iso1 = dau1->isolationR03();
 
   
   return ZREC.size()==1 && ZREC[0].mass()>zmassmin && ZREC[0].mass()<zmassmax &&
          dau0->pt() > ptmucut && fabs(dau0->eta()) < etamucut && 
          dau1->pt() > ptmucut && fabs(dau1->eta()) < etamucut &&
-         (dau0->hcalIso() + dau0->ecalIso() + dau0->trackIso()) / dau0->pt() < isocut &&  
-         (dau1->hcalIso() + dau1->ecalIso() + dau1->trackIso()) / dau1->pt() < isocut &&  
+         (iso0.hadEt + iso0.emEt + iso0.sumPt) / dau0->pt() < isocut &&  
+         (iso1.hadEt + iso1.emEt + iso1.sumPt) / dau1->pt() < isocut &&  
          dau0->numberOfValidHits() > minnhit && dau1->numberOfValidHits() > minnhit &&
          dau0->normChi2() < maxchi2 && dau1->normChi2() < maxchi2 &&
          dau0->dB() < dxycut && dau1->dB() < dxycut && 
-         ecalIso0->depositWithin(ecalIso0->veto().dR, pat::IsoDeposit::Vetos(), true) < maxecaletinveto &&
-         ecalIso1->depositWithin(ecalIso1->veto().dR, pat::IsoDeposit::Vetos(), true) < maxecaletinveto &&
-         hcalIso0->depositWithin(hcalIso0->veto().dR, pat::IsoDeposit::Vetos(), true) < maxhcaletinveto && 
-         hcalIso1->depositWithin(hcalIso1->veto().dR, pat::IsoDeposit::Vetos(), true) < maxhcaletinveto ; 
+         iso0.emVetoEt < maxecaletinveto &&
+         iso1.emVetoEt < maxecaletinveto &&
+         iso0.hadVetoEt < maxhcaletinveto && 
+         iso1.hadVetoEt < maxhcaletinveto ; 
 }
 
 inline bool RecSelectedWithTrigger(const std::vector<reco::CompositeCandidate>& ZREC, const pat::TriggerEvent& triggers, double isocut, 
                                    const pat::Muon* extdau0 = 0, const pat::Muon* extdau1 = 0){
-  //"@ZzjetsRECO.size()==1 && @ZzjetsRECODauMuon.size()==2 && ZzjetsRECO._mass>60. && ZzjetsRECO._mass<120. && ZzjetsRECODauMuon[0]._pt>20 && abs(ZzjetsRECODauMuon[0]._eta)<2.4 && ZzjetsRECODauMuon[1]._pt>20 && abs(ZzjetsRECODauMuon[1]._eta)<2.4 && (ZzjetsRECODauMuon[0]._hcalIso+ZzjetsRECODauMuon[0]._ecalIso+ZzjetsRECODauMuon[0]._trackIso)/ZzjetsRECODauMuon[0]._pt<0.3 && (ZzjetsRECODauMuon[1]._hcalIso+ZzjetsRECODauMuon[1]._ecalIso+ZzjetsRECODauMuon[1]._trackIso)/ZzjetsRECODauMuon[1]._pt<0.3 && ZzjetsRECODauMuon[0]._nhit>11 && ZzjetsRECODauMuon[1]._nhit>11"
   
   bool isTriggered = isMuonTriggered(triggers);
   if (!isTriggered) return false;
@@ -377,11 +301,11 @@ inline bool RecSelectedWithTrigger(const std::vector<reco::CompositeCandidate>& 
 
 inline bool RecSelectedNoIso(const std::vector<reco::CompositeCandidate>& ZREC, const pat::Muon* extdau0 = 0, const pat::Muon* extdau1 = 0 ){
   if (ZREC.size() == 0) return false;
-  if (ZREC.size() > 1){
+  /*if (ZREC.size() > 1){
     std::cout << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! " << std::endl;
     throw cms::Exception("PATAnalysis:RecSelectedTwoMuonsOppositeCharge_Mass") << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! ";
     return false;
-  }
+  }*/
 
   const pat::Muon* dau0 = 0;
   const pat::Muon* dau1 = 0;
@@ -391,20 +315,6 @@ inline bool RecSelectedNoIso(const std::vector<reco::CompositeCandidate>& ZREC, 
   } else {
     dau0 = dynamic_cast<const pat::Muon*>(ZREC[0].daughter(0));
     dau1 = dynamic_cast<const pat::Muon*>(ZREC[0].daughter(1));
-    if (!dau0) {
-     //maybe a shallow clone
-     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (ZREC[0].daughter(0));
-     if (scc && scc->hasMasterClone()){
-       dau0 = dynamic_cast<const pat::Muon*>(scc->masterClone().get());
-     }
-    }
-    if (!dau1) {
-     //maybe a shallow clone
-     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (ZREC[0].daughter(1));
-     if (scc && scc->hasMasterClone()){
-       dau1 = dynamic_cast<const pat::Muon*>(scc->masterClone().get());
-     }
-    }
   }  
 
   assert(dau0 && dau1);

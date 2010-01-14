@@ -24,7 +24,8 @@ genMuPlusStatus3Selector = cms.EDFilter('CandViewSelector',
 )
 
 ##Z mumu with QED FS photons
-zmumugenfull = cms.EDFilter('CandViewShallowCloneCombiner',
+#zmumugenfull = cms.EDFilter('CandViewShallowCloneCombiner',
+zmumugenfull = cms.EDFilter('CandViewCombiner',
    decay = cms.string('genMuPlusStatus3Selector@+ genMuMinusStatus3Selector@-'),
    cut   = cms.string('20 < mass < 10000'),
    name  = cms.string('ZmumuGenFull'),
@@ -42,7 +43,8 @@ genMuPlusSelector = cms.EDFilter('CandViewSelector',
    cut = cms.string('status == 1 & pdgId == -13 & pt > 0 & abs(eta) < 100.')
 )
 ## Z mumu wothout QED FS photons
-zmumugen = cms.EDFilter('CandViewShallowCloneCombiner',
+#zmumugen = cms.EDFilter('CandViewShallowCloneCombiner',
+zmumugen = cms.EDFilter('CandViewCombiner',
    decay = cms.string('genMuPlusSelector@+ genMuMinusSelector@-'),
    cut   = cms.string('20 < mass < 10000'),
    name  = cms.string('ZmumuGen'),

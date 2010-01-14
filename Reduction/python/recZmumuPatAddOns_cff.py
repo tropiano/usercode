@@ -9,7 +9,8 @@ selectedMuons.cut = cms.string("pt > 10. & abs(eta) < 3. & isGlobalMuon()")
 
 
 #Z candidate combiner
-zmumurec = cms.EDFilter('CandViewShallowCloneCombiner',
+#zmumurec = cms.EDFilter('CandViewShallowCloneCombiner',
+zmumurec = cms.EDFilter('CandViewCombiner',
   decay = cms.string('selectedMuons@+ selectedMuons@-'),
   cut   = cms.string('50 < mass < 130'),
   name  = cms.string('Zmumu'),

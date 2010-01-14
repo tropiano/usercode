@@ -135,10 +135,13 @@ void  GenMuon::process(const fwlite::Event& iEvent)
       
    }*/
    //we need to add the piece of code that select the Z candidate in case of multiple candidates
-   if (zHandle->size() > 1) return; 
+   //if (zHandle->size() > 1) return; 
+
+   //we just take the first element in the collection of Z candidates.
+   //That is the candidate in which the leading muon has the highest pt
 
 
-   if (GenSelected(*zHandle)){
+   if (GenSelectedMuon(*zHandle)){
       genPtZ->Fill((*zHandle)[0].pt(), weight);
       genEtaZ->Fill((*zHandle)[0].eta(), weight);
       genMassZ->Fill((*zHandle)[0].mass(), weight);

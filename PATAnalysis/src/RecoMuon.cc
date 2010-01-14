@@ -152,15 +152,18 @@ void  RecoMuon::process(const fwlite::Event& iEvent)
 
    
    //we need to add the piece of code that select the Z candidate in case of multiple candidates
-   if (zHandle->size() > 1) return; 
-
+   //if (zHandle->size() > 1) return; 
+   
+   //we just take the first element in the collection of Z candidates.
+   //That is the candidate in which the leading muon has the highest pt
+   
    const pat::Muon* dau0 = 0;
    const pat::Muon* dau1 = 0;
-   if (zHandle->size() == 1){
+   if (zHandle->size() > 0){
     //take the two muons with all the needed castings
     dau0 = dynamic_cast<const pat::Muon*>((*zHandle)[0].daughter(0));
     dau1 = dynamic_cast<const pat::Muon*>((*zHandle)[0].daughter(1));
-    if (!dau0) {
+    /*if (!dau0) {
      //maybe a shallow clone
      const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> ((*zHandle)[0].daughter(0));
      if (scc && scc->hasMasterClone()){
@@ -174,9 +177,8 @@ void  RecoMuon::process(const fwlite::Event& iEvent)
        dau1 = dynamic_cast<const pat::Muon*>(scc->masterClone().get());
      }
     }
-    assert(dau0 && dau1);
+    assert(dau0 && dau1);*/
    } 
-  
 
 
 

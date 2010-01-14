@@ -1,6 +1,6 @@
 #include <iostream>
 //#include "Signal.h"
-//#include "Firenze/PATAnalysis/include/Background.h"
+#include "Firenze/PATAnalysis/include/EfficiencyAnalyzerMuon.h"
 #include "TFile.h"
 #include "TTree.h"
 //#include "RooUnfold/RooUnfoldResponse.h"
@@ -31,8 +31,10 @@ TDSet* getDS(const char* filename){
 
 
 int main(){
+/*
   TProof * p = TProof::Open("");
-  
+  //p->SetParallel(1);
+ 
   double targetLumi = 100.;
   
 
@@ -47,11 +49,20 @@ int main(){
 
   //process the background
   TDSet* muDS = getDS("mudata.txt") ;
-  TNamed* configbg = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/config_Mu.py");
+  TNamed* configbg = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/config_signal.py");
   p->AddInput(configbg);
   p->Process(muDS, "FWLiteTSelector");
   p->ClearInput();
   delete muDS;
+*/
+  
+  TFile* in = new TFile("signal.root");
+  TFile* out = new TFile("Mu_Eff.root", "RECREATE");
+
+  EfficiencyAnalyzerMuon mueffana(in, out, "EfficiencyMuon");
+  mueffana.analyze();
+
+  delete out;
 /*
   //process the signal
   TDSet* signalDS = getDS("signaldata.txt");
