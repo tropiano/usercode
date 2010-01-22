@@ -20,6 +20,8 @@ process.load("Firenze.Reduction.genJetPatAddOns_cff")
 #################
 #customizartion
 #################
+#muons
+process.muonMatch.checkCharge = cms.bool(False)
 
 #jets
 # run the 3.3.x software on Summer 09 MC from 3.1.x:
