@@ -17,10 +17,24 @@ zmumurec = cms.EDFilter('CandViewCombiner',
   roles = cms.vstring('mu1', 'mu2')
 )
 
-zmumurecSequence = cms.Sequence(selectedMuons*zmumurec)
+zmumurecSameChargePlus = cms.EDFilter('CandViewCombiner',
+  decay = cms.string('selectedMuons@+ selectedMuons@+'),
+  cut   = cms.string('50 < mass < 130'),
+  name  = cms.string('Zmumu_samechargeplus'),
+  roles = cms.vstring('mu1', 'mu2')
+)
+
+zmumurecSameChargeMinus = cms.EDFilter('CandViewCombiner',
+  decay = cms.string('selectedMuons@- selectedMuons@-'),
+  cut   = cms.string('50 < mass < 130'),
+  name  = cms.string('Zmumu_samechargeminus'),
+  roles = cms.vstring('mu1', 'mu2')
+)
+
+zmumurecSequence = cms.Sequence(selectedMuons*(zmumurec + zmumurecSameChargePlus + zmumurecSameChargeMinus))
 
 zmumurecEventContent = [
   'keep *_selectedMuons_*_*',
-  'keep *_zmumurec_*_*'
+  'keep *_zmumurec*_*_*'
 ]
 

@@ -16,9 +16,23 @@ zeerec = cms.EDFilter('CandViewShallowCloneCombiner',
   roles = cms.vstring('e1', 'e2')
 )
 
-zeerecSequence = cms.Sequence(selectedElectrons*zeerec)
+zeerecSameChargePlus = cms.EDFilter('CandViewShallowCloneCombiner',
+  decay = cms.string('selectedElectrons@+ selectedElectrons@+'),
+  cut   = cms.string('50 < mass < 130'),
+  name  = cms.string('Zeerec_samechargeplus'),
+  roles = cms.vstring('e1', 'e2')
+)
+
+zeerecSameChargeMinus = cms.EDFilter('CandViewShallowCloneCombiner',
+  decay = cms.string('selectedElectrons@- selectedElectrons@-'),
+  cut   = cms.string('50 < mass < 130'),
+  name  = cms.string('Zeerec_samechargeminus'),
+  roles = cms.vstring('e1', 'e2')
+)
+
+zeerecSequence = cms.Sequence(selectedElectrons * (zeerec + zeerecSameChargePlus + zeerecSameChargeMinus))
 
 zeerecEventContent = [
   'keep *_selectedElectrons_*_*',
-  'keep *_zeerec_*_*'
+  'keep *_zeerec*_*_*'
 ]
