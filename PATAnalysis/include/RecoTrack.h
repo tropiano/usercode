@@ -25,7 +25,7 @@ namespace myanalysis {
     private:
     std::string _name, _title;
     bool _initialized;
-    TH1F *_pt, *_eta, *_dxyFromPV, *_dzFromPV, *_nhits, *_phi;
+    TH1F *_pt, *_eta, *_dxyFromPV, *_dzFromPV, *_nhits, *_phi, *_chi2;
   }; 
 }
 
@@ -50,7 +50,7 @@ private:
 
   TDirectory* _dir;
 
-  double _ptcut, _nhit, _etamax;
+  double _ptcuttk, _ptcutmu, _ptcutjet, _nhit, _etamax;
 
   myanalysis::TrackPlots _all, _hp, _pv, _hppv;
 
@@ -58,6 +58,9 @@ private:
   TH1F *_nTrkAll, *_nTrkPV, *_nTrkHP, *_nMu;  
   TH1F *_muonPt, *_muonEta, *_muonType, *_muonTrkIso, *_muonHcalIso, *_muonEcalIso, 
        *_muonChi2, *_muonNTkHits, *_muonDxyPV, *_muonDzPV;
+  std::vector<TH1D*> _trkIsoVsInclusiveMulti;     
+  std::vector<TH1D*> _hcalIsoVsInclusiveMulti;     
+  std::vector<TH1D*> _ecalIsoVsInclusiveMulti;     
        
 };
 #endif

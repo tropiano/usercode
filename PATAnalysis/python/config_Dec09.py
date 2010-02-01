@@ -9,7 +9,9 @@ process.outputFile = cms.PSet(
 process.track = cms.PSet (
   type        = cms.string("RecoTrack"),
   Name        = cms.string("RecoTrack"),
-  MinPt       = cms.double(0.),
+  MinPtTk     = cms.double(0.5),
+  MinPtMu     = cms.double(1.),
+  MinPtJet    = cms.double(10.),
   MaxEta      = cms.double(3.),
   MinHit      = cms.double(5.)
 )

@@ -123,7 +123,7 @@ namespace myanalysis{
   void JetPlots::initialize(){
     std::string fullname  = "pt_"+_name;
     std::string fulltitle = "pt_"+_title;
-    _pt   = new TH1F(fullname.c_str(), fulltitle.c_str(), 100, 0, 30);
+    _pt   = new TH1F(fullname.c_str(), fulltitle.c_str(), 200, 0, 40);
     _pt->Sumw2();
     fullname  = "eta_"+_name;
     fulltitle = "eta_"+_title;  

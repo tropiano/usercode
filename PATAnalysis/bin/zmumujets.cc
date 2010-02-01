@@ -31,7 +31,7 @@ TDSet* getDS(const char* filename){
 
 
 int main(){
-/*
+
   TProof * p = TProof::Open("");
   //p->SetParallel(1);
  
@@ -42,11 +42,12 @@ int main(){
   AutoLibraryLoader::enable();
   gSystem->Load("libFirenzePATAnalysis");
 
-  p->Exec( ".x /raid/lenzip/CMSSW/test/CMSSW_3_3_5/src/Firenze/PATAnalysis/bin/remote.C" );
+  p->Exec( ".x /raid/lenzip/CMSSW/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/remote.C" );
 
   TProofLog *pl = TProof::Mgr("")->GetSessionLogs();
   pl->Save("*","/raid/lenzip/CMSSW/test/CMSSW_3_3_5/src/Firenze/PATAnalysis/bin/Log.txt");
 
+/*  
   //process the background
   TDSet* muDS = getDS("mudata.txt") ;
   TNamed* configbg = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/config_signal.py");
@@ -54,15 +55,15 @@ int main(){
   p->Process(muDS, "FWLiteTSelector");
   p->ClearInput();
   delete muDS;
-*/
-  
-  TFile* in = new TFile("signal.root");
+*/  
+/*  TFile* in = new TFile("signal.root");
   TFile* out = new TFile("Mu_Eff.root", "RECREATE");
 
   EfficiencyAnalyzerMuon mueffana(in, out, "EfficiencyMuon");
   mueffana.analyze();
 
   delete out;
+*/  
 /*
   //process the signal
   TDSet* signalDS = getDS("signaldata.txt");
@@ -78,15 +79,12 @@ int main(){
   fm.OutputFile("total.root");
   fm.Merge();
 */
-
-/*
   TDSet* dsdata = getDS("tracks_data.txt") ;
   TNamed* configdata = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/config_Dec09_data.py");
   p->AddInput(configdata);
   p->Process(dsdata, "FWLiteTSelector");
   p->ClearInput();
   delete dsdata;
-
 
   TDSet* dsmc = getDS("tracks_mc.txt") ;
   TNamed* configmc = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/config_Dec09_mc.py");
@@ -95,5 +93,5 @@ int main(){
   p->ClearInput();
   delete dsmc;
   p->Close();
-*/
+
 }

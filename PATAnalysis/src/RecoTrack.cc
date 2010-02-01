@@ -1,5 +1,6 @@
 
 #include "Firenze/PATAnalysis/include/RecoTrack.h"
+#include "Firenze/PATAnalysis/include/RecoJet.h"
 #include "Firenze/PATAnalysis/include/Utilities.h"
 
 #include <TH2.h>
@@ -36,7 +37,9 @@ void RecoTrack::begin(TFile* out, const edm::ParameterSet& iConfig){
    _file = out; 
    std::string dirname = iConfig.getParameter<std::string>("Name");
 
-   _ptcut  = iConfig.getParameter<double>("MinPt");
+   _ptcuttk  = iConfig.getParameter<double>("MinPtTk");
+   _ptcutmu  = iConfig.getParameter<double>("MinPtMu");
+   _ptcutjet  = iConfig.getParameter<double>("MinPtJet");
    _nhit    = iConfig.getParameter<double>("MinHit");
    _etamax = iConfig.getParameter<double>("MaxEta");
 
@@ -55,11 +58,11 @@ void RecoTrack::begin(TFile* out, const edm::ParameterSet& iConfig){
    _ntrackVsZ->Sumw2();
    _ntrackVsPz = new TH2F("ntrackVsPz", "# tracks vs PV total p_{z}", 100, 0, 10000, 500, 0., 500.);
    _ntrackVsPz->Sumw2();
-   _muonPt = new TH1F("muonPt", "Muon p_{T}", 100, 0, 10); 
+   _muonPt = new TH1F("muonPt", "Muon p_{T}", 200, 0, 40); 
    _muonPt->Sumw2();
    _muonEta = new TH1F("muonEta", "Muon #eta", 100, -3., 3.);
    _muonEta->Sumw2();
-   _muonType = new TH1F("muonType", "#muon type", 5, 0, 5);
+   _muonType = new TH1F("muonType", "#muon type", 30, 0, 30);
    _muonType->Sumw2();
    _muonTrkIso = new TH1F("muonTrkIso", "Muon tracker isolation", 100, 0, 5);
    _muonTrkIso->Sumw2();
@@ -79,7 +82,7 @@ void RecoTrack::begin(TFile* out, const edm::ParameterSet& iConfig){
    _nTrkAll->Sumw2();
    _nTrkPV = new TH1F("nTrkPV", "# PV tracks per event", 150, 0, 150); 
    _nTrkPV ->Sumw2();
-   _nTrkHP = new TH1F("nTrkHPV", "# HP tracks per event", 150, 0, 150);   
+   _nTrkHP = new TH1F("nTrkHP", "# HP tracks per event", 150, 0, 150);   
    _nTrkHP ->Sumw2();
    _nMu  = new TH1F("nMu", "# muons per event", 10, 0, 10);
    _nMu->Sumw2(); 
@@ -101,6 +104,9 @@ void  RecoTrack::process(const fwlite::Event& iEvent)
 
    _file->cd();
 
+   fwlite::Handle<std::vector<pat::Jet> > jetHandle;
+   jetHandle.getByLabel(iEvent, "selectedJets");
+
    fwlite::Handle<std::vector<reco::Track> > trackHandle;
    trackHandle.getByLabel(iEvent, "generalTracks");
 
@@ -120,50 +126,86 @@ void  RecoTrack::process(const fwlite::Event& iEvent)
    //we select events with at least one valid vertex and less than 100 tracks  
    if (!validVertex || trackHandle->size() > 100 ) return;
    //if (!validVertex ) return;
-   
-   _nTrkAll->Fill(trackHandle->size());
-   _nTrkPV->Fill(vertexHandle->front().tracksSize());
+  
+  
   
    //we loop ovet the tracks associated to the PV and fill histograms 
    reco::Vertex::Point p = vertexHandle->front().position();
    reco::Vertex::trackRef_iterator ir;
    reco::Vertex::trackRef_iterator beginr = vertexHandle->front().tracks_begin();
    reco::Vertex::trackRef_iterator endr   = vertexHandle->front().tracks_end();
+   unsigned int countPV = 0;
    for (ir = beginr; ir != endr; ++ir ){
-     _pv.fillWithPV(**ir, p);
-     if ((*ir)->quality(reco::Track::qualityByName("highPurity"))){
-       _hppv.fillWithPV(**ir, p);
-     }
+     if ((*ir)->pt() > _ptcuttk){ 
+        _pv.fillWithPV(**ir, p);
+        countPV++;  
+        if ((*ir)->quality(reco::Track::qualityByName("highPurity"))){
+          _hppv.fillWithPV(**ir, p);
+        }
+     } 
    }
+   _nTrkPV->Fill(countPV);
 
    //we loop on all tracks in the event and fill histograms
    std::vector<reco::Track>::const_iterator it;
    std::vector<reco::Track>::const_iterator begin = trackHandle->begin();
    std::vector<reco::Track>::const_iterator end   = trackHandle->end();
-   int countHP = 0;
+   unsigned int countHP  = 0;
+   unsigned int countAll = 0;
    for ( it = begin; it != end; ++it ){
-      _all.fillWithPV(*it, p);
-      if(it->quality(reco::Track::qualityByName("highPurity"))){
-        _hp.fillWithPV(*it, p);
-        countHP++;
-      }
+      if (it->pt() > _ptcuttk){
+        countAll++;
+        _all.fillWithPV(*it, p);
+        if(it->quality(reco::Track::qualityByName("highPurity"))){
+          _hp.fillWithPV(*it, p);
+          countHP++;
+        }
+      }  
    }
+   _nTrkAll->Fill(countAll);
    _nTrkHP->Fill(countHP);
 
-   _nMu->Fill(muonHandle->size()); 
+   //_nMu->Fill(muonHandle->size());
+
+   //count jets 
+   std::vector<pat::Jet>::const_iterator ijet;
+   std::vector<pat::Jet>::const_iterator jetbeg = jetHandle->begin();
+   std::vector<pat::Jet>::const_iterator jetend = jetHandle->end();
+   unsigned int countJet = 0;
+   for (ijet = jetbeg; ijet != jetend; ++ijet){
+     if (ijet->pt() > _ptcutjet && fabs(ijet->eta()) < _etamax  &&
+         ijet->emEnergyFraction() > 0.01 &&
+         ijet->jetID().fHPD < 0.98 &&
+         ijet->jetID().n90Hits > 1) {
+        countJet++;
+     }
+   } 
+
+   unsigned int countMu = 0; 
 
    std::vector<pat::Muon>::const_iterator imu;
    std::vector<pat::Muon>::const_iterator mubeg = muonHandle->begin();
    std::vector<pat::Muon>::const_iterator muend = muonHandle->end();
    for (imu = mubeg; imu != muend; ++imu){
+     if (! ((imu->isGlobalMuon() || imu->isGood("TMOneStationLoose")) && imu->pt() > _ptcutmu)) continue;
+     countMu++;
      _muonPt->Fill(imu->pt());
      _muonEta->Fill(imu->eta());
      //_muonChi2->Fill(imu->globalTrack()->normalizedChi2());
      _muonType->Fill(imu->type());
-     const reco::MuonIsolation& iso03 = imu->isolationR03(); 
+     const reco::MuonIsolation& iso03 = imu->isolationR03();
+     _dir->cd();
+     addHistosVsMulti(countJet, "TrkIso", "TrkIso", 100, 0., 5., _trkIsoVsInclusiveMulti);
+     addHistosVsMulti(countJet, "HcalIso", "HcalIso", 100, 0., 5., _hcalIsoVsInclusiveMulti);
+     addHistosVsMulti(countJet, "EcalIso", "EcalIso", 100, 0., 5., _ecalIsoVsInclusiveMulti);
      _muonTrkIso->Fill(iso03.sumPt);
      _muonHcalIso->Fill(iso03.hadEt);
      _muonEcalIso->Fill(iso03.emEt);
+     for (unsigned int kk = 0; kk <= countJet; ++kk){
+        _trkIsoVsInclusiveMulti[kk]->Fill(iso03.sumPt);
+        _hcalIsoVsInclusiveMulti[kk]->Fill(iso03.hadEt);
+        _ecalIsoVsInclusiveMulti[kk]->Fill(iso03.emEt);
+     }
      if (imu->innerTrack().isNonnull()){
         _muonNTkHits->Fill(imu->innerTrack()->found());
         _muonChi2->Fill(imu->innerTrack()->normalizedChi2());
@@ -171,7 +213,7 @@ void  RecoTrack::process(const fwlite::Event& iEvent)
         _muonDzPV->Fill(imu->innerTrack()->dz(p));
      } 
    }
-
+   _nMu->Fill(countMu);
 }
 
 void RecoTrack::finalize(){
@@ -185,7 +227,7 @@ namespace myanalysis{
   void TrackPlots::initialize(){
     std::string fullname  = "pt_"+_name;
     std::string fulltitle = "pt_"+_title;
-    _pt   = new TH1F(fullname.c_str(), fulltitle.c_str(), 100, 0, 30);
+    _pt   = new TH1F(fullname.c_str(), fulltitle.c_str(), 200, 0, 40);
     _pt->Sumw2();
     fullname  = "eta_"+_name;
     fulltitle = "eta_"+_title;  
@@ -207,6 +249,11 @@ namespace myanalysis{
     fulltitle = "phi_"+_title;
     _phi = new TH1F(fullname.c_str(), fulltitle.c_str(), 100, 0., 4.);
     _phi->Sumw2();
+    fullname  = "chi2_"+_name;
+    fulltitle = "chi2_"+_title;
+    _chi2 = new TH1F(fullname.c_str(), fulltitle.c_str(), 100, 0., 10.);
+    _chi2->Sumw2(); 
+    
     _initialized = true;
   }
 
@@ -227,6 +274,7 @@ namespace myanalysis{
     _eta->Fill(track.eta());
     _nhits->Fill(track.found());
     _phi->Fill(track.phi());
+    _chi2->Fill(track.normalizedChi2());
   }
  
   void TrackPlots::fillWithPV(const reco::Track& track, const reco::Vertex::Point& pv){
