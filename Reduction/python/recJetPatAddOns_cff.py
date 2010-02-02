@@ -5,12 +5,18 @@ selectedJets = PhysicsTools.PatAlgos.selectionLayer1.jetSelector_cfi.selectedLay
 selectedJets.src = cms.InputTag("cleanLayer1Jets")
 selectedJets.cut = cms.string('pt > 20. & abs(eta) < 10. & nConstituents > 0')
 
-import PhysicsTools.PFCandProducer.ParticleSelectors.ptMinPFJetSelector_cfi
-selectedPFJets = PhysicsTools.PFCandProducer.ParticleSelectors.ptMinPFJetSelector_cfi.ptMinPFJets.clone()
-selectedPFJets.src = cms.InputTag('antikt5PFJets')
-selectedPFJets.ptMin = 20.
+#pfjets
+from Firenze.JetUtilities.pfAK5Jets_cff import *
 
-recjetsSequence = cms.Sequence(selectedJets + selectedPFJets)
+#import PhysicsTools.PFCandProducer.ParticleSelectors.ptMinPFJetSelector_cfi
+import PhysicsTools.PatAlgos.selectionLayer1.jetSelector_cfi
+selectedPFJets = PhysicsTools.PatAlgos.selectionLayer1.jetSelector_cfi.selectedLayer1Jets.clone()
+selectedPFJets.src = cms.InputTag('allLayer1PFJets')
+selectedPFJets.cut = cms.string('pt > 20. & abs(eta) < 10.')
+
+recPFjetsSequence = cms.Sequence(allLayer1PFJetsSequence * selectedPFJets)
+
+recjetsSequence = cms.Sequence(selectedJets + recPFjetsSequence)
 
 
 jetrecEventContent = [

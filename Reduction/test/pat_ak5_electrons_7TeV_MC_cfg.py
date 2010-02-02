@@ -3,8 +3,12 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1000)
 
 process.source.fileNames = [
-'file:/raid/sfrosali/tmp/Zee_Summer09_GEN-SIM-RECO_test.root']
+'file:Zee_7TeV_AOD_test.root']
 process.maxEvents.input = 10000          ## (e.g. -1 to run on all events)
+
+##global tag for electron re-reconstruction
+process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
+process.GlobalTag.globaltag = 'MC_31X_V3::All'
 
 #################
 #my modules

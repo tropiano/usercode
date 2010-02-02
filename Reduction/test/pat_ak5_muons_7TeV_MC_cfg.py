@@ -6,6 +6,10 @@ process.source.fileNames = [
 'file:Zmumu7TeV_testAOD.root']
 process.maxEvents.input = 2000               ## (e.g. -1 to run on all events)
 
+##global tag for electron re-reconstruction
+process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
+process.GlobalTag.globaltag = 'MC_31X_V3::All'
+
 #################
 #my modules
 #################
