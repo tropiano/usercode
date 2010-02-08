@@ -23,7 +23,6 @@
 #include "DataFormats/JetReco/interface/GenJet.h"
 #include "DataFormats/FWLite/interface/ChainEvent.h"
 #include "FWCore/ParameterSet/interface/ProcessDesc.h"
-//#include "FWCore/ParameterSet/interface/PythonProcessDesc.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 using namespace std;
@@ -37,7 +36,7 @@ GenIsoJetPt_Acc(0), GenJetPt_Acc(0), GenIsoJetCounter_Acc(0), GenJetCounter_Acc(
 genLeadElPt(0), genSecElPt(0), genLeadElEta(0), genSecElEta(0),
 genLeadElPt_Acc(0), genSecElPt_Acc(0), genLeadElEta_Acc(0), genSecElEta_Acc(0),
 
-_ptjetmin(30.), _etajetmax(3.), _norm(1.), _Norm(true), _EventsPerFile(0),
+_ptjetmin(30.), _etajetmax(3.), _norm(1.), _Norm(true), _Sumw2(false), _EventsPerFile(0),
 _file(0), _dir(0),  _histovector()
 {   }
 
@@ -49,6 +48,7 @@ void GenElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _targetLumi= iConfig.getParameter<double>("targetLumi");
    _xsec      = iConfig.getParameter<double>("CrossSection");
    _Norm      = iConfig.getParameter<bool>("Norm");
+   _Sumw2      = iConfig.getParameter<bool>("Sumw2");
    _EventsPerFile      = iConfig.getParameter<double>("EventsPerFile");
    _ReportName = iConfig.getParameter<std::string>("ReportName");
 
@@ -329,16 +329,22 @@ void GenElectron::finalize(){
 
    _histovector.insert(_histovector.end(), genEl2PtVsExclMulti.begin(), genEl2PtVsExclMulti.end());
    _histovector.insert(_histovector.end(), genEl2EtaVsExclMulti.begin(), genEl2EtaVsExclMulti.end());
-    
-   std::vector<TH1D*>::const_iterator ibeg = _histovector.begin();
-   std::vector<TH1D*>::const_iterator iend = _histovector.end();
    
    //Normalization
+   
+   std::vector<TH1D*>::const_iterator ibeg = _histovector.begin();
+   std::vector<TH1D*>::const_iterator iend = _histovector.end();
    
    double lumi = _entries/_xsec;
 
    if(lumi){
    _norm = _targetLumi/lumi;
+   }
+   
+   if(_Sumw2){
+   for (std::vector<TH1D*>::const_iterator i = ibeg; i != iend; ++i){
+    (*i)->Sumw2();
+   }
    }
    
    for (std::vector<TH1D*>::const_iterator i = ibeg; i != iend; ++i){     

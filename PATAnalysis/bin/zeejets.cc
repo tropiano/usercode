@@ -19,46 +19,38 @@ using namespace std;
 
 int main() {
 
-/*  string cfgName = "config_Zee.py";
-  string sourceList = "files_Zee.txt";
-  string outputName = "Signal_NewSel_RobustLoose_Iso03";
-  string electronID = "eidRobustLoose";
-  double xsec = 1944.;
-  double targetLumi = 100.;
-  string Norm = "True";
-  bool Log = false; */
-  
   //Job
-  string cfgName = "config_test.py";
+  string cfgName = "config.py";
   string sourceList = "files_test.txt";
-  string outputName = "Signal_test_NewCode";
-  string electronID = "eidLoose";
+  string outputName = "test_RL01_10234";
+  string electronID = "eidRobustLoose";
   
   //Normalization
-  double xsec = 1944.;
+  double xsec = 1300.;
   double targetLumi = 100.;
   string Norm = "True";
   int EventsPerFile = 0;
+  string Sumw2= "False";
   
   //Modules
   bool GEN = true;
   bool RECO = true;
   bool EFF = true;
-  bool NTUPLE = true;
+  bool NTUPLE = false;
   
   //Cuts
   int Acc = 1;
-  int Qual = 2;
-  int Imp = 3;
-  int Iso = 5;
+  int Qual = 0;
+  int Imp = 2;
+  int Iso = 3;
   int EiD = 4;
   
   //Log
-  bool Log = true;
+  bool Log = false;
   
-  string path = "/afs/cern.ch/user/s/sfrosali/scratch0/Zjets/Commit/CMSSW_3_3_5/src/Firenze/PATAnalysis/bin/";
+  string path = "/raid/sfrosali/Zjets/Commit/CMSSW_3_3_5/src/Firenze/PATAnalysis/bin";
 
-  makeCfg(GEN, RECO, EFF, NTUPLE, Acc, Qual, Imp, Iso, EiD, path.c_str(), cfgName.c_str(), sourceList.c_str(), outputName.c_str(), Norm.c_str(), EventsPerFile, electronID.c_str(), xsec, targetLumi);
+  makeCfg(GEN, RECO, EFF, NTUPLE, Acc, Qual, Imp, Iso, EiD, path.c_str(), cfgName.c_str(), sourceList.c_str(), outputName.c_str(), Norm.c_str(), Sumw2.c_str(), EventsPerFile, electronID.c_str(), xsec, targetLumi);
 
   gEnv->SetValue("Proof.Sandbox", "/raid/sfrosali/.proof");
 
@@ -81,7 +73,7 @@ int main() {
   
  if(Log){ 
  TProofLog *pl = TProof::Mgr("")->GetSessionLogs();
- pl->Save("0.0","/afs/cern.ch/user/s/sfrosali/scratch0/Zjets/Commit/CMSSW_3_3_5/src/Firenze/PATAnalysis/bin/");
+ pl->Save("0.0","/raid/sfrosali/Zjets/Commit/CMSSW_3_3_5/src/Firenze/PATAnalysis/bin");
  }
   
   p->ClearInput();

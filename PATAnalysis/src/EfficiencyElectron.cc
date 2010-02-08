@@ -212,9 +212,6 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    GenIsoJetEff_12345 = new TH1D(GenIsoJetEff_name.c_str(), "Number of Gen Iso Jet", 10, 0, 10);
    _histoVector.push_back(GenIsoJetEff_12345);
  
-   std::vector<TH1D*>::const_iterator i1beg = _histoVector.begin(); 
-   std::vector<TH1D*>::const_iterator i1end = _histoVector.end(); 
-   
   cout << "EfficiencyElectron Worker built." << endl;   
 }
 
@@ -245,8 +242,13 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent)
    fwlite::Handle<pat::TriggerEvent> triggerHandle;
    triggerHandle.getByLabel(iEvent, "patTriggerEvent");
    
+   //// Only first Z considered (higher pt of leading electron)
+   int ZNum = 0;
+   
+   if(zrecHandle->size()){
+   
    //Z Reco daughters
-   std::vector<const pat::Electron*> zdaughters = ZDaughters(*zrecHandle);
+   std::vector<const pat::Electron*> zdaughters = ZDaughters((*zrecHandle)[ZNum]);
    const pat::Electron *dau0, *dau1;
    
    //Z Gen daughters
@@ -292,8 +294,8 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent)
      std::vector<const pat::Jet*> notisojets;
       
      for(unsigned int i = 0; i < recjets.size(); i++){
-     if(RecoIsoJet(*zrecHandle,*recjets[i]))isojets.push_back(recjets[i]);
-     if(!RecoIsoJet(*zrecHandle,*recjets[i]))notisojets.push_back(recjets[i]);
+     if(RecoIsoJet((*zrecHandle)[ZNum],*recjets[i]))isojets.push_back(recjets[i]);
+     if(!RecoIsoJet((*zrecHandle)[ZNum],*recjets[i]))notisojets.push_back(recjets[i]);
      }
      
      if(zdaughters.size() != 0){   
@@ -333,8 +335,8 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent)
       
      }
      
-     //Events with a selected Zee Acc
-     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), *zrecHandle)){
+     //Events with a selected Zee 1
+     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])){
      
      //Eff vs Z variables
      genMassZEff_1->Fill((*zgenHandle)[0].mass());
@@ -350,8 +352,8 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent)
      
      }
      
-     //Events with a selected Zee Acc+Qual
-     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), *zrecHandle)&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), *zrecHandle)){
+     //Events with a selected Zee 1+2
+     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])){
      
      //Eff vs Z variables
      genMassZEff_12->Fill((*zgenHandle)[0].mass());
@@ -367,8 +369,8 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent)
         
      }
      
-     //Events with a selected Zee Acc+Qual+Imp
-     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), *zrecHandle)&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), *zrecHandle)&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), *zrecHandle)){
+     //Events with a selected Zee 1+2+3
+     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])){
      
      //Eff vs Z variables
      genMassZEff_123->Fill((*zgenHandle)[0].mass());
@@ -385,8 +387,8 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent)
      
      }
      
-     //Events with a selected Zee Acc+Qual+Imp+Iso
-     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), *zrecHandle)&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), *zrecHandle)&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), *zrecHandle)&&RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), *zrecHandle)){
+     //Events with a selected Zee 1+2+3+4
+     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])&&RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])){
      
      //Eff vs Z variables
      genMassZEff_1234->Fill((*zgenHandle)[0].mass());
@@ -402,8 +404,8 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent)
      
      }
      
-     //Events with a selected Zee Acc+Qual+Iso+EiD
-     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), *zrecHandle)&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), *zrecHandle)&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), *zrecHandle)&&RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), *zrecHandle)&&RecSelected(_RecoCutFlags[5].c_str(), _electronID.c_str(), *zrecHandle)){
+     //Events with a selected Zee 1+2+3+4+5
+     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])&&RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])&&RecSelected(_RecoCutFlags[5].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])){
       
       //Eff vs Z variables
       genMassZEff_12345->Fill((*zgenHandle)[0].mass());
@@ -417,6 +419,8 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent)
       //Eff vs Jet variables
       GenIsoJetEff_12345->Fill(isogenjets.size());
       
+}
+
 }
  
 }

@@ -23,7 +23,7 @@ TDSet* getDS(const char* filename){
   return out; 
 }
 
-void makeCfg(bool GEN, bool RECO, bool EFF, bool NTUPLE, int Acc, int Qual, int Imp, int Iso, int EiD, const char* path, const char *cfgName, const char* sourceList, const char *outFile, const char* Norm, int EventsPerFile, const char* electronID, double xsec, double targetLumi){
+void makeCfg(bool GEN, bool RECO, bool EFF, bool NTUPLE, int Acc, int Qual, int Imp, int Iso, int EiD, const char* path, const char *cfgName, const char* sourceList, const char *outFile, const char* Norm, const char* Sumw2, int EventsPerFile, const char* electronID, double xsec, double targetLumi){
 
 //cfg
 string cfgPath = path;
@@ -61,6 +61,7 @@ cfg<<"sourceFileList = cms.string(\""<<Source.c_str()<<"\"),"<<std::endl;
 cfg<<"CrossSection = cms.double("<<xsec<<"),"<<std::endl;
 cfg<<"targetLumi  = cms.double("<<targetLumi<<"),"<<std::endl;
 cfg<<"Norm        = cms.bool("<<Norm<<"),"<<std::endl;
+cfg<<"Sumw2       = cms.bool("<<Sumw2<<"),"<<std::endl;
 cfg<<"EventsPerFile  = cms.double("<<EventsPerFile<<")"<<std::endl;
 cfg<<")"<<std::endl<<std::endl;
 }
@@ -79,6 +80,7 @@ cfg<<"EiD = cms.double("<<EiD<<"),"<<std::endl;
 cfg<<"CrossSection = cms.double("<<xsec<<"),"<<std::endl;
 cfg<<"targetLumi  = cms.double("<<targetLumi<<"),"<<std::endl;
 cfg<<"Norm        = cms.bool("<<Norm<<"),"<<std::endl;
+cfg<<"Sumw2       = cms.bool("<<Sumw2<<"),"<<std::endl;
 cfg<<"EventsPerFile  = cms.double("<<EventsPerFile<<")"<<std::endl;
 cfg<<")"<<std::endl<<std::endl;
 }

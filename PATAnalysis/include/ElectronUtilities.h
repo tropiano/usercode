@@ -23,27 +23,8 @@
 #include "TMath.h"
 #include "TH1D.h"
 
-/*
 
-// Old Selection Parameters
-
-static double ptelcut = 20.;    //Gev/c
-static double etaelcut = 2.4;
-static double eta_el_excl_up = 1.56;               //Excluded Eta region
-static double eta_el_excl_down = 1.4442;           //Excluded Eta region
-static double zmassmin = 50.;   //Gev/c^2
-static double zmassmax = 130.;  //Gev/c^2
-static double minnhit = 11.;
-static double maxchi2 = 10.;
-static double dxycut = 0.2;     //cm
-static double ptjetmin = 30.;   //Gev/c
-static double etajetmax = 3.0;
-static double isocut = 0.3;                        //CombRelIso
-static double isojetcut = 0.5;                     //Isolation jet - Z electron
-
-*/
-
-// New Selection Parameters
+// Selection Parameters
 
 static double ptelcut = 20.;    //Gev/c
 static double etaelcut = 2.4;
@@ -57,10 +38,7 @@ static double dxycut = 0.02;     //cm
 static double ptjetmin = 30.;   //Gev/c
 static double etajetmax = 3.0;
 static double isocut = 0.1;                        //CombRelIso
-//static double isocut = 0.3;                        //CombRelIso
 static double isojetcut = 0.5;                     //Isolation jet - Z electron
-
-
 
 ////////////////////////////////
 
@@ -168,7 +146,7 @@ inline bool isTriggered(const pat::TriggerEvent& triggers, std::string triggerna
 }
 
 inline bool isElectronTriggered(const pat::TriggerEvent& triggers){
-  return isTriggered(triggers, "HLT1ElectronEt15_L1R_LI") || isTriggered(triggers, "HLT1ElectronEt15_L1R_LI"); //trigger messi a caso
+  return isTriggered(triggers, "HLT_Ele10_LW_L1R");
 }
 
 inline bool isJetTriggered(const pat::TriggerEvent& triggersREC){
@@ -214,55 +192,53 @@ const reco::Candidate *dau, *daudau;
   
 }
 
-inline bool isZdaughtersAvailable(const std::vector<reco::CompositeCandidate>& ZREC){
+inline bool isZdaughtersAvailable(const reco::CompositeCandidate ZREC){
 
-if (ZREC.size() == 0) return false;
-  if (ZREC.size() > 1){
-    std::cout << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! " << std::endl;
-    return false;
-  }
-  const pat::Electron* dau0 = dynamic_cast<const pat::Electron*>(ZREC[0].daughter(0));
-  const pat::Electron* dau1 = dynamic_cast<const pat::Electron*>(ZREC[0].daughter(1));
+  const pat::Electron* dau0 = dynamic_cast<const pat::Electron*>(ZREC.daughter(0));
+  const pat::Electron* dau1 = dynamic_cast<const pat::Electron*>(ZREC.daughter(1));
 
 if (!dau0) {
      //maybe a shallow clone
-     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (ZREC[0].daughter(0));
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (ZREC.daughter(0));
      if (scc && scc->hasMasterClone()){
        dau0 = dynamic_cast<const pat::Electron*>(scc->masterClone().get()); 
      }
     }
 if (!dau1) {
      //maybe a shallow clone
-     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (ZREC[0].daughter(1));
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (ZREC.daughter(1));
      if (scc && scc->hasMasterClone()){
        dau1 = dynamic_cast<const pat::Electron*>(scc->masterClone().get());
      }
 }
 
   if(dau0 && dau1){
-  return true;}
+    return true;
+  }else{
+    return false;
+  }
   
 }
 
-inline std::vector<const pat::Electron*> ZDaughters(const std::vector<reco::CompositeCandidate>& ZREC){
+inline std::vector<const pat::Electron*> ZDaughters(const reco::CompositeCandidate ZREC){
 
 std::vector<const pat::Electron*> zdaughters;
 
 if(isZdaughtersAvailable(ZREC)){
 
-  const pat::Electron* dau0 = dynamic_cast<const pat::Electron*>(ZREC[0].daughter(0));
-  const pat::Electron* dau1 = dynamic_cast<const pat::Electron*>(ZREC[0].daughter(1));
+  const pat::Electron* dau0 = dynamic_cast<const pat::Electron*>(ZREC.daughter(0));
+  const pat::Electron* dau1 = dynamic_cast<const pat::Electron*>(ZREC.daughter(1));
 
 if (!dau0) {
      //maybe a shallow clone
-     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (ZREC[0].daughter(0));
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (ZREC.daughter(0));
      if (scc && scc->hasMasterClone()){
        dau0 = dynamic_cast<const pat::Electron*>(scc->masterClone().get()); 
      }
     }
 if (!dau1) {
      //maybe a shallow clone
-     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (ZREC[0].daughter(1));
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (ZREC.daughter(1));
      if (scc && scc->hasMasterClone()){
        dau1 = dynamic_cast<const pat::Electron*>(scc->masterClone().get());
      }
@@ -318,7 +294,7 @@ inline bool GenSelectedInAcceptance(const std::vector<reco::CompositeCandidate>&
 
 // REC SELECTION
   
-inline bool RecSelected(string Flag, string EID, const std::vector<reco::CompositeCandidate>& ZREC){
+inline bool RecSelected(string Flag, string EID, const reco::CompositeCandidate ZREC){
   
   std::vector<const pat::Electron*> zdaughters = ZDaughters(ZREC);
   
@@ -333,13 +309,6 @@ inline bool RecSelected(string Flag, string EID, const std::vector<reco::Composi
   const reco::GsfTrack track1 = *(dau1->gsfTrack());
   assert(&track0 && &track1);
   
-  /*const pat::IsoDeposit* hcalIso0 = dau0->isoDeposit(pat::HCalIso);
-  const pat::IsoDeposit* ecalIso0 = dau0->isoDeposit(pat::ECalIso);
-  const pat::IsoDeposit* hcalIso1 = dau1->isoDeposit(pat::HCalIso);
-  const pat::IsoDeposit* ecalIso1 = dau1->isoDeposit(pat::ECalIso);
-  assert(hcalIso0 && hcalIso1);
-  assert(ecalIso0 && ecalIso1);*/
-  
   bool electron_ID0 = false;
   bool electron_ID1 = false;
   
@@ -349,7 +318,7 @@ inline bool RecSelected(string Flag, string EID, const std::vector<reco::Composi
   }
  
   if(Flag=="_Acc"){
-  return ZREC.size()==1 && ZREC[0].mass()>zmassmin && ZREC[0].mass()<zmassmax
+  return ZREC.mass()>zmassmin && ZREC.mass()<zmassmax
          && dau0->pt() > ptelcut && fabs(dau0->eta()) < etaelcut 
          && dau1->pt() > ptelcut && fabs(dau1->eta()) < etaelcut
          && (fabs(dau0->eta())<eta_el_excl_down || fabs(dau0->eta())>eta_el_excl_up) &&
@@ -448,8 +417,6 @@ inline double MinDeltaRZDau_GEN(const std::vector<reco::CompositeCandidate>& ZGE
 	minDeltaRZDau = (Delta_R_GEN(*dau0,jet) < Delta_R_GEN(*dau1,jet)) ? Delta_R_GEN(*dau0,jet) : Delta_R_GEN(*dau1,jet);		
 	}
 	
-	if(!zdaughters.size())std::cout<<"### MINDELTARZDAU_GEN::ZDAUGHTERS SIZE = 0"<<std::endl;
-	
 	return minDeltaRZDau;
 	
 }
@@ -516,7 +483,7 @@ inline double MinDeltaRElectron(const std::vector<pat::Electron>& Electrons, con
 	
 }
 
-inline double MinDeltaRZDau(const std::vector<reco::CompositeCandidate>& ZREC, const reco::Jet& jet){
+inline double MinDeltaRZDau(const reco::CompositeCandidate ZREC, const reco::Jet& jet){
 
         double minDeltaRZDau = -999999;
         
@@ -530,8 +497,6 @@ inline double MinDeltaRZDau(const std::vector<reco::CompositeCandidate>& ZREC, c
 
 	minDeltaRZDau = (Delta_R(*dau0,jet) < Delta_R(*dau1,jet)) ? Delta_R(*dau0,jet) : Delta_R(*dau1,jet);		
 	}
-	
-	if(!zdaughters.size())std::cout<<"### MINDELTARZDAU::ZDAUGHTERS SIZE = 0"<<std::endl;
 	
 	return minDeltaRZDau;
 	
@@ -555,7 +520,7 @@ inline bool GenIsoJet(const std::vector<reco::CompositeCandidate>& ZGEN, const r
 
 // Jet Isolation - RECO
 
-inline bool RecoIsoJet(const std::vector<reco::CompositeCandidate>& ZREC, const reco::Jet& jet){
+inline bool RecoIsoJet(const reco::CompositeCandidate ZREC, const reco::Jet& jet){
 	
 	bool iso_jet = true;
 	
