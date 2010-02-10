@@ -22,7 +22,7 @@ int main() {
   //Job
   string cfgName = "config.py";
   string sourceList = "files_test.txt";
-  string outputName = "test_RL01_10234";
+  string outputName = "test";
   string electronID = "eidRobustLoose";
   
   //Normalization
@@ -31,6 +31,9 @@ int main() {
   string Norm = "True";
   int EventsPerFile = 0;
   string Sumw2= "False";
+  
+  //Gen Particle Matching
+  string GenParticleMatch = "False";
   
   //Modules
   bool GEN = true;
@@ -48,9 +51,9 @@ int main() {
   //Log
   bool Log = false;
   
-  string path = "/raid/sfrosali/Zjets/Commit/CMSSW_3_3_5/src/Firenze/PATAnalysis/bin";
+  string path = "/raid/sfrosali/Zjets/Commit/CMSSW_3_3_5/src/Firenze/PATAnalysis/bin/";
 
-  makeCfg(GEN, RECO, EFF, NTUPLE, Acc, Qual, Imp, Iso, EiD, path.c_str(), cfgName.c_str(), sourceList.c_str(), outputName.c_str(), Norm.c_str(), Sumw2.c_str(), EventsPerFile, electronID.c_str(), xsec, targetLumi);
+  makeCfg(GEN, RECO, EFF, NTUPLE, Acc, Qual, Imp, Iso, EiD, path.c_str(), cfgName.c_str(), sourceList.c_str(), outputName.c_str(), Norm.c_str(), Sumw2.c_str(), EventsPerFile, electronID.c_str(), xsec, targetLumi, GenParticleMatch.c_str());
 
   gEnv->SetValue("Proof.Sandbox", "/raid/sfrosali/.proof");
 
@@ -73,7 +76,7 @@ int main() {
   
  if(Log){ 
  TProofLog *pl = TProof::Mgr("")->GetSessionLogs();
- pl->Save("0.0","/raid/sfrosali/Zjets/Commit/CMSSW_3_3_5/src/Firenze/PATAnalysis/bin");
+ pl->Save("0.0","/raid/sfrosali/Zjets/Commit/CMSSW_3_3_5/src/Firenze/PATAnalysis/bin/");
  }
   
   p->ClearInput();

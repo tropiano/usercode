@@ -245,11 +245,25 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent)
    //// Only first Z considered (higher pt of leading electron)
    int ZNum = 0;
    
+   //Z Reco daughters
+   std::vector<const pat::Electron*> zdaughters;
+   const pat::Electron *dau0, *dau1;
+   
+   //Reco jets
+   std::vector<const pat::Jet*> recjets = GetJets<pat::Jet>(*jetrecHandle);
+   std::vector<const pat::Jet*> isojets;
+   std::vector<const pat::Jet*> notisojets;
+   
    if(zrecHandle->size()){
    
-   //Z Reco daughters
-   std::vector<const pat::Electron*> zdaughters = ZDaughters((*zrecHandle)[ZNum]);
-   const pat::Electron *dau0, *dau1;
+   zdaughters = ZDaughters((*zrecHandle)[ZNum]);
+      
+   for(unsigned int i = 0; i < recjets.size(); i++){
+   if(RecoIsoJet((*zrecHandle)[ZNum],*recjets[i]))isojets.push_back(recjets[i]);
+   if(!RecoIsoJet((*zrecHandle)[ZNum],*recjets[i]))notisojets.push_back(recjets[i]);
+   }
+   
+   }
    
    //Z Gen daughters
    std::vector<const reco::Candidate*> zgendaughters = ZGENDaughters(*zgenHandle);
@@ -288,16 +302,6 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent)
      if(GenIsoJet(*zgenHandle,*genjets[i]))isogenjets.push_back(genjets[i]);
      }
      
-     //Reco jets
-     std::vector<const pat::Jet*> recjets = GetJets<pat::Jet>(*jetrecHandle);
-     std::vector<const pat::Jet*> isojets;
-     std::vector<const pat::Jet*> notisojets;
-      
-     for(unsigned int i = 0; i < recjets.size(); i++){
-     if(RecoIsoJet((*zrecHandle)[ZNum],*recjets[i]))isojets.push_back(recjets[i]);
-     if(!RecoIsoJet((*zrecHandle)[ZNum],*recjets[i]))notisojets.push_back(recjets[i]);
-     }
-     
      if(zdaughters.size() != 0){   
      
      dau0 = zdaughters[0];
@@ -334,6 +338,8 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent)
      EffDenom_GenIsoJetNumber->Fill(isogenjets.size());
       
      }
+     
+     if(zrecHandle->size()){
      
      //Events with a selected Zee 1
      if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])){

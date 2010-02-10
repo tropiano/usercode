@@ -100,6 +100,8 @@ private:
   
   bool _Sumw2;
   
+  bool _GenParticleMatch;
+  
   int _entries, _EventsPerFile, _Acc, _Qual, _Imp, _Iso, _EiD;
   
   std::string _electronID;

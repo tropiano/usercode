@@ -56,7 +56,7 @@ AllEl_Pt_Acc(0), AllEl_Eta_Acc(0), AllEl_Hit_Acc(0), AllEl_fBrem_Acc(0), AllEl_I
 
 DeltaRvsCharge_JetRec(0), DeltaRvsCharge_JetRec_Iso(0), DeltaRvsCharge_JetRec_NotIso(0),
 
-_norm(1.), _dir(0), _Norm(true), _Sumw2(false), _entries(0), _EventsPerFile(0), _electronID("eidRobustTight"), _file(0), _Acc(1), _Qual(2), _Imp(3), _Iso(4), _EiD(5), _histoVector()
+_norm(1.), _dir(0), _Norm(true), _Sumw2(false), _entries(0), _EventsPerFile(0), _GenParticleMatch(false), _electronID("eidRobustTight"), _file(0), _Acc(1), _Qual(2), _Imp(3), _Iso(4), _EiD(5), _histoVector()
 
 { }
 
@@ -71,6 +71,7 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _Norm      = iConfig.getParameter<bool>("Norm");
    _Sumw2      = iConfig.getParameter<bool>("Sumw2");
    _EventsPerFile    = iConfig.getParameter<double>("EventsPerFile");
+   _GenParticleMatch = iConfig.getParameter<bool>("GenParticleMatch");
    
    //Selections
    _Acc = iConfig.getParameter<double>("Acc");
@@ -466,6 +467,8 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
    ZdauOCinAcc = false; 
    ZdauSCinAcc = false;
 
+   if(_GenParticleMatch){
+
    const reco::Candidate *mom;
      
    if(genCorrElectron.isNonnull()){
@@ -492,8 +495,22 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
     }
     }
     }
-     } 
+     }
+   
+   }else{
+   
+   if(genCorrElectron.isNonnull()){
+   if(genCorrElectron->pt() > ptelcut && fabs(genCorrElectron->eta()) < etaelcut && (fabs(genCorrElectron->eta())<eta_el_excl_down || fabs(genCorrElectron->eta())>eta_el_excl_up)){   
+     ZdauOCinAcc=true; 
+    }}
 
+   if(genMisElectron.isNonnull()){
+   if(genMisElectron->pt() > ptelcut && fabs(genMisElectron->eta()) < etaelcut && (fabs(genMisElectron->eta())<eta_el_excl_down || fabs(genMisElectron->eta())>eta_el_excl_up)){
+      ZdauSCinAcc=true; 
+    }}
+    
+    }
+   
    if(ZdauOCinAcc){
 
    fBremVsEta->Fill(selectedelectrons[i].eta(),selectedelectrons[i].fbrem());
