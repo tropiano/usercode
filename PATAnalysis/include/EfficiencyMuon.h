@@ -40,6 +40,9 @@ public :
     fake rate                 = [#Z rec in acceptance WITHOUT a Z gen in acceptance]/[#Z rec in acceptance WITH a Z gen in acceptance]
    */
 
+   TH1D *_acc_den, *_acc_num;
+   
+
    //plots to estimate reconstruction efficiency step by step
    TH1D *TwoMuons, *TM_MuTriggered, *TM_MuT_OppositeCharge, *TM_MuT_OC_Mass, *TM_MuT_OC_M_QualityCuts, *TM_MuT_OC_M_QC_DXY, *TM_MuT_OC_M_QC_DXY_Iso;
    TH1D * TM_MuJetTriggered;

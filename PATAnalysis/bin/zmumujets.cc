@@ -64,7 +64,7 @@ int main(){
 
   delete out;
 */  
-/*
+
   //process the signal
   TDSet* signalDS = getDS("signaldata.txt");
   TNamed* configsignal = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/config_signal.py");
@@ -72,6 +72,15 @@ int main(){
   p->Process(signalDS, "FWLiteTSelector");
   delete signalDS;
 
+  TFile* in = new TFile("signal.root");
+  TFile* out = new TFile("signal_eff.root", "RECREATE");
+
+  EfficiencyAnalyzerMuon mueffana(in, out, "EfficiencyMuon");
+  mueffana.analyze();
+
+  delete out;
+  
+/*
   //merge results
   TFileMerger fm(true);
   fm.AddFile("Mu.root");
@@ -79,6 +88,7 @@ int main(){
   fm.OutputFile("total.root");
   fm.Merge();
 */
+/*
   TDSet* dsdata = getDS("tracks_data.txt") ;
   TNamed* configdata = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/config_Dec09_data.py");
   p->AddInput(configdata);
@@ -93,5 +103,5 @@ int main(){
   p->ClearInput();
   delete dsmc;
   p->Close();
-
+*/
 }

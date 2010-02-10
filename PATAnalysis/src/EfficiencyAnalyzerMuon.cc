@@ -17,6 +17,9 @@ void EfficiencyAnalyzerMuon::analyze(){
     return;
   }
 
+  TH1D *acc_num = (TH1D *) _dir->Get("acceptance_numerator");
+  TH1D *acc_den = (TH1D *) _dir->Get("acceptance_denominator");
+
   TH1D *TwoMuons = (TH1D *) _dir->Get("TwoMuons");
   TH1D *TM_MuTriggered = (TH1D *) _dir->Get("TM_MuT");
   TH1D *TM_MuT_OppositeCharge = (TH1D *) _dir->Get("TM_MuT_OppositeCharge");
@@ -29,6 +32,9 @@ void EfficiencyAnalyzerMuon::analyze(){
   TH1D *generalefficiency_denominator = (TH1D *) _dir->Get("efficiency_denominator");
 
   _output->cd();
+  TGraphAsymmErrors acceptance(acc_num, acc_den);
+  acceptance.SetNameTitle("acceptance", "acceptance");
+  
   TGraphAsymmErrors efficiency(generalefficiency_numerator, generalefficiency_denominator);
   efficiency.SetNameTitle("efficiency", "Reconstruction efficiency");
 
@@ -53,6 +59,7 @@ void EfficiencyAnalyzerMuon::analyze(){
   TGraphAsymmErrors TM_MuT_OC_M_QC_DXY_Iso_Eff(TM_MuT_OC_M_QC_DXY_Iso, TM_MuT_OC_M_QC_DXY);
   TM_MuT_OC_M_QC_DXY_Iso_Eff.SetNameTitle("TM_MuT_OC_M_QC_DXY_Iso_Eff", "2 triggered muons Opposite Charge Quality Cuts and DXY cut, mass constraint with isolation eff");
 
+  acceptance.Write();
 
   efficiency.Write();
 
@@ -63,8 +70,8 @@ void EfficiencyAnalyzerMuon::analyze(){
   TM_MuT_OC_M_QualityCuts_Eff.Write();
   TM_MuT_OC_M_QC_DXY_Eff.Write();
   TM_MuT_OC_M_QC_DXY_Iso_Eff.Write();
-
+/*
   TagAndProbeAnalyzer tpana(_dir, _output, "TM_MuT_OC_M_QC_DXY_Iso");
   tpana.analyze(2);
- 
+*/ 
 }

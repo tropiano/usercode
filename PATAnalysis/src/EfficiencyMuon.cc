@@ -34,6 +34,8 @@ void EfficiencyMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
   _outputfile->cd();
   TDirectory* dir = _outputfile->mkdir(dirname.c_str(), dirname.c_str());
   dir->cd();
+  _acc_den                      = new TH1D("acceptance_denominator", "acceptance_denominator", _nbin, _xmin, _xmax); 
+  _acc_num                      = new TH1D("acceptance_numerator", "acceptance_numerator", _nbin, _xmin, _xmax); 
   generalefficiency_numerator   = new TH1D("efficiency_numerator", "efficiency Vs #jets", _nbin, _xmin, _xmax);
   _vectorHistos.push_back(generalefficiency_numerator);
   generalefficiency_denominator = new TH1D("efficiency_denominator", "efficiency Vs #jets denominator", _nbin, _xmin, _xmax);
@@ -122,7 +124,13 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
 
    bool denominatorCondition = _requireGenInAcceptance ? GenSelectedInAcceptanceMuon(*zGenHandle) : true;
 
-   if (denominatorCondition) generalefficiency_denominator->Fill(size, w);     
+   bool generatedCondition   = _requireGenInAcceptance ? GenSelectedMuon(*zGenHandle): true;
+   if (generatedCondition) _acc_den->Fill(size, w);
+
+   if (denominatorCondition) {
+      generalefficiency_denominator->Fill(size, w);
+      _acc_num->Fill(size, w); 
+   }    
 
    if (!denominatorCondition) return;
 
