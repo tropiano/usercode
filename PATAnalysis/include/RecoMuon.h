@@ -63,6 +63,8 @@ private:
 
   double _norm;
 
+  std::string _zcandSrc;
+
   TFile* _file; 
 
   TDirectory* _dir;

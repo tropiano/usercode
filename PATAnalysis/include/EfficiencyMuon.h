@@ -45,8 +45,11 @@ public :
 
    //plots to estimate reconstruction efficiency step by step
    TH1D *TwoMuons, *TM_MuTriggered, *TM_MuT_OppositeCharge, *TM_MuT_OC_Mass, *TM_MuT_OC_M_QualityCuts, *TM_MuT_OC_M_QC_DXY, *TM_MuT_OC_M_QC_DXY_Iso;
-   TH1D * TM_MuJetTriggered;
-   TH1D * TM_JetTriggered;
+   TH1D *TwoMuonsVsMuPt, *TM_MuTriggeredVsMuPt, *TM_MuT_OppositeChargeVsMuPt, *TM_MuT_OC_MassVsMuPt, *TM_MuT_OC_M_QualityCutsVsMuPt, *TM_MuT_OC_M_QC_DXYVsMuPt, *TM_MuT_OC_M_QC_DXY_IsoVsMuPt;
+   TH1D *TwoMuonsVsMuEta, *TM_MuTriggeredVsMuEta, *TM_MuT_OppositeChargeVsMuEta, *TM_MuT_OC_MassVsMuEta, *TM_MuT_OC_M_QualityCutsVsMuEta, *TM_MuT_OC_M_QC_DXYVsMuEta, *TM_MuT_OC_M_QC_DXY_IsoVsMuEta;
+   TH1D *TM_MuT_OC_MassVsMass, *TM_MuT_OC_M_QualityCutsVsMass, *TM_MuT_OC_M_QC_DXYVsMass, *TM_MuT_OC_M_QC_DXY_IsoVsMass;
+   TH1D * TM_MuJetTriggered, *TM_MuJetTriggeredVsMuPt, *TM_MuJetTriggeredVsMuEta;
+   TH1D * TM_JetTriggered, *TM_JetTriggeredVsMuPt, *TM_JetTriggeredVsMuEta;
 
    //plots to estimate fake rate (a "fake" is an event reconstructed in acceptance but generated outside acceptance)
    //the global selection efficiency (#Zrec in acceptance/#Zgen total ) is UNAFFECTED by these fake, because even if they were generated outside acceptance
@@ -75,6 +78,10 @@ private:
    double _xmin;
 
    double _xmax;
+
+   std::string _zcandSrc;
+
+   bool _oppositeCharge;
 
    bool _requireGenInAcceptance;
 

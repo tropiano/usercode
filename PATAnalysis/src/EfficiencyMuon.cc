@@ -28,6 +28,8 @@ void EfficiencyMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
   _nbin      = iConfig.getParameter<uint32_t>("NBin");
   _xmin      = iConfig.getParameter<double>("XMin");
   _xmax      = iConfig.getParameter<double>("XMax");
+  _zcandSrc  = iConfig.getParameter<std::string>("Zsource");
+  _oppositeCharge = iConfig.getParameter<bool>("OppositeCharge");
   _requireGenInAcceptance = iConfig.getParameter<bool>("RequireGenInAcceptance");
   
 
@@ -58,6 +60,61 @@ void EfficiencyMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
   _vectorHistos.push_back(TM_MuJetTriggered);
   TM_JetTriggered               = new TH1D("TM_JetTriggered", "TM_JetTriggered", _nbin, _xmin, _xmax);
   _vectorHistos.push_back(TM_JetTriggered);
+
+ 
+  TwoMuonsVsMuPt                      = new TH1D("TwoMuonsVsMuPt", "TwoMuonsVsMuPt", 500, 0., 500.);
+  _vectorHistos.push_back(TwoMuonsVsMuPt);
+  TM_MuTriggeredVsMuPt                = new TH1D("TM_MuTVsMuPt", "TM_MuTVsMuPt", 500, 0., 500.);
+  _vectorHistos.push_back(TM_MuTriggeredVsMuPt);
+  TM_MuT_OppositeChargeVsMuPt         = new TH1D("TM_MuT_OppositeChargeVsMuPt", "TM_MuT_OppositeChargeVsMuPt", 500, 0., 500.);
+  _vectorHistos.push_back(TM_MuT_OppositeChargeVsMuPt);
+  TM_MuT_OC_MassVsMuPt                = new TH1D("TM_MuT_OC_MassVsMuPt", "TM_MuT_OC_MassVsMuPt", 500, 0., 500.);
+  _vectorHistos.push_back(TM_MuT_OC_MassVsMuPt);
+  TM_MuT_OC_M_QualityCutsVsMuPt       = new TH1D("TM_MuT_OC_M_QualityCutsVsMuPt", "TM_MuT_OC_M_QualityCutsVsMuPt", 500, 0., 500.);
+  _vectorHistos.push_back(TM_MuT_OC_M_QualityCutsVsMuPt);
+  TM_MuT_OC_M_QC_DXYVsMuPt            = new TH1D("TM_MuT_OC_M_QC_DXYVsMuPt", "TM_MuT_OC_M_QC_DXYVsMuPt", 500, 0., 500.);
+  _vectorHistos.push_back(TM_MuT_OC_M_QC_DXYVsMuPt);
+  TM_MuT_OC_M_QC_DXY_IsoVsMuPt        = new TH1D("TM_MuT_OC_M_QC_DXY_IsoVsMuPt", "TM_MuT_OC_M_QC_DXY_IsoVsMuPt", 500, 0., 500.);
+  _vectorHistos.push_back(TM_MuT_OC_M_QC_DXY_IsoVsMuPt);
+  TM_MuJetTriggeredVsMuPt             = new TH1D("TM_MuJetTriggeredVsMuPt", "TM_MuJetTriggeredVsMuPt", 500, 0., 500.);
+  _vectorHistos.push_back(TM_MuJetTriggeredVsMuPt);
+  TM_JetTriggeredVsMuPt               = new TH1D("TM_JetTriggeredVsMuPt", "TM_JetTriggeredVsMuPt", 500, 0., 500.);
+  _vectorHistos.push_back(TM_JetTriggeredVsMuPt);
+        
+  TwoMuonsVsMuEta                      = new TH1D("TwoMuonsVsMuEta", "TwoMuonsVsMuEta", 300, -3, 3);
+  _vectorHistos.push_back(TwoMuonsVsMuEta);
+  TM_MuTriggeredVsMuEta                = new TH1D("TM_MuTVsMuEta", "TM_MuTVsMuEta", 300, -3, 3);
+  _vectorHistos.push_back(TM_MuTriggeredVsMuEta);
+  TM_MuT_OppositeChargeVsMuEta         = new TH1D("TM_MuT_OppositeChargeVsMuEta", "TM_MuT_OppositeChargeVsMuEta", 300, -3, 3);
+  _vectorHistos.push_back(TM_MuT_OppositeChargeVsMuEta);
+  TM_MuT_OC_MassVsMuEta                = new TH1D("TM_MuT_OC_MassVsMuEta", "TM_MuT_OC_MassVsMuEta", 300, -3, 3);
+  _vectorHistos.push_back(TM_MuT_OC_MassVsMuEta);
+  TM_MuT_OC_M_QualityCutsVsMuEta       = new TH1D("TM_MuT_OC_M_QualityCutsVsMuEta", "TM_MuT_OC_M_QualityCutsVsMuEta", 300, -3, 3);
+  _vectorHistos.push_back(TM_MuT_OC_M_QualityCutsVsMuEta);
+  TM_MuT_OC_M_QC_DXYVsMuEta            = new TH1D("TM_MuT_OC_M_QC_DXYVsMuEta", "TM_MuT_OC_M_QC_DXYVsMuEta", 300, -3, 3);
+  _vectorHistos.push_back(TM_MuT_OC_M_QC_DXYVsMuEta);
+  TM_MuT_OC_M_QC_DXY_IsoVsMuEta        = new TH1D("TM_MuT_OC_M_QC_DXY_IsoVsMuEta", "TM_MuT_OC_M_QC_DXY_IsoVsMuEta", 300, -3, 3);
+  _vectorHistos.push_back(TM_MuT_OC_M_QC_DXY_IsoVsMuEta);
+  TM_MuJetTriggeredVsMuEta             = new TH1D("TM_MuJetTriggeredVsMuEta", "TM_MuJetTriggeredVsMuEta", 300, -3, 3);
+  _vectorHistos.push_back(TM_MuJetTriggeredVsMuEta);
+  TM_JetTriggeredVsMuEta               = new TH1D("TM_JetTriggeredVsMuEta", "TM_JetTriggeredVsMuEta", 300, -3, 3);
+  _vectorHistos.push_back(TM_JetTriggeredVsMuEta);
+
+  TM_MuT_OC_MassVsMass                = new TH1D("TM_MuT_OC_MassVsMass", "TM_MuT_OC_MassVsMass", 100, 50., 150.);
+  _vectorHistos.push_back(TM_MuT_OC_MassVsMass);
+  TM_MuT_OC_M_QualityCutsVsMass       = new TH1D("TM_MuT_OC_M_QualityCutsVsMass", "TM_MuT_OC_M_QualityCutsVsMass", 100, 50., 150.);
+  _vectorHistos.push_back(TM_MuT_OC_M_QualityCutsVsMass);
+  TM_MuT_OC_M_QC_DXYVsMass            = new TH1D("TM_MuT_OC_M_QC_DXYVsMass", "TM_MuT_OC_M_QC_DXYVsMass", 100, 50., 150.);
+  _vectorHistos.push_back(TM_MuT_OC_M_QC_DXYVsMass);
+  TM_MuT_OC_M_QC_DXY_IsoVsMass        = new TH1D("TM_MuT_OC_M_QC_DXY_IsoVsMass", "TM_MuT_OC_M_QC_DXY_IsoVsMass", 100, 50., 150.);
+  _vectorHistos.push_back(TM_MuT_OC_M_QC_DXY_IsoVsMass);
+
+  std::vector<TH1*>::const_iterator ibeg = _vectorHistos.begin(); 
+  std::vector<TH1*>::const_iterator iend = _vectorHistos.end(); 
+  for (std::vector<TH1*>::const_iterator i = ibeg; i != iend; ++i){
+    (*i)->Sumw2();
+  } 
+ 
   dir->cd("-");
 
   std::vector<bool (*)(const reco::Candidate&)> tag_cuts;
@@ -106,7 +163,7 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
    muonHandle.getByLabel(iEvent, "selectedMuons");
 
    fwlite::Handle<std::vector<reco::CompositeCandidate> > zHandle;
-   zHandle.getByLabel(iEvent, "zmumurec");
+   zHandle.getByLabel(iEvent, _zcandSrc.c_str());
 
    fwlite::Handle<std::vector<pat::Jet> > jetHandle;
    jetHandle.getByLabel(iEvent, "selectedJets");
@@ -182,8 +239,10 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
 
    bool recselectedTwoMuons = RecSelected_GlobalMuons(allmuons,2).first;
    bool recselectedTM_MuTriggered = recselectedTwoMuons && isMuTriggered;
-   bool recselectedTM_MuT_OppositeCharge = RecSelected_OppositeCharge(allmuons).first && recselectedTM_MuTriggered;
-   bool recselectedTM_MuT_OC_Mass = zHandle->size()==1 && RecSelected_Mass(*zHandle) && RecSelected_GlobalMuons(muonsfromZ, 2).first && isMuTriggered && RecSelected_OppositeCharge(muonsfromZ).first; 
+   //bool recselectedTM_MuT_OppositeCharge = RecSelected_OppositeCharge(allmuons).first && recselectedTM_MuTriggered;
+   bool recselectedTM_MuT_Charge = _oppositeCharge ? RecSelected_Charge(allmuons, -1).first && recselectedTM_MuTriggered : 
+                                                     RecSelected_Charge(allmuons,  1).first && recselectedTM_MuTriggered;
+   bool recselectedTM_MuT_OC_Mass = zHandle->size()==1 && RecSelected_Mass(*zHandle) && RecSelected_GlobalMuons(muonsfromZ, 2).first && isMuTriggered; //&& RecSelected_OppositeCharge(muonsfromZ).first; these should already have the desired charge assignment
    bool recselectedTM_MuT_OC_M_QualityCuts = RecSelected_QualityCuts(muonsfromZ, 2).first && recselectedTM_MuT_OC_Mass;
    bool recselectedTM_MuT_OC_M_QC_DXY = RecSelected_DXY(muonsfromZ, 2).first && recselectedTM_MuT_OC_M_QualityCuts;
    bool recselectedTM_MuT_OC_M_QC_DXY_Iso = RecSelected_Isolation(muonsfromZ, _isocut, 2).first && recselectedTM_MuT_OC_M_QC_DXY;
@@ -191,20 +250,61 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
    bool recselectedTM_MuJetTriggered = recselectedTwoMuons && isMuTriggered && isJTriggered;
    bool recselectedTM_JetTriggered = recselectedTwoMuons && isJTriggered;
 
-   if (recselectedTwoMuons) TwoMuons->Fill(size, w);
-   if (recselectedTM_MuTriggered) TM_MuTriggered->Fill(size, w);
-   if (recselectedTM_MuT_OppositeCharge) TM_MuT_OppositeCharge->Fill(size, w);
-   if (recselectedTM_MuT_OC_Mass) TM_MuT_OC_Mass->Fill(size, w);
-   if (recselectedTM_MuT_OC_M_QualityCuts) TM_MuT_OC_M_QualityCuts->Fill(size, w);
-   if (recselectedTM_MuT_OC_M_QC_DXY) TM_MuT_OC_M_QC_DXY->Fill(size, w);
-   if (recselectedTM_MuT_OC_M_QC_DXY_Iso) TM_MuT_OC_M_QC_DXY_Iso->Fill(size, w);
+   if (recselectedTwoMuons) {
+      TwoMuons->Fill(size, w);
+      TwoMuonsVsMuPt->Fill(allmuons.front()->pt(), w);
+      TwoMuonsVsMuEta->Fill(allmuons.front()->eta(), w);
+   }   
+   if (recselectedTM_MuTriggered) {
+      TM_MuTriggered->Fill(size, w);
+      TM_MuTriggeredVsMuPt->Fill(allmuons.front()->pt(), w);
+      TM_MuTriggeredVsMuEta->Fill(allmuons.front()->eta(), w);
+   }   
+   if (recselectedTM_MuT_Charge) {
+      TM_MuT_OppositeCharge->Fill(size, w);
+      TM_MuT_OppositeChargeVsMuPt->Fill(allmuons.front()->pt(), w);
+      TM_MuT_OppositeChargeVsMuEta->Fill(allmuons.front()->eta(), w);
+   }   
+   if (recselectedTM_MuT_OC_Mass) {
+      TM_MuT_OC_Mass->Fill(size, w);
+      TM_MuT_OC_MassVsMuPt->Fill(muonsfromZ.front()->pt(), w);
+      TM_MuT_OC_MassVsMuEta->Fill(muonsfromZ.front()->eta(), w);
+      TM_MuT_OC_MassVsMass->Fill((*zHandle)[0].mass(), w);
+   }   
+   if (recselectedTM_MuT_OC_M_QualityCuts) {
+      TM_MuT_OC_M_QualityCuts->Fill(size, w);
+      TM_MuT_OC_M_QualityCutsVsMuPt->Fill(muonsfromZ.front()->pt(), w);  
+      TM_MuT_OC_M_QualityCutsVsMuEta->Fill(muonsfromZ.front()->eta(), w);
+      TM_MuT_OC_M_QualityCutsVsMass->Fill((*zHandle)[0].mass(), w);
+   }   
+   if (recselectedTM_MuT_OC_M_QC_DXY) {
+      TM_MuT_OC_M_QC_DXY->Fill(size, w);
+      TM_MuT_OC_M_QC_DXYVsMuPt->Fill(muonsfromZ.front()->pt(), w);
+      TM_MuT_OC_M_QC_DXYVsMuEta->Fill(muonsfromZ.front()->eta(), w);
+      TM_MuT_OC_M_QC_DXYVsMass->Fill((*zHandle)[0].mass(), w);
+
+   }   
+   if (recselectedTM_MuT_OC_M_QC_DXY_Iso) {
+      TM_MuT_OC_M_QC_DXY_Iso->Fill(size, w);
+      TM_MuT_OC_M_QC_DXY_IsoVsMuPt->Fill(muonsfromZ.front()->pt(), w);
+      TM_MuT_OC_M_QC_DXY_IsoVsMuEta->Fill(muonsfromZ.front()->eta(), w);
+      TM_MuT_OC_M_QC_DXY_IsoVsMass->Fill((*zHandle)[0].mass(), w);
+   }   
    
-   if (recselectedTM_JetTriggered) TM_JetTriggered->Fill(size, w);
-   if (recselectedTM_MuJetTriggered) TM_MuJetTriggered->Fill(size, w);
+   if (recselectedTM_JetTriggered) {
+      TM_JetTriggered->Fill(size, w);
+      TM_JetTriggeredVsMuPt->Fill(allmuons.front()->pt(), w);
+      TM_JetTriggeredVsMuEta->Fill(allmuons.front()->eta(), w);
+   }   
+   if (recselectedTM_MuJetTriggered) {
+      TM_MuJetTriggered->Fill(size, w);
+      TM_MuJetTriggeredVsMuPt->Fill(allmuons.front()->pt(), w);
+      TM_MuJetTriggeredVsMuEta->Fill(allmuons.front()->eta(), w);
+   }   
 
    //tag and probe 
    if (recselectedTM_MuT_OC_Mass) {
-      //FEXME!!!!!!!!!!! we need to select the Z candidate
+      //FIXME!!!!!!!!!!! we need to select the Z candidate
       if (zHandle->size() == 1){
         //_tp_TM_MuT_OC_M_QC->fill(_zmuons, _zs, x, w);
         //_tp_TM_MuT_OC_M_QC_DXY->fill(_zmuons, _zs, x, w);

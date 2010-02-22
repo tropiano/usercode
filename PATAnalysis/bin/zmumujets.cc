@@ -64,7 +64,7 @@ int main(){
 
   delete out;
 */  
-
+/*
   //process the signal
   TDSet* signalDS = getDS("signaldata.txt");
   TNamed* configsignal = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/config_signal.py");
@@ -79,11 +79,49 @@ int main(){
   mueffana.analyze();
 
   delete out;
+*/ 
+
+/*
+  TDSet* qcdDS = getDS("qcd.txt");
+  TNamed* configqcd = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/config_background_QCD.py");
+  p->AddInput(configqcd);       
+  p->Process(qcdDS, "FWLiteTSelector");
+*/  
+/*  TNamed* configqcd_samesign = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/config_background_samesign.py");
+  p->AddInput(configqcd_samesign);
+  p->Process(qcdDS, "FWLiteTSelector");
+*/  
+  //delete qcdDS;
+
+/*  
+  TDSet* ttbarDS = getDS("ttbar.txt");
+  TNamed* configttbar = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/config_background_TTbar.py");
+  p->AddInput(configttbar);
+  p->Process(ttbarDS, "FWLiteTSelector");
+  delete ttbarDS;
+
+  TDSet* wDS = getDS("w.txt");
+  TNamed* configw = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/config_background_Wjets.py");
+  p->AddInput(configw);
+  p->Process(wDS, "FWLiteTSelector");
+  delete wDS;
+*/
+  TDSet* signalDS = getDS("zmumu.txt");
+/*  TNamed* configsignal = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/config_signal.py");
+  p->AddInput(configsignal);
+  p->Process(signalDS, "FWLiteTSelector");*/
+  TNamed* configsignal_samesign = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/config_signal_samesign.py");
+  p->AddInput(configsignal_samesign);
+  p->Process(signalDS, "FWLiteTSelector");
+  delete signalDS;
+  
   
 /*
+
   //merge results
   TFileMerger fm(true);
-  fm.AddFile("Mu.root");
+  fm.AddFile("qcd.root");
+  fm.AddFile("ttbar.root");
   fm.AddFile("signal.root");
   fm.OutputFile("total.root");
   fm.Merge();

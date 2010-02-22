@@ -72,6 +72,7 @@ void RecoMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
    _isocut    = iConfig.getParameter<double>("IsoCut");
    _etajetmax = iConfig.getParameter<double>("MaxEtaJet");
    _norm      = iConfig.getParameter<double>("ScaleFactor");
+   _zcandSrc  = iConfig.getParameter<std::string>("Zsource");
 
    //_file = proofFile->OpenFile("RECREATE");
    cout << "RecoMuon file name : " << _file->GetName() << endl;
@@ -114,11 +115,11 @@ void RecoMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
    _histoVector.push_back(recLeadJetPt);
    recLeadJetEta = new TH1D("recLeadJetEta", "Reconstructed Leading Jet #eta", 100, -5, 5); 
    _histoVector.push_back(recLeadJetEta);
-   std::vector<TH1D*>::const_iterator ibeg = _histoVector.begin(); 
+  /* std::vector<TH1D*>::const_iterator ibeg = _histoVector.begin(); 
    std::vector<TH1D*>::const_iterator iend = _histoVector.end(); 
   for (std::vector<TH1D*>::const_iterator i = ibeg; i != iend; ++i){
     (*i)->Sumw2();
-  }
+  }*/
   _dir->cd("-");
    
   cout << "RecoMuon Worker built." << endl;   
@@ -135,14 +136,14 @@ void  RecoMuon::process(const fwlite::Event& iEvent)
 {
 
 
-   double weight = 1.;
+   //double weight = 1.;
    _file->cd();
 
    fwlite::Handle<std::vector<pat::Muon> > muonHandle;
    muonHandle.getByLabel(iEvent, "selectedMuons");
 
    fwlite::Handle<std::vector<reco::CompositeCandidate> > zHandle;
-   zHandle.getByLabel(iEvent, "zmumurec");
+   zHandle.getByLabel(iEvent, _zcandSrc.c_str());//"zmumurec");
 
    fwlite::Handle<std::vector<pat::Jet> > jetHandle;
    jetHandle.getByLabel(iEvent, "selectedJets");
@@ -185,13 +186,13 @@ void  RecoMuon::process(const fwlite::Event& iEvent)
    //if (RecSelected(zHandle, zHandleDauMuon, _isocut)){
    if (RecSelectedWithTrigger(*zHandle, *triggerHandle, _isocut, dau0, dau1)){
       //cout << "PASSED!" << endl;
-      recPtZ->Fill((*zHandle)[0].pt());
-      recEtaZ->Fill((*zHandle)[0].eta());
-      recMassZ->Fill((*zHandle)[0].mass());
-      recLeadMuPt->Fill((*zHandle)[0].daughter(0)->pt());
-      recLeadMuEta->Fill((*zHandle)[0].daughter(0)->eta());
-      recSecMuPt->Fill((*zHandle)[0].daughter(1)->pt());
-      recSecMuEta->Fill((*zHandle)[0].daughter(1)->eta());
+      recPtZ->Fill((*zHandle)[0].pt(), _norm);
+      recEtaZ->Fill((*zHandle)[0].eta(), _norm);
+      recMassZ->Fill((*zHandle)[0].mass(), _norm);
+      recLeadMuPt->Fill((*zHandle)[0].daughter(0)->pt(), _norm);
+      recLeadMuEta->Fill((*zHandle)[0].daughter(0)->eta(), _norm);
+      recSecMuPt->Fill((*zHandle)[0].daughter(1)->pt(), _norm);
+      recSecMuEta->Fill((*zHandle)[0].daughter(1)->eta(), _norm);
    
    
       std::vector<const pat::Jet*> recjets = GetJets<pat::Jet>(*jetHandle, _ptjetmin, _etajetmax);
@@ -210,30 +211,30 @@ void  RecoMuon::process(const fwlite::Event& iEvent)
       addHistosVsMulti(recjets.size(), "recMu2EtaExcl", " reconstructed sec #mu #eta spectrum", 100, -5., 5., recMu2EtaVsExclMulti);   
       _dir->cd("-");
 
-      recMulti->Fill(recjets.size());
+      recMulti->Fill(recjets.size(), _norm);
 
       if (recjets.size()){
-        recLeadJetPt->Fill(recjets[0]->pt());
-        recLeadJetEta->Fill(recjets[0]->eta());
+        recLeadJetPt->Fill(recjets[0]->pt(), _norm);
+        recLeadJetEta->Fill(recjets[0]->eta(), _norm);
         for (unsigned int i = 0; i < recjets.size(); ++i){
-          recJetPtVsInclMulti[i+1]->Fill(recjets[i]->pt(), weight);
-          recJetEtaVsInclMulti[i+1]->Fill(recjets[i]->eta(), weight);
+          recJetPtVsInclMulti[i+1]->Fill(recjets[i]->pt(), _norm);
+          recJetEtaVsInclMulti[i+1]->Fill(recjets[i]->eta(), _norm);
         }
       }
 
       //fill inclusive histograms
       for (unsigned int i = 0; i < recjets.size()+1; ++i){
-        recZPtVsInclMulti[i]->Fill((*zHandle)[0].pt(), weight);
-        recZEtaVsInclMulti[i]->Fill((*zHandle)[0].eta(), weight);
+        recZPtVsInclMulti[i]->Fill((*zHandle)[0].pt(), _norm);
+        recZEtaVsInclMulti[i]->Fill((*zHandle)[0].eta(), _norm);
       }
 
       //fill exclusive histograms
-      recZPtVsExclMulti[recjets.size()]->Fill((*zHandle)[0].pt(), weight);
-      recZEtaVsExclMulti[recjets.size()]->Fill((*zHandle)[0].eta(), weight);
-      recMu1PtVsExclMulti[recjets.size()]->Fill(dau0->pt(), weight);
-      recMu1EtaVsExclMulti[recjets.size()]->Fill(dau0->eta(), weight);
-      recMu2PtVsExclMulti[recjets.size()]->Fill(dau1->pt(), weight);
-      recMu2EtaVsExclMulti[recjets.size()]->Fill(dau1->eta(), weight);
+      recZPtVsExclMulti[recjets.size()]->Fill((*zHandle)[0].pt(), _norm);
+      recZEtaVsExclMulti[recjets.size()]->Fill((*zHandle)[0].eta(), _norm);
+      recMu1PtVsExclMulti[recjets.size()]->Fill(dau0->pt(), _norm);
+      recMu1EtaVsExclMulti[recjets.size()]->Fill(dau0->eta(), _norm);
+      recMu2PtVsExclMulti[recjets.size()]->Fill(dau1->pt(), _norm);
+      recMu2EtaVsExclMulti[recjets.size()]->Fill(dau1->eta(), _norm);
 
 
       
@@ -277,8 +278,10 @@ void RecoMuon::finalize(){
 
    std::vector<TH1D*>::const_iterator ibeg = _histoVector.begin();
    std::vector<TH1D*>::const_iterator iend = _histoVector.end();
+   //use the errors as they were from real data 
    for (std::vector<TH1D*>::const_iterator i = ibeg; i != iend; ++i){
-     if (*i) (*i)->Scale(_norm);
+     if (*i) //(*i)->Scale(_norm);
+      (*i)->Sumw2();
    }
 
    

@@ -20,7 +20,8 @@ process.zmumurec = cms.PSet (
   MinPtJet    = cms.double(30.),
   MaxEtaJet   = cms.double(3.),
   ScaleFactor = cms.double(1.),
-  IsoCut      = cms.double(0.3)
+  IsoCut      = cms.double(0.3),
+  Zsource     = cms.string("zmumurec")
 )
 
 process.zmumueff = cms.PSet (
@@ -33,5 +34,7 @@ process.zmumueff = cms.PSet (
   NBin        = cms.uint32(10),
   XMin        = cms.double(-0.5),
   XMax        = cms.double(9.5),
-  IsoCut      = cms.double(0.3)
+  IsoCut      = cms.double(0.3),
+  Zsource     = cms.string("zmumurec"),
+  OppositeCharge = cms.bool(True)
 )

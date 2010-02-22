@@ -181,7 +181,7 @@ inline std::pair<bool, std::vector<const pat::Muon*> > RecSelected_GlobalMuons(c
   else return std::make_pair(true, output);
 }
 
-inline std::pair<bool, std::vector<const pat::Muon*> > RecSelected_OppositeCharge(const std::vector<const pat::Muon*>& MuREC) {
+inline std::pair<bool, std::vector<const pat::Muon*> > RecSelected_Charge(const std::vector<const pat::Muon*>& MuREC, int product = -1.) {
   //if (!RecSelectedTwoMuons(MuREC)) return false;
   std::vector<const pat::Muon*> output;
   if (MuREC.size() == 0) return std::make_pair(false, output);
@@ -190,7 +190,7 @@ inline std::pair<bool, std::vector<const pat::Muon*> > RecSelected_OppositeCharg
   double charge0 = MuREC.front()->charge(); 
   for (imu = MuREC.begin()+1; imu != MuREC.end(); ++imu){
     //among the others, that are still in acceptance, check for opposite charge
-    if ((*imu)->pt() > ptmucut && fabs((*imu)->eta()) < etamucut && (*imu)->charge() * charge0 < 0) {
+    if ((*imu)->pt() > ptmucut && fabs((*imu)->eta()) < etamucut && (*imu)->charge() * charge0  == product) {
       output = MuREC;
       return std::make_pair(true, output);
     }  
