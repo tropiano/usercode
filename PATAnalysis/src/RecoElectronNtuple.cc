@@ -47,14 +47,14 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    _targetLumi= iConfig.getParameter<double>("targetLumi");
    _xsec      = iConfig.getParameter<double>("CrossSection");
    _Norm      = iConfig.getParameter<bool>("Norm");
-   _EventsPerFile    = iConfig.getParameter<double>("EventsPerFile");
+   _EventsPerFile    = iConfig.getParameter<int32_t>("EventsPerFile");
    
    //Selections
-   _Acc = iConfig.getParameter<double>("Acc");
-   _Qual = iConfig.getParameter<double>("Qual");
-   _Imp = iConfig.getParameter<double>("Imp");
-   _Iso = iConfig.getParameter<double>("Iso");
-   _EiD = iConfig.getParameter<double>("EiD");
+   _Acc = iConfig.getParameter<int32_t>("Acc");
+   _Qual = iConfig.getParameter<int32_t>("Qual");
+   _Imp = iConfig.getParameter<int32_t>("Imp");
+   _Iso = iConfig.getParameter<int32_t>("Iso");
+   _EiD = iConfig.getParameter<int32_t>("EiD");
    
    for(int i=0; i<6; i++){
    _RecoCutFlags[i] = "_1";}
@@ -367,7 +367,8 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    if (zgenHandle->size() > 1) return;
    
    std::vector<const reco::Candidate*> zgendaughters = ZGENDaughters(*zgenHandle);
-   const reco::Candidate *gendau0, *gendau1;
+   const reco::Candidate *gendau0 = 0;
+   const reco::Candidate *gendau1 = 0;
    
      if(zgendaughters.size() != 0){        
      gendau0 = zgendaughters[0];
@@ -473,9 +474,6 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    numberOfZ=zrecHandle->size();
    nelesall=electronHandle->size();    // all electrons with loose cuts
    
-   //// Only first Z considered (higher pt of leading electron)
-   int ZNum = 0;
-   
    if(zrecHandle->size()){
 
      std::vector<const pat::Jet*> recjets = GetJets<pat::Jet>(*jetrecHandle);
@@ -483,11 +481,12 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
      std::vector<const pat::Jet*> notisorecjets;
       
      for(unsigned int i = 0; i < recjets.size(); i++){     
-     if(RecoIsoJet((*zrecHandle)[ZNum],*recjets[i]))isorecjets.push_back(recjets[i]);
-     if(!RecoIsoJet((*zrecHandle)[ZNum],*recjets[i]))notisorecjets.push_back(recjets[i]);}
+     if(RecoIsoJet((*zrecHandle)[0],*recjets[i]))isorecjets.push_back(recjets[i]);
+     if(!RecoIsoJet((*zrecHandle)[0],*recjets[i]))notisorecjets.push_back(recjets[i]);}
    
-     std::vector<const pat::Electron*> zrecdaughters = ZDaughters((*zrecHandle)[ZNum]);
-     const pat::Electron *recdau0, *recdau1;
+     std::vector<const pat::Electron*> zrecdaughters = ZDaughters((*zrecHandle)[0]);
+     const pat::Electron *recdau0 = 0;
+     const pat::Electron *recdau1 = 0;
     
      if(zrecdaughters.size()){
      
@@ -502,7 +501,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
 
    // loose cuts, only acceptance cuts
    
-   if (RecSelected("_Acc", _electronID.c_str(), (*zrecHandle)[ZNum])){
+   if (RecSelected("_Acc", _electronID.c_str(), (*zrecHandle)[0])){
    
    const reco::GsfTrack track0 = *(recdau0->gsfTrack());
    const reco::GsfTrack track1 = *(recdau1->gsfTrack());
@@ -510,10 +509,10 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
 
       // fill variables for ntuple
       
-      loosezmass=(*zrecHandle)[ZNum].mass();
-      zpt=(*zrecHandle)[ZNum].pt();
-      zeta=(*zrecHandle)[ZNum].eta();
-      zphi=(*zrecHandle)[ZNum].phi();
+      loosezmass=(*zrecHandle)[0].mass();
+      zpt=(*zrecHandle)[0].pt();
+      zeta=(*zrecHandle)[0].eta();
+      zphi=(*zrecHandle)[0].phi();
       
       elept1=recdau0->pt();
       eleeta1=recdau0->eta();
@@ -609,9 +608,9 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
 
    // now starts the stricter cuts
       
-   if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])&&RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])&&RecSelected(_RecoCutFlags[5].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])){
+   if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[5].c_str(), _electronID.c_str(), (*zrecHandle)[0])){
   
-      zmass_AllCuts=(*zrecHandle)[ZNum].mass();
+      zmass_AllCuts=(*zrecHandle)[0].mass();
       
    }  // endif strict selected Z
    

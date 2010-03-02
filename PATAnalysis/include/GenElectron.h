@@ -26,11 +26,15 @@ public :
    virtual void finalize(); 
 
    //Histograms
-   TH1D *genPtZ, *genEtaZ, *genMassZ, *genPtZ_Acc, *genEtaZ_Acc, *genMassZ_Acc, *genLeadIsoJetPt_Acc, *genLeadIsoJetEta_Acc, *GenIsoJetPt_Acc, *GenJetPt_Acc;
+   TH1D *genPtZ, *genEtaZ, *genMassZ, *genPtZ_Acc, *genEtaZ_Acc, *genMassZ_Acc;
    
-   TH1D *GenJetCounter, *GenJetCounter_Acc, *GenIsoJetCounter,  *GenIsoJetCounter_Acc, *JetMinDeltaRZDau_GEN;
+   TH1D *GenIsoJetPt_Acc, *GenJetPt_Acc, *genLeadIsoJetPt_Acc, *genLeadIsoJetEta_Acc;
+   
+   TH1D *GenJetCounter, *GenJetCounter_Acc, *GenIsoJetCounter,  *GenIsoJetCounter_Acc;
    
    TH1D *genLeadElPt, *genSecElPt, *genLeadElEta, *genSecElEta, *genLeadElPt_Acc, *genSecElPt_Acc, *genLeadElEta_Acc, *genSecElEta_Acc;
+   
+   TH1D *JetMinDeltaRZDau_GEN;
   
 
    std::vector<TH1D*> genJetPtVsInclMulti;
@@ -73,7 +77,7 @@ private:
 
   TFile* _file;  
 
-  TDirectory* _dir;
+  TDirectory *_dir, *_Zdir, *_Eldir, *_Jetdir;
   
   std::string _ReportName;
 

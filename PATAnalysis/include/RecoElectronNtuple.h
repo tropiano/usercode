@@ -12,7 +12,7 @@ public :
 
    RecoElectronNtuple();
 
-   ~RecoElectronNtuple();
+   virtual ~RecoElectronNtuple();
 
    void  process(const fwlite::Event& iEvent);
    

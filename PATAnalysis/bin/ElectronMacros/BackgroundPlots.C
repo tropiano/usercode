@@ -25,13 +25,13 @@
 using namespace std;
 
 
-void Plot(){
+void BackPlot(){
 	
 	int _Acc  = 1;
-	int _Qual = 2;
-	int _Imp  = 3;
-	int _Iso  = 4;
-	int _EiD  = 5;
+	int _Qual = 0;
+	int _Imp  = 2;
+	int _Iso  = 3;
+	int _EiD  = 4;
 	
 	string _RecoCutFlags[6];
 	for(int i=0; i<6; i++){
@@ -43,27 +43,30 @@ void Plot(){
 	_RecoCutFlags[_Iso] = "_Iso";
 	_RecoCutFlags[_EiD] = "_EiD";
 
-TFile *signal_file = TFile::Open("OutputFiles_Zee/Signal/New_selections/Signal_NewSel_Loose_Iso01.root");
+TFile *signal_file = TFile::Open("Zee_7TeV_RL01_10234.root");
 
-TFile* QCD = TFile::Open("OutputFiles_Zee/Background/FullSample/New_Selections/Iso01/QCD_All_FullSample.root");
+TFile* QCD = TFile::Open("QCDall_norm100.root");
 	
-TFile* TTbar = TFile::Open("OutputFiles_Zee/Background/FullSample/New_Selections/Iso01/TTbar_RobustLoose_FullSample.root");
+TFile* TTbar = TFile::Open("TTbar_norm100.root");
 	
-TFile* Wenu = TFile::Open("OutputFiles_Zee/Background/FullSample/New_Selections/Iso01/Wenu_skim_RL01.root");
+TFile* Wenu = TFile::Open("Wenu_norm100.root");
 	
-TFile* outplots = new TFile("Plot_Background_NewCode.root", "RECREATE");
+TFile* outplots = new TFile("TestBackgroundPlots.root", "RECREATE");
 
 TDirectory *Mass, *Jet;
 
 Mass     = outplots->mkdir("ZMass");
 Jet      = outplots->mkdir("JetNumber");
-
+	
 	
    /////////////   Z Mass
 	
+	ofstream cut;
+	cut.open("Cuts_Report_test.txt");
+	
 	Mass->cd();
 	
-	string Signal_recMassZ_name = "RecoElectron/recMassZ";
+	string Signal_recMassZ_name = "RecoElectron/recZ_Plots/recMassZ";
 	Signal_recMassZ_name+=_RecoCutFlags[1].c_str();
 	TH1D* Signal_recMassZ_1 = (TH1D*) signal_file->Get(Signal_recMassZ_name.c_str());
 	Signal_recMassZ_name+=_RecoCutFlags[2].c_str();
@@ -75,7 +78,7 @@ Jet      = outplots->mkdir("JetNumber");
 	Signal_recMassZ_name+=_RecoCutFlags[5].c_str();
 	TH1D* Signal_recMassZ_12345 = (TH1D*) signal_file->Get(Signal_recMassZ_name.c_str());
 	
-	string QCD_recMassZ_name = "RecoElectron/recMassZ";
+	string QCD_recMassZ_name = "RecoElectron/recZ_Plots/recMassZ";
 	QCD_recMassZ_name+=_RecoCutFlags[1].c_str();
 	TH1D* QCD_recMassZ_1 = (TH1D*) QCD->Get(QCD_recMassZ_name.c_str());
 	QCD_recMassZ_name+=_RecoCutFlags[2].c_str();
@@ -87,7 +90,7 @@ Jet      = outplots->mkdir("JetNumber");
 	QCD_recMassZ_name+=_RecoCutFlags[5].c_str();
 	TH1D* QCD_recMassZ_12345 = (TH1D*) QCD->Get(QCD_recMassZ_name.c_str());
 	
-	string TTbar_recMassZ_name = "RecoElectron/recMassZ";
+	string TTbar_recMassZ_name = "RecoElectron/recZ_Plots/recMassZ";
 	TTbar_recMassZ_name+=_RecoCutFlags[1].c_str();
 	TH1D* TTbar_recMassZ_1 = (TH1D*) TTbar->Get(TTbar_recMassZ_name.c_str());
 	TTbar_recMassZ_name+=_RecoCutFlags[2].c_str();
@@ -99,7 +102,7 @@ Jet      = outplots->mkdir("JetNumber");
 	TTbar_recMassZ_name+=_RecoCutFlags[5].c_str();
 	TH1D* TTbar_recMassZ_12345 = (TH1D*) TTbar->Get(TTbar_recMassZ_name.c_str());
 	
-	string Wenu_recMassZ_name = "RecoElectron/recMassZ";
+	string Wenu_recMassZ_name = "RecoElectron/recZ_Plots/recMassZ";
 	Wenu_recMassZ_name+=_RecoCutFlags[1].c_str();
 	TH1D* Wenu_recMassZ_1 = (TH1D*) Wenu->Get(Wenu_recMassZ_name.c_str());
 	Wenu_recMassZ_name+=_RecoCutFlags[2].c_str();
@@ -110,28 +113,32 @@ Jet      = outplots->mkdir("JetNumber");
 	TH1D* Wenu_recMassZ_1234 = (TH1D*) Wenu->Get(Wenu_recMassZ_name.c_str());
 	Wenu_recMassZ_name+=_RecoCutFlags[5].c_str();
 	TH1D* Wenu_recMassZ_12345 = (TH1D*) Wenu->Get(Wenu_recMassZ_name.c_str());
-		
+	
 	
 	TCanvas *ZMass_1 = new TCanvas;
 	Signal_recMassZ_1->SetLineColor(1);
+	Signal_recMassZ_1->SetLineWidth(3);
 	Signal_recMassZ_1->Draw();
 	Signal_recMassZ_1->GetXaxis()->SetTitle("rec Z Mass");
 	Signal_recMassZ_1->SetTitle("Signal");
 	QCD_recMassZ_1->SetLineColor(2);
+	QCD_recMassZ_1->SetLineWidth(2);
 	QCD_recMassZ_1->SetFillColor(2);
 	QCD_recMassZ_1->SetFillStyle(3002);
 	QCD_recMassZ_1->SetTitle("QCD");
-	QCD_recMassZ_1->Draw("sames");
-	TTbar_recMassZ_1->SetLineColor(8);
-	TTbar_recMassZ_1->SetFillColor(8);
+	QCD_recMassZ_1->Draw("hist sames");
+	TTbar_recMassZ_1->SetLineColor(4);
+	TTbar_recMassZ_1->SetLineWidth(2);
+	TTbar_recMassZ_1->SetFillColor(4);
 	TTbar_recMassZ_1->SetFillStyle(3002);
 	TTbar_recMassZ_1->SetTitle("TTbar");
-	TTbar_recMassZ_1->Draw("sames");
-	Wenu_recMassZ_1->SetLineColor(9);
-	Wenu_recMassZ_1->SetFillColor(9);
-	Wenu_recMassZ_1->SetFillStyle(3002);
+	TTbar_recMassZ_1->Draw("hist sames");
+	Wenu_recMassZ_1->SetLineColor(6);
+	Wenu_recMassZ_1->SetLineWidth(2);
+	Wenu_recMassZ_1->SetFillColor(6);
+	Wenu_recMassZ_1->SetFillStyle(3001);
 	Wenu_recMassZ_1->SetTitle("Wenu");
-	Wenu_recMassZ_1->Draw("sames");
+	Wenu_recMassZ_1->Draw("hist sames");
 	TLegend *LegMAcc = ZMass_1->BuildLegend(0.5,0.67,0.88,0.88,"Legenda");
 	LegMAcc->Draw();
 	Signal_recMassZ_1->SetTitle("Reconstructed Z Mass");
@@ -140,27 +147,44 @@ Jet      = outplots->mkdir("JetNumber");
 	ZMass_1->Write(ZMass_name.c_str());
 	ZMass_1->Close();
 	
+	double sig_err_1, qcd_err_1, tt_err_1, w_err_1;
+	
+	cut<<endl<<"Cut level = "<<_RecoCutFlags[1]<<endl;
+	
+	cut<<endl<<"Signal Integral   = "<<Signal_recMassZ_1->IntegralAndError(0,-1,sig_err_1,"")<<endl;
+	cut<<"Signal Int. error = "<<sig_err_1<<endl<<endl;
+	cut<<"QCD Integral   = "<<QCD_recMassZ_1->IntegralAndError(0,-1,qcd_err_1,"")<<endl;
+	cut<<"QCD Int. error = "<<qcd_err_1<<endl<<endl;
+	cut<<"TTbar Integral   = "<<TTbar_recMassZ_1->IntegralAndError(0,-1,tt_err_1,"")<<endl;
+	cut<<"TTbar Int. error = "<<tt_err_1<<endl<<endl;
+	cut<<"Wenu Integral   = "<<Wenu_recMassZ_1->IntegralAndError(0,-1,w_err_1,"")<<endl;
+	cut<<"Wenu Int. error = "<<w_err_1<<endl<<endl;
+
 	if(_RecoCutFlags[2] != "_1"){
 	TCanvas *ZMass_12 = new TCanvas;
 	Signal_recMassZ_12->SetLineColor(1);
+	Signal_recMassZ_12->SetLineWidth(3);
 	Signal_recMassZ_12->Draw();
 	Signal_recMassZ_12->GetXaxis()->SetTitle("rec Z Mass");
 	Signal_recMassZ_12->SetTitle("Signal");
 	QCD_recMassZ_12->SetLineColor(2);
+	QCD_recMassZ_12->SetLineWidth(2);
 	QCD_recMassZ_12->SetFillColor(2);
 	QCD_recMassZ_12->SetFillStyle(3002);
 	QCD_recMassZ_12->SetTitle("QCD");
-	QCD_recMassZ_12->Draw("sames");
-	TTbar_recMassZ_12->SetLineColor(8);
-	TTbar_recMassZ_12->SetFillColor(8);
+	QCD_recMassZ_12->Draw("hist sames");
+	TTbar_recMassZ_12->SetLineColor(4);
+	TTbar_recMassZ_12->SetLineWidth(2);
+	TTbar_recMassZ_12->SetFillColor(4);
 	TTbar_recMassZ_12->SetFillStyle(3002);
 	TTbar_recMassZ_12->SetTitle("TTbar");
-	TTbar_recMassZ_12->Draw("sames");
-	Wenu_recMassZ_12->SetLineColor(9);
-	Wenu_recMassZ_12->SetFillColor(9);
-	Wenu_recMassZ_12->SetFillStyle(3002);
+	TTbar_recMassZ_12->Draw("hist sames");
+	Wenu_recMassZ_12->SetLineColor(6);
+	Wenu_recMassZ_12->SetLineWidth(2);
+	Wenu_recMassZ_12->SetFillColor(6);
+	Wenu_recMassZ_12->SetFillStyle(3001);
 	Wenu_recMassZ_12->SetTitle("Wenu");
-	Wenu_recMassZ_12->Draw("sames");
+	Wenu_recMassZ_12->Draw("hist sames");
 	TLegend *LegMAcc_Qual = ZMass_12->BuildLegend(0.5,0.67,0.88,0.88,"Legenda");
 	LegMAcc_Qual->Draw();
 	Signal_recMassZ_12->SetTitle("Reconstructed Z Mass");
@@ -168,27 +192,45 @@ Jet      = outplots->mkdir("JetNumber");
 	ZMass_12->Write(ZMass_name.c_str());
 		ZMass_12->Close();}
 	
+	double sig_err_12, qcd_err_12, tt_err_12, w_err_12;
+	
+	cut<<endl<<"Cut level = "<<_RecoCutFlags[1]<<", "<<_RecoCutFlags[2]<<endl;
+	
+	cut<<endl<<"Signal Integral   = "<<Signal_recMassZ_12->IntegralAndError(0,-1,sig_err_12,"")<<endl;
+	cut<<"Signal Int. error = "<<sig_err_12<<endl<<endl;
+	cut<<"QCD Integral   = "<<QCD_recMassZ_12->IntegralAndError(0,-1,qcd_err_12,"")<<endl;
+	cut<<"QCD Int. error = "<<qcd_err_12<<endl<<endl;
+	cut<<"TTbar Integral   = "<<TTbar_recMassZ_12->IntegralAndError(0,-1,tt_err_12,"")<<endl;
+	cut<<"TTbar Int. error = "<<tt_err_12<<endl<<endl;
+	cut<<"Wenu Integral   = "<<Wenu_recMassZ_12->IntegralAndError(0,-1,w_err_12,"")<<endl;
+	cut<<"Wenu Int. error = "<<w_err_12<<endl<<endl;
+
+	
 	if(_RecoCutFlags[3] != "_1"){
 	TCanvas *ZMass_123 = new TCanvas;
 	Signal_recMassZ_123->SetLineColor(1);
+	Signal_recMassZ_123->SetLineWidth(3);
 	Signal_recMassZ_123->Draw();
 	Signal_recMassZ_123->GetXaxis()->SetTitle("rec Z Mass");
 	Signal_recMassZ_123->SetTitle("Signal");
 	QCD_recMassZ_123->SetLineColor(2);
+	QCD_recMassZ_123->SetLineWidth(2);
 	QCD_recMassZ_123->SetFillColor(2);
 	QCD_recMassZ_123->SetFillStyle(3002);
 	QCD_recMassZ_123->SetTitle("QCD");
-	QCD_recMassZ_123->Draw("sames");
-	TTbar_recMassZ_123->SetLineColor(8);
-	TTbar_recMassZ_123->SetFillColor(8);
+	QCD_recMassZ_123->Draw("hist sames");
+	TTbar_recMassZ_123->SetLineColor(4);
+	TTbar_recMassZ_123->SetLineWidth(2);
+	TTbar_recMassZ_123->SetFillColor(4);
 	TTbar_recMassZ_123->SetFillStyle(3002);
 	TTbar_recMassZ_123->SetTitle("TTbar");
-	TTbar_recMassZ_123->Draw("sames");
-	Wenu_recMassZ_123->SetLineColor(9);
-	Wenu_recMassZ_123->SetFillColor(9);
-	Wenu_recMassZ_123->SetFillStyle(3002);
+	TTbar_recMassZ_123->Draw("hist sames");
+	Wenu_recMassZ_123->SetLineColor(6);
+	Wenu_recMassZ_123->SetLineWidth(2);
+	Wenu_recMassZ_123->SetFillColor(6);
+	Wenu_recMassZ_123->SetFillStyle(3001);
 	Wenu_recMassZ_123->SetTitle("Wenu");
-	Wenu_recMassZ_123->Draw("sames");
+	Wenu_recMassZ_123->Draw("hist sames");
 	TLegend *LegMAccQualImp = ZMass_123->BuildLegend(0.5,0.67,0.88,0.88,"Legenda");
 	LegMAccQualImp->Draw();
 	Signal_recMassZ_123->SetTitle("Reconstructed Z Mass");
@@ -196,27 +238,44 @@ Jet      = outplots->mkdir("JetNumber");
 	ZMass_123->Write(ZMass_name.c_str());
 		ZMass_123->Close();}
 	
+	double sig_err_123, qcd_err_123, tt_err_123, w_err_123;
+	
+	cut<<endl<<"Cut level = "<<_RecoCutFlags[1]<<", "<<_RecoCutFlags[2]<<", "<<_RecoCutFlags[3]<<endl;
+	
+	cut<<endl<<"Signal Integral   = "<<Signal_recMassZ_123->IntegralAndError(0,-1,sig_err_123,"")<<endl;
+	cut<<"Signal Int. error = "<<sig_err_123<<endl<<endl;
+	cut<<"QCD Integral   = "<<QCD_recMassZ_123->IntegralAndError(0,-1,qcd_err_123,"")<<endl;
+	cut<<"QCD Int. error = "<<qcd_err_123<<endl<<endl;
+	cut<<"TTbar Integral   = "<<TTbar_recMassZ_123->IntegralAndError(0,-1,tt_err_123,"")<<endl;
+	cut<<"TTbar Int. error = "<<tt_err_123<<endl<<endl;
+	cut<<"Wenu Integral   = "<<Wenu_recMassZ_123->IntegralAndError(0,-1,w_err_123,"")<<endl;
+	cut<<"Wenu Int. error = "<<w_err_123<<endl<<endl;
+	
 	if(_RecoCutFlags[4] != "_1"){
 	TCanvas *ZMass_1234 = new TCanvas;
 	Signal_recMassZ_1234->SetLineColor(1);
+	Signal_recMassZ_1234->SetLineWidth(3);
 	Signal_recMassZ_1234->Draw();
 	Signal_recMassZ_1234->GetXaxis()->SetTitle("rec Z Mass");
 	Signal_recMassZ_1234->SetTitle("Signal");
 	QCD_recMassZ_1234->SetLineColor(2);
+	QCD_recMassZ_1234->SetLineWidth(2);
 	QCD_recMassZ_1234->SetFillColor(2);
 	QCD_recMassZ_1234->SetFillStyle(3002);
 	QCD_recMassZ_1234->SetTitle("QCD");
-	QCD_recMassZ_1234->Draw("sames");
-	TTbar_recMassZ_1234->SetLineColor(8);
-	TTbar_recMassZ_1234->SetFillColor(8);
+	QCD_recMassZ_1234->Draw("hist sames");
+	TTbar_recMassZ_1234->SetLineColor(4);
+	TTbar_recMassZ_1234->SetLineWidth(2);
+	TTbar_recMassZ_1234->SetFillColor(4);
 	TTbar_recMassZ_1234->SetFillStyle(3002);
 	TTbar_recMassZ_1234->SetTitle("TTbar");
-	TTbar_recMassZ_1234->Draw("sames");
-	Wenu_recMassZ_1234->SetLineColor(9);
-	Wenu_recMassZ_1234->SetFillColor(9);
-	Wenu_recMassZ_1234->SetFillStyle(3002);
+	TTbar_recMassZ_1234->Draw("hist sames");
+	Wenu_recMassZ_1234->SetLineColor(6);
+	Wenu_recMassZ_1234->SetLineWidth(2);
+	Wenu_recMassZ_1234->SetFillColor(6);
+	Wenu_recMassZ_1234->SetFillStyle(3001);
 	Wenu_recMassZ_1234->SetTitle("Wenu");
-	Wenu_recMassZ_1234->Draw("sames");
+	Wenu_recMassZ_1234->Draw("hist sames");
 	TLegend *LegMAccQualImpIso = ZMass_1234->BuildLegend(0.5,0.67,0.88,0.88,"Legenda");
 	LegMAccQualImpIso->Draw();
 	Signal_recMassZ_1234->SetTitle("Reconstructed Z Mass");
@@ -224,27 +283,44 @@ Jet      = outplots->mkdir("JetNumber");
 	ZMass_1234->Write(ZMass_name.c_str());
 		ZMass_1234->Close();}
 	
+	double sig_err_1234, qcd_err_1234, tt_err_1234, w_err_1234;
+	
+	cut<<endl<<"Cut level = "<<_RecoCutFlags[1]<<", "<<_RecoCutFlags[2]<<", "<<_RecoCutFlags[3]<<", "<<_RecoCutFlags[4]<<endl;
+	
+	cut<<endl<<"Signal Integral   = "<<Signal_recMassZ_1234->IntegralAndError(0,-1,sig_err_1234,"")<<endl;
+	cut<<"Signal Int. error = "<<sig_err_1234<<endl<<endl;
+	cut<<"QCD Integral   = "<<QCD_recMassZ_1234->IntegralAndError(0,-1,qcd_err_1234,"")<<endl;
+	cut<<"QCD Int. error = "<<qcd_err_1234<<endl<<endl;
+	cut<<"TTbar Integral   = "<<TTbar_recMassZ_1234->IntegralAndError(0,-1,tt_err_1234,"")<<endl;
+	cut<<"TTbar Int. error = "<<tt_err_1234<<endl<<endl;
+	cut<<"Wenu Integral   = "<<Wenu_recMassZ_1234->IntegralAndError(0,-1,w_err_1234,"")<<endl;
+	cut<<"Wenu Int. error = "<<w_err_1234<<endl<<endl;
+
 	if(_RecoCutFlags[5] != "_1"){
 	TCanvas *ZMass_12345 = new TCanvas;
 	Signal_recMassZ_12345->SetLineColor(1);
+	Signal_recMassZ_12345->SetLineWidth(3);
 	Signal_recMassZ_12345->Draw();
 	Signal_recMassZ_12345->GetXaxis()->SetTitle("rec Z Mass");
 	Signal_recMassZ_12345->SetTitle("Signal");
 	QCD_recMassZ_12345->SetLineColor(2);
+	QCD_recMassZ_12345->SetLineWidth(2);
 	QCD_recMassZ_12345->SetFillColor(2);
 	QCD_recMassZ_12345->SetFillStyle(3002);
 	QCD_recMassZ_12345->SetTitle("QCD");
-	QCD_recMassZ_12345->Draw("sames");
-	TTbar_recMassZ_12345->SetLineColor(8);
-	TTbar_recMassZ_12345->SetFillColor(8);
+	QCD_recMassZ_12345->Draw("hist sames");
+	TTbar_recMassZ_12345->SetLineColor(4);
+	TTbar_recMassZ_12345->SetLineWidth(2);
+	TTbar_recMassZ_12345->SetFillColor(4);
 	TTbar_recMassZ_12345->SetFillStyle(3002);
 	TTbar_recMassZ_12345->SetTitle("TTbar");
-	TTbar_recMassZ_12345->Draw("sames");
-	Wenu_recMassZ_12345->SetLineColor(9);
-	Wenu_recMassZ_12345->SetFillColor(9);
-	Wenu_recMassZ_12345->SetFillStyle(3002);
+	TTbar_recMassZ_12345->Draw("hist sames");
+	Wenu_recMassZ_12345->SetLineColor(6);
+	Wenu_recMassZ_12345->SetLineWidth(2);
+	Wenu_recMassZ_12345->SetFillColor(6);
+	Wenu_recMassZ_12345->SetFillStyle(3001);
 	Wenu_recMassZ_12345->SetTitle("Wenu");
-	Wenu_recMassZ_12345->Draw("sames");
+	Wenu_recMassZ_12345->Draw("hist sames");
 	TLegend *LegMAccQualImpIsoEiD = ZMass_12345->BuildLegend(0.5,0.67,0.88,0.88,"Legenda");
 	LegMAccQualImpIsoEiD->Draw();
 	Signal_recMassZ_12345->SetTitle("Reconstructed Z Mass");
@@ -252,12 +328,27 @@ Jet      = outplots->mkdir("JetNumber");
 	ZMass_12345->Write(ZMass_name.c_str());
 		ZMass_12345->Close();}
 	
+	double sig_err_12345, qcd_err_12345, tt_err_12345, w_err_12345;
 	
+	cut<<endl<<"Cut level = "<<_RecoCutFlags[1]<<", "<<_RecoCutFlags[2]<<", "<<_RecoCutFlags[3]<<", "<<_RecoCutFlags[4]<<", "<<_RecoCutFlags[5]<<endl;
+	
+	cut<<endl<<"Signal Integral   = "<<Signal_recMassZ_12345->IntegralAndError(0,-1,sig_err_12345,"")<<endl;
+	cut<<"Signal Int. error = "<<sig_err_12345<<endl<<endl;
+	cut<<"QCD Integral   = "<<QCD_recMassZ_12345->IntegralAndError(0,-1,qcd_err_12345,"")<<endl;
+	cut<<"QCD Int. error = "<<qcd_err_12345<<endl<<endl;
+	cut<<"TTbar Integral   = "<<TTbar_recMassZ_12345->IntegralAndError(0,-1,tt_err_12345,"")<<endl;
+	cut<<"TTbar Int. error = "<<tt_err_12345<<endl<<endl;
+	cut<<"Wenu Integral   = "<<Wenu_recMassZ_12345->IntegralAndError(0,-1,w_err_12345,"")<<endl;
+	cut<<"Wenu Int. error = "<<w_err_12345<<endl<<endl;
+	
+	cut.close();
+	
+
 	////////// Jet number
 	
 	Jet->cd();
 	
-	string Signal_recJetN_name = "RecoElectron/IsoJetCounter";
+	string Signal_recJetN_name = "RecoElectron/recJet_Plots/IsoJetCounter";
 	Signal_recJetN_name+=_RecoCutFlags[1].c_str();
 	TH1D* Signal_recJetN_1 = (TH1D*) signal_file->Get(Signal_recJetN_name.c_str());
 	Signal_recJetN_name+=_RecoCutFlags[2].c_str();
@@ -269,7 +360,7 @@ Jet      = outplots->mkdir("JetNumber");
 	Signal_recJetN_name+=_RecoCutFlags[5].c_str();
 	TH1D* Signal_recJetN_12345 = (TH1D*) signal_file->Get(Signal_recJetN_name.c_str());
 	
-	string QCD_recJetN_name = "RecoElectron/IsoJetCounter";
+	string QCD_recJetN_name = "RecoElectron/recJet_Plots/IsoJetCounter";
 	QCD_recJetN_name+=_RecoCutFlags[1].c_str();
 	TH1D* QCD_recJetN_1 = (TH1D*) QCD->Get(QCD_recJetN_name.c_str());
 	QCD_recJetN_name+=_RecoCutFlags[2].c_str();
@@ -281,7 +372,7 @@ Jet      = outplots->mkdir("JetNumber");
 	QCD_recJetN_name+=_RecoCutFlags[5].c_str();
 	TH1D* QCD_recJetN_12345 = (TH1D*) QCD->Get(QCD_recJetN_name.c_str());
 	
-	string TTbar_recJetN_name = "RecoElectron/IsoJetCounter";
+	string TTbar_recJetN_name = "RecoElectron/recJet_Plots/IsoJetCounter";
 	TTbar_recJetN_name+=_RecoCutFlags[1].c_str();
 	TH1D* TTbar_recJetN_1 = (TH1D*) TTbar->Get(TTbar_recJetN_name.c_str());
 	TTbar_recJetN_name+=_RecoCutFlags[2].c_str();
@@ -293,7 +384,7 @@ Jet      = outplots->mkdir("JetNumber");
 	TTbar_recJetN_name+=_RecoCutFlags[5].c_str();
 	TH1D* TTbar_recJetN_12345 = (TH1D*) TTbar->Get(TTbar_recJetN_name.c_str());
 	
-	string Wenu_recJetN_name = "RecoElectron/IsoJetCounter";
+	string Wenu_recJetN_name = "RecoElectron/recJet_Plots/IsoJetCounter";
 	Wenu_recJetN_name+=_RecoCutFlags[1].c_str();
 	TH1D* Wenu_recJetN_1 = (TH1D*) Wenu->Get(Wenu_recJetN_name.c_str());
 	Wenu_recJetN_name+=_RecoCutFlags[2].c_str();
@@ -304,27 +395,31 @@ Jet      = outplots->mkdir("JetNumber");
 	TH1D* Wenu_recJetN_1234 = (TH1D*) Wenu->Get(Wenu_recJetN_name.c_str());
 	Wenu_recJetN_name+=_RecoCutFlags[5].c_str();
 	TH1D* Wenu_recJetN_12345 = (TH1D*) Wenu->Get(Wenu_recJetN_name.c_str());
-	
+
 	TCanvas *JetN_1 = new TCanvas;
 	Signal_recJetN_1->SetLineColor(1);
+	Signal_recJetN_1->SetLineWidth(3);
 	Signal_recJetN_1->Draw();
 	Signal_recJetN_1->GetXaxis()->SetTitle("rec #jet");
 	Signal_recJetN_1->SetTitle("Signal");
 	QCD_recJetN_1->SetLineColor(2);
+	QCD_recJetN_1->SetLineWidth(2);
 	QCD_recJetN_1->SetFillColor(2);
 	QCD_recJetN_1->SetFillStyle(3002);
 	QCD_recJetN_1->SetTitle("QCD");
-	QCD_recJetN_1->Draw("sames");	
-	TTbar_recJetN_1->SetLineColor(8);
-	TTbar_recJetN_1->SetFillColor(8);
+	QCD_recJetN_1->Draw("hist sames");	
+	TTbar_recJetN_1->SetLineColor(4);
+	TTbar_recJetN_1->SetLineWidth(2);
+	TTbar_recJetN_1->SetFillColor(4);
 	TTbar_recJetN_1->SetFillStyle(3002);
 	TTbar_recJetN_1->SetTitle("TTbar");
-	TTbar_recJetN_1->Draw("sames");
-	Wenu_recJetN_1->SetLineColor(9);
-	Wenu_recJetN_1->SetFillColor(9);
-	Wenu_recJetN_1->SetFillStyle(3002);
+	TTbar_recJetN_1->Draw("hist sames");
+	Wenu_recJetN_1->SetLineColor(6);
+	Wenu_recJetN_1->SetLineWidth(2);
+	Wenu_recJetN_1->SetFillColor(6);
+	Wenu_recJetN_1->SetFillStyle(3001);
 	Wenu_recJetN_1->SetTitle("Wenu");
-	Wenu_recJetN_1->Draw("sames");
+	Wenu_recJetN_1->Draw("hist sames");
 	TLegend *LegJAcc = JetN_1->BuildLegend(0.5,0.67,0.88,0.88,"Legenda");
 	LegJAcc->Draw();
 	Signal_recJetN_1->SetTitle("Reconstructed #jet");
@@ -336,24 +431,28 @@ Jet      = outplots->mkdir("JetNumber");
 	if(_RecoCutFlags[2] != "_1"){
 	TCanvas *JetN_12 = new TCanvas;
 	Signal_recJetN_12->SetLineColor(1);
+	Signal_recJetN_12->SetLineWidth(3);
 	Signal_recJetN_12->Draw();
 	Signal_recJetN_12->GetXaxis()->SetTitle("rec #jet");
 	Signal_recJetN_12->SetTitle("Signal");
 	QCD_recJetN_12->SetLineColor(2);
+	QCD_recJetN_12->SetLineWidth(2);
 	QCD_recJetN_12->SetFillColor(2);
 	QCD_recJetN_12->SetFillStyle(3002);
 	QCD_recJetN_12->SetTitle("QCD");
-	QCD_recJetN_12->Draw("sames");	
-	TTbar_recJetN_12->SetLineColor(8);
-	TTbar_recJetN_12->SetFillColor(8);
+	QCD_recJetN_12->Draw("hist sames");	
+	TTbar_recJetN_12->SetLineColor(4);
+	TTbar_recJetN_12->SetLineWidth(2);
+	TTbar_recJetN_12->SetFillColor(4);
 	TTbar_recJetN_12->SetFillStyle(3002);
 	TTbar_recJetN_12->SetTitle("TTbar");
-	TTbar_recJetN_12->Draw("sames");
-	Wenu_recJetN_12->SetLineColor(9);
-	Wenu_recJetN_12->SetFillColor(9);
-	Wenu_recJetN_12->SetFillStyle(3002);
+	TTbar_recJetN_12->Draw("hist sames");
+	Wenu_recJetN_12->SetLineColor(6);
+	Wenu_recJetN_12->SetLineWidth(2);
+	Wenu_recJetN_12->SetFillColor(6);
+	Wenu_recJetN_12->SetFillStyle(3001);
 	Wenu_recJetN_12->SetTitle("Wenu");
-	Wenu_recJetN_12->Draw("sames");
+	Wenu_recJetN_12->Draw("hist sames");
 	TLegend *LegJAcc_Qual = JetN_12->BuildLegend(0.5,0.67,0.88,0.88,"Legenda");
 	LegJAcc_Qual->Draw();
 	Signal_recJetN_12->SetTitle("Reconstructed #jet");
@@ -364,24 +463,28 @@ Jet      = outplots->mkdir("JetNumber");
 	if(_RecoCutFlags[3] != "_1"){
 	TCanvas *JetN_123 = new TCanvas;
 	Signal_recJetN_123->SetLineColor(1);
+	Signal_recJetN_123->SetLineWidth(3);
 	Signal_recJetN_123->Draw();
 	Signal_recJetN_123->GetXaxis()->SetTitle("rec #jet");
 	Signal_recJetN_123->SetTitle("Signal");
 	QCD_recJetN_123->SetLineColor(2);
+	QCD_recJetN_123->SetLineWidth(2);
 	QCD_recJetN_123->SetFillColor(2);
 	QCD_recJetN_123->SetFillStyle(3002);
 	QCD_recJetN_123->SetTitle("QCD");
-	QCD_recJetN_123->Draw("sames");	
-	TTbar_recJetN_123->SetLineColor(8);
-	TTbar_recJetN_123->SetFillColor(8);
+	QCD_recJetN_123->Draw("hist sames");	
+	TTbar_recJetN_123->SetLineColor(4);
+	TTbar_recJetN_123->SetLineWidth(2);
+	TTbar_recJetN_123->SetFillColor(4);
 	TTbar_recJetN_123->SetFillStyle(3002);
 	TTbar_recJetN_123->SetTitle("TTbar");
-	TTbar_recJetN_123->Draw("sames");
-	Wenu_recJetN_123->SetLineColor(9);
-	Wenu_recJetN_123->SetFillColor(9);
-	Wenu_recJetN_123->SetFillStyle(3002);
+	TTbar_recJetN_123->Draw("hist sames");
+	Wenu_recJetN_123->SetLineColor(6);
+	Wenu_recJetN_123->SetLineWidth(2);
+	Wenu_recJetN_123->SetFillColor(6);
+	Wenu_recJetN_123->SetFillStyle(3001);
 	Wenu_recJetN_123->SetTitle("Wenu");
-	Wenu_recJetN_123->Draw("sames");
+	Wenu_recJetN_123->Draw("hist sames");
 	TLegend *LegJAccQualImp = JetN_123->BuildLegend(0.5,0.67,0.88,0.88,"Legenda");
 	LegJAccQualImp->Draw();
 	Signal_recJetN_123->SetTitle("Reconstructed #jet");
@@ -392,24 +495,28 @@ Jet      = outplots->mkdir("JetNumber");
 	if(_RecoCutFlags[4] != "_1"){
 	TCanvas *JetN_1234 = new TCanvas;
 	Signal_recJetN_1234->SetLineColor(1);
+	Signal_recJetN_1234->SetLineWidth(3);
 	Signal_recJetN_1234->Draw();
 	Signal_recJetN_1234->GetXaxis()->SetTitle("rec #jet");
 	Signal_recJetN_1234->SetTitle("Signal");
 	QCD_recJetN_1234->SetLineColor(2);
+	QCD_recJetN_1234->SetLineWidth(2);
 	QCD_recJetN_1234->SetFillColor(2);
 	QCD_recJetN_1234->SetFillStyle(3002);
 	QCD_recJetN_1234->SetTitle("QCD");
-	QCD_recJetN_1234->Draw("sames");	
-	TTbar_recJetN_1234->SetLineColor(8);
-	TTbar_recJetN_1234->SetFillColor(8);
+	QCD_recJetN_1234->Draw("hist sames");	
+	TTbar_recJetN_1234->SetLineColor(4);
+	TTbar_recJetN_1234->SetLineWidth(2);
+	TTbar_recJetN_1234->SetFillColor(4);
 	TTbar_recJetN_1234->SetFillStyle(3002);
 	TTbar_recJetN_1234->SetTitle("TTbar");
-	TTbar_recJetN_1234->Draw("sames");
-	Wenu_recJetN_1234->SetLineColor(9);
-	Wenu_recJetN_1234->SetFillColor(9);
-	Wenu_recJetN_1234->SetFillStyle(3002);
+	TTbar_recJetN_1234->Draw("hist sames");
+	Wenu_recJetN_1234->SetLineColor(6);
+	Wenu_recJetN_1234->SetLineWidth(2);
+	Wenu_recJetN_1234->SetFillColor(6);
+	Wenu_recJetN_1234->SetFillStyle(3001);
 	Wenu_recJetN_1234->SetTitle("Wenu");
-	Wenu_recJetN_1234->Draw("sames");
+	Wenu_recJetN_1234->Draw("hist sames");
 	TLegend *LegJAccQualImpIso = JetN_1234->BuildLegend(0.5,0.67,0.88,0.88,"Legenda");
 	LegJAccQualImpIso->Draw();
 	Signal_recJetN_1234->SetTitle("Reconstructed #jet");
@@ -420,24 +527,28 @@ Jet      = outplots->mkdir("JetNumber");
 	if(_RecoCutFlags[5] != "_1"){
 	TCanvas *JetN_12345 = new TCanvas;
 	Signal_recJetN_12345->SetLineColor(1);
+	Signal_recJetN_12345->SetLineWidth(3);
 	Signal_recJetN_12345->Draw();
 	Signal_recJetN_12345->GetXaxis()->SetTitle("rec #jet");
 	Signal_recJetN_12345->SetTitle("Signal");
 	QCD_recJetN_12345->SetLineColor(2);
+	QCD_recJetN_12345->SetLineWidth(2);
 	QCD_recJetN_12345->SetFillColor(2);
 	QCD_recJetN_12345->SetFillStyle(3002);
 	QCD_recJetN_12345->SetTitle("QCD");
-	QCD_recJetN_12345->Draw("sames");	
-	TTbar_recJetN_12345->SetLineColor(8);
-	TTbar_recJetN_12345->SetFillColor(8);
+	QCD_recJetN_12345->Draw("hist sames");	
+	TTbar_recJetN_12345->SetLineColor(4);
+	TTbar_recJetN_12345->SetLineWidth(2);
+	TTbar_recJetN_12345->SetFillColor(4);
 	TTbar_recJetN_12345->SetFillStyle(3002);
 	TTbar_recJetN_12345->SetTitle("TTbar");
-	TTbar_recJetN_12345->Draw("sames");
-	Wenu_recJetN_12345->SetLineColor(9);
-	Wenu_recJetN_12345->SetFillColor(9);
-	Wenu_recJetN_12345->SetFillStyle(3002);
+	TTbar_recJetN_12345->Draw("hist sames");
+	Wenu_recJetN_12345->SetLineColor(6);
+	Wenu_recJetN_12345->SetLineWidth(2);
+	Wenu_recJetN_12345->SetFillColor(6);
+	Wenu_recJetN_12345->SetFillStyle(3001);
 	Wenu_recJetN_12345->SetTitle("Wenu");
-	Wenu_recJetN_12345->Draw("sames");
+	Wenu_recJetN_12345->Draw("hist sames");
 	TLegend *LegJAccQualImpIsoEiD = JetN_12345->BuildLegend(0.5,0.67,0.88,0.88,"Legenda");
 	LegJAccQualImpIsoEiD->Draw();
 	Signal_recJetN_12345->SetTitle("Reconstructed #jet");
@@ -450,5 +561,3 @@ Jet      = outplots->mkdir("JetNumber");
   outplots->Write();
   outplots->Close();
 }
-
-

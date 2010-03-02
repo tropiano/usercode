@@ -21,16 +21,16 @@ int main() {
 
   //Job
   string cfgName = "config.py";
-  string sourceList = "files_test.txt";
-  string outputName = "test";
+  string sourceList = "TTbar_norm100.txt";
+  string outputName = "TTbar_norm100";
   string electronID = "eidRobustLoose";
   
   //Normalization
-  double xsec = 1300.;
+  double xsec = 94.3;
   double targetLumi = 100.;
-  string Norm = "True";
-  int EventsPerFile = 0;
-  string Sumw2= "False";
+  string Norm = "False";
+  int EventsPerFile = 50000;
+  string Sumw2= "True";
   
   //Gen Particle Matching
   string GenParticleMatch = "False";
@@ -48,6 +48,9 @@ int main() {
   int Iso = 3;
   int EiD = 4;
   
+  //Number of CPUs
+  int CPU = 8;
+  
   //Log
   bool Log = false;
   
@@ -58,6 +61,8 @@ int main() {
   gEnv->SetValue("Proof.Sandbox", "/raid/sfrosali/.proof");
 
   TProof * p = TProof::Open("");
+  
+  p->SetParallel(CPU);
   
   gSystem->Load("libFWCoreFWLite");
   AutoLibraryLoader::enable();
@@ -74,10 +79,10 @@ int main() {
   p->AddInput(configsignal);
   p->Process(SignalDS, "FWLiteTSelector");
   
- if(Log){ 
- TProofLog *pl = TProof::Mgr("")->GetSessionLogs();
- pl->Save("0.0","/raid/sfrosali/Zjets/Commit/CMSSW_3_3_5/src/Firenze/PATAnalysis/bin/");
- }
+  if(Log){ 
+  TProofLog *pl = TProof::Mgr("")->GetSessionLogs();
+  pl->Save("0.1",path.c_str());
+  }
   
   p->ClearInput();
   delete SignalDS;

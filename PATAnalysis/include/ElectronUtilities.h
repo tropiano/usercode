@@ -161,11 +161,12 @@ inline std::vector<const reco::Candidate*> ZGENDaughters(const std::vector<reco:
 
 std::vector<const reco::Candidate*> zdaughters;
 
-const reco::Candidate *dau, *daudau;
+const reco::Candidate *dau = 0;
+const reco::Candidate *daudau = 0;
   
   if(ZGEN.size() == 1){
   
-  for(int i = 0; i != ZGEN[0].numberOfDaughters(); i++){ 
+  for(unsigned i = 0; i != ZGEN[0].numberOfDaughters(); i++){ 
   dau = ZGEN[0].daughter(i);
   
   if(!dau->numberOfDaughters()){
@@ -173,7 +174,7 @@ const reco::Candidate *dau, *daudau;
   }
   
   if(dau->numberOfDaughters()){
-  for(int i = 0; i != dau->numberOfDaughters(); i++){
+  for(unsigned i = 0; i != dau->numberOfDaughters(); i++){
   daudau = dau->daughter(i);
   if((daudau->pdgId() == 11) || (daudau->pdgId() == -11))zdaughters.push_back(daudau);
   }
@@ -273,7 +274,8 @@ inline bool GenSelectedInAcceptance(const std::vector<reco::CompositeCandidate>&
   }
   
   std::vector<const reco::Candidate*> zgendaughters = ZGENDaughters(ZGEN);
-  const reco::Candidate *dau0, *dau1;
+  const reco::Candidate *dau0 = 0;
+  const reco::Candidate *dau1 = 0;
   
   if(zgendaughters.size() != 0){      
     
@@ -327,7 +329,7 @@ inline bool RecSelected(string Flag, string EID, const reco::CompositeCandidate 
   else if(Flag=="_Qual"){
   return track0.numberOfValidHits() > minnhit && track1.numberOfValidHits() > minnhit &&
          track0.normalizedChi2() < maxchi2 && track1.normalizedChi2() < maxchi2;
-         }      
+         }  
   else if(Flag=="_Imp"){
   return dau0->dB() < dxycut && dau1->dB() < dxycut;
   }
@@ -364,7 +366,7 @@ inline bool RecSelectedWithTrigger(const std::vector<reco::CompositeCandidate>& 
 
 inline double Delta_Phi_GEN(const reco::Candidate& Electron, const reco::Jet& jet){
 	
-	double deltaPhi;
+	double deltaPhi = 0;
 
 	if((TMath::Abs(Electron.phi() - jet.phi()) < TMath::Pi()) && (TMath::Abs(Electron.phi() - jet.phi()) > -(TMath::Pi()))){
 	deltaPhi = Electron.phi() - jet.phi();
@@ -383,10 +385,8 @@ inline double Delta_Phi_GEN(const reco::Candidate& Electron, const reco::Jet& je
 }
 
 inline double Delta_Eta_GEN(const reco::Candidate& Electron, const reco::Jet& jet){
-	
-	double deltaEta;
-	
-	deltaEta = Electron.eta() - jet.eta();
+
+	double deltaEta = Electron.eta() - jet.eta();
 	
 	return deltaEta;
 	
@@ -394,9 +394,7 @@ inline double Delta_Eta_GEN(const reco::Candidate& Electron, const reco::Jet& je
 
 inline double Delta_R_GEN(const reco::Candidate& Electron, const reco::Jet& jet){
 
-	double deltaR;
-	
-	deltaR = sqrt(pow(Delta_Phi_GEN(Electron,jet),2) + pow(Delta_Eta_GEN(Electron,jet),2));
+	double deltaR = sqrt(pow(Delta_Phi_GEN(Electron,jet),2) + pow(Delta_Eta_GEN(Electron,jet),2));
 	
 	return deltaR;
 	
@@ -407,7 +405,8 @@ inline double MinDeltaRZDau_GEN(const std::vector<reco::CompositeCandidate>& ZGE
         double minDeltaRZDau = -999999;
         
         std::vector<const reco::Candidate*> zdaughters = ZGENDaughters(ZGEN);
-        const reco::Candidate *dau0, *dau1;
+        const reco::Candidate *dau0 = 0;
+        const reco::Candidate *dau1 = 0;
 
         if(zdaughters.size()){
         
@@ -427,7 +426,7 @@ inline double MinDeltaRZDau_GEN(const std::vector<reco::CompositeCandidate>& ZGE
 
 inline double Delta_Phi(const pat::Electron& Electron, const reco::Jet& jet){
 	
-	double deltaPhi;
+	double deltaPhi = 0;
 
 	if((TMath::Abs(Electron.phi() - jet.phi()) < TMath::Pi()) && (TMath::Abs(Electron.phi() - jet.phi()) > -(TMath::Pi()))){
 	deltaPhi = Electron.phi() - jet.phi();
@@ -447,9 +446,7 @@ inline double Delta_Phi(const pat::Electron& Electron, const reco::Jet& jet){
 
 inline double Delta_Eta(const pat::Electron& Electron, const reco::Jet& jet){
 	
-	double deltaEta;
-	
-	deltaEta = Electron.eta() - jet.eta();
+	double deltaEta = Electron.eta() - jet.eta();
 	
 	return deltaEta;
 	
@@ -457,9 +454,7 @@ inline double Delta_Eta(const pat::Electron& Electron, const reco::Jet& jet){
 
 inline double Delta_R(const pat::Electron& Electron, const reco::Jet& jet){
 
-	double deltaR;
-	
-	deltaR = sqrt(pow(Delta_Phi(Electron,jet),2) + pow(Delta_Eta(Electron,jet),2));
+	double deltaR = sqrt(pow(Delta_Phi(Electron,jet),2) + pow(Delta_Eta(Electron,jet),2));
 	
 	return deltaR;
 	
@@ -468,6 +463,7 @@ inline double Delta_R(const pat::Electron& Electron, const reco::Jet& jet){
 inline double MinDeltaRElectron(const std::vector<pat::Electron>& Electrons, const reco::Jet& jet){
 	
 	double DeltaR, minDeltaR;
+	DeltaR = 0;
         minDeltaR = 999999;
 	
 	for(unsigned int i = 0; i < Electrons.size(); ++i){
@@ -488,7 +484,8 @@ inline double MinDeltaRZDau(const reco::CompositeCandidate ZREC, const reco::Jet
         double minDeltaRZDau = -999999;
         
         std::vector<const pat::Electron*> zdaughters = ZDaughters(ZREC);
-        const pat::Electron *dau0, *dau1;
+        const pat::Electron *dau0 = 0;
+        const pat::Electron *dau1 = 0;
 
         if(zdaughters.size()){
         

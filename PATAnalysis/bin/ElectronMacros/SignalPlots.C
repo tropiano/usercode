@@ -1,5 +1,4 @@
 #include <vector>
-#include <iostream>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -25,7 +24,7 @@
 using namespace std;
 
 
-void Plot(){
+void SignalPlot(){
 	
 	int _Acc  = 1;
 	int _Qual = 0;
@@ -43,11 +42,11 @@ void Plot(){
 	_RecoCutFlags[_Iso] = "_Iso";
 	_RecoCutFlags[_EiD] = "_EiD";
 
-TFile *signal_file = TFile::Open("OutputFiles_Zee/NewCode/Signal_test_NewCode.root");
+    TFile *signal_file = TFile::Open("Zee_7TeV_RL01_10234.root");
 
-TFile* outplots = new TFile("Plots_Signal_NewCode.root", "RECREATE");
+    TFile* outplots = new TFile("TestSignalPlots.root", "RECREATE");
 
-TDirectory *Eff, *Acc, *Pt_Eff, *Eta_Eff, *Jet_Eff, *Mass_Eff, *Dist, *GenRec, *IsoJet;
+TDirectory *Eff, *Acc, *Pt_Eff, *Eta_Eff, *Jet_Eff, *Mass_Eff, *Dist, *GenRec, *IsoJet, *ChargeMisID;
 
 Eff      = outplots->mkdir("Efficiency");
 Acc      = outplots->mkdir("Acceptance");
@@ -58,6 +57,7 @@ Pt_Eff = Eff->mkdir("Efficiency_vs_ZPt");
 Eta_Eff = Eff->mkdir("Efficiency_vs_ZEta");
 Jet_Eff = Eff->mkdir("Efficiency_vs_GenJet");
 Dist    = Eff->mkdir("Distributions");
+ChargeMisID = outplots->mkdir("ChargeMisID");
 	
    /////////////Efficiency
 
@@ -389,7 +389,7 @@ Dist    = Eff->mkdir("Distributions");
 	
 	Dist->cd();
 	
-	string recMassZ_name = "RecoElectron/recMassZ";
+	string recMassZ_name = "RecoElectron/recZ_Plots/recMassZ";
 	recMassZ_name+=_RecoCutFlags[1].c_str();
 	TH1D* recMassZ_1 = (TH1D*) signal_file->Get(recMassZ_name.c_str());
 	recMassZ_name+=_RecoCutFlags[2].c_str();
@@ -421,7 +421,7 @@ Dist    = Eff->mkdir("Distributions");
 	ZMass->Write("ZMass.root");
 	ZMass->Close();
 	
-	string recPtZ_name = "RecoElectron/recPtZ";
+	string recPtZ_name = "RecoElectron/recZ_Plots/recPtZ";
 	recPtZ_name+=_RecoCutFlags[1].c_str();
 	TH1D* recPtZ_1 = (TH1D*) signal_file->Get(recPtZ_name.c_str());
 	recPtZ_name+=_RecoCutFlags[2].c_str();
@@ -453,7 +453,7 @@ Dist    = Eff->mkdir("Distributions");
 	ZPt->Write("ZPt.root");
 	ZPt->Close();
 	
-	string recEtaZ_name = "RecoElectron/recEtaZ";
+	string recEtaZ_name = "RecoElectron/recZ_Plots/recEtaZ";
 	recEtaZ_name+=_RecoCutFlags[1].c_str();
 	TH1D* recEtaZ_1 = (TH1D*) signal_file->Get(recEtaZ_name.c_str());
 	recEtaZ_name+=_RecoCutFlags[2].c_str();
@@ -485,7 +485,7 @@ Dist    = Eff->mkdir("Distributions");
 	ZEta->Write("ZEta.root");
 	ZEta->Close();
 	
-	string recJetN_name = "RecoElectron/IsoJetCounter";
+	string recJetN_name = "RecoElectron/recJet_Plots/IsoJetCounter";
 	recJetN_name+=_RecoCutFlags[1].c_str();
 	TH1D* recJetN_1 = (TH1D*) signal_file->Get(recJetN_name.c_str());
 	recJetN_name+=_RecoCutFlags[2].c_str();
@@ -517,15 +517,14 @@ Dist    = Eff->mkdir("Distributions");
 	JetN->Write("JetN.root");
 	JetN->Close();
 	
-	
 	////////////////// Gen - Rec Plots
 	
 	GenRec->cd();
 	
-	TH1D* GENMassZ_Acc = (TH1D*) signal_file->Get("GenElectron/genMassZ_Acc");
-    TH1D* GENPtZ_Acc = (TH1D*) signal_file->Get("GenElectron/genPtZ_Acc");
-    TH1D* GENEtaZ_Acc = (TH1D*) signal_file->Get("GenElectron/genEtaZ_Acc");
-    TH1D* GENJetN_Acc = (TH1D*) signal_file->Get("GenElectron/GenIsoJetCounter_Acc");
+	TH1D* GENMassZ_Acc = (TH1D*) signal_file->Get("GenElectron/genZ_Plots/genMassZ_Acc");
+    TH1D* GENPtZ_Acc = (TH1D*) signal_file->Get("GenElectron/genZ_Plots/genPtZ_Acc");
+    TH1D* GENEtaZ_Acc = (TH1D*) signal_file->Get("GenElectron/genZ_Plots/genEtaZ_Acc");
+    TH1D* GENJetN_Acc = (TH1D*) signal_file->Get("GenElectron/genJet_Plots/GenIsoJetCounter_Acc");
 	
 	TCanvas *GenRec_ZMass = new TCanvas;
 	recMassZ_12345->SetLineColor(1);
@@ -571,10 +570,10 @@ Dist    = Eff->mkdir("Distributions");
 	
 	IsoJet->cd();
 	
-	TH1D* GENJetPt = (TH1D*) signal_file->Get("GenElectron/GenJetPt_Acc");
-	TH1D* GENIsoJetPt = (TH1D*) signal_file->Get("GenElectron/GenIsoJetPt_Acc");
+	TH1D* GENJetPt = (TH1D*) signal_file->Get("GenElectron/genJet_Plots/GenJetPt_Acc");
+	TH1D* GENIsoJetPt = (TH1D*) signal_file->Get("GenElectron/genJet_Plots/GenIsoJetPt_Acc");
 	
-	string RECJetPt_name = "RecoElectron/RecoJetPt";
+	string RECJetPt_name = "RecoElectron/recJet_Plots/RecoJetPt";
 	RECJetPt_name+=_RecoCutFlags[1].c_str();
 	RECJetPt_name+=_RecoCutFlags[2].c_str();
 	RECJetPt_name+=_RecoCutFlags[3].c_str();
@@ -582,7 +581,7 @@ Dist    = Eff->mkdir("Distributions");
 	RECJetPt_name+=_RecoCutFlags[5].c_str();
 	TH1D* RECJetPt_12345 = (TH1D*) signal_file->Get(RECJetPt_name.c_str());
 	
-	string RECIsoJetPt_name = "RecoElectron/RecoIsoJetPt";
+	string RECIsoJetPt_name = "RecoElectron/recJet_Plots/RecoIsoJetPt";
 	RECIsoJetPt_name+=_RecoCutFlags[1].c_str();
 	RECIsoJetPt_name+=_RecoCutFlags[2].c_str();
 	RECIsoJetPt_name+=_RecoCutFlags[3].c_str();
@@ -608,14 +607,44 @@ Dist    = Eff->mkdir("Distributions");
 	IsoJetPt->Write("IsoJetPt.root");
 	IsoJetPt->Close();
 	
+	////////// Charge Misidentification
 	
-	////////// EiD comparison
+	ChargeMisID->cd();
+	
+    TH1D* AllEl_Pt_Acc = (TH1D*) signal_file->Get("RecoElectron/ChargeMisID/AllEl_Pt_Acc");
+	TH1D* AllEl_Eta_Acc = (TH1D*) signal_file->Get("RecoElectron/ChargeMisID/AllEl_Eta_Acc");
+	TH1D* AllEl_Hit_Acc = (TH1D*) signal_file->Get("RecoElectron/ChargeMisID/AllEl_Hit_Acc");
+	TH1D* AllEl_fBrem_Acc = (TH1D*) signal_file->Get("RecoElectron/ChargeMisID/AllEl_fBrem_Acc");
+	TH1D* AllEl_IP_Acc = (TH1D*) signal_file->Get("RecoElectron/ChargeMisID/AllEl_IP_Acc");
+	TH1D* ChargeMisID_Pt_Acc = (TH1D*) signal_file->Get("RecoElectron/ChargeMisID/ChargeMisID_Pt_Acc");
+	TH1D* ChargeMisID_Eta_Acc = (TH1D*) signal_file->Get("RecoElectron/ChargeMisID/ChargeMisID_Eta_Acc");
+	TH1D* ChargeMisID_Hit_Acc = (TH1D*) signal_file->Get("RecoElectron/ChargeMisID/ChargeMisID_Hit_Acc");
+	TH1D* ChargeMisID_fBrem_Acc = (TH1D*) signal_file->Get("RecoElectron/ChargeMisID/ChargeMisID_fBrem_Acc");
+	TH1D* ChargeMisID_IP_Acc = (TH1D*) signal_file->Get("RecoElectron/ChargeMisID/ChargeMisID_IP_Acc");
 	
 	
-	 
+	ChargeMisID_Eta_Acc->Divide(AllEl_Eta_Acc);
+	ChargeMisID_Eta_Acc->GetXaxis()->SetTitle("gen Eta");
+	ChargeMisID_Eta_Acc->SetName("ChargeMisID_Eta");
+	ChargeMisID_Eta_Acc->Write();
+	ChargeMisID_Pt_Acc->Divide(AllEl_Pt_Acc);
+	ChargeMisID_Pt_Acc->GetXaxis()->SetTitle("gen Pt");
+	ChargeMisID_Pt_Acc->SetName("ChargeMisID_Pt");
+	ChargeMisID_Pt_Acc->Write();
+	ChargeMisID_Hit_Acc->Divide(AllEl_Hit_Acc);
+	ChargeMisID_Hit_Acc->GetXaxis()->SetTitle("Number of Hits on track");
+	ChargeMisID_Hit_Acc->SetName("ChargeMisID_Hit");
+	ChargeMisID_Hit_Acc->Write();
+	ChargeMisID_IP_Acc->Divide(AllEl_IP_Acc);
+	ChargeMisID_IP_Acc->GetXaxis()->SetTitle("Impact Parameter");
+	ChargeMisID_IP_Acc->SetName("ChargeMisID_IP");
+	ChargeMisID_IP_Acc->Write();
+	ChargeMisID_fBrem_Acc->Divide(AllEl_fBrem_Acc);
+	ChargeMisID_fBrem_Acc->GetXaxis()->SetTitle("fBrem");
+	ChargeMisID_fBrem_Acc->SetName("ChargeMisID_fBrem");
+	ChargeMisID_fBrem_Acc->Write();	
+		
 
   outplots->Write();
   outplots->Close();
 }
-
-

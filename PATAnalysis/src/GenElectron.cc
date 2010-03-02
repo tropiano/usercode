@@ -32,12 +32,18 @@ GenElectron::GenElectron():
 
 genPtZ(0), genEtaZ(0), genMassZ(0), 
 genPtZ_Acc(0), genEtaZ_Acc(0), genMassZ_Acc(0),
-GenIsoJetPt_Acc(0), GenJetPt_Acc(0), GenIsoJetCounter_Acc(0), GenJetCounter_Acc(0), GenIsoJetCounter(0), GenJetCounter(0), genLeadIsoJetPt_Acc(0), genLeadIsoJetEta_Acc(0), JetMinDeltaRZDau_GEN(0),
+
+GenIsoJetPt_Acc(0), GenJetPt_Acc(0), genLeadIsoJetPt_Acc(0), genLeadIsoJetEta_Acc(0),
+
+GenJetCounter(0), GenJetCounter_Acc(0), GenIsoJetCounter(0), GenIsoJetCounter_Acc(0),  
+
 genLeadElPt(0), genSecElPt(0), genLeadElEta(0), genSecElEta(0),
 genLeadElPt_Acc(0), genSecElPt_Acc(0), genLeadElEta_Acc(0), genSecElEta_Acc(0),
 
+JetMinDeltaRZDau_GEN(0),
+
 _ptjetmin(30.), _etajetmax(3.), _norm(1.), _Norm(true), _Sumw2(false), _EventsPerFile(0),
-_file(0), _dir(0),  _histovector()
+_file(0), _dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _histovector()
 {   }
 
 void GenElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
@@ -49,7 +55,7 @@ void GenElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _xsec      = iConfig.getParameter<double>("CrossSection");
    _Norm      = iConfig.getParameter<bool>("Norm");
    _Sumw2      = iConfig.getParameter<bool>("Sumw2");
-   _EventsPerFile      = iConfig.getParameter<double>("EventsPerFile");
+   _EventsPerFile      = iConfig.getParameter<int32_t>("EventsPerFile");
    _ReportName = iConfig.getParameter<std::string>("ReportName");
 
     cout << "GenElectron file name : " << _file->GetName() << endl;
@@ -58,6 +64,9 @@ void GenElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _dir->cd();
    
    //Z variables
+   _Zdir = _dir->mkdir("genZ_Plots");
+   _Zdir->cd();
+   
    genPtZ   = new TH1D("genPtZ", "Generated Z p_{T}", 200, 0, 200);
    _histovector.push_back(genPtZ);
    genEtaZ  = new TH1D("genEtaZ", "Generated Z #eta", 100, -10, 10);
@@ -72,6 +81,9 @@ void GenElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _histovector.push_back(genMassZ_Acc);
    
    //Z Electrons variables
+   _Eldir = _dir->mkdir("genZElectrons_Plots");
+   _Eldir->cd();
+   
    genLeadElPt = new TH1D("genLeadElPt", "Generated Leading electron p_{T}", 200, 0, 200);
    _histovector.push_back(genLeadElPt);
    genSecElPt  = new TH1D("genSecElPt", "Generated Second electron p_{T}", 200, 0, 200);
@@ -90,6 +102,8 @@ void GenElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _histovector.push_back(genSecElEta_Acc);
    
    //Jet variables
+   _Jetdir = _dir->mkdir("genJet_Plots");
+   _Jetdir->cd();
    
    GenIsoJetCounter = new TH1D("GenIsoJetCounter", "Number of Generated Iso Jet per event", 10, 0, 10);
    _histovector.push_back(GenIsoJetCounter);
@@ -111,9 +125,6 @@ void GenElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    JetMinDeltaRZDau_GEN = new TH1D("JetMinDeltaRZDau_GEN", "Min Delta R Z Daughters All Gen Jets", 100, 0, 10);
    _histovector.push_back(JetMinDeltaRZDau_GEN);
    
-   std::vector<TH1D*>::const_iterator ibeg = _histovector.begin();
-   std::vector<TH1D*>::const_iterator iend = _histovector.end();
-   
    _fileCounter = 0;
    
    TChain *ch = new TChain("Events");
@@ -124,7 +135,7 @@ void GenElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
     ch->Add(datafile.c_str());
     _fileCounter++;
   }
-  
+   
   if(_Norm==true){
   _entries = ch->GetEntries();
   cout<<"RecoElectron analyzing nr. file = "<<_fileCounter<<endl;
@@ -163,7 +174,8 @@ void  GenElectron::process(const fwlite::Event& iEvent)
    if (zgenHandle->size() > 1) return;
    
    std::vector<const reco::Candidate*> zdaughters = ZGENDaughters(*zgenHandle);
-   const reco::Candidate *dau0, *dau1;
+   const reco::Candidate *dau0 = 0;
+   const reco::Candidate *dau1 = 0;
    
      if(zdaughters.size() != 0){        
      dau0 = zdaughters[0];
@@ -263,13 +275,15 @@ void  GenElectron::process(const fwlite::Event& iEvent)
       }
 
       
-      _dir->cd();
+      _Jetdir->cd();
       addHistosVsMulti(isogenjets.size(), "genJetPtIncl", " generated jet p_{T} spectrum", 200, 0, 200, genJetPtVsInclMulti);
       addHistosVsMulti(isogenjets.size(), "genJetEtaIncl", " generated jet #eta spectrum", 100, -5., 5., genJetEtaVsInclMulti);
+      _Zdir->cd();
       addHistosVsMulti(isogenjets.size(), "genZPtIncl", " generated Z p_{T} spectrum", 200, 0., 200., genZPtVsInclMulti);
       addHistosVsMulti(isogenjets.size(), "genZEtaIncl", " generated Z #eta spectrum", 100, -5., 5., genZEtaVsInclMulti);
       addHistosVsMulti(isogenjets.size(), "genZPtExcl", " generated Z p_{T} spectrum", 200, 0., 200., genZPtVsExclMulti);
       addHistosVsMulti(isogenjets.size(), "genZEtaExcl", " generated Z #eta spectrum", 100, -5., 5., genZEtaVsExclMulti);
+      _Eldir->cd();
       addHistosVsMulti(isogenjets.size(), "genEl1PtExcl", " generated lead electron p_{T} spectrum", 200, 0., 200., genEl1PtVsExclMulti);
       addHistosVsMulti(isogenjets.size(), "genEl1EtaExcl", " generated lead electron #eta spectrum", 100, -5., 5., genEl1EtaVsExclMulti);
       addHistosVsMulti(isogenjets.size(), "genEl2PtExcl", " generated sec electron p_{T} spectrum", 200, 0., 200., genEl2PtVsExclMulti);
@@ -353,7 +367,6 @@ void GenElectron::finalize(){
    
    ofstream Report;
    Report.open(_ReportName.c_str());
-   
    Report<<endl<<endl<<"----- Sample Info -----"<<endl<<endl;
    Report<<"File number = "<<_fileCounter<<endl;
    if(_Norm){
@@ -365,7 +378,6 @@ void GenElectron::finalize(){
    Report<<"Normalized to "<<_targetLumi<<" pb-1"<<endl;
    Report<<"Cross section = "<<_xsec<<" pb"<<endl;
    Report<<"Normalization factor = "<<_norm<<endl<<endl;
-   
    Report.close();
    
    _file->Write();

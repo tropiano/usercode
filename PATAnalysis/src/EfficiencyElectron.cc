@@ -37,6 +37,7 @@ genMassZEff_12(0), genPtZEff_12(0), genEtaZEff_12(0),
 genMassZEff_123(0), genPtZEff_123(0), genEtaZEff_123(0),
 genMassZEff_1234(0), genPtZEff_1234(0), genEtaZEff_1234(0),
 genMassZEff_12345(0), genPtZEff_12345(0), genEtaZEff_12345(0),
+
 GenIsoJetEff_1(0), GenIsoJetEff_12(0), GenIsoJetEff_123(0), GenIsoJetEff_1234(0), GenIsoJetEff_12345(0),
 
 genLeadElEtaEff_1(0), genLeadElEtaEff_12(0), genLeadElEtaEff_123(0), genLeadElEtaEff_1234(0), genLeadElEtaEff_12345(0),
@@ -57,11 +58,11 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
     _electronID = iConfig.getParameter<std::string>("electronID");
     
     //Selections
-   _Acc = iConfig.getParameter<double>("Acc");
-   _Qual = iConfig.getParameter<double>("Qual");
-   _Imp = iConfig.getParameter<double>("Imp");
-   _Iso = iConfig.getParameter<double>("Iso");
-   _EiD = iConfig.getParameter<double>("EiD");
+   _Acc = iConfig.getParameter<int32_t>("Acc");
+   _Qual = iConfig.getParameter<int32_t>("Qual");
+   _Imp = iConfig.getParameter<int32_t>("Imp");
+   _Iso = iConfig.getParameter<int32_t>("Iso");
+   _EiD = iConfig.getParameter<int32_t>("EiD");
    
    for(int i=0; i<6; i++){
    _RecoCutFlags[i] = "_1";}
@@ -242,9 +243,6 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent)
    fwlite::Handle<pat::TriggerEvent> triggerHandle;
    triggerHandle.getByLabel(iEvent, "patTriggerEvent");
    
-   //// Only first Z considered (higher pt of leading electron)
-   int ZNum = 0;
-   
    //Z Reco daughters
    std::vector<const pat::Electron*> zdaughters;
    const pat::Electron *dau0, *dau1;
@@ -256,19 +254,23 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent)
    
    if(zrecHandle->size()){
    
-   zdaughters = ZDaughters((*zrecHandle)[ZNum]);
+   zdaughters = ZDaughters((*zrecHandle)[0]);
       
    for(unsigned int i = 0; i < recjets.size(); i++){
-   if(RecoIsoJet((*zrecHandle)[ZNum],*recjets[i]))isojets.push_back(recjets[i]);
-   if(!RecoIsoJet((*zrecHandle)[ZNum],*recjets[i]))notisojets.push_back(recjets[i]);
+   if(RecoIsoJet((*zrecHandle)[0],*recjets[i]))isojets.push_back(recjets[i]);
+   if(!RecoIsoJet((*zrecHandle)[0],*recjets[i]))notisojets.push_back(recjets[i]);
    }
    
    }
    
    //Z Gen daughters
    std::vector<const reco::Candidate*> zgendaughters = ZGENDaughters(*zgenHandle);
-   const reco::Candidate *gendau0, *gendau1;
-   double genleadelpt, genleadeleta, gensecondelpt, gensecondeleta;
+   const reco::Candidate *gendau0 = 0;
+   const reco::Candidate *gendau1 = 0;
+   double genleadelpt = 0; 
+   double genleadeleta = 0; 
+   double gensecondelpt = 0;
+   double gensecondeleta = 0;
    
      if(zgendaughters.size() != 0){ 
             
@@ -342,7 +344,7 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent)
      if(zrecHandle->size()){
      
      //Events with a selected Zee 1
-     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])){
+     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0])){
      
      //Eff vs Z variables
      genMassZEff_1->Fill((*zgenHandle)[0].mass());
@@ -359,7 +361,7 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent)
      }
      
      //Events with a selected Zee 1+2
-     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])){
+     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[0])){
      
      //Eff vs Z variables
      genMassZEff_12->Fill((*zgenHandle)[0].mass());
@@ -376,7 +378,7 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent)
      }
      
      //Events with a selected Zee 1+2+3
-     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])){
+     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[0])){
      
      //Eff vs Z variables
      genMassZEff_123->Fill((*zgenHandle)[0].mass());
@@ -394,7 +396,7 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent)
      }
      
      //Events with a selected Zee 1+2+3+4
-     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])&&RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])){
+     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), (*zrecHandle)[0])){
      
      //Eff vs Z variables
      genMassZEff_1234->Fill((*zgenHandle)[0].mass());
@@ -411,7 +413,7 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent)
      }
      
      //Events with a selected Zee 1+2+3+4+5
-     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])&&RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])&&RecSelected(_RecoCutFlags[5].c_str(), _electronID.c_str(), (*zrecHandle)[ZNum])){
+     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[5].c_str(), _electronID.c_str(), (*zrecHandle)[0])){
       
       //Eff vs Z variables
       genMassZEff_12345->Fill((*zgenHandle)[0].mass());

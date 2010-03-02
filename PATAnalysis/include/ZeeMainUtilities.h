@@ -62,7 +62,7 @@ cfg<<"CrossSection = cms.double("<<xsec<<"),"<<std::endl;
 cfg<<"targetLumi  = cms.double("<<targetLumi<<"),"<<std::endl;
 cfg<<"Norm        = cms.bool("<<Norm<<"),"<<std::endl;
 cfg<<"Sumw2       = cms.bool("<<Sumw2<<"),"<<std::endl;
-cfg<<"EventsPerFile  = cms.double("<<EventsPerFile<<")"<<std::endl;
+cfg<<"EventsPerFile  = cms.int32("<<EventsPerFile<<")"<<std::endl;
 cfg<<")"<<std::endl<<std::endl;
 }
 
@@ -72,17 +72,17 @@ cfg<<"type        = cms.string(\"RecoElectron\"),"<<std::endl;
 cfg<<"Name        = cms.string(\"RecoElectron\"),"<<std::endl;
 cfg<<"sourceFileList = cms.string(\""<<Source.c_str()<<"\"),"<<std::endl;
 cfg<<"electronID = cms.string(\""<<electronID<<"\"),"<<std::endl;
-cfg<<"Acc = cms.double("<<Acc<<"),"<<std::endl;
-cfg<<"Qual = cms.double("<<Qual<<"),"<<std::endl;
-cfg<<"Imp = cms.double("<<Imp<<"),"<<std::endl;
-cfg<<"Iso = cms.double("<<Iso<<"),"<<std::endl;
-cfg<<"EiD = cms.double("<<EiD<<"),"<<std::endl;
+cfg<<"Acc = cms.int32("<<Acc<<"),"<<std::endl;
+cfg<<"Qual = cms.int32("<<Qual<<"),"<<std::endl;
+cfg<<"Imp = cms.int32("<<Imp<<"),"<<std::endl;
+cfg<<"Iso = cms.int32("<<Iso<<"),"<<std::endl;
+cfg<<"EiD = cms.int32("<<EiD<<"),"<<std::endl;
 cfg<<"CrossSection = cms.double("<<xsec<<"),"<<std::endl;
 cfg<<"targetLumi  = cms.double("<<targetLumi<<"),"<<std::endl;
 cfg<<"Norm        = cms.bool("<<Norm<<"),"<<std::endl;
 cfg<<"Sumw2       = cms.bool("<<Sumw2<<"),"<<std::endl;
 cfg<<"GenParticleMatch = cms.bool("<<GenParticleMatch<<"),"<<std::endl;
-cfg<<"EventsPerFile  = cms.double("<<EventsPerFile<<")"<<std::endl;
+cfg<<"EventsPerFile  = cms.int32("<<EventsPerFile<<")"<<std::endl;
 cfg<<")"<<std::endl<<std::endl;
 }
 
@@ -92,11 +92,11 @@ cfg<<"type        = cms.string(\"EfficiencyElectron\"),"<<std::endl;
 cfg<<"Name        = cms.string(\"EfficiencyElectron\"),"<<std::endl;
 cfg<<"sourceFileList = cms.string(\""<<Source.c_str()<<"\"),"<<std::endl;
 cfg<<"electronID = cms.string(\""<<electronID<<"\"),"<<std::endl;
-cfg<<"Acc = cms.double("<<Acc<<"),"<<std::endl;
-cfg<<"Qual = cms.double("<<Qual<<"),"<<std::endl;
-cfg<<"Imp = cms.double("<<Imp<<"),"<<std::endl;
-cfg<<"Iso = cms.double("<<Iso<<"),"<<std::endl;
-cfg<<"EiD = cms.double("<<EiD<<")"<<std::endl;
+cfg<<"Acc = cms.int32("<<Acc<<"),"<<std::endl;
+cfg<<"Qual = cms.int32("<<Qual<<"),"<<std::endl;
+cfg<<"Imp = cms.int32("<<Imp<<"),"<<std::endl;
+cfg<<"Iso = cms.int32("<<Iso<<"),"<<std::endl;
+cfg<<"EiD = cms.int32("<<EiD<<")"<<std::endl;
 cfg<<")"<<std::endl<<std::endl;
 }
 
@@ -106,15 +106,15 @@ cfg<<"type        = cms.string(\"RecoElectronNtuple\"),"<<std::endl;
 cfg<<"Name        = cms.string(\"RecoElectronNtuple\"),"<<std::endl;
 cfg<<"sourceFileList = cms.string(\""<<Source.c_str()<<"\"),"<<std::endl;
 cfg<<"electronID = cms.string(\""<<electronID<<"\"),"<<std::endl;
-cfg<<"Acc = cms.double("<<Acc<<"),"<<std::endl;
-cfg<<"Qual = cms.double("<<Qual<<"),"<<std::endl;
-cfg<<"Imp = cms.double("<<Imp<<"),"<<std::endl;
-cfg<<"Iso = cms.double("<<Iso<<"),"<<std::endl;
-cfg<<"EiD = cms.double("<<EiD<<"),"<<std::endl;
+cfg<<"Acc = cms.int32("<<Acc<<"),"<<std::endl;
+cfg<<"Qual = cms.int32("<<Qual<<"),"<<std::endl;
+cfg<<"Imp = cms.int32("<<Imp<<"),"<<std::endl;
+cfg<<"Iso = cms.int32("<<Iso<<"),"<<std::endl;
+cfg<<"EiD = cms.int32("<<EiD<<"),"<<std::endl;
 cfg<<"CrossSection = cms.double("<<xsec<<"),"<<std::endl;
 cfg<<"targetLumi  = cms.double("<<targetLumi<<"),"<<std::endl;
 cfg<<"Norm        = cms.bool("<<Norm<<"),"<<std::endl;
-cfg<<"EventsPerFile  = cms.double("<<EventsPerFile<<")"<<std::endl;
+cfg<<"EventsPerFile  = cms.int32("<<EventsPerFile<<")"<<std::endl;
 cfg<<")"<<std::endl<<std::endl;
 }
 
