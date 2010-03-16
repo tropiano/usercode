@@ -23,8 +23,9 @@
 #include "TMath.h"
 #include "TH1D.h"
 
+using namespace std;
 
-// Selection Parameters
+// Selection Cuts
 
 static double ptelcut = 20.;    //Gev/c
 static double etaelcut = 2.4;
@@ -40,9 +41,21 @@ static double etajetmax = 3.0;
 static double isocut = 0.1;                        //CombRelIso
 static double isojetcut = 0.5;                     //Isolation jet - Z electron
 
-////////////////////////////////
+// Tag & Probe cuts
 
-using namespace std;
+static double TAG_ptelcut = 30.;    //Gev/c
+static double TAG_etaelcut = 2.4;
+static double TAG_eta_el_excl_up = 1.56;               //Excluded Eta region
+static double TAG_eta_el_excl_down = 1.4442;           //Excluded Eta region
+static double TAG_minnhit = 15.;
+static double TAG_maxchi2 = 3.;
+static double TAG_dxycut = 0.02;     //cm
+static double TAG_isocut = 0.05;                        //CombRelIso
+static string TagEiD = "eidRobustLoose";
+
+
+/////////////////////////////////////////////////////////////////////////////////
+
 
 inline int nocase_cmp(const std::string & s1, const std::string & s2)
 {
@@ -153,7 +166,7 @@ inline bool isJetTriggered(const pat::TriggerEvent& triggersREC){
   return isTriggered(triggersREC, "HLT_Jet30");
 }
 
-////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
 
 // Z Daughters Methods
 
@@ -581,6 +594,129 @@ inline void addHistosVsMulti(unsigned int multi, std::string name, std::string t
   }
 }
 
-//////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////
 
+// Tag & Probe
+
+//Conditions required to fill TagAndProbe
+inline bool RecSelected_TagAndProbe(const reco::CompositeCandidate ZREC){
+  if ( ZREC.mass() > zmassmin && ZREC.mass() < zmassmax ){
+  return true;
+  }else{
+  return false;
+  }
+}
+
+//Cuts applied on Tag electron
+inline bool singleEl_Tag(const reco::Candidate& cand){
+  const pat::Electron* electron = dynamic_cast<const pat::Electron*>(&cand);
+  if (!electron) {
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (&cand);
+     if (scc && scc->hasMasterClone()){
+       electron = dynamic_cast<const pat::Electron*>(scc->masterClone().get()); 
+     }
+    }
+  if(electron){
+  const reco::GsfTrack track = *(electron->gsfTrack());
+  assert(&track);
+  bool TAG_EiD = false;
+  if(electron->isElectronIDAvailable(TagEiD.c_str())){
+  if(electron->electronID(TagEiD.c_str())==1.0)TAG_EiD = true;
+  }
+  return electron->pt() > TAG_ptelcut && 
+  	 fabs(electron->eta()) < TAG_etaelcut &&
+         (fabs(electron->eta())<TAG_eta_el_excl_down || fabs(electron->eta())>TAG_eta_el_excl_up) &&
+         track.numberOfValidHits() > TAG_minnhit && 
+         track.normalizedChi2() < TAG_maxchi2 &&
+         electron->dB() < TAG_dxycut &&
+         (electron->hcalIso() + electron->ecalIso() + electron->trackIso()) / electron->pt() < TAG_isocut &&  
+         TAG_EiD;
+ }else{
+ return false;}
+}
+
+//Probe cuts
+inline bool singleEl_Probe_Acc(const reco::Candidate& cand){
+  const pat::Electron* electron = dynamic_cast<const pat::Electron*>(&cand);
+  if (!electron) {
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (&cand);
+     if (scc && scc->hasMasterClone()){
+       electron = dynamic_cast<const pat::Electron*>(scc->masterClone().get()); 
+     }
+    }
+  if(electron){
+  return electron->pt() > ptelcut && fabs(electron->eta()) < etaelcut &&
+         (fabs(electron->eta())<eta_el_excl_down || fabs(electron->eta())>eta_el_excl_up);
+  }else{
+  return false;}
+  }
+  
+inline bool singleEl_Probe_Qual(const reco::Candidate& cand){
+  const pat::Electron* electron = dynamic_cast<const pat::Electron*>(&cand);
+  if (!electron) {
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (&cand);
+     if (scc && scc->hasMasterClone()){
+       electron = dynamic_cast<const pat::Electron*>(scc->masterClone().get()); 
+     }
+    }
+  if(electron){
+  const reco::GsfTrack track = *(electron->gsfTrack());
+  assert(&track);
+  return track.numberOfValidHits() > minnhit && track.normalizedChi2() < maxchi2;
+  }else{
+  return false;}
+  }
+  
+inline bool singleEl_Probe_Imp(const reco::Candidate& cand){
+  const pat::Electron* electron = dynamic_cast<const pat::Electron*>(&cand);
+  if (!electron) {
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (&cand);
+     if (scc && scc->hasMasterClone()){
+       electron = dynamic_cast<const pat::Electron*>(scc->masterClone().get()); 
+     }
+    }
+  if(electron){
+  return electron->dB() < dxycut;
+  }else{
+  return false;}
+  }
+  
+inline bool singleEl_Probe_Iso(const reco::Candidate& cand){
+  const pat::Electron* electron = dynamic_cast<const pat::Electron*>(&cand);
+  if (!electron) {
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (&cand);
+     if (scc && scc->hasMasterClone()){
+       electron = dynamic_cast<const pat::Electron*>(scc->masterClone().get()); 
+     }
+    }
+  if(electron){
+  const reco::GsfTrack track = *(electron->gsfTrack());
+  assert(&track);
+  return (electron->hcalIso() + electron->ecalIso() + electron->trackIso()) / electron->pt() < isocut;
+  }else{
+  return false;}
+  }
+  
+inline bool singleEl_Probe_EiD(const reco::Candidate& cand){
+  const pat::Electron* electron = dynamic_cast<const pat::Electron*>(&cand);
+  if (!electron) {
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (&cand);
+     if (scc && scc->hasMasterClone()){
+       electron = dynamic_cast<const pat::Electron*>(scc->masterClone().get()); 
+     }
+    }
+  if(electron){
+  bool electron_ID = false;
+  if(electron->isElectronIDAvailable(TagEiD.c_str())){
+  if(electron->electronID(TagEiD.c_str())==1.0)electron_ID = true;}
+  return electron_ID;
+  }else{
+  return false;}
+  }
+  
+inline bool singleEl_Probe_True(const reco::Candidate& cand){
+return true;
+}
+  
+  
 #endif

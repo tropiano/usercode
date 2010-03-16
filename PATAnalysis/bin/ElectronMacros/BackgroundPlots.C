@@ -25,7 +25,7 @@
 using namespace std;
 
 
-void BackPlot(){
+void BackPlots(){
 	
 	int _Acc  = 1;
 	int _Qual = 0;
@@ -45,11 +45,31 @@ void BackPlot(){
 
 TFile *signal_file = TFile::Open("Zee_7TeV_RL01_10234.root");
 
+        if(!signal_file){
+	cout<<"Error! Signal files doesn't exist!"<<endl;
+	return;
+	}
+
 TFile* QCD = TFile::Open("QCDall_norm100.root");
+
+        if(!QCD){
+	cout<<"Error! QCD files doesn't exist!"<<endl;
+	return;
+	}
 	
 TFile* TTbar = TFile::Open("TTbar_norm100.root");
+
+        if(!TTbar){
+	cout<<"Error! TTbar files doesn't exist!"<<endl;
+	return;
+	}
 	
 TFile* Wenu = TFile::Open("Wenu_norm100.root");
+
+        if(!Wenu){
+	cout<<"Error! Wenu files doesn't exist!"<<endl;
+	return;
+	}
 	
 TFile* outplots = new TFile("TestBackgroundPlots.root", "RECREATE");
 
@@ -77,6 +97,11 @@ Jet      = outplots->mkdir("JetNumber");
 	TH1D* Signal_recMassZ_1234 = (TH1D*) signal_file->Get(Signal_recMassZ_name.c_str());
 	Signal_recMassZ_name+=_RecoCutFlags[5].c_str();
 	TH1D* Signal_recMassZ_12345 = (TH1D*) signal_file->Get(Signal_recMassZ_name.c_str());
+	
+	if(!Signal_recMassZ_12345){
+	cout<<"Error! Cut sequence wrong!"<<endl;
+	return;
+	}
 	
 	string QCD_recMassZ_name = "RecoElectron/recZ_Plots/recMassZ";
 	QCD_recMassZ_name+=_RecoCutFlags[1].c_str();
@@ -281,7 +306,7 @@ Jet      = outplots->mkdir("JetNumber");
 	Signal_recMassZ_1234->SetTitle("Reconstructed Z Mass");
 	ZMass_name+=_RecoCutFlags[4].c_str();
 	ZMass_1234->Write(ZMass_name.c_str());
-		ZMass_1234->Close();}
+	ZMass_1234->Close();}
 	
 	double sig_err_1234, qcd_err_1234, tt_err_1234, w_err_1234;
 	
@@ -326,7 +351,7 @@ Jet      = outplots->mkdir("JetNumber");
 	Signal_recMassZ_12345->SetTitle("Reconstructed Z Mass");
 	ZMass_name+=_RecoCutFlags[5].c_str();
 	ZMass_12345->Write(ZMass_name.c_str());
-		ZMass_12345->Close();}
+	ZMass_12345->Close();}
 	
 	double sig_err_12345, qcd_err_12345, tt_err_12345, w_err_12345;
 	
@@ -458,7 +483,7 @@ Jet      = outplots->mkdir("JetNumber");
 	Signal_recJetN_12->SetTitle("Reconstructed #jet");
 	JetN_name+=_RecoCutFlags[2].c_str();
 	JetN_12->Write(JetN_name.c_str());
-		JetN_12->Close();}
+	JetN_12->Close();}
 	
 	if(_RecoCutFlags[3] != "_1"){
 	TCanvas *JetN_123 = new TCanvas;
@@ -490,7 +515,7 @@ Jet      = outplots->mkdir("JetNumber");
 	Signal_recJetN_123->SetTitle("Reconstructed #jet");
 	JetN_name+=_RecoCutFlags[3].c_str();
 	JetN_123->Write(JetN_name.c_str());
-		JetN_123->Close();}
+	JetN_123->Close();}
 	
 	if(_RecoCutFlags[4] != "_1"){
 	TCanvas *JetN_1234 = new TCanvas;
@@ -522,7 +547,7 @@ Jet      = outplots->mkdir("JetNumber");
 	Signal_recJetN_1234->SetTitle("Reconstructed #jet");
 	JetN_name+=_RecoCutFlags[4].c_str();
 	JetN_1234->Write(JetN_name.c_str());
-		JetN_1234->Close();}
+	JetN_1234->Close();}
 	
 	if(_RecoCutFlags[5] != "_1"){
 	TCanvas *JetN_12345 = new TCanvas;
@@ -554,7 +579,7 @@ Jet      = outplots->mkdir("JetNumber");
 	Signal_recJetN_12345->SetTitle("Reconstructed #jet");
 	JetN_name+=_RecoCutFlags[5].c_str();
 	JetN_12345->Write(JetN_name.c_str());
-		JetN_12345->Close();}
+	JetN_12345->Close();}
 	
 	
 	

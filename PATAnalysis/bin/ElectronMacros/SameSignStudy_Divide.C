@@ -45,6 +45,10 @@ gStyle->SetOptStat(1001111);
 gStyle->SetOptFit(1111);
 
 TFile *inputFile = new TFile ("QCD_all_norm100.root");
+        if(!inputFile){
+	cout<<"Error! Input files doesn't exist!"<<endl;
+	return;
+	}
 TFile* outplots = new TFile("TestDivide.root", "RECREATE");
 
 TDirectory *PtDir = outplots->mkdir("Pt");
@@ -69,6 +73,11 @@ recLeadElPt_name+=_RecoCutFlags[4].c_str();
 TH1D *PtHistoOC_1234 = (TH1D*) OC->Get(recLeadElPt_name.c_str());
 recLeadElPt_name+=_RecoCutFlags[5].c_str();
 TH1D *PtHistoOC_12345 = (TH1D*) OC->Get(recLeadElPt_name.c_str());
+
+        if(!PtHistoOC_12345){
+	cout<<"Error! Cut sequence wrong!"<<endl;
+	return;
+	}
 
 string recLeadElPtSC_name = "recLeadElPtSC";
 recLeadElPtSC_name+=_RecoCutFlags[1].c_str();

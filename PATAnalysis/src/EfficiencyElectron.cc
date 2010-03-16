@@ -46,7 +46,7 @@ genLeadElPtEff_1(0), genLeadElPtEff_12(0), genLeadElPtEff_123(0), genLeadElPtEff
 AccDenom_genPtZ(0), AccDenom_genMassZ(0), AccDenom_genEtaZ(0), AccDenom_genLeadElEta(0), AccDenom_genLeadElPt(0), AccDenom_GenIsoJetNumber(0),
 EffDenom_genPtZ(0), EffDenom_genMassZ(0), EffDenom_genEtaZ(0), EffDenom_genLeadElEta(0), EffDenom_genLeadElPt(0), EffDenom_GenIsoJetNumber(0),
 
-_dir(0), _electronID("eidRobustTight"), _file(0), _Acc(1), _Qual(2), _Imp(3), _Iso(4), _EiD(5), _histoVector()
+_dir(0), _electronID("eidRobustTight"), _file(0), _Acc(1), _Qual(2), _Imp(3), _Iso(4), _EiD(5), _histoVector(), _nbin(10), _xmin(-0.5), _xmax(9.5), _Norm(true), _norm(1.), _entries(0), _EventsPerFile(0) 
 
 { }
 
@@ -56,6 +56,9 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
     std::string dirname = iConfig.getParameter<std::string>("Name");
     std::string sourceFileList = iConfig.getParameter<std::string>("sourceFileList");
     _electronID = iConfig.getParameter<std::string>("electronID");
+    _Norm      = iConfig.getParameter<bool>("Norm");
+    _targetLumi= iConfig.getParameter<double>("targetLumi");
+    _xsec      = iConfig.getParameter<double>("CrossSection");
     
     //Selections
    _Acc = iConfig.getParameter<int32_t>("Acc");
@@ -198,30 +201,143 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    //Eff vs Jet properties
    string GenIsoJetEff_name = "GenIsoJetEff";
    GenIsoJetEff_name+=_RecoCutFlags[1].c_str();
-   GenIsoJetEff_1 = new TH1D(GenIsoJetEff_name.c_str(), "Number of Gen Iso Jet", 10, 0, 10);
+   GenIsoJetEff_1 = new TH1D(GenIsoJetEff_name.c_str(), "Number of Gen Iso Jet", 10, -0.5, 9.5);
    _histoVector.push_back(GenIsoJetEff_1);
    GenIsoJetEff_name+=_RecoCutFlags[2].c_str();
-   GenIsoJetEff_12 = new TH1D(GenIsoJetEff_name.c_str(), "Number of Gen Iso Jet", 10, 0, 10);
+   GenIsoJetEff_12 = new TH1D(GenIsoJetEff_name.c_str(), "Number of Gen Iso Jet", 10, -0.5, 9.5);
    _histoVector.push_back(GenIsoJetEff_12);
    GenIsoJetEff_name+=_RecoCutFlags[3].c_str();
-   GenIsoJetEff_123 = new TH1D(GenIsoJetEff_name.c_str(), "Number of Gen Iso Jet", 10, 0, 10);
+   GenIsoJetEff_123 = new TH1D(GenIsoJetEff_name.c_str(), "Number of Gen Iso Jet", 10, -0.5, 9.5);
    _histoVector.push_back(GenIsoJetEff_123);
    GenIsoJetEff_name+=_RecoCutFlags[4].c_str();
-   GenIsoJetEff_1234 = new TH1D(GenIsoJetEff_name.c_str(), "Number of Gen Iso Jet", 10, 0, 10);
+   GenIsoJetEff_1234 = new TH1D(GenIsoJetEff_name.c_str(), "Number of Gen Iso Jet", 10, -0.5, 9.5);
    _histoVector.push_back(GenIsoJetEff_1234);
    GenIsoJetEff_name+=_RecoCutFlags[5].c_str();
-   GenIsoJetEff_12345 = new TH1D(GenIsoJetEff_name.c_str(), "Number of Gen Iso Jet", 10, 0, 10);
+   GenIsoJetEff_12345 = new TH1D(GenIsoJetEff_name.c_str(), "Number of Gen Iso Jet", 10, -0.5, 9.5);
    _histoVector.push_back(GenIsoJetEff_12345);
+   
+// Tag & Probe
+
+  //std::vector<bool (*)(const reco::Candidate&)> tag_cuts;
+  tag_cuts.push_back(singleEl_Tag);
+  
+  std::vector<bool (*)(const reco::Candidate&)> probe_cuts_1;
+  std::vector<bool (*)(const reco::Candidate&)> probe_cuts_12;
+  std::vector<bool (*)(const reco::Candidate&)> probe_cuts_123;
+  std::vector<bool (*)(const reco::Candidate&)> probe_cuts_1234;
+  std::vector<bool (*)(const reco::Candidate&)> probe_cuts_12345;
+  
+  probe_cuts_1.clear();
+  probe_cuts_12.clear();
+  probe_cuts_123.clear();
+  probe_cuts_1234.clear();
+  probe_cuts_12345.clear();
+  
+  for(unsigned int i = 1; i < 6; i++){
+  if(_RecoCutFlags[i] == "_Acc"){
+  if(i<2)probe_cuts_1.push_back(singleEl_Probe_Acc);
+  if(i<3)probe_cuts_12.push_back(singleEl_Probe_Acc);
+  if(i<4)probe_cuts_123.push_back(singleEl_Probe_Acc);
+  if(i<5)probe_cuts_1234.push_back(singleEl_Probe_Acc);
+  if(i<6)probe_cuts_12345.push_back(singleEl_Probe_Acc);}
+  if(_RecoCutFlags[i] == "_Qual"){
+  if(i<2)probe_cuts_1.push_back(singleEl_Probe_Qual);
+  if(i<3)probe_cuts_12.push_back(singleEl_Probe_Qual);
+  if(i<4)probe_cuts_123.push_back(singleEl_Probe_Qual);
+  if(i<5)probe_cuts_1234.push_back(singleEl_Probe_Qual);
+  if(i<6)probe_cuts_12345.push_back(singleEl_Probe_Qual);}
+  if(_RecoCutFlags[i] == "_Imp"){
+  if(i<2)probe_cuts_1.push_back(singleEl_Probe_Imp);
+  if(i<3)probe_cuts_12.push_back(singleEl_Probe_Imp);
+  if(i<4)probe_cuts_123.push_back(singleEl_Probe_Imp);
+  if(i<5)probe_cuts_1234.push_back(singleEl_Probe_Imp);
+  if(i<6)probe_cuts_12345.push_back(singleEl_Probe_Imp);}
+  if(_RecoCutFlags[i] == "_Iso"){
+  if(i<2)probe_cuts_1.push_back(singleEl_Probe_Iso);
+  if(i<3)probe_cuts_12.push_back(singleEl_Probe_Iso);
+  if(i<4)probe_cuts_123.push_back(singleEl_Probe_Iso);
+  if(i<5)probe_cuts_1234.push_back(singleEl_Probe_Iso);
+  if(i<6)probe_cuts_12345.push_back(singleEl_Probe_Iso);}
+  if(_RecoCutFlags[i] == "_EiD"){
+  if(i<2)probe_cuts_1.push_back(singleEl_Probe_EiD);
+  if(i<3)probe_cuts_12.push_back(singleEl_Probe_EiD);
+  if(i<4)probe_cuts_123.push_back(singleEl_Probe_EiD);
+  if(i<5)probe_cuts_1234.push_back(singleEl_Probe_EiD);
+  if(i<6)probe_cuts_12345.push_back(singleEl_Probe_EiD);}
+  if(_RecoCutFlags[i] == "_1"){
+  if(i<2)probe_cuts_1.push_back(singleEl_Probe_True);
+  if(i<3)probe_cuts_12.push_back(singleEl_Probe_True);
+  if(i<4)probe_cuts_123.push_back(singleEl_Probe_True);
+  if(i<5)probe_cuts_1234.push_back(singleEl_Probe_True);
+  if(i<6)probe_cuts_12345.push_back(singleEl_Probe_True);}
+  }
+  
+  string name_TagDir="Tag&Probe";
+  string name_TPFiller="Electron";
+  
+  name_TagDir+=_RecoCutFlags[1].c_str();
+  name_TPFiller+=_RecoCutFlags[1].c_str();
+  name_TagDir+=_RecoCutFlags[2].c_str();
+  name_TPFiller+=_RecoCutFlags[2].c_str();
+  string name_TPFiller_12 = name_TPFiller+"_";
+  TDirectory *TagDir_12 = _dir->mkdir(name_TagDir.c_str());
+  
+  _TagProbe_Electron_12 = new TagAndProbeFiller(TagDir_12, string(name_TPFiller_12.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts_1, probe_cuts_12);
+  
+  name_TagDir+=_RecoCutFlags[3].c_str();
+  name_TPFiller+=_RecoCutFlags[3].c_str();
+  string name_TPFiller_123 = name_TPFiller+"_";
+  TDirectory *TagDir_123 = _dir->mkdir(name_TagDir.c_str());
+  
+  _TagProbe_Electron_123 = new TagAndProbeFiller(TagDir_123, string(name_TPFiller_123.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts_12, probe_cuts_123);
+  
+  name_TagDir+=_RecoCutFlags[4].c_str();
+  name_TPFiller+=_RecoCutFlags[4].c_str();
+  string name_TPFiller_1234 = name_TPFiller+"_";
+  TDirectory *TagDir_1234 = _dir->mkdir(name_TagDir.c_str());
+  
+  _TagProbe_Electron_1234 = new TagAndProbeFiller(TagDir_1234, string(name_TPFiller_1234.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts_123, probe_cuts_1234);
+  
+  name_TagDir+=_RecoCutFlags[5].c_str();
+  name_TPFiller+=_RecoCutFlags[5].c_str();
+  string name_TPFiller_12345 = name_TPFiller+"_";
+  TDirectory *TagDir_12345 = _dir->mkdir(name_TagDir.c_str());
+  
+  _TagProbe_Electron_12345 = new TagAndProbeFiller(TagDir_12345, string(name_TPFiller_12345.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts_1234, probe_cuts_12345);
+  
+  int fileCounter = 0;
+  
+  TChain *ch = new TChain("Events");
+  ifstream infile;
+  infile.open(sourceFileList.c_str());
+  string datafile;
+  while(getline (infile, datafile)){
+    ch->Add(datafile.c_str());
+    fileCounter++;
+  }
+  
+  if(_Norm==true){
+  _entries = ch->GetEntries();
+  cout<<"RecoElectron analyzing nr. file = "<<fileCounter<<endl;
+  cout<<"RecoElectron analyzing nr. event = "<<_entries<<endl;}
  
+  if(_Norm==false){
+  _entries = fileCounter*_EventsPerFile;
+  cout<<"RecoElectron analyzing nr. file = "<<fileCounter<<endl;
+  cout<<"RecoElectron analyzing nr. event = "<<_entries<<endl;
+  }
+  
+  delete ch;
+  
   cout << "EfficiencyElectron Worker built." << endl;   
+  
 }
 
 EfficiencyElectron::~EfficiencyElectron(){
   _file->ls();
 }
 
-void  EfficiencyElectron::process(const fwlite::Event& iEvent)
-{
+void  EfficiencyElectron::process(const fwlite::Event& iEvent){
 
    _file->cd();
 
@@ -429,12 +545,34 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent)
       
 }
 
+// Tag & Probe
+
+if(RecSelected_TagAndProbe((*zrecHandle)[0])){
+
+double lumi = _entries/_xsec;
+
+   if(lumi){
+   _norm = _targetLumi/lumi;
+   }
+
+_TagProbe_Electron_12->fill((*zrecHandle)[0], isojets.size(), _norm);
+_TagProbe_Electron_123->fill((*zrecHandle)[0], isojets.size(), _norm);
+_TagProbe_Electron_1234->fill((*zrecHandle)[0], isojets.size(), _norm);
+_TagProbe_Electron_12345->fill((*zrecHandle)[0], isojets.size(), _norm);
+
+}
 }
  
 }
 
 void EfficiencyElectron::finalize(){
-   
+
+  _TagProbe_Electron_12->finalize();
+  _TagProbe_Electron_123->finalize();
+  _TagProbe_Electron_1234->finalize();
+  _TagProbe_Electron_12345->finalize();
+  
   _file->Write();
   
 }
+

@@ -21,19 +21,19 @@ int main() {
 
   //Job
   string cfgName = "config.py";
-  string sourceList = "TTbar_norm100.txt";
-  string outputName = "TTbar_norm100";
+  string sourceList = "files_test.txt";
+  string outputName = "test";
   string electronID = "eidRobustLoose";
   
   //Normalization
-  double xsec = 94.3;
+  double xsec = 1300.;
   double targetLumi = 100.;
-  string Norm = "False";
-  int EventsPerFile = 50000;
+  string Norm = "True";
+  int EventsPerFile = 0;
   string Sumw2= "True";
   
   //Gen Particle Matching
-  string GenParticleMatch = "False";
+  string GenParticleMatch = "True";
   
   //Modules
   bool GEN = true;
@@ -54,7 +54,8 @@ int main() {
   //Log
   bool Log = false;
   
-  string path = "/raid/sfrosali/Zjets/Commit/CMSSW_3_3_5/src/Firenze/PATAnalysis/bin/";
+  //DO NOT FORGET THE SLASH AT THE END OF THE PATH
+  string path = "/raid/sfrosali/Zjets/Commit/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/";
 
   makeCfg(GEN, RECO, EFF, NTUPLE, Acc, Qual, Imp, Iso, EiD, path.c_str(), cfgName.c_str(), sourceList.c_str(), outputName.c_str(), Norm.c_str(), Sumw2.c_str(), EventsPerFile, electronID.c_str(), xsec, targetLumi, GenParticleMatch.c_str());
 

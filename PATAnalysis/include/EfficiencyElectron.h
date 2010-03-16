@@ -8,6 +8,7 @@
 #include "TList.h"
 #include "TFile.h"
 #include "MyPatAnalysis.h"
+#include "TagAndProbeFiller.h"
 
 class EfficiencyElectron : public MyPatAnalysis{
 public :
@@ -50,6 +51,29 @@ private:
   std::vector<TH1D*> _histoVector;
   
   std::string _RecoCutFlags[6];
+  
+  std::vector<bool (*)(const reco::Candidate&)> tag_cuts;
+  
+  TagAndProbeFiller* _TagProbe_Electron_12;
+  TagAndProbeFiller* _TagProbe_Electron_123;
+  TagAndProbeFiller* _TagProbe_Electron_1234;
+  TagAndProbeFiller* _TagProbe_Electron_12345;
+  
+  int _nbin;
+  
+  double _xmin;
+
+  double _xmax;
+  
+  bool _Norm;
+  
+  double _norm;
+  
+  int _entries, _EventsPerFile;
+  
+  double _targetLumi;
+  
+  double _xsec;
 
 };
 #endif

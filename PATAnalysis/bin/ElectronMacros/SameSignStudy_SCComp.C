@@ -39,7 +39,15 @@ void SCComp() {
 gROOT->SetStyle("Plain");
 
 TFile *Signal = new TFile ("Zee_7TeV_RL01_10234.root");
+        if(!Signal){
+	cout<<"Error! Signal files doesn't exist!"<<endl;
+	return;
+	}
 TFile *Background = new TFile ("QCD_all_norm100.root");
+        if(!Background){
+	cout<<"Error! Background files doesn't exist!"<<endl;
+	return;
+	}
 TFile *outplots = new TFile("TestSCComp.root", "RECREATE");
 
 TDirectory *SignalDir = (TDirectory*) Signal->Get("RecoElectron/SameSign");
@@ -61,6 +69,11 @@ TH1D *BackSC_1234 = (TH1D*) BackDir->Get(recMassZSC_name.c_str());
 recMassZSC_name+=_RecoCutFlags[5].c_str();
 TH1D *SignalSC_12345 = (TH1D*) SignalDir->Get(recMassZSC_name.c_str());
 TH1D *BackSC_12345 = (TH1D*) BackDir->Get(recMassZSC_name.c_str());
+
+        if(!BackSC_12345){
+	cout<<"Error! Cut sequence wrong!"<<endl;
+	return;
+	}
 
 TCanvas *MassComp_1 = new TCanvas;
 MassComp_1->SetLogy();
