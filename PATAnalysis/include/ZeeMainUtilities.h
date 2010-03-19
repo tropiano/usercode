@@ -97,6 +97,7 @@ cfg<<"electronID = cms.string(\""<<electronID<<"\"),"<<std::endl;
 cfg<<"CrossSection = cms.double("<<xsec<<"),"<<std::endl;
 cfg<<"targetLumi  = cms.double("<<targetLumi<<"),"<<std::endl;
 cfg<<"Norm        = cms.bool("<<Norm<<"),"<<std::endl;
+cfg<<"EventsPerFile  = cms.int32("<<EventsPerFile<<"),"<<std::endl;
 cfg<<"Acc = cms.int32("<<Acc<<"),"<<std::endl;
 cfg<<"Trg = cms.int32("<<Trg<<"),"<<std::endl;
 cfg<<"Qual = cms.int32("<<Qual<<"),"<<std::endl;

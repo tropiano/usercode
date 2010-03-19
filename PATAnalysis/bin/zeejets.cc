@@ -26,8 +26,7 @@ int main() {
   string electronID = "eidRobustLoose";
   
   //Sample: mc = MonteCarlo , data = Data
-  
-  string sample = "data";
+  string sample = "mc";
   
   //Normalization - If Norm = "False" and EventsPerFile = 0 -> Normalization is not applied
   double xsec = 1300.;
@@ -43,7 +42,7 @@ int main() {
   bool GEN = true;
   bool RECO = true;
   bool EFF = true;
-  bool NTUPLE = true;
+  bool NTUPLE = false;
   
   //Cuts
   int Acc = 1;

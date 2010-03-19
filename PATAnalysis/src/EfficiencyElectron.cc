@@ -58,6 +58,7 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
     std::string sourceFileList = iConfig.getParameter<std::string>("sourceFileList");
     _electronID = iConfig.getParameter<std::string>("electronID");
     _Norm      = iConfig.getParameter<bool>("Norm");
+    _EventsPerFile    = iConfig.getParameter<int32_t>("EventsPerFile");
     _targetLumi= iConfig.getParameter<double>("targetLumi");
     _xsec      = iConfig.getParameter<double>("CrossSection");
     
