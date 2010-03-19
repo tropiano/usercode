@@ -19,7 +19,6 @@
 #include "DataFormats/FWLite/interface/ChainEvent.h"
 #include "DataFormats/FWLite/interface/Handle.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
-#include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 #include "DataFormats/Candidate/interface/CompositeCandidate.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/FWLite/interface/ChainEvent.h"
@@ -37,22 +36,24 @@ genMassZEff_12(0), genPtZEff_12(0), genEtaZEff_12(0),
 genMassZEff_123(0), genPtZEff_123(0), genEtaZEff_123(0),
 genMassZEff_1234(0), genPtZEff_1234(0), genEtaZEff_1234(0),
 genMassZEff_12345(0), genPtZEff_12345(0), genEtaZEff_12345(0),
+genMassZEff_123456(0), genPtZEff_123456(0), genEtaZEff_123456(0),
 
-GenIsoJetEff_1(0), GenIsoJetEff_12(0), GenIsoJetEff_123(0), GenIsoJetEff_1234(0), GenIsoJetEff_12345(0),
+GenIsoJetEff_1(0), GenIsoJetEff_12(0), GenIsoJetEff_123(0), GenIsoJetEff_1234(0), GenIsoJetEff_12345(0), GenIsoJetEff_123456(0),
 
-genLeadElEtaEff_1(0), genLeadElEtaEff_12(0), genLeadElEtaEff_123(0), genLeadElEtaEff_1234(0), genLeadElEtaEff_12345(0),
-genLeadElPtEff_1(0), genLeadElPtEff_12(0), genLeadElPtEff_123(0), genLeadElPtEff_1234(0), genLeadElPtEff_12345(0),
+genLeadElEtaEff_1(0), genLeadElEtaEff_12(0), genLeadElEtaEff_123(0), genLeadElEtaEff_1234(0), genLeadElEtaEff_12345(0), genLeadElEtaEff_123456(0),
+genLeadElPtEff_1(0), genLeadElPtEff_12(0), genLeadElPtEff_123(0), genLeadElPtEff_1234(0), genLeadElPtEff_12345(0), genLeadElPtEff_123456(0),
 
 AccDenom_genPtZ(0), AccDenom_genMassZ(0), AccDenom_genEtaZ(0), AccDenom_genLeadElEta(0), AccDenom_genLeadElPt(0), AccDenom_GenIsoJetNumber(0),
 EffDenom_genPtZ(0), EffDenom_genMassZ(0), EffDenom_genEtaZ(0), EffDenom_genLeadElEta(0), EffDenom_genLeadElPt(0), EffDenom_GenIsoJetNumber(0),
 
-_dir(0), _electronID("eidRobustTight"), _file(0), _Acc(1), _Qual(2), _Imp(3), _Iso(4), _EiD(5), _histoVector(), _nbin(10), _xmin(-0.5), _xmax(9.5), _Norm(true), _norm(1.), _entries(0), _EventsPerFile(0) 
+_sample("mc"), _dir(0), _electronID("eidRobustTight"), _file(0), _Acc(1), _Trg(2), _Qual(3), _Imp(4), _Iso(5), _EiD(6), _histoVector(), _nbin(10), _xmin(-0.5), _xmax(9.5), _Norm(true), _norm(1.), _entries(0), _EventsPerFile(0) 
 
 { }
 
 void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _file = out; 
-  
+    
+    _sample = iConfig.getParameter<std::string>("Sample");
     std::string dirname = iConfig.getParameter<std::string>("Name");
     std::string sourceFileList = iConfig.getParameter<std::string>("sourceFileList");
     _electronID = iConfig.getParameter<std::string>("electronID");
@@ -62,19 +63,21 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
     
     //Selections
    _Acc = iConfig.getParameter<int32_t>("Acc");
+   _Trg = iConfig.getParameter<int32_t>("Trg");
    _Qual = iConfig.getParameter<int32_t>("Qual");
    _Imp = iConfig.getParameter<int32_t>("Imp");
    _Iso = iConfig.getParameter<int32_t>("Iso");
    _EiD = iConfig.getParameter<int32_t>("EiD");
    
-   for(int i=0; i<6; i++){
+   for(int i=0; i<7; i++){
    _RecoCutFlags[i] = "_1";}
    
-   _RecoCutFlags[_Acc] = "_Acc";
+   _RecoCutFlags[_Acc] =  "_Acc";
+   _RecoCutFlags[_Trg] =  "_Trg";
    _RecoCutFlags[_Qual] = "_Qual";
-   _RecoCutFlags[_Imp] = "_Imp";
-   _RecoCutFlags[_Iso] = "_Iso";
-   _RecoCutFlags[_EiD] = "_EiD";
+   _RecoCutFlags[_Imp] =  "_Imp";
+   _RecoCutFlags[_Iso] =  "_Iso";
+   _RecoCutFlags[_EiD] =  "_EiD";
   
     cout << "EfficiencyElectron file name : " << _file->GetName() << endl;
    _file->cd();
@@ -126,7 +129,10 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _histoVector.push_back(genLeadElEtaEff_1234);
    genLeadElEtaEff_name+=_RecoCutFlags[5].c_str();
    genLeadElEtaEff_12345 = new TH1D(genLeadElEtaEff_name.c_str(), "Generated Leading electron #eta", 100, -2.5, 2.5);
-   _histoVector.push_back(genLeadElEtaEff_12345);   
+   _histoVector.push_back(genLeadElEtaEff_12345);
+   genLeadElEtaEff_name+=_RecoCutFlags[6].c_str();
+   genLeadElEtaEff_123456 = new TH1D(genLeadElEtaEff_name.c_str(), "Generated Leading electron #eta", 100, -2.5, 2.5);
+   _histoVector.push_back(genLeadElEtaEff_123456);  
    
    string genLeadElPtEff_name = "genLeadElPtEff";
    genLeadElPtEff_name+=_RecoCutFlags[1].c_str();
@@ -144,6 +150,9 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    genLeadElPtEff_name+=_RecoCutFlags[5].c_str();
    genLeadElPtEff_12345 = new TH1D(genLeadElPtEff_name.c_str(), "Generated Leading electron Pt", 200, 0, 200);
    _histoVector.push_back(genLeadElPtEff_12345);
+   genLeadElPtEff_name+=_RecoCutFlags[6].c_str();
+   genLeadElPtEff_123456 = new TH1D(genLeadElPtEff_name.c_str(), "Generated Leading electron Pt", 200, 0, 200);
+   _histoVector.push_back(genLeadElPtEff_123456);
    
    //Eff vs Z properties
    
@@ -163,6 +172,9 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    genMassZEff_name+=_RecoCutFlags[5].c_str();
    genMassZEff_12345 = new TH1D(genMassZEff_name.c_str(), "Generated Z Mass", 200, 50, 150);
    _histoVector.push_back(genMassZEff_12345);
+   genMassZEff_name+=_RecoCutFlags[6].c_str();
+   genMassZEff_123456 = new TH1D(genMassZEff_name.c_str(), "Generated Z Mass", 200, 50, 150);
+   _histoVector.push_back(genMassZEff_123456);
    
    string genPtZEff_name = "genPtZEff";
    genPtZEff_name+=_RecoCutFlags[1].c_str();
@@ -180,6 +192,9 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    genPtZEff_name+=_RecoCutFlags[5].c_str();
    genPtZEff_12345 = new TH1D(genPtZEff_name.c_str(), "Generated Z pt",  200, 0, 200);
    _histoVector.push_back(genPtZEff_12345);
+   genPtZEff_name+=_RecoCutFlags[6].c_str();
+   genPtZEff_123456 = new TH1D(genPtZEff_name.c_str(), "Generated Z pt",  200, 0, 200);
+   _histoVector.push_back(genPtZEff_123456);
    
    string genEtaZEff_name = "genEtaZEff";
    genEtaZEff_name+=_RecoCutFlags[1].c_str();
@@ -197,6 +212,9 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    genEtaZEff_name+=_RecoCutFlags[5].c_str();
    genEtaZEff_12345 = new TH1D(genEtaZEff_name.c_str(), "Generated Z #eta",  100, -10, 10);
    _histoVector.push_back(genEtaZEff_12345);
+   genEtaZEff_name+=_RecoCutFlags[6].c_str();
+   genEtaZEff_123456 = new TH1D(genEtaZEff_name.c_str(), "Generated Z #eta",  100, -10, 10);
+   _histoVector.push_back(genEtaZEff_123456);
    
    //Eff vs Jet properties
    string GenIsoJetEff_name = "GenIsoJetEff";
@@ -215,6 +233,9 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    GenIsoJetEff_name+=_RecoCutFlags[5].c_str();
    GenIsoJetEff_12345 = new TH1D(GenIsoJetEff_name.c_str(), "Number of Gen Iso Jet", 10, -0.5, 9.5);
    _histoVector.push_back(GenIsoJetEff_12345);
+   GenIsoJetEff_name+=_RecoCutFlags[6].c_str();
+   GenIsoJetEff_123456 = new TH1D(GenIsoJetEff_name.c_str(), "Number of Gen Iso Jet", 10, -0.5, 9.5);
+   _histoVector.push_back(GenIsoJetEff_123456);
    
 // Tag & Probe
 
@@ -226,12 +247,14 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
   std::vector<bool (*)(const reco::Candidate&)> probe_cuts_123;
   std::vector<bool (*)(const reco::Candidate&)> probe_cuts_1234;
   std::vector<bool (*)(const reco::Candidate&)> probe_cuts_12345;
+  std::vector<bool (*)(const reco::Candidate&)> probe_cuts_123456;
   
   probe_cuts_1.clear();
   probe_cuts_12.clear();
   probe_cuts_123.clear();
   probe_cuts_1234.clear();
   probe_cuts_12345.clear();
+  probe_cuts_123456.clear();
   
   for(unsigned int i = 1; i < 6; i++){
   if(_RecoCutFlags[i] == "_Acc"){
@@ -239,37 +262,43 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
   if(i<3)probe_cuts_12.push_back(singleEl_Probe_Acc);
   if(i<4)probe_cuts_123.push_back(singleEl_Probe_Acc);
   if(i<5)probe_cuts_1234.push_back(singleEl_Probe_Acc);
-  if(i<6)probe_cuts_12345.push_back(singleEl_Probe_Acc);}
+  if(i<6)probe_cuts_12345.push_back(singleEl_Probe_Acc);
+  if(i<7)probe_cuts_123456.push_back(singleEl_Probe_Acc);}
   if(_RecoCutFlags[i] == "_Qual"){
   if(i<2)probe_cuts_1.push_back(singleEl_Probe_Qual);
   if(i<3)probe_cuts_12.push_back(singleEl_Probe_Qual);
   if(i<4)probe_cuts_123.push_back(singleEl_Probe_Qual);
   if(i<5)probe_cuts_1234.push_back(singleEl_Probe_Qual);
-  if(i<6)probe_cuts_12345.push_back(singleEl_Probe_Qual);}
+  if(i<6)probe_cuts_12345.push_back(singleEl_Probe_Qual);
+  if(i<7)probe_cuts_123456.push_back(singleEl_Probe_Qual);}
   if(_RecoCutFlags[i] == "_Imp"){
   if(i<2)probe_cuts_1.push_back(singleEl_Probe_Imp);
   if(i<3)probe_cuts_12.push_back(singleEl_Probe_Imp);
   if(i<4)probe_cuts_123.push_back(singleEl_Probe_Imp);
   if(i<5)probe_cuts_1234.push_back(singleEl_Probe_Imp);
-  if(i<6)probe_cuts_12345.push_back(singleEl_Probe_Imp);}
+  if(i<6)probe_cuts_12345.push_back(singleEl_Probe_Imp);
+  if(i<7)probe_cuts_123456.push_back(singleEl_Probe_Imp);}
   if(_RecoCutFlags[i] == "_Iso"){
   if(i<2)probe_cuts_1.push_back(singleEl_Probe_Iso);
   if(i<3)probe_cuts_12.push_back(singleEl_Probe_Iso);
   if(i<4)probe_cuts_123.push_back(singleEl_Probe_Iso);
   if(i<5)probe_cuts_1234.push_back(singleEl_Probe_Iso);
-  if(i<6)probe_cuts_12345.push_back(singleEl_Probe_Iso);}
+  if(i<6)probe_cuts_12345.push_back(singleEl_Probe_Iso);
+  if(i<7)probe_cuts_123456.push_back(singleEl_Probe_Iso);}
   if(_RecoCutFlags[i] == "_EiD"){
   if(i<2)probe_cuts_1.push_back(singleEl_Probe_EiD);
   if(i<3)probe_cuts_12.push_back(singleEl_Probe_EiD);
   if(i<4)probe_cuts_123.push_back(singleEl_Probe_EiD);
   if(i<5)probe_cuts_1234.push_back(singleEl_Probe_EiD);
-  if(i<6)probe_cuts_12345.push_back(singleEl_Probe_EiD);}
+  if(i<6)probe_cuts_12345.push_back(singleEl_Probe_EiD);
+  if(i<7)probe_cuts_123456.push_back(singleEl_Probe_EiD);}
   if(_RecoCutFlags[i] == "_1"){
   if(i<2)probe_cuts_1.push_back(singleEl_Probe_True);
   if(i<3)probe_cuts_12.push_back(singleEl_Probe_True);
   if(i<4)probe_cuts_123.push_back(singleEl_Probe_True);
   if(i<5)probe_cuts_1234.push_back(singleEl_Probe_True);
-  if(i<6)probe_cuts_12345.push_back(singleEl_Probe_True);}
+  if(i<6)probe_cuts_12345.push_back(singleEl_Probe_True);
+  if(i<7)probe_cuts_123456.push_back(singleEl_Probe_True);}
   }
   
   string name_TagDir="Tag&Probe";
@@ -304,6 +333,13 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
   TDirectory *TagDir_12345 = _dir->mkdir(name_TagDir.c_str());
   
   _TagProbe_Electron_12345 = new TagAndProbeFiller(TagDir_12345, string(name_TPFiller_12345.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts_1234, probe_cuts_12345);
+  
+  name_TagDir+=_RecoCutFlags[6].c_str();
+  name_TPFiller+=_RecoCutFlags[6].c_str();
+  string name_TPFiller_123456 = name_TPFiller+"_";
+  TDirectory *TagDir_123456 = _dir->mkdir(name_TagDir.c_str());
+  
+  _TagProbe_Electron_123456 = new TagAndProbeFiller(TagDir_123456, string(name_TPFiller_123456.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts_12345, probe_cuts_123456);
   
   int fileCounter = 0;
   
@@ -361,7 +397,8 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
    
    //Z Reco daughters
    std::vector<const pat::Electron*> zdaughters;
-   const pat::Electron *dau0, *dau1;
+   const pat::Electron *dau0 = 0; 
+   const pat::Electron *dau1 = 0;
    
    //Reco jets
    std::vector<const pat::Jet*> recjets = GetJets<pat::Jet>(*jetrecHandle);
@@ -378,6 +415,22 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
    }
    
    }
+   
+   //Z Rec daughters
+   if(zdaughters.size() != 0){   
+     
+   dau0 = zdaughters[0];
+   dau1 = zdaughters[1];
+     
+   //Pre selection events
+     
+     
+     
+     
+     
+   }
+   
+   if(_sample=="mc"){
    
    //Z Gen daughters
    std::vector<const reco::Candidate*> zgendaughters = ZGENDaughters(*zgenHandle);
@@ -419,19 +472,6 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
      for(unsigned int i = 0; i < genjets.size(); i++){
      if(GenIsoJet(*zgenHandle,*genjets[i]))isogenjets.push_back(genjets[i]);
      }
-     
-     if(zdaughters.size() != 0){   
-     
-     dau0 = zdaughters[0];
-     dau1 = zdaughters[1];
-     
-     //Pre selection events
-     
-     
-     
-     
-     
-     }
     
      //Acceptance denominator
      if (GenSelected(*zgenHandle)&&zgendaughters.size()!=0){
@@ -460,7 +500,7 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
      if(zrecHandle->size()){
      
      //Events with a selected Zee 1
-     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0])){
+     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)){
      
      //Eff vs Z variables
      genMassZEff_1->Fill((*zgenHandle)[0].mass());
@@ -477,7 +517,7 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
      }
      
      //Events with a selected Zee 1+2
-     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[0])){
+     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)){
      
      //Eff vs Z variables
      genMassZEff_12->Fill((*zgenHandle)[0].mass());
@@ -494,7 +534,7 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
      }
      
      //Events with a selected Zee 1+2+3
-     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[0])){
+     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)){
      
      //Eff vs Z variables
      genMassZEff_123->Fill((*zgenHandle)[0].mass());
@@ -512,7 +552,7 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
      }
      
      //Events with a selected Zee 1+2+3+4
-     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), (*zrecHandle)[0])){
+     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)){
      
      //Eff vs Z variables
      genMassZEff_1234->Fill((*zgenHandle)[0].mass());
@@ -529,7 +569,7 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
      }
      
      //Events with a selected Zee 1+2+3+4+5
-     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[5].c_str(), _electronID.c_str(), (*zrecHandle)[0])){
+     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[5].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)){
       
       //Eff vs Z variables
       genMassZEff_12345->Fill((*zgenHandle)[0].mass());
@@ -545,9 +585,31 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
       
 }
 
+//Events with a selected Zee 1+2+3+4+5+6
+     if (GenSelectedInAcceptance(*zgenHandle)&&RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[5].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[6].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)){
+      
+      //Eff vs Z variables
+      genMassZEff_123456->Fill((*zgenHandle)[0].mass());
+      genPtZEff_123456->Fill((*zgenHandle)[0].pt());
+      genEtaZEff_123456->Fill((*zgenHandle)[0].eta());
+      
+      //Eff vs Z Electrons variables
+      genLeadElEtaEff_123456->Fill(genleadeleta);
+      genLeadElPtEff_123456->Fill(genleadelpt);
+      
+      //Eff vs Jet variables
+      GenIsoJetEff_123456->Fill(isogenjets.size());
+      
+}
+
+}
+}//end if(_sample)
+
+if(zrecHandle->size()){
+
 // Tag & Probe
 
-if(RecSelected_TagAndProbe((*zrecHandle)[0])){
+if(RecSelected_TagAndProbe((*zrecHandle)[0])&&(RecSelected_TrgMatch(*dau0)||RecSelected_TrgMatch(*dau1))){
 
 double lumi = _entries/_xsec;
 
@@ -559,6 +621,7 @@ _TagProbe_Electron_12->fill((*zrecHandle)[0], isojets.size(), _norm);
 _TagProbe_Electron_123->fill((*zrecHandle)[0], isojets.size(), _norm);
 _TagProbe_Electron_1234->fill((*zrecHandle)[0], isojets.size(), _norm);
 _TagProbe_Electron_12345->fill((*zrecHandle)[0], isojets.size(), _norm);
+_TagProbe_Electron_123456->fill((*zrecHandle)[0], isojets.size(), _norm);
 
 }
 }
@@ -571,6 +634,7 @@ void EfficiencyElectron::finalize(){
   _TagProbe_Electron_123->finalize();
   _TagProbe_Electron_1234->finalize();
   _TagProbe_Electron_12345->finalize();
+  _TagProbe_Electron_123456->finalize();
   
   _file->Write();
   

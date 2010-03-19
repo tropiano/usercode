@@ -68,6 +68,8 @@ public :
 
 private:
 
+  std::string _sample;
+
   double _ptjetmin;
 
   double _etajetmax;
@@ -80,9 +82,9 @@ private:
   
   double _xsec;
   
-  int _entries, _EventsPerFile, _Acc, _Qual, _Imp, _Iso, _EiD;
+  int _entries, _EventsPerFile, _Acc, _Trg, _Qual, _Imp, _Iso, _EiD;
   
-  std::string _RecoCutFlags[6];
+  std::string _RecoCutFlags[7];
   
   bool _Norm;
   

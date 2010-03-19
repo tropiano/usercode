@@ -32,7 +32,7 @@ using namespace edm;
 
 RecoElectronNtuple::RecoElectronNtuple(): 
  
-_ptjetmin(30.), _etajetmax(3.), _isocut(0.1), _weight(1.)
+_sample("mc"), _ptjetmin(30.), _etajetmax(3.), _isocut(0.1), _weight(1.), _Acc(1), _Trg(2), _Qual(3), _Imp(4), _Iso(5), _EiD(6)
 
 { }
 
@@ -43,6 +43,7 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
     std::string dirname = iConfig.getParameter<std::string>("Name");
     std::string sourceFileList = iConfig.getParameter<std::string>("sourceFileList");
     
+   _sample = iConfig.getParameter<std::string>("Sample");
    _electronID = iConfig.getParameter<std::string>("electronID");
    _targetLumi= iConfig.getParameter<double>("targetLumi");
    _xsec      = iConfig.getParameter<double>("CrossSection");
@@ -51,19 +52,21 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    
    //Selections
    _Acc = iConfig.getParameter<int32_t>("Acc");
+   _Trg = iConfig.getParameter<int32_t>("Trg");
    _Qual = iConfig.getParameter<int32_t>("Qual");
    _Imp = iConfig.getParameter<int32_t>("Imp");
    _Iso = iConfig.getParameter<int32_t>("Iso");
    _EiD = iConfig.getParameter<int32_t>("EiD");
    
-   for(int i=0; i<6; i++){
+   for(int i=0; i<7; i++){
    _RecoCutFlags[i] = "_1";}
    
-   _RecoCutFlags[_Acc] = "_Acc";
+   _RecoCutFlags[_Acc] =  "_Acc";
+   _RecoCutFlags[_Trg] =  "_Trg";
    _RecoCutFlags[_Qual] = "_Qual";
-   _RecoCutFlags[_Imp] = "_Imp";
-   _RecoCutFlags[_Iso] = "_Iso";
-   _RecoCutFlags[_EiD] = "_EiD";
+   _RecoCutFlags[_Imp] =  "_Imp";
+   _RecoCutFlags[_Iso] =  "_Iso";
+   _RecoCutFlags[_EiD] =  "_EiD";
 
    cout << "RecoElectronNtuple file name : " << _file->GetName() << endl;
    _file->cd();
@@ -363,6 +366,8 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
 
    fwlite::Handle<std::vector<reco::GenJet> > jetgenHandle;
    jetgenHandle.getByLabel(iEvent, "selectedGenJets");
+   
+   if(_sample=="mc"){
 
    if (zgenHandle->size() > 1) return;
    
@@ -456,6 +461,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
 
    } // end selected in acceptance
 
+}
 
    //Reconstructed quantities
    
@@ -501,7 +507,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
 
    // loose cuts, only acceptance cuts
    
-   if (RecSelected("_Acc", _electronID.c_str(), (*zrecHandle)[0])){
+   if (RecSelected("_Acc", _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)){
    
    const reco::GsfTrack track0 = *(recdau0->gsfTrack());
    const reco::GsfTrack track1 = *(recdau1->gsfTrack());
@@ -608,7 +614,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
 
    // now starts the stricter cuts
       
-   if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), (*zrecHandle)[0])&&RecSelected(_RecoCutFlags[5].c_str(), _electronID.c_str(), (*zrecHandle)[0])){
+   if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[5].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[6].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)){
   
       zmass_AllCuts=(*zrecHandle)[0].mass();
       

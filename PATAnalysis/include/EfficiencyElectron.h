@@ -30,15 +30,19 @@ public :
    *genMassZEff_12, *genPtZEff_12, *genEtaZEff_12,
    *genMassZEff_123, *genPtZEff_123, *genEtaZEff_123,
    *genMassZEff_1234, *genPtZEff_1234, *genEtaZEff_1234,
-   *genMassZEff_12345, *genPtZEff_12345, *genEtaZEff_12345;
+   *genMassZEff_12345, *genPtZEff_12345, *genEtaZEff_12345,
+   *genMassZEff_123456, *genPtZEff_123456, *genEtaZEff_123456;
    
-   TH1D *GenIsoJetEff_1, *GenIsoJetEff_12, *GenIsoJetEff_123, *GenIsoJetEff_1234, *GenIsoJetEff_12345;
+   TH1D *GenIsoJetEff_1, *GenIsoJetEff_12, *GenIsoJetEff_123, *GenIsoJetEff_1234, *GenIsoJetEff_12345, *GenIsoJetEff_123456;
    
-   TH1D *genLeadElEtaEff_1, *genLeadElEtaEff_12, *genLeadElEtaEff_123, *genLeadElEtaEff_1234, *genLeadElEtaEff_12345, *genLeadElPtEff_1, *genLeadElPtEff_12, *genLeadElPtEff_123, *genLeadElPtEff_1234, *genLeadElPtEff_12345;
+   TH1D *genLeadElEtaEff_1, *genLeadElEtaEff_12, *genLeadElEtaEff_123, *genLeadElEtaEff_1234, *genLeadElEtaEff_12345, *genLeadElEtaEff_123456, 
+   *genLeadElPtEff_1, *genLeadElPtEff_12, *genLeadElPtEff_123, *genLeadElPtEff_1234, *genLeadElPtEff_12345, *genLeadElPtEff_123456;
    
    TH1D *AccDenom_genPtZ, *AccDenom_genMassZ, *AccDenom_genEtaZ, *AccDenom_genLeadElEta,     *AccDenom_genLeadElPt, *AccDenom_GenIsoJetNumber, *EffDenom_genPtZ, *EffDenom_genMassZ, *EffDenom_genEtaZ, *EffDenom_genLeadElEta, *EffDenom_genLeadElPt, *EffDenom_GenIsoJetNumber;
    
 private:
+
+  std::string _sample;
 
   TDirectory* _dir;
   
@@ -46,11 +50,11 @@ private:
   
   TFile* _file;
   
-  int _Acc, _Qual, _Imp, _Iso, _EiD;
+  int _Acc, _Trg, _Qual, _Imp, _Iso, _EiD;
   
   std::vector<TH1D*> _histoVector;
   
-  std::string _RecoCutFlags[6];
+  std::string _RecoCutFlags[7];
   
   std::vector<bool (*)(const reco::Candidate&)> tag_cuts;
   
@@ -58,6 +62,7 @@ private:
   TagAndProbeFiller* _TagProbe_Electron_123;
   TagAndProbeFiller* _TagProbe_Electron_1234;
   TagAndProbeFiller* _TagProbe_Electron_12345;
+  TagAndProbeFiller* _TagProbe_Electron_123456;
   
   int _nbin;
   

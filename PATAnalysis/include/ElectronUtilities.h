@@ -2,7 +2,6 @@
 #define PATAnalysisUtilities_h
 
 #include "FWCore/Utilities/interface/Exception.h"
-#include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/JetReco/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/Isolation.h"
@@ -10,6 +9,9 @@
 #include "DataFormats/RecoCandidate/interface/IsoDeposit.h"
 #include "DataFormats/Candidate/interface/ShallowCloneCandidate.h"
 #include "DataFormats/GsfTrackReco/interface/GsfTrack.h"
+#include "DataFormats/PatCandidates/interface/TriggerEvent.h"
+#include "PhysicsTools/PatExamples/plugins/PatTriggerAnalyzer.h"
+#include "PhysicsTools/PatUtils/interface/TriggerHelper.h"
 
 #include <vector>
 #include <math.h>
@@ -24,6 +26,9 @@
 #include "TH1D.h"
 
 using namespace std;
+using namespace pat;
+using namespace pat::helper;
+using namespace TMath;
 
 // Selection Cuts
 
@@ -40,17 +45,19 @@ static double ptjetmin = 30.;   //Gev/c
 static double etajetmax = 3.0;
 static double isocut = 0.1;                        //CombRelIso
 static double isojetcut = 0.5;                     //Isolation jet - Z electron
+static string ElectronTrigger = "HLT_Ele10_LW_L1R";
+static string JetTrigger = "HLT_Jet30";
 
 // Tag & Probe cuts
 
-static double TAG_ptelcut = 30.;    //Gev/c
+static double TAG_ptelcut = 25.;    //Gev/c
 static double TAG_etaelcut = 2.4;
 static double TAG_eta_el_excl_up = 1.56;               //Excluded Eta region
 static double TAG_eta_el_excl_down = 1.4442;           //Excluded Eta region
 static double TAG_minnhit = 15.;
 static double TAG_maxchi2 = 3.;
 static double TAG_dxycut = 0.02;     //cm
-static double TAG_isocut = 0.05;                        //CombRelIso
+static double TAG_isocut = 0.01;                        //CombRelIso
 static string TagEiD = "eidRobustLoose";
 
 
@@ -159,11 +166,11 @@ inline bool isTriggered(const pat::TriggerEvent& triggers, std::string triggerna
 }
 
 inline bool isElectronTriggered(const pat::TriggerEvent& triggers){
-  return isTriggered(triggers, "HLT_Ele10_LW_L1R");
+  return isTriggered(triggers, ElectronTrigger.c_str());
 }
 
 inline bool isJetTriggered(const pat::TriggerEvent& triggersREC){
-  return isTriggered(triggersREC, "HLT_Jet30");
+  return isTriggered(triggersREC, JetTrigger.c_str());
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -309,7 +316,7 @@ inline bool GenSelectedInAcceptance(const std::vector<reco::CompositeCandidate>&
 
 // REC SELECTION
   
-inline bool RecSelected(string Flag, string EID, const reco::CompositeCandidate ZREC){
+inline bool RecSelected(string Flag, string EID, const reco::CompositeCandidate ZREC, const pat::TriggerEvent& triggers){
   
   std::vector<const pat::Electron*> zdaughters = ZDaughters(ZREC);
   
@@ -320,9 +327,9 @@ inline bool RecSelected(string Flag, string EID, const reco::CompositeCandidate 
   const pat::Electron* dau0 = zdaughters[0];
   const pat::Electron* dau1 = zdaughters[1];
   
-  const reco::GsfTrack track0 = *(dau0->gsfTrack());
-  const reco::GsfTrack track1 = *(dau1->gsfTrack());
-  assert(&track0 && &track1);
+  const reco::GsfTrackRef track0 = dau0->gsfTrack();
+  const reco::GsfTrackRef track1 = dau1->gsfTrack();
+  assert (track0.isNonnull() && track1.isNonnull());
   
   bool electron_ID0 = false;
   bool electron_ID1 = false;
@@ -338,24 +345,27 @@ inline bool RecSelected(string Flag, string EID, const reco::CompositeCandidate 
          && dau1->pt() > ptelcut && fabs(dau1->eta()) < etaelcut
          && (fabs(dau0->eta())<eta_el_excl_down || fabs(dau0->eta())>eta_el_excl_up) &&
             (fabs(dau1->eta())<eta_el_excl_down || fabs(dau1->eta())>eta_el_excl_up);
-            }
+         }
+  else if(Flag=="_Trg"){
+  return isElectronTriggered(triggers);
+         }
   else if(Flag=="_Qual"){
-  return track0.numberOfValidHits() > minnhit && track1.numberOfValidHits() > minnhit &&
-         track0.normalizedChi2() < maxchi2 && track1.normalizedChi2() < maxchi2;
+  return track0->numberOfValidHits() > minnhit && track1->numberOfValidHits() > minnhit &&
+         track0->normalizedChi2() < maxchi2 && track1->normalizedChi2() < maxchi2;
          }  
   else if(Flag=="_Imp"){
   return dau0->dB() < dxycut && dau1->dB() < dxycut;
-  }
+         }
   else if(Flag=="_Iso"){
   return (dau0->hcalIso() + dau0->ecalIso() + dau0->trackIso()) / dau0->pt() < isocut &&  
          (dau1->hcalIso() + dau1->ecalIso() + dau1->trackIso()) / dau1->pt() < isocut;
          }
   else if(Flag=="_EiD"){
   return electron_ID0 && electron_ID1;
-  }
+         }
   else if(Flag=="_1"){
   return true;
-  }
+         }
   else{
   return false;
   }
@@ -364,13 +374,16 @@ inline bool RecSelected(string Flag, string EID, const reco::CompositeCandidate 
   
 }
 
-inline bool RecSelectedWithTrigger(const std::vector<reco::CompositeCandidate>& ZREC, string EID, const pat::TriggerEvent& triggers, const pat::Electron* extdau0 = 0, const pat::Electron* extdau1 = 0){
-  bool isTriggered = isElectronTriggered(triggers);
-  if(!isTriggered){
-  return false;
-  }else{
-  return true;
-  }
+inline bool RecSelected_TrgMatch(const pat::Electron& Electron){
+
+const TriggerObjectStandAloneCollection MatchElectron = Electron.triggerObjectMatches();
+    
+if(MatchElectron.size()){
+return true;
+}else{
+return false;
+}
+
 }
 
 /////////////////////////////////////////////////
@@ -617,8 +630,8 @@ inline bool singleEl_Tag(const reco::Candidate& cand){
      }
     }
   if(electron){
-  const reco::GsfTrack track = *(electron->gsfTrack());
-  assert(&track);
+  const reco::GsfTrackRef track = electron->gsfTrack();
+  assert(track.isNonnull());
   bool TAG_EiD = false;
   if(electron->isElectronIDAvailable(TagEiD.c_str())){
   if(electron->electronID(TagEiD.c_str())==1.0)TAG_EiD = true;
@@ -626,8 +639,8 @@ inline bool singleEl_Tag(const reco::Candidate& cand){
   return electron->pt() > TAG_ptelcut && 
   	 fabs(electron->eta()) < TAG_etaelcut &&
          (fabs(electron->eta())<TAG_eta_el_excl_down || fabs(electron->eta())>TAG_eta_el_excl_up) &&
-         track.numberOfValidHits() > TAG_minnhit && 
-         track.normalizedChi2() < TAG_maxchi2 &&
+         track->numberOfValidHits() > TAG_minnhit && 
+         track->normalizedChi2() < TAG_maxchi2 &&
          electron->dB() < TAG_dxycut &&
          (electron->hcalIso() + electron->ecalIso() + electron->trackIso()) / electron->pt() < TAG_isocut &&  
          TAG_EiD;
@@ -660,9 +673,9 @@ inline bool singleEl_Probe_Qual(const reco::Candidate& cand){
      }
     }
   if(electron){
-  const reco::GsfTrack track = *(electron->gsfTrack());
-  assert(&track);
-  return track.numberOfValidHits() > minnhit && track.normalizedChi2() < maxchi2;
+  const reco::GsfTrackRef track = electron->gsfTrack();
+  assert(track.isNonnull());
+  return track->numberOfValidHits() > minnhit && track->normalizedChi2() < maxchi2;
   }else{
   return false;}
   }
@@ -690,8 +703,6 @@ inline bool singleEl_Probe_Iso(const reco::Candidate& cand){
      }
     }
   if(electron){
-  const reco::GsfTrack track = *(electron->gsfTrack());
-  assert(&track);
   return (electron->hcalIso() + electron->ecalIso() + electron->trackIso()) / electron->pt() < isocut;
   }else{
   return false;}

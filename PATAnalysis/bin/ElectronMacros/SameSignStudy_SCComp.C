@@ -21,20 +21,22 @@ using namespace std;
 void SCComp() {
 
         int _Acc  = 1;
+        int _Trg  = 2;
 	int _Qual = 0;
-	int _Imp  = 2;
-	int _Iso  = 3;
-	int _EiD  = 4;
+	int _Imp  = 3;
+	int _Iso  = 4;
+	int _EiD  = 5;
 	
-	string _RecoCutFlags[6];
-	for(int i=0; i<6; i++){
+	string _RecoCutFlags[7];
+	for(int i=0; i<7; i++){
 		_RecoCutFlags[i] = "_1";}
 	
-	_RecoCutFlags[_Acc] = "_Acc";
+	_RecoCutFlags[_Acc] =  "_Acc";
+	_RecoCutFlags[_Trg] =  "_Trg";
 	_RecoCutFlags[_Qual] = "_Qual";
-	_RecoCutFlags[_Imp] = "_Imp";
-	_RecoCutFlags[_Iso] = "_Iso";
-	_RecoCutFlags[_EiD] = "_EiD";
+	_RecoCutFlags[_Imp] =  "_Imp";
+	_RecoCutFlags[_Iso] =  "_Iso";
+	_RecoCutFlags[_EiD] =  "_EiD";
 
 gROOT->SetStyle("Plain");
 
@@ -69,8 +71,11 @@ TH1D *BackSC_1234 = (TH1D*) BackDir->Get(recMassZSC_name.c_str());
 recMassZSC_name+=_RecoCutFlags[5].c_str();
 TH1D *SignalSC_12345 = (TH1D*) SignalDir->Get(recMassZSC_name.c_str());
 TH1D *BackSC_12345 = (TH1D*) BackDir->Get(recMassZSC_name.c_str());
+recMassZSC_name+=_RecoCutFlags[6].c_str();
+TH1D *SignalSC_123456 = (TH1D*) SignalDir->Get(recMassZSC_name.c_str());
+TH1D *BackSC_123456 = (TH1D*) BackDir->Get(recMassZSC_name.c_str());
 
-        if(!BackSC_12345){
+        if(!BackSC_123456){
 	cout<<"Error! Cut sequence wrong!"<<endl;
 	return;
 	}
@@ -130,6 +135,17 @@ BackSC_12345->Draw("sames");
 MassComp_name+=_RecoCutFlags[5].c_str();
 MassComp_12345->Write(MassComp_name.c_str());
 MassComp_12345->Close();
+
+TCanvas *MassComp_123456 = new TCanvas;
+MassComp_123456->SetLogy();
+SignalSC_123456->GetXaxis()->SetTitle("Invariant Mass");
+SignalSC_123456->SetTitle("Reconstructed Invariant Mass for Signal (black) and Background (red) Same Charge electron pairs");
+SignalSC_123456->Draw();
+BackSC_123456->SetLineColor(2);
+BackSC_123456->Draw("sames");
+MassComp_name+=_RecoCutFlags[6].c_str();
+MassComp_123456->Write(MassComp_name.c_str());
+MassComp_123456->Close();
 
 outplots->Write();
 outplots->Close();

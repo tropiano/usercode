@@ -25,31 +25,33 @@ using namespace std;
 void divide() {
 
         int _Acc  = 1;
+        int _Trg  = 2;
 	int _Qual = 0;
-	int _Imp  = 2;
-	int _Iso  = 3;
-	int _EiD  = 4;
+	int _Imp  = 3;
+	int _Iso  = 4;
+	int _EiD  = 5;
 	
-	string _RecoCutFlags[6];
-	for(int i=0; i<6; i++){
+	string _RecoCutFlags[7];
+	for(int i=0; i<7; i++){
 		_RecoCutFlags[i] = "_1";}
 	
-	_RecoCutFlags[_Acc] = "_Acc";
+	_RecoCutFlags[_Acc] =  "_Acc";
+	_RecoCutFlags[_Trg] =  "_Trg";
 	_RecoCutFlags[_Qual] = "_Qual";
-	_RecoCutFlags[_Imp] = "_Imp";
-	_RecoCutFlags[_Iso] = "_Iso";
-	_RecoCutFlags[_EiD] = "_EiD";
+	_RecoCutFlags[_Imp] =  "_Imp";
+	_RecoCutFlags[_Iso] =  "_Iso";
+	_RecoCutFlags[_EiD] =  "_EiD";
 
 gROOT->SetStyle("Plain");
 gStyle->SetOptStat(1001111);
 gStyle->SetOptFit(1111);
 
-TFile *inputFile = new TFile ("QCD_all_norm100.root");
+TFile *inputFile = new TFile ("test_data.root");
         if(!inputFile){
 	cout<<"Error! Input files doesn't exist!"<<endl;
 	return;
 	}
-TFile* outplots = new TFile("TestDivide.root", "RECREATE");
+TFile* outplots = new TFile("SS_divide_data.root", "RECREATE");
 
 TDirectory *PtDir = outplots->mkdir("Pt");
 TDirectory *EtaDir = outplots->mkdir("Eta");
@@ -73,8 +75,10 @@ recLeadElPt_name+=_RecoCutFlags[4].c_str();
 TH1D *PtHistoOC_1234 = (TH1D*) OC->Get(recLeadElPt_name.c_str());
 recLeadElPt_name+=_RecoCutFlags[5].c_str();
 TH1D *PtHistoOC_12345 = (TH1D*) OC->Get(recLeadElPt_name.c_str());
+recLeadElPt_name+=_RecoCutFlags[6].c_str();
+TH1D *PtHistoOC_123456 = (TH1D*) OC->Get(recLeadElPt_name.c_str());
 
-        if(!PtHistoOC_12345){
+        if(!PtHistoOC_123456){
 	cout<<"Error! Cut sequence wrong!"<<endl;
 	return;
 	}
@@ -90,6 +94,8 @@ recLeadElPtSC_name+=_RecoCutFlags[4].c_str();
 TH1D *PtHistoSC_1234 = (TH1D*) SC->Get(recLeadElPtSC_name.c_str());
 recLeadElPtSC_name+=_RecoCutFlags[5].c_str();
 TH1D *PtHistoSC_12345 = (TH1D*) SC->Get(recLeadElPtSC_name.c_str());
+recLeadElPtSC_name+=_RecoCutFlags[6].c_str();
+TH1D *PtHistoSC_123456 = (TH1D*) SC->Get(recLeadElPtSC_name.c_str());
 
 TCanvas *PtCanvas_1 = new TCanvas;
 PtHistoSC_1->Divide(PtHistoOC_1);
@@ -157,6 +163,19 @@ if(PtHistoSC_12345->GetEntries()>10)PtHistoSC_12345->Fit("pol0");
 PtHistoSC_12345->Write();
 PtCanvas_12345->Close();
 
+TCanvas *PtCanvas_123456 = new TCanvas;
+PtHistoSC_123456->Divide(PtHistoOC_123456);
+PtHistoSC_123456->SetTitle("Reconstructed Leading Electron Pt: Same Charge/Opposite Charge");
+PtName+=_RecoCutFlags[6].c_str();
+PtHistoSC_123456->SetName(PtName.c_str());
+PtHistoSC_123456->SetLineColor(1);
+PtHistoSC_123456->SetXTitle("Pt");
+PtHistoSC_123456->SetYTitle("Events SC/OC");
+PtHistoSC_123456->GetYaxis()->SetTitleOffset(1.4);
+if(PtHistoSC_123456->GetEntries()>10)PtHistoSC_123456->Fit("pol0");
+PtHistoSC_123456->Write();
+PtCanvas_123456->Close();
+
 //Eta
 EtaDir->cd();
 
@@ -171,6 +190,8 @@ recLeadElEta_name+=_RecoCutFlags[4].c_str();
 TH1D *EtaHistoOC_1234 = (TH1D*) OC->Get(recLeadElEta_name.c_str());
 recLeadElEta_name+=_RecoCutFlags[5].c_str();
 TH1D *EtaHistoOC_12345 = (TH1D*) OC->Get(recLeadElEta_name.c_str());
+recLeadElEta_name+=_RecoCutFlags[6].c_str();
+TH1D *EtaHistoOC_123456 = (TH1D*) OC->Get(recLeadElEta_name.c_str());
 
 string recLeadElEtaSC_name = "recLeadElEtaSC";
 recLeadElEtaSC_name+=_RecoCutFlags[1].c_str();
@@ -183,6 +204,8 @@ recLeadElEtaSC_name+=_RecoCutFlags[4].c_str();
 TH1D *EtaHistoSC_1234 = (TH1D*) SC->Get(recLeadElEtaSC_name.c_str());
 recLeadElEtaSC_name+=_RecoCutFlags[5].c_str();
 TH1D *EtaHistoSC_12345 = (TH1D*) SC->Get(recLeadElEtaSC_name.c_str());
+recLeadElEtaSC_name+=_RecoCutFlags[6].c_str();
+TH1D *EtaHistoSC_123456 = (TH1D*) SC->Get(recLeadElEtaSC_name.c_str());
 
 TCanvas *EtaCanvas_1 = new TCanvas;
 EtaHistoSC_1->Divide(EtaHistoOC_1);
@@ -250,6 +273,19 @@ if(EtaHistoSC_12345->GetEntries()>10)EtaHistoSC_12345->Fit("pol0");
 EtaHistoSC_12345->Write();
 EtaCanvas_12345->Close();
 
+TCanvas *EtaCanvas_123456 = new TCanvas;
+EtaHistoSC_123456->Divide(EtaHistoOC_123456);
+EtaHistoSC_123456->SetTitle("Reconstructed Leading Electron Eta: Same Charge/Opposite Charge");
+EtaName+=_RecoCutFlags[6].c_str();
+EtaHistoSC_123456->SetName(EtaName.c_str());
+EtaHistoSC_123456->SetLineColor(1);
+EtaHistoSC_123456->SetXTitle("Eta");
+EtaHistoSC_123456->SetYTitle("Events SC/OC");
+EtaHistoSC_123456->GetYaxis()->SetTitleOffset(1.4);
+if(EtaHistoSC_123456->GetEntries()>10)EtaHistoSC_123456->Fit("pol0");
+EtaHistoSC_123456->Write();
+EtaCanvas_123456->Close();
+
 //fBrem
 fBremDir->cd();
 
@@ -264,6 +300,8 @@ recLeadElfBrem_name+=_RecoCutFlags[4].c_str();
 TH1D *fBremHistoOC_1234 = (TH1D*) OC->Get(recLeadElfBrem_name.c_str());
 recLeadElfBrem_name+=_RecoCutFlags[5].c_str();
 TH1D *fBremHistoOC_12345 = (TH1D*) OC->Get(recLeadElfBrem_name.c_str());
+recLeadElfBrem_name+=_RecoCutFlags[6].c_str();
+TH1D *fBremHistoOC_123456 = (TH1D*) OC->Get(recLeadElfBrem_name.c_str());
 
 string recLeadElfBremSC_name = "recLeadElfBremSC";
 recLeadElfBremSC_name+=_RecoCutFlags[1].c_str();
@@ -276,6 +314,8 @@ recLeadElfBremSC_name+=_RecoCutFlags[4].c_str();
 TH1D *fBremHistoSC_1234 = (TH1D*) SC->Get(recLeadElfBremSC_name.c_str());
 recLeadElfBremSC_name+=_RecoCutFlags[5].c_str();
 TH1D *fBremHistoSC_12345 = (TH1D*) SC->Get(recLeadElfBremSC_name.c_str());
+recLeadElfBremSC_name+=_RecoCutFlags[6].c_str();
+TH1D *fBremHistoSC_123456 = (TH1D*) SC->Get(recLeadElfBremSC_name.c_str());
 
 TCanvas *fBremCanvas_1 = new TCanvas;
 fBremHistoSC_1->Divide(fBremHistoOC_1);
@@ -343,6 +383,19 @@ if(fBremHistoSC_12345->GetEntries()>10)fBremHistoSC_12345->Fit("pol0");
 fBremHistoSC_12345->Write();
 fBremCanvas_12345->Close();
 
+TCanvas *fBremCanvas_123456 = new TCanvas;
+fBremHistoSC_123456->Divide(fBremHistoOC_123456);
+fBremHistoSC_123456->SetTitle("Reconstructed Leading Electron fBrem: Same Charge/Opposite Charge");
+fBremName+=_RecoCutFlags[6].c_str();
+fBremHistoSC_123456->SetName(fBremName.c_str());
+fBremHistoSC_123456->SetLineColor(1);
+fBremHistoSC_123456->SetXTitle("fBrem");
+fBremHistoSC_123456->SetYTitle("Events SC/OC");
+fBremHistoSC_123456->GetYaxis()->SetTitleOffset(1.4);
+if(fBremHistoSC_123456->GetEntries()>10)fBremHistoSC_123456->Fit("pol0");
+fBremHistoSC_123456->Write();
+fBremCanvas_123456->Close();
+
 //Mass
 MassDir->cd();
 
@@ -359,6 +412,8 @@ recMassZ_name+=_RecoCutFlags[4].c_str();
 TH1D *MassHistoOC_1234 = (TH1D*) OC_Z->Get(recMassZ_name.c_str());
 recMassZ_name+=_RecoCutFlags[5].c_str();
 TH1D *MassHistoOC_12345 = (TH1D*) OC_Z->Get(recMassZ_name.c_str());
+recMassZ_name+=_RecoCutFlags[6].c_str();
+TH1D *MassHistoOC_123456 = (TH1D*) OC_Z->Get(recMassZ_name.c_str());
 
 string recMassZSC_name = "recMassZSC";
 recMassZSC_name+=_RecoCutFlags[1].c_str();
@@ -371,6 +426,8 @@ recMassZSC_name+=_RecoCutFlags[4].c_str();
 TH1D *MassHistoSC_1234 = (TH1D*) SC->Get(recMassZSC_name.c_str());
 recMassZSC_name+=_RecoCutFlags[5].c_str();
 TH1D *MassHistoSC_12345 = (TH1D*) SC->Get(recMassZSC_name.c_str());
+recMassZSC_name+=_RecoCutFlags[6].c_str();
+TH1D *MassHistoSC_123456 = (TH1D*) SC->Get(recMassZSC_name.c_str());
 
 TCanvas *MassCanvas_1 = new TCanvas;
 MassHistoSC_1->Divide(MassHistoOC_1);
@@ -437,6 +494,19 @@ MassHistoSC_12345->GetYaxis()->SetTitleOffset(1.4);
 if(MassHistoSC_12345->GetEntries()>100)MassHistoSC_12345->Fit("pol0");
 MassHistoSC_12345->Write();
 MassCanvas_12345->Close();
+
+TCanvas *MassCanvas_123456 = new TCanvas;
+MassHistoSC_123456->Divide(MassHistoOC_123456);
+MassHistoSC_123456->SetTitle("Reconstructed Invariant Mass: Same Charge/Opposite Charge");
+MassName+=_RecoCutFlags[6].c_str();
+MassHistoSC_123456->SetName(MassName.c_str());
+MassHistoSC_123456->SetLineColor(1);
+MassHistoSC_123456->SetXTitle("Mass");
+MassHistoSC_123456->SetYTitle("Events SC/OC");
+MassHistoSC_123456->GetYaxis()->SetTitleOffset(1.4);
+if(MassHistoSC_123456->GetEntries()>100)MassHistoSC_123456->Fit("pol0");
+MassHistoSC_123456->Write();
+MassCanvas_123456->Close();
 
   outplots->Write();
   outplots->Close();

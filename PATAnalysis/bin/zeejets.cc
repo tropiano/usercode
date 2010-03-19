@@ -25,7 +25,11 @@ int main() {
   string outputName = "test";
   string electronID = "eidRobustLoose";
   
-  //Normalization
+  //Sample: mc = MonteCarlo , data = Data
+  
+  string sample = "data";
+  
+  //Normalization - If Norm = "False" and EventsPerFile = 0 -> Normalization is not applied
   double xsec = 1300.;
   double targetLumi = 100.;
   string Norm = "True";
@@ -39,14 +43,15 @@ int main() {
   bool GEN = true;
   bool RECO = true;
   bool EFF = true;
-  bool NTUPLE = false;
+  bool NTUPLE = true;
   
   //Cuts
   int Acc = 1;
+  int Trg = 2;
   int Qual = 0;
-  int Imp = 2;
-  int Iso = 3;
-  int EiD = 4;
+  int Imp = 3;
+  int Iso = 4;
+  int EiD = 5;
   
   //Number of CPUs
   int CPU = 8;
@@ -55,9 +60,13 @@ int main() {
   bool Log = false;
   
   //DO NOT FORGET THE SLASH AT THE END OF THE PATH
-  string path = "/raid/sfrosali/Zjets/Commit/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/";
+  string path = "/raid/sfrosali/Zjets/MC/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/";
+  
+  if(sample=="data"){
+  GenParticleMatch = "False";
+  GEN = false;}
 
-  makeCfg(GEN, RECO, EFF, NTUPLE, Acc, Qual, Imp, Iso, EiD, path.c_str(), cfgName.c_str(), sourceList.c_str(), outputName.c_str(), Norm.c_str(), Sumw2.c_str(), EventsPerFile, electronID.c_str(), xsec, targetLumi, GenParticleMatch.c_str());
+  makeCfg(sample, GEN, RECO, EFF, NTUPLE, Acc, Trg, Qual, Imp, Iso, EiD, path.c_str(), cfgName.c_str(), sourceList.c_str(), outputName.c_str(), Norm.c_str(), Sumw2.c_str(), EventsPerFile, electronID.c_str(), xsec, targetLumi, GenParticleMatch.c_str());
 
   gEnv->SetValue("Proof.Sandbox", "/raid/sfrosali/.proof");
 

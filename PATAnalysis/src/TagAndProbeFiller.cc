@@ -68,7 +68,6 @@ void TagAndProbeFiller::fill(const reco::Candidate& Z, double x, double w){
   _passprobe = 0;
   //sprintf(_passprobe, "fail");
   //_passprobe_cat.setLabel("fail");
-cout<<"### Filler 1"<<endl;
   //tag cand 1, probe cand 2 
   if (tag(*(Z.daughter(0)))) probe(*(Z.daughter(1)), Z.mass(), x, w);
 
@@ -78,17 +77,14 @@ cout<<"### Filler 1"<<endl;
   _passprobe = 0;
   //sprintf(_passprobe, "fail");
   //tag cand 2 probe cand 1
-  cout<<"### Filler 2"<<endl;
   if (tag(*(Z.daughter(1)))) probe(*(Z.daughter(0)), Z.mass(), x, w);
 }
 
 bool TagAndProbeFiller::tag(const reco::Candidate& cand){
-cout<<"### Filler 3"<<endl;
   return applyCuts(cand, _tag_cuts);
 }
 
 void TagAndProbeFiller::probe(const reco::Candidate& cand, double mass, double x, double w){
-cout<<"### Filler 4"<<endl;
   if ( applyCuts(cand, _probe_cuts) ) { 
     _denominator->Fill(x,w);
     int ibin = _denominator->FindBin(x);
@@ -99,7 +95,7 @@ cout<<"### Filler 4"<<endl;
       _probe = 1.;
     } else cout << "warning in TagAndProbeFiller::probe bin index out of range: " << ibin << endl;
   }
-  cout<<"### Filler 5"<<endl;
+  
   if ( applyCuts(cand, _passprobe_cuts) ) {
     _numerator->Fill(x,w);
     int ibin = _numerator->FindBin(x);
@@ -113,24 +109,17 @@ cout<<"### Filler 4"<<endl;
     } else cout << "warning in TagAndProbeFiller::probe bin index out of range: " << ibin << endl;
   }
   //_rootree->add(*_argset, w);
-  cout<<"### Filler 6"<<endl;
   _rootree->Fill();
 }
 
 bool TagAndProbeFiller::applyCuts(const reco::Candidate& cand, const std::vector<bool (*)(const reco::Candidate&)>& cuts) {
-cout<<"### Filler 7.1"<<endl;
   std::vector<bool (*)(const reco::Candidate&)>::const_iterator begin = cuts.begin();
-  cout<<"### Filler 7.2"<<endl;
   std::vector<bool (*)(const reco::Candidate&)>::const_iterator end = cuts.end();
-  cout<<"### Filler 7.3"<<endl;
   std::vector<bool (*)(const reco::Candidate&)>::const_iterator i;
   for (i = begin; i != end; ++i){
-  cout<<"### Filler 7.4"<<endl;
     if ((*i)(cand) == false) return false;
-    cout<<"### Filler 7.5"<<endl;
   }
   return true;
-  cout<<"### Filler 8"<<endl;
 }
 
 void TagAndProbeFiller::finalize() const {

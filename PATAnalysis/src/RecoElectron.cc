@@ -37,42 +37,49 @@ recPtZ_12(0), recEtaZ_12(0), recMassZ_12(0),
 recPtZ_123(0), recEtaZ_123(0), recMassZ_123(0),
 recPtZ_1234(0), recEtaZ_1234(0), recMassZ_1234(0),
 recPtZ_12345(0), recEtaZ_12345(0), recMassZ_12345(0),
+recPtZ_123456(0), recEtaZ_123456(0), recMassZ_123456(0),
 
 recLeadElPt_1(0), recSecElPt_1(0), recLeadElEta_1(0), recSecElEta_1(0),
 recLeadElPt_12(0), recSecElPt_12(0), recLeadElEta_12(0), recSecElEta_12(0),
 recLeadElPt_123(0), recSecElPt_123(0), recLeadElEta_123(0), recSecElEta_123(0), 
 recLeadElPt_1234(0), recSecElPt_1234(0), recLeadElEta_1234(0), recSecElEta_1234(0),
 recLeadElPt_12345(0), recSecElPt_12345(0), recLeadElEta_12345(0), recSecElEta_12345(0),
+recLeadElPt_123456(0), recSecElPt_123456(0), recLeadElEta_123456(0), recSecElEta_123456(0),
 
 recLeadElIP_1(0), recSecElIP_1(0), recLeadElfBrem_1(0), recSecElfBrem_1(0),
 recLeadElIP_12(0), recSecElIP_12(0), recLeadElfBrem_12(0), recSecElfBrem_12(0),
 recLeadElIP_123(0), recSecElIP_123(0), recLeadElfBrem_123(0), recSecElfBrem_123(0), 
 recLeadElIP_1234(0), recSecElIP_1234(0), recLeadElfBrem_1234(0), recSecElfBrem_1234(0),
 recLeadElIP_12345(0), recSecElIP_12345(0), recLeadElfBrem_12345(0), recSecElfBrem_12345(0),
+recLeadElIP_123456(0), recSecElIP_123456(0), recLeadElfBrem_123456(0), recSecElfBrem_123456(0),
 
 recPtZSC_1(0), recEtaZSC_1(0), recMassZSC_1(0), 
 recPtZSC_12(0), recEtaZSC_12(0), recMassZSC_12(0),
 recPtZSC_123(0), recEtaZSC_123(0), recMassZSC_123(0),
 recPtZSC_1234(0), recEtaZSC_1234(0), recMassZSC_1234(0),
 recPtZSC_12345(0), recEtaZSC_12345(0), recMassZSC_12345(0),
+recPtZSC_123456(0), recEtaZSC_123456(0), recMassZSC_123456(0),
 
 recLeadElPtSC_1(0), recSecElPtSC_1(0), recLeadElEtaSC_1(0), recSecElEtaSC_1(0),
 recLeadElPtSC_12(0), recSecElPtSC_12(0), recLeadElEtaSC_12(0), recSecElEtaSC_12(0),
 recLeadElPtSC_123(0), recSecElPtSC_123(0), recLeadElEtaSC_123(0), recSecElEtaSC_123(0), 
 recLeadElPtSC_1234(0), recSecElPtSC_1234(0), recLeadElEtaSC_1234(0), recSecElEtaSC_1234(0),
 recLeadElPtSC_12345(0), recSecElPtSC_12345(0), recLeadElEtaSC_12345(0), recSecElEtaSC_12345(0),
+recLeadElPtSC_123456(0), recSecElPtSC_123456(0), recLeadElEtaSC_123456(0), recSecElEtaSC_123456(0),
 
 recLeadElIPSC_1(0), recSecElIPSC_1(0), recLeadElfBremSC_1(0), recSecElfBremSC_1(0),
 recLeadElIPSC_12(0), recSecElIPSC_12(0), recLeadElfBremSC_12(0), recSecElfBremSC_12(0),
 recLeadElIPSC_123(0), recSecElIPSC_123(0), recLeadElfBremSC_123(0), recSecElfBremSC_123(0), 
 recLeadElIPSC_1234(0), recSecElIPSC_1234(0), recLeadElfBremSC_1234(0), recSecElfBremSC_1234(0),
 recLeadElIPSC_12345(0), recSecElIPSC_12345(0), recLeadElfBremSC_12345(0), recSecElfBremSC_12345(0),
+recLeadElIPSC_123456(0), recSecElIPSC_123456(0), recLeadElfBremSC_123456(0), recSecElfBremSC_123456(0),
 
 recTrackIsoLead_PreIso(0), recEcalIsoLead_PreIso(0), recHcalIsoLead_PreIso(0), recRelIsoLead_PreIso(0), recTrackIsoSec_PreIso(0), recEcalIsoSec_PreIso(0), recHcalIsoSec_PreIso(0), recRelIsoSec_PreIso(0),
 
 HoverE_PreEiD(0), DeltaEtaIn_PreEiD(0), DeltaPhiIn_PreEiD(0), SigmaIEtaIEta_PreEiD(0), HoverE_EiD(0), DeltaEtaIn_EiD(0), DeltaPhiIn_EiD(0), SigmaIEtaIEta_EiD(0), 
 
-RecoIsoJetPt_12345(0), RecoJetPt_12345(0), recLeadIsoJetPt_12345(0), recLeadIsoJetEta_12345(0), JetCounter_12345(0), IsoJetCounter_1(0), IsoJetCounter_12(0), IsoJetCounter_123(0), IsoJetCounter_1234(0), IsoJetCounter_12345(0),
+RecoIsoJetPt_123456(0), RecoJetPt_123456(0), recLeadIsoJetPt_123456(0), recLeadIsoJetEta_123456(0), JetCounter_123456(0), 
+IsoJetCounter_1(0), IsoJetCounter_12(0), IsoJetCounter_123(0), IsoJetCounter_1234(0), IsoJetCounter_12345(0), IsoJetCounter_123456(0),
 
 HEnergy_IsoJet_ElType(0), EMEnergy_IsoJet_ElType(0), Jet_EMEnergy(0), Jet_HEnergy(0), MinDeltaR_ZDau(0), AllJetCharge(0), IsoJetCharge(0), NotIsoJetCharge(0), DeltaR_IsoJet(0), DeltaR_NotIsoJet(0), DeltaR_IsoJet_ElType(0),
 
@@ -84,7 +91,7 @@ PixelHit_OC(0), PixelHit_SC(0), FirstPixelBarrelHit_OC(0), FirstPixelBarrelHit_S
 
 DeltaRvsCharge_JetRec(0), DeltaRvsCharge_JetRec_Iso(0), DeltaRvsCharge_JetRec_NotIso(0),
 
-_norm(1.), _dir(0), _charge_dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _Norm(true), _Sumw2(false), _GenParticleMatch(false), _entries(0), _EventsPerFile(0), _Acc(1), _Qual(2), _Imp(3), _Iso(4), _EiD(5), _electronID("eidRobustTight"), _file(0), _histoVector(), _histoVector2D()
+_norm(1.), _dir(0), _charge_dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _Norm(true), _Sumw2(false), _GenParticleMatch(false), _entries(0), _EventsPerFile(0), _Acc(1), _Trg(2), _Qual(3), _Imp(4), _Iso(5), _EiD(6), _electronID("eidRobustTight"), _file(0), _histoVector(), _histoVector2D()
 
 { }
 
@@ -103,19 +110,21 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    
    //Selections
    _Acc = iConfig.getParameter<int32_t>("Acc");
+   _Trg = iConfig.getParameter<int32_t>("Trg");
    _Qual = iConfig.getParameter<int32_t>("Qual");
    _Imp = iConfig.getParameter<int32_t>("Imp");
    _Iso = iConfig.getParameter<int32_t>("Iso");
    _EiD = iConfig.getParameter<int32_t>("EiD");
    
-   for(int i=0; i<6; i++){
+   for(int i=0; i<7; i++){
    _RecoCutFlags[i] = "_1";}
    
-   _RecoCutFlags[_Acc] = "_Acc";
+   _RecoCutFlags[_Acc] =  "_Acc";
+   _RecoCutFlags[_Trg] =  "_Trg";
    _RecoCutFlags[_Qual] = "_Qual";
-   _RecoCutFlags[_Imp] = "_Imp";
-   _RecoCutFlags[_Iso] = "_Iso";
-   _RecoCutFlags[_EiD] = "_EiD";
+   _RecoCutFlags[_Imp] =  "_Imp";
+   _RecoCutFlags[_Iso] =  "_Iso";
+   _RecoCutFlags[_EiD] =  "_EiD";
    
    cout << "RecoElectron file name : " << _file->GetName() << endl;
    _file->cd();
@@ -153,6 +162,9 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    recPtZ_name+=_RecoCutFlags[5].c_str();
    recPtZ_12345  = new TH1D(recPtZ_name.c_str(), "Reconstructed Z p_{T}", 200, 0, 200);
    _histoVector.push_back(recPtZ_12345);
+   recPtZ_name+=_RecoCutFlags[6].c_str();
+   recPtZ_123456  = new TH1D(recPtZ_name.c_str(), "Reconstructed Z p_{T}", 200, 0, 200);
+   _histoVector.push_back(recPtZ_123456);
    
    string recEtaZ_name = "recEtaZ";
    recEtaZ_name+=_RecoCutFlags[1].c_str();
@@ -170,6 +182,9 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    recEtaZ_name+=_RecoCutFlags[5].c_str();
    recEtaZ_12345  = new TH1D(recEtaZ_name.c_str(), "Reconstructed Z #eta", 100, -10, 10);
    _histoVector.push_back(recEtaZ_12345);
+   recEtaZ_name+=_RecoCutFlags[6].c_str();
+   recEtaZ_123456  = new TH1D(recEtaZ_name.c_str(), "Reconstructed Z #eta", 100, -10, 10);
+   _histoVector.push_back(recEtaZ_123456);
    
    string recMassZ_name = "recMassZ";
    recMassZ_name+=_RecoCutFlags[1].c_str();
@@ -187,6 +202,9 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    recMassZ_name+=_RecoCutFlags[5].c_str();
    recMassZ_12345 = new TH1D(recMassZ_name.c_str(), "Reconstructed Z mass", 200, 50, 150);
    _histoVector.push_back(recMassZ_12345);
+   recMassZ_name+=_RecoCutFlags[6].c_str();
+   recMassZ_123456 = new TH1D(recMassZ_name.c_str(), "Reconstructed Z mass", 200, 50, 150);
+   _histoVector.push_back(recMassZ_123456);
    
    //Z variables - SC
    TDirectory *SC_dir = _dir->mkdir("SameSign");
@@ -208,6 +226,9 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    recPtZSC_name+=_RecoCutFlags[5].c_str();
    recPtZSC_12345  = new TH1D(recPtZSC_name.c_str(), "Reconstructed ZSC p_{T}", 200, 0, 200);
    _histoVector.push_back(recPtZSC_12345);
+   recPtZSC_name+=_RecoCutFlags[6].c_str();
+   recPtZSC_123456  = new TH1D(recPtZSC_name.c_str(), "Reconstructed ZSC p_{T}", 200, 0, 200);
+   _histoVector.push_back(recPtZSC_123456);
    
    string recEtaZSC_name = "recEtaZSC";
    recEtaZSC_name+=_RecoCutFlags[1].c_str();
@@ -225,6 +246,9 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    recEtaZSC_name+=_RecoCutFlags[5].c_str();
    recEtaZSC_12345  = new TH1D(recEtaZSC_name.c_str(), "Reconstructed ZSC #eta", 100, -10, 10);
    _histoVector.push_back(recEtaZSC_12345);
+   recEtaZSC_name+=_RecoCutFlags[6].c_str();
+   recEtaZSC_123456  = new TH1D(recEtaZSC_name.c_str(), "Reconstructed ZSC #eta", 100, -10, 10);
+   _histoVector.push_back(recEtaZSC_123456);
    
    string recMassZSC_name = "recMassZSC";
    recMassZSC_name+=_RecoCutFlags[1].c_str();
@@ -242,6 +266,9 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    recMassZSC_name+=_RecoCutFlags[5].c_str();
    recMassZSC_12345 = new TH1D(recMassZSC_name.c_str(), "Reconstructed ZSC mass", 200, 50, 150);
    _histoVector.push_back(recMassZSC_12345);
+   recMassZSC_name+=_RecoCutFlags[6].c_str();
+   recMassZSC_123456 = new TH1D(recMassZSC_name.c_str(), "Reconstructed ZSC mass", 200, 50, 150);
+   _histoVector.push_back(recMassZSC_123456);
    
    //Z Electron variables   
    _Eldir = _dir->mkdir("recZElectrons_Plots");
@@ -263,6 +290,9 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    recLeadElPt_name+=_RecoCutFlags[5].c_str();
    recLeadElPt_12345 = new TH1D(recLeadElPt_name.c_str(), "Reconstructed Leading electron p_{T}", 200, 0, 200);
    _histoVector.push_back(recLeadElPt_12345);
+   recLeadElPt_name+=_RecoCutFlags[6].c_str();
+   recLeadElPt_123456 = new TH1D(recLeadElPt_name.c_str(), "Reconstructed Leading electron p_{T}", 200, 0, 200);
+   _histoVector.push_back(recLeadElPt_123456);
    
    string recSecElPt_name = "recSecElPt";
    recSecElPt_name+=_RecoCutFlags[1].c_str();
@@ -280,6 +310,9 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    recSecElPt_name+=_RecoCutFlags[5].c_str();
    recSecElPt_12345  = new TH1D(recSecElPt_name.c_str(), "Reconstructed Second electron p_{T}", 200, 0, 200);
    _histoVector.push_back(recSecElPt_12345);
+   recSecElPt_name+=_RecoCutFlags[6].c_str();
+   recSecElPt_123456  = new TH1D(recSecElPt_name.c_str(), "Reconstructed Second electron p_{T}", 200, 0, 200);
+   _histoVector.push_back(recSecElPt_123456);
    
    string recLeadElEta_name = "recLeadElEta";
    recLeadElEta_name+=_RecoCutFlags[1].c_str();  
@@ -297,6 +330,9 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    recLeadElEta_name+=_RecoCutFlags[5].c_str();
    recLeadElEta_12345 = new TH1D(recLeadElEta_name.c_str(), "Reconstructed Leading electron #eta", 100, -2.5, 2.5);
    _histoVector.push_back(recLeadElEta_12345);
+   recLeadElEta_name+=_RecoCutFlags[6].c_str();
+   recLeadElEta_123456 = new TH1D(recLeadElEta_name.c_str(), "Reconstructed Leading electron #eta", 100, -2.5, 2.5);
+   _histoVector.push_back(recLeadElEta_123456);
    
    string recSecElEta_name = "recSecElEta";
    recSecElEta_name+=_RecoCutFlags[1].c_str(); 
@@ -314,6 +350,9 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    recSecElEta_name+=_RecoCutFlags[5].c_str();  
    recSecElEta_12345  = new TH1D(recSecElEta_name.c_str(), "Reconstructed Second electron #eta", 100, -2.5, 2.5);
    _histoVector.push_back(recSecElEta_12345);
+   recSecElEta_name+=_RecoCutFlags[6].c_str();  
+   recSecElEta_123456  = new TH1D(recSecElEta_name.c_str(), "Reconstructed Second electron #eta", 100, -2.5, 2.5);
+   _histoVector.push_back(recSecElEta_123456);
    
    string recLeadElIP_name = "recLeadElIP";
    recLeadElIP_name+=_RecoCutFlags[1].c_str();  
@@ -331,6 +370,9 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    recLeadElIP_name+=_RecoCutFlags[5].c_str();  
    recLeadElIP_12345 = new TH1D(recLeadElIP_name.c_str(), "Reconstructed Leading electron IP", 100, 0, 0.1);
    _histoVector.push_back(recLeadElIP_12345);
+   recLeadElIP_name+=_RecoCutFlags[6].c_str();  
+   recLeadElIP_123456 = new TH1D(recLeadElIP_name.c_str(), "Reconstructed Leading electron IP", 100, 0, 0.1);
+   _histoVector.push_back(recLeadElIP_123456);
    
    string recSecElIP_name = "recSecElIP";
    recSecElIP_name+=_RecoCutFlags[1].c_str();  
@@ -348,6 +390,9 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    recSecElIP_name+=_RecoCutFlags[5].c_str();  
    recSecElIP_12345 = new TH1D(recSecElIP_name.c_str(), "Reconstructed Second electron IP", 100, 0, 0.1);
    _histoVector.push_back(recSecElIP_12345);
+   recSecElIP_name+=_RecoCutFlags[6].c_str();  
+   recSecElIP_123456 = new TH1D(recSecElIP_name.c_str(), "Reconstructed Second electron IP", 100, 0, 0.1);
+   _histoVector.push_back(recSecElIP_123456);
    
    string recLeadElfBrem_name = "recLeadElfBrem";
    recLeadElfBrem_name+=_RecoCutFlags[1].c_str();  
@@ -365,6 +410,9 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    recLeadElfBrem_name+=_RecoCutFlags[5].c_str();  
    recLeadElfBrem_12345 = new TH1D(recLeadElfBrem_name.c_str(), "Reconstructed Leading electron fBrem", 100, 0, 2);
    _histoVector.push_back(recLeadElfBrem_12345);
+   recLeadElfBrem_name+=_RecoCutFlags[6].c_str();  
+   recLeadElfBrem_123456 = new TH1D(recLeadElfBrem_name.c_str(), "Reconstructed Leading electron fBrem", 100, 0, 2);
+   _histoVector.push_back(recLeadElfBrem_123456);
    
    string recSecElfBrem_name = "recSecElfBrem";
    recSecElfBrem_name+=_RecoCutFlags[1].c_str();  
@@ -382,6 +430,9 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    recSecElfBrem_name+=_RecoCutFlags[5].c_str();  
    recSecElfBrem_12345 = new TH1D(recSecElfBrem_name.c_str(), "Reconstructed Second electron fBrem", 100, 0, 2);
    _histoVector.push_back(recSecElfBrem_12345);
+   recSecElfBrem_name+=_RecoCutFlags[6].c_str();  
+   recSecElfBrem_123456 = new TH1D(recSecElfBrem_name.c_str(), "Reconstructed Second electron fBrem", 100, 0, 2);
+   _histoVector.push_back(recSecElfBrem_123456);
    
    //Z Electron variables - SC   
    SC_dir->cd();
@@ -402,6 +453,9 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    recLeadElPtSC_name+=_RecoCutFlags[5].c_str();
    recLeadElPtSC_12345 = new TH1D(recLeadElPtSC_name.c_str(), "Reconstructed Leading electron p_{T} - SameCharge", 200, 0, 200);
    _histoVector.push_back(recLeadElPtSC_12345);
+   recLeadElPtSC_name+=_RecoCutFlags[6].c_str();
+   recLeadElPtSC_123456 = new TH1D(recLeadElPtSC_name.c_str(), "Reconstructed Leading electron p_{T} - SameCharge", 200, 0, 200);
+   _histoVector.push_back(recLeadElPtSC_123456);
    
    string recSecElPtSC_name = "recSecElPtSC";
    recSecElPtSC_name+=_RecoCutFlags[1].c_str();
@@ -419,6 +473,9 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    recSecElPtSC_name+=_RecoCutFlags[5].c_str();
    recSecElPtSC_12345  = new TH1D(recSecElPtSC_name.c_str(), "Reconstructed Second electron p_{T} - SameCharge", 200, 0, 200);
    _histoVector.push_back(recSecElPtSC_12345);
+   recSecElPtSC_name+=_RecoCutFlags[6].c_str();
+   recSecElPtSC_123456  = new TH1D(recSecElPtSC_name.c_str(), "Reconstructed Second electron p_{T} - SameCharge", 200, 0, 200);
+   _histoVector.push_back(recSecElPtSC_123456);
    
    string recLeadElEtaSC_name = "recLeadElEtaSC";
    recLeadElEtaSC_name+=_RecoCutFlags[1].c_str();  
@@ -436,6 +493,9 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    recLeadElEtaSC_name+=_RecoCutFlags[5].c_str();
    recLeadElEtaSC_12345 = new TH1D(recLeadElEtaSC_name.c_str(), "Reconstructed Leading electron #eta - SameCharge", 100, -2.5, 2.5);
    _histoVector.push_back(recLeadElEtaSC_12345);
+   recLeadElEtaSC_name+=_RecoCutFlags[6].c_str();
+   recLeadElEtaSC_123456 = new TH1D(recLeadElEtaSC_name.c_str(), "Reconstructed Leading electron #eta - SameCharge", 100, -2.5, 2.5);
+   _histoVector.push_back(recLeadElEtaSC_123456);
    
    string recSecElEtaSC_name = "recSecElEtaSC";
    recSecElEtaSC_name+=_RecoCutFlags[1].c_str(); 
@@ -453,6 +513,9 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    recSecElEtaSC_name+=_RecoCutFlags[5].c_str();  
    recSecElEtaSC_12345  = new TH1D(recSecElEtaSC_name.c_str(), "Reconstructed Second electron #eta - SameCharge", 100, -2.5, 2.5);
    _histoVector.push_back(recSecElEtaSC_12345);
+   recSecElEtaSC_name+=_RecoCutFlags[6].c_str();  
+   recSecElEtaSC_123456  = new TH1D(recSecElEtaSC_name.c_str(), "Reconstructed Second electron #eta - SameCharge", 100, -2.5, 2.5);
+   _histoVector.push_back(recSecElEtaSC_123456);
    
    string recLeadElIPSC_name = "recLeadElIPSC";
    recLeadElIPSC_name+=_RecoCutFlags[1].c_str();  
@@ -470,6 +533,9 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    recLeadElIPSC_name+=_RecoCutFlags[5].c_str();  
    recLeadElIPSC_12345 = new TH1D(recLeadElIPSC_name.c_str(), "Reconstructed Leading electron IP - SameCharge", 100, 0, 0.1);
    _histoVector.push_back(recLeadElIPSC_12345);
+   recLeadElIPSC_name+=_RecoCutFlags[6].c_str();  
+   recLeadElIPSC_123456 = new TH1D(recLeadElIPSC_name.c_str(), "Reconstructed Leading electron IP - SameCharge", 100, 0, 0.1);
+   _histoVector.push_back(recLeadElIPSC_123456);
    
    string recSecElIPSC_name = "recSecElIPSC";
    recSecElIPSC_name+=_RecoCutFlags[1].c_str();  
@@ -487,6 +553,9 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    recSecElIPSC_name+=_RecoCutFlags[5].c_str();  
    recSecElIPSC_12345 = new TH1D(recSecElIPSC_name.c_str(), "Reconstructed Second electron IP - SameCharge", 100, 0, 0.1);
    _histoVector.push_back(recSecElIPSC_12345);
+   recSecElIPSC_name+=_RecoCutFlags[6].c_str();  
+   recSecElIPSC_123456 = new TH1D(recSecElIPSC_name.c_str(), "Reconstructed Second electron IP - SameCharge", 100, 0, 0.1);
+   _histoVector.push_back(recSecElIPSC_123456);
    
    string recLeadElfBremSC_name = "recLeadElfBremSC";
    recLeadElfBremSC_name+=_RecoCutFlags[1].c_str();  
@@ -504,6 +573,9 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    recLeadElfBremSC_name+=_RecoCutFlags[5].c_str();  
    recLeadElfBremSC_12345 = new TH1D(recLeadElfBremSC_name.c_str(), "Reconstructed Leading electron fBrem - SameCharge", 100, 0, 2);
    _histoVector.push_back(recLeadElfBremSC_12345);
+   recLeadElfBremSC_name+=_RecoCutFlags[6].c_str();  
+   recLeadElfBremSC_123456 = new TH1D(recLeadElfBremSC_name.c_str(), "Reconstructed Leading electron fBrem - SameCharge", 100, 0, 2);
+   _histoVector.push_back(recLeadElfBremSC_123456);
    
    string recSecElfBremSC_name = "recSecElfBremSC";
    recSecElfBremSC_name+=_RecoCutFlags[1].c_str();  
@@ -521,6 +593,9 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    recSecElfBremSC_name+=_RecoCutFlags[5].c_str();  
    recSecElfBremSC_12345 = new TH1D(recSecElfBremSC_name.c_str(), "Reconstructed Second electron fBrem - SameCharge", 100, 0, 2);
    _histoVector.push_back(recSecElfBremSC_12345);
+   recSecElfBremSC_name+=_RecoCutFlags[6].c_str();  
+   recSecElfBremSC_123456 = new TH1D(recSecElfBremSC_name.c_str(), "Reconstructed Second electron fBrem - SameCharge", 100, 0, 2);
+   _histoVector.push_back(recSecElfBremSC_123456);
    
    //Electron identification variable
    _Eldir->cd();
@@ -573,23 +648,23 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    string RecoJetPt_name = "RecoJetPt";
    string JetCounter_name = "JetCounter";
   
-   for(int c=1;c!=6;c++){
+   for(int c=1;c!=7;c++){
    recLeadIsoJetPt_name+=_RecoCutFlags[c].c_str();
    recLeadIsoJetEta_name+=_RecoCutFlags[c].c_str();
    RecoIsoJetPt_name+=_RecoCutFlags[c].c_str();
    RecoJetPt_name+=_RecoCutFlags[c].c_str();
    JetCounter_name+=_RecoCutFlags[c].c_str();}
    
-   recLeadIsoJetPt_12345 = new TH1D(recLeadIsoJetPt_name.c_str(), "Reconstructed Leading Iso Jet p_{T}", 200, 0, 200);
-   _histoVector.push_back(recLeadIsoJetPt_12345);
-   recLeadIsoJetEta_12345 = new TH1D(recLeadIsoJetEta_name.c_str(), "Reconstructed Leading Iso Jet #eta", 100, -5, 5); 
-   _histoVector.push_back(recLeadIsoJetEta_12345);
-   RecoIsoJetPt_12345 = new TH1D(RecoIsoJetPt_name.c_str(), "Reconstructed Iso Jet p_{T}", 250, 0, 250);
-   _histoVector.push_back(RecoIsoJetPt_12345);
-   RecoJetPt_12345 = new TH1D(RecoJetPt_name.c_str(), "Reconstructed Jet p_{T}", 250, 0, 250);
-   _histoVector.push_back(RecoJetPt_12345);
-   JetCounter_12345 = new TH1D(JetCounter_name.c_str(), "Number of Reconstructed Jet per event", 10, 0, 10);
-   _histoVector.push_back(JetCounter_12345);
+   recLeadIsoJetPt_123456 = new TH1D(recLeadIsoJetPt_name.c_str(), "Reconstructed Leading Iso Jet p_{T}", 200, 0, 200);
+   _histoVector.push_back(recLeadIsoJetPt_123456);
+   recLeadIsoJetEta_123456 = new TH1D(recLeadIsoJetEta_name.c_str(), "Reconstructed Leading Iso Jet #eta", 100, -5, 5); 
+   _histoVector.push_back(recLeadIsoJetEta_123456);
+   RecoIsoJetPt_123456 = new TH1D(RecoIsoJetPt_name.c_str(), "Reconstructed Iso Jet p_{T}", 250, 0, 250);
+   _histoVector.push_back(RecoIsoJetPt_123456);
+   RecoJetPt_123456 = new TH1D(RecoJetPt_name.c_str(), "Reconstructed Jet p_{T}", 250, 0, 250);
+   _histoVector.push_back(RecoJetPt_123456);
+   JetCounter_123456 = new TH1D(JetCounter_name.c_str(), "Number of Reconstructed Jet per event", 10, 0, 10);
+   _histoVector.push_back(JetCounter_123456);
    
    string IsoJetCounter_name = "IsoJetCounter";
    IsoJetCounter_name+=_RecoCutFlags[1].c_str();
@@ -607,6 +682,9 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    IsoJetCounter_name+=_RecoCutFlags[5].c_str();
    IsoJetCounter_12345 = new TH1D(IsoJetCounter_name.c_str(), "Number of Reconstructed Iso Jet per event", 10, 0, 10);
    _histoVector.push_back(IsoJetCounter_12345);
+   IsoJetCounter_name+=_RecoCutFlags[6].c_str();
+   IsoJetCounter_123456 = new TH1D(IsoJetCounter_name.c_str(), "Number of Reconstructed Iso Jet per event", 10, 0, 10);
+   _histoVector.push_back(IsoJetCounter_123456);
    
    //Jet isolation properties
    TDirectory *jetiso_dir = _dir->mkdir("JetIsolation");
@@ -795,7 +873,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      }
    
      //Events with a selected Zee SC - SELECTIONS: 1
-     if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandleSC)[0])){
+     if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandleSC)[0], *triggerHandle)){
      
      //Z variables
      recPtZSC_1->Fill((*zrecHandleSC)[0].pt());
@@ -815,7 +893,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      }
      
      //Events with a selected Zee SC - SELECTIONS: 1+2
-     if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandleSC)[0])&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandleSC)[0])){
+     if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandleSC)[0], *triggerHandle)){
      
      //Z variables
      recPtZSC_12->Fill((*zrecHandleSC)[0].pt());
@@ -835,7 +913,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      }
      
      //Events with a selected Zee SC - SELECTIONS: 1+2+3
-     if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandleSC)[0])&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandleSC)[0])&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandleSC)[0])){
+     if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandleSC)[0], *triggerHandle)){
      
      //Z variables
      recPtZSC_123->Fill((*zrecHandleSC)[0].pt());
@@ -855,7 +933,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      }
      
      //Events with a selected Zee SC - SELECTIONS: 1+2+3+4
-     if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandleSC)[0])&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandleSC)[0])&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandleSC)[0])&&RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), (*zrecHandleSC)[0])){
+     if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), (*zrecHandleSC)[0], *triggerHandle)){
      
      //Z variables
      recPtZSC_1234->Fill((*zrecHandleSC)[0].pt());
@@ -876,7 +954,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      }
      
      //Events with a selected Zee SC - SELECTIONS: 1+2+3+4+5
-     if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandleSC)[0])&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandleSC)[0])&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandleSC)[0])&&RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), (*zrecHandleSC)[0])&&RecSelected(_RecoCutFlags[5].c_str(), _electronID.c_str(), (*zrecHandleSC)[0])){
+     if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[5].c_str(), _electronID.c_str(), (*zrecHandleSC)[0], *triggerHandle)){
      
      //Z variables
      recPtZSC_12345->Fill((*zrecHandleSC)[0].pt());
@@ -892,6 +970,26 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      recSecElIPSC_12345->Fill(dau1SC->dB());
      recLeadElfBremSC_12345->Fill(dau0SC->fbrem());
      recSecElfBremSC_12345->Fill(dau1SC->fbrem());
+    
+     }
+     
+     //Events with a selected Zee SC - SELECTIONS: 1+2+3+4+5+6
+     if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[5].c_str(), _electronID.c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[6].c_str(), _electronID.c_str(), (*zrecHandleSC)[0], *triggerHandle)){
+     
+     //Z variables
+     recPtZSC_123456->Fill((*zrecHandleSC)[0].pt());
+     recEtaZSC_123456->Fill((*zrecHandleSC)[0].eta());
+     recMassZSC_123456->Fill((*zrecHandleSC)[0].mass());
+     
+     //Z Electrons variables
+     recLeadElEtaSC_123456->Fill(dau0SC->eta());
+     recSecElEtaSC_123456->Fill(dau1SC->eta());
+     recLeadElPtSC_123456->Fill(dau0SC->pt());
+     recSecElPtSC_123456->Fill(dau1SC->pt());
+     recLeadElIPSC_123456->Fill(dau0SC->dB());
+     recSecElIPSC_123456->Fill(dau1SC->dB());
+     recLeadElfBremSC_123456->Fill(dau0SC->fbrem());
+     recSecElfBremSC_123456->Fill(dau1SC->fbrem());
     
      }
    
@@ -1089,7 +1187,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      }
      
      //Events with a selected Zee - SELECTIONS: 1
-     if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0])){
+     if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)){
      
      //Z variables
      recPtZ_1->Fill((*zrecHandle)[0].pt());
@@ -1113,7 +1211,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      
    
      //Events with a selected Zee - SELECTIONS: 1+2
-     if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0]) && RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[0])){
+     if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)){
     
      //Z variables
      recPtZ_12->Fill((*zrecHandle)[0].pt());
@@ -1136,7 +1234,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      }
      
      //Events with a selected Zee - SELECTIONS: 1+2+3
-     if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0]) && RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[0]) && RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[0])){
+     if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)){
     
      //Z variables
      recPtZ_123->Fill((*zrecHandle)[0].pt());
@@ -1159,7 +1257,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      }
     
      //Events with a selected Zee - SELECTIONS: 1+2+3+4
-     if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0]) && RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[0]) && RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[0]) && RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), (*zrecHandle)[0])){
+     if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)){
      
      //Z variables
      recPtZ_1234->Fill((*zrecHandle)[0].pt());
@@ -1180,9 +1278,9 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      IsoJetCounter_1234->Fill(isorecjets.size());
           
     }
-  
-     //Events with a selected Zee - SELECTIONS: 1+2+3+4+5
-     if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0]) && RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[0]) && RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[0]) && RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), (*zrecHandle)[0]) && RecSelected(_RecoCutFlags[5].c_str(), _electronID.c_str(), (*zrecHandle)[0])){
+    
+    //Events with a selected Zee - SELECTIONS: 1+2+3+4+5
+     if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[5].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)){
      
       //Z variables     
       recPtZ_12345->Fill((*zrecHandle)[0].pt());
@@ -1200,18 +1298,41 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
       recSecElfBrem_12345->Fill(dau1->fbrem());
            
       //Jet variables     
-      JetCounter_12345->Fill(recjets.size());
       IsoJetCounter_12345->Fill(isorecjets.size());
+      
+      }
+  
+     //Events with a selected Zee - SELECTIONS: 1+2+3+4+5+6
+     if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[5].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[6].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)){
+     
+      //Z variables     
+      recPtZ_123456->Fill((*zrecHandle)[0].pt());
+      recEtaZ_123456->Fill((*zrecHandle)[0].eta());
+      recMassZ_123456->Fill((*zrecHandle)[0].mass());
+
+      //Z Electrons variables      
+      recLeadElEta_123456->Fill(dau0->eta());
+      recSecElEta_123456->Fill(dau1->eta());
+      recLeadElPt_123456->Fill(dau0->pt());
+      recSecElPt_123456->Fill(dau1->pt());
+      recLeadElIP_123456->Fill(dau0->dB());
+      recSecElIP_123456->Fill(dau1->dB());
+      recLeadElfBrem_123456->Fill(dau0->fbrem());
+      recSecElfBrem_123456->Fill(dau1->fbrem());
+           
+      //Jet variables     
+      JetCounter_123456->Fill(recjets.size());
+      IsoJetCounter_123456->Fill(isorecjets.size());
     
       for(unsigned int i = 0; i < recjets.size(); i++){
-      RecoJetPt_12345->Fill(recjets[i]->pt());}
+      RecoJetPt_123456->Fill(recjets[i]->pt());}
       
       for(unsigned int i = 0; i < isorecjets.size(); i++){
-      RecoIsoJetPt_12345->Fill(isorecjets[i]->pt());}
+      RecoIsoJetPt_123456->Fill(isorecjets[i]->pt());}
       
       if (isorecjets.size()){
-        recLeadIsoJetPt_12345->Fill(isorecjets[0]->pt());
-        recLeadIsoJetEta_12345->Fill(isorecjets[0]->eta());
+        recLeadIsoJetPt_123456->Fill(isorecjets[0]->pt());
+        recLeadIsoJetEta_123456->Fill(isorecjets[0]->eta());
         }
       
       //Jet properties      
@@ -1300,13 +1421,13 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
    
    }
  
-   for(int fcount = 1; fcount<6; fcount++){
+   for(int fcount = 1; fcount<7; fcount++){
    
    if(fcount != 5){
    if(_RecoCutFlags[fcount+1] == "_Iso"){   
    bool PreIso = false;
    for(int n = 1; n < fcount+1; n++){
-   if(RecSelected(_RecoCutFlags[n].c_str(), _electronID.c_str(), (*zrecHandle)[0])){
+   if(RecSelected(_RecoCutFlags[n].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)){
    PreIso = true;
    }else{
    PreIso = false;
@@ -1332,7 +1453,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
    if(_RecoCutFlags[fcount+1] == "_EiD"){   
    bool PreEiD = false;
    for(int n = 1; n < fcount+1; n++){
-   if(RecSelected(_RecoCutFlags[n].c_str(), _electronID.c_str(), (*zrecHandle)[0])){
+   if(RecSelected(_RecoCutFlags[n].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)){
    PreEiD = true;
    }else{
    PreEiD = false;
@@ -1351,7 +1472,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      SigmaIEtaIEta_PreEiD->Fill(dau1->sigmaIetaIeta());     
      }
      
-   if(PreEiD && RecSelected(_RecoCutFlags[fcount+1].c_str(), _electronID.c_str(), (*zrecHandle)[0])){
+   if(PreEiD && RecSelected(_RecoCutFlags[fcount+1].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)){
      HoverE_EiD->Fill(dau0->hcalOverEcal());
      HoverE_EiD->Fill(dau1->hcalOverEcal());
      DeltaEtaIn_EiD->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
