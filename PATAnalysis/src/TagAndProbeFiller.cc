@@ -14,13 +14,7 @@ TagAndProbeFiller::TagAndProbeFiller(TDirectory* output, std::string name, int n
                          const std::vector<bool (*)(const reco::Candidate&)>& passprobe_cuts): 
 _output(output),
 _name(name),
-/*
-_mass("mass", "mass", 0, 10000.),
-_bin("bin", "bin", 0, 10),
-_probe("probe", "probe", -2, 2),
-_passprobe("passprobe", "passprobe", -2, 2),
-_weight("weight", "weight", 0., 100.),
-_passprobe_cat("passprobe", "passprobe"),*/
+
 _mass(0.),
 _bin(0),
 _probe(0.),
@@ -41,13 +35,6 @@ _passprobe_cuts(passprobe_cuts)
     name2 << name << "TagPassProbeMassBin" << i;
     _v_mass_tagpassprobe.push_back(new TH1D(name2.str().c_str(), name2.str().c_str(), 30, 60., 120.));
   }
-
-  //_passprobe_cat.defineType("pass",  1);
-  //_passprobe_cat.defineType("fail",  0);
- 
-  //_argset = new RooArgSet(_mass, _bin, _probe, _passprobe_cat, _weight );
-  
-  //_rootree = new RooDataSet("dataset", "dataset", *_argset, "weight");
   _rootree = new TTree("dataset", "dataset");
   _rootree->Branch("mass", &_mass, "mass/D");
   _rootree->Branch("bin",  &_bin, "bin/D");
@@ -59,15 +46,14 @@ _passprobe_cuts(passprobe_cuts)
 TagAndProbeFiller::~TagAndProbeFiller(){
   delete _numerator;
   delete _denominator;
-  //delete _argset;
 }
 
 void TagAndProbeFiller::fill(const reco::Candidate& Z, double x, double w){
+  
   _mass = 0.;
   _probe = 0.;
   _passprobe = 0;
-  //sprintf(_passprobe, "fail");
-  //_passprobe_cat.setLabel("fail");
+ 
   //tag cand 1, probe cand 2 
   if (tag(*(Z.daughter(0)))) probe(*(Z.daughter(1)), Z.mass(), x, w);
 
@@ -75,9 +61,10 @@ void TagAndProbeFiller::fill(const reco::Candidate& Z, double x, double w){
   _mass = 0.;
   _probe = 0.;
   _passprobe = 0;
-  //sprintf(_passprobe, "fail");
+ 
   //tag cand 2 probe cand 1
   if (tag(*(Z.daughter(1)))) probe(*(Z.daughter(0)), Z.mass(), x, w);
+  
 }
 
 bool TagAndProbeFiller::tag(const reco::Candidate& cand){
@@ -104,12 +91,13 @@ void TagAndProbeFiller::probe(const reco::Candidate& cand, double mass, double x
       _mass = mass;
       _bin = double(ibin-1);
       _passprobe = 1;
-      //sprintf(_passprobe, "pass");
-      //_passprobe_cat.setLabel("pass");
+     
     } else cout << "warning in TagAndProbeFiller::probe bin index out of range: " << ibin << endl;
   }
-  //_rootree->add(*_argset, w);
+  
+  _weight=w;
   _rootree->Fill();
+  
 }
 
 bool TagAndProbeFiller::applyCuts(const reco::Candidate& cand, const std::vector<bool (*)(const reco::Candidate&)>& cuts) {

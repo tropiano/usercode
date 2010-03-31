@@ -17,6 +17,7 @@
 #include "RooNLLVar.h"
 #include "TTree.h"
 #include "TH1.h"
+#include "TVectorD.h"
 
 using namespace std;
 
@@ -35,7 +36,7 @@ _probe("probe", "probe", -1, 2),
 _weight("weight", "weight", 0., 100.),
 _passprobe_cat("passprobe", "passprobe")
 {
-  //_input->cd();
+  _input->cd();
   
   _passprobe_cat.defineType("pass",  1);
   _passprobe_cat.defineType("fail",  0);
@@ -65,6 +66,8 @@ void TagAndProbeAnalyzer::analyze(unsigned int nbins, std::string option )
    }
   
    _rootree->Write();
+   
+   TGraphAsymmErrors singleEfficiency;
   
    for (unsigned int i = 0; i < nbins; ++i){
       stringstream name_tp;
@@ -80,36 +83,31 @@ void TagAndProbeAnalyzer::analyze(unsigned int nbins, std::string option )
       //_mass.setMin(80.); //TRY smaller range
       //_mass.setMax(100.); //TRY smaller range
     
-      if (i>0) {
         std::pair<RooFitResult*, RooRealVar*>  tp_fit  = fit(tagprobe, name_tp.str().c_str(), option);
-     
-      /* 
-      if (tp_fit.first && //tpp_fit.first &&
-          tp_fit.first->status()  == 0 ){//&& tpp_fit.first->status()  == 0 ){ //&& 
+        
+        if(tp_fit.first && tp_fit.first->status() == 0 ){
           cout << "Using backgound correctedvalues for " << _name << " in bin " << i << endl;  
           singleEfficiency.SetPoint(i, i, tp_fit.second->getVal());
           double errlow = 0.;
           double errhigh = 0.;
-          //if (tp_fit.second->hasAsymError()){
-          //   errhigh = tp_fit.second->getAsymErrorHi();
-          //   errlow  = tp_fit.second->getAsymErrorLo();
-          //} else {
+          if (tp_fit.second->hasAsymError()){
+            errhigh = tp_fit.second->getAsymErrorHi();
+            errlow  = tp_fit.second->getAsymErrorLo();
+          } else {
             errlow  = tp_fit.second->getError();
             errhigh = tp_fit.second->getError();
-          //}
+          }
           singleEfficiency.SetPointEYhigh(i, errhigh);
           singleEfficiency.SetPointEYlow(i, errlow);
-        }
-        */
+          } 
+                  
           if (tp_fit.first) delete tp_fit.first;
           if (tp_fit.second) delete tp_fit.second;
-       }   
    }
 
-
    //double muon efficiency
-   //TGraphAsymmErrors doubleEfficiency = createDoubleMuonEfficiency(singleEfficiency);
-   //doubleEfficiency.Write(); 
+   TGraphAsymmErrors doubleEfficiency = createDoubleMuonEfficiency(singleEfficiency);
+   doubleEfficiency.Write(); 
    
 }
 
@@ -118,7 +116,7 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
 
   string dirname(_input->GetName());
 
-  //cout << "bins mass" << _mass.getBins()  << endl; 
+  cout << "bins mass" << _mass.getBins()  << endl; 
 
   stringstream nllname;
   nllname << "nll_" << name;
@@ -160,7 +158,6 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
   RooRealVar widthR_pass("widthR_pass", "widthR_pass", 4, 2, 15);
   RooRealVar fraction_pass("fraction_pass", "fraction_pass", 0.9, 0., 1.);
 
-
   RooRealVar mu_fail("mu_fail", "average_fail", 90, 80, 100);
   RooRealVar mu_fail2("mu_fail2", "average_fail2", 90, 80, 100);
   RooRealVar width_fail("width_fail", "width_fail", 2, 0, 10);
@@ -182,8 +179,10 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
    
   // if we are using signal shape from training 
   if (_training_signal) {
+  cout<<"TRAINING SIGNAL 1"<<endl;
     //if the training fit was succesfull and succesfully retrieved
     if ( training_results_signal && training_results_signal->status() == 0){ 
+    cout<<"TRAINING SIGNAL 2"<<endl;
       for (int i = 0; i < training_results_signal->floatParsFinal().getSize(); ++i) { 
         RooRealVar* par = (RooRealVar*) training_results_signal->floatParsFinal().at(i); 
         string parname(par->GetName());
@@ -191,15 +190,13 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
           mu_pass.setVal(par->getVal());
           mu_pass.setConstant();
         } 
-        else if (parname == "mu_pass2"){
+          else if (parname == "mu_pass2"){
           mu_pass2.setVal(par->getVal());
           mu_pass2.setConstant();
-        }
-        else if (parname == "width_pass"){
+        } else if (parname == "width_pass"){
           width_pass.setVal(par->getVal());
           width_pass.setConstant();
-        }  
-        else if (parname == "sigma_pass"){
+        } else if (parname == "sigma_pass"){
           sigma_pass.setVal(par->getVal());
           sigma_pass.setConstant();
         } else if (parname == "widthL_pass"){
@@ -257,8 +254,10 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
 
 
   if (_training_background) {
+  cout<<"TRAINING BACKGROUND 1"<<endl;
     //if the training fit was succesfull and succesfully retrieved
     if ( training_results_background && training_results_background->status() == 0){
+    cout<<"TRAINING BACKGROUND 2"<<endl;
       for (int i = 0; i < training_results_background->floatParsFinal().getSize(); ++i) {
         RooRealVar* par = (RooRealVar*) training_results_background->floatParsFinal().at(i);
         string parname(par->GetName());
@@ -293,7 +292,6 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
     }
   }   
  
-
   RooRealVar s("s", "signal yield", data->sumEntries(), 1, 300000);
   RooRealVar efficiency("efficiency", "efficiency", 0.9, 0., 0.999);
   RooRealVar b_pass("b_pass", "background yield pass", 50, 0, 1000);
@@ -344,56 +342,11 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
   _passprobe_cat.setLabel("fail");
   //total_fit.addPdf(signal_fail, _passprobe_cat.getLabel());
   total_fit.addPdf(sumfail, _passprobe_cat.getLabel());
-/*
-  RooFitResult* fitresult = 0;//total_fit.fitTo(*data);
-  //RooAbsReal* nll = total_fit.createNLL(*data);//("nll","nll", *sum, *data, kTRUE);
-  RooNLLVar nll("nll", "nll", total_fit, *data, RooFit::Extended(kTRUE), RooFit::DataError(RooDataHist::SumW2), RooFit::NumCPU(6));
-  nll.printCompactTree(" ", "tree");
-  nll.SetName(nllname.str().c_str());
-  RooMinuit m(nll);
-  //m.setErrorLevel(0.5);
-  m.setStrategy(2);
-  m.hesse();
-  m.migrad();
-  m.hesse();
-  m.minos();
-  fitresult = m.save();
-  fitresult->Write();
-*/
-/*  
-  //RooAbsData* passprobe_ds = data->reduce("passprobe==passprobe::pass");
-  //RooDataHist roobinned("bdata","Binned Data", RooArgSet(_mass), *passprobe_ds);
-  RooFitResult* fitresult = 0;
-  //RooAbsReal* nll = signal_pass.createNLL(*passprobe_ds);
-  RooNLLVar nll("nll", "nll", total_fit, roobinned, RooFit::DataError(RooDataHist::SumW2), RooFit::NumCPU(6));
-  //RooChi2Var chi2("chi2", "chi2", total_fit, roobinned, RooFit::DataError(RooDataHist::SumW2));
-  //nll->SetName(nllname.str().c_str());
-  RooMinuit m(nll);
-  //m.setErrorLevel(0.5);
-  m.setStrategy(2);
-  m.hesse();
-  m.migrad();
-  m.hesse();
-  m.minos();
-  fitresult = m.save();
-  fitresult->Write();
-*/
 
-  RooFitResult* fitresult = total_fit.fitTo(*data, /*RooFit::ConditionalObservables(RooArgSet(_passprobe_cat)),*/ RooFit::Strategy(2), RooFit::NumCPU(8), RooFit::Extended(kTRUE), RooFit::SumW2Error(true));
 
-  
-/*
-  RooChi2Var chi2("chi2", "chi2", total_fit, roobinned, RooFit::DataError(RooDataHist::SumW2), RooFit::Extended(kTRUE));
-  RooMinuit m(chi2);
-  m.setStrategy(2);
-  m.hesse();
-  m.migrad();
-  m.hesse();
-  m.minos();
-  fitresult = m.save();
-  fitresult->Write();
-*/  
+  RooFitResult* fitresult = total_fit.fitTo(*data, RooFit::Save(true), RooFit::Strategy(2), RooFit::NumCPU(8), RooFit::Extended(kTRUE), RooFit::SumW2Error(true));
 
+  fitresult->Write(); 
 
   stringstream name_pass;
   name_pass << name << "PassProbe";
@@ -401,8 +354,8 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
   name_fail << name << "FailProbe";   
   RooPlot * mass_pass = _mass.frame() ;
   mass_pass->SetNameTitle(name_pass.str().c_str(), name_pass.str().c_str());
-  data->plotOn(mass_pass, RooFit::Cut("passprobe==passprobe::pass"),  RooFit::DataError(RooAbsData::SumW2)) ;
-  //roobinned.plotOn(mass_pass, /*RooFit::Cut("passprobe==passprobe::pass"),*/  RooFit::DataError(RooDataHist::SumW2)) ;
+  data->plotOn(mass_pass, RooFit::Cut("passprobe==passprobe::pass"), RooFit::DataError(RooAbsData::SumW2)) ;
+  //roobinned.plotOn(mass_pass, RooFit::Cut("passprobe==passprobe::pass"),  RooFit::DataError(RooDataHist::SumW2)) ;
   total_fit.plotOn(mass_pass, RooFit::Slice(_passprobe_cat, "pass"), RooFit::ProjWData(_passprobe_cat,*data));
   //signal_pass.plotOn(mass_pass);
   mass_pass->Write();
@@ -416,14 +369,14 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
   mass_fail->Write(); 
     
   //roobinned.Write();
-
+  
   delete hmass;
   delete mass_pass;
   delete mass_fail;
   return std::make_pair(fitresult, (RooRealVar*) efficiency.Clone() );
 }
 
-/*
+
 TGraphAsymmErrors TagAndProbeAnalyzer::createDoubleMuonEfficiency(const TGraphAsymmErrors& single) const {
   int n = single.GetN();
   TVectorD vx(n);
@@ -447,4 +400,4 @@ TGraphAsymmErrors TagAndProbeAnalyzer::createDoubleMuonEfficiency(const TGraphAs
   doubleMuEff.SetNameTitle((_name+"DoubleMuTag&Probe").c_str(), (_name+"DoubleMuTag&Probe").c_str());
   return doubleMuEff;
 } 
-*/
+

@@ -3,7 +3,10 @@
 
 #include "TDirectory.h"
 #include "TFile.h"
+#include "TGraphAsymmErrors.h"
 #include <string>
+#include <fstream>
+#include <iotream>
 
 #include "RooDataSet.h"
 #include "RooRealVar.h"
@@ -21,6 +24,8 @@ public :
     ~TagAndProbeAnalyzer();
 
     void analyze(unsigned int nbins, std::string option="signal");
+    
+    TGraphAsymmErrors createDoubleMuonEfficiency(const TGraphAsymmErrors& single) const;
 
 private:  
   std::pair<RooFitResult*, RooRealVar*> fit(RooAbsData* data, const char* name, std::string option = "signal") ;
@@ -37,6 +42,7 @@ private:
   RooRealVar _probe, /*_passprobe,*/ _weight;
   RooCategory _passprobe_cat;
   RooArgSet* _argset;
+  
 };
 
 #endif
