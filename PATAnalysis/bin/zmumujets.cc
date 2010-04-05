@@ -1,6 +1,7 @@
 #include <iostream>
 //#include "Signal.h"
 #include "Firenze/PATAnalysis/include/EfficiencyAnalyzerMuon.h"
+#include "Firenze/PATAnalysis/include/Unfolding.h"
 #include "TFile.h"
 #include "TTree.h"
 //#include "RooUnfold/RooUnfoldResponse.h"
@@ -31,9 +32,8 @@ TDSet* getDS(const char* filename){
 
 
 int main(){
-
   TProof * p = TProof::Open("");
-  //p->SetParallel(1);
+  //p->SetParallel(4);
  
   double targetLumi = 100.;
   
@@ -42,10 +42,12 @@ int main(){
   AutoLibraryLoader::enable();
   gSystem->Load("libFirenzePATAnalysis");
 
-  p->Exec( ".x /raid/lenzip/CMSSW/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/remote.C" );
+  p->Exec( ".x /raid/lenzip/CMSSW/test/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/remote.C" );
 
   TProofLog *pl = TProof::Mgr("")->GetSessionLogs();
-  pl->Save("*","/raid/lenzip/CMSSW/test/CMSSW_3_3_5/src/Firenze/PATAnalysis/bin/Log.txt");
+  pl->Save("*","/raid/lenzip/CMSSW/test/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/Log.txt");
+
+
 
 /*  
   //process the background
@@ -106,15 +108,22 @@ int main(){
   p->Process(wDS, "FWLiteTSelector");
   delete wDS;
 */
+  TDSet* trainingDS = getDS("zmumu_training.txt");
+  TNamed* configtraining = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/test/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/config_signal_training.py");
+  p->AddInput(configtraining);
+  p->Process(trainingDS, "FWLiteTSelector");
+  delete trainingDS;
+ 
   TDSet* signalDS = getDS("zmumu.txt");
-/*  TNamed* configsignal = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/config_signal.py");
+  TNamed* configsignal = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/test/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/config_signal.py");
   p->AddInput(configsignal);
-  p->Process(signalDS, "FWLiteTSelector");*/
-  TNamed* configsignal_samesign = new TNamed("ConfigFile", "/raid/lenzip/CMSSW/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/config_signal_samesign.py");
-  p->AddInput(configsignal_samesign);
   p->Process(signalDS, "FWLiteTSelector");
   delete signalDS;
-  
+  TFile trainingoutput("training.root");
+  TFile measuredoutput("signal.root");
+  TFile unfolding("unfolding.root", "RECREATE");
+  Unfolding unfoldingAnalyzer(&trainingoutput, &measuredoutput, &unfolding, "EfficiencyMuon", "RecoMuon");
+  unfoldingAnalyzer.analyze();
   
 /*
 

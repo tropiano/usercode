@@ -6,7 +6,7 @@
 #include "TGraphAsymmErrors.h"
 #include <string>
 #include <fstream>
-#include <iotream>
+#include <iostream>
 
 #include "RooDataSet.h"
 #include "RooRealVar.h"

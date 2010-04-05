@@ -22,6 +22,7 @@
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/FWLite/interface/ChainEvent.h"
 
+//RooUnfold
 
 
 using namespace std;
@@ -35,6 +36,7 @@ recLeadMuPt(0), recSecMuPt(0), recLeadMuEta(0), recSecMuEta(0),
 recLeadJetPt(0), recLeadJetEta(0), 
 _ptjetmin(30.), _etajetmax(3.), _isocut(0.3), _norm(1.),
 _file(0), _dir(0), _histoVector()
+//_bayesUnfold("bayesUnfoldedMulti", "Bayes unfolded Jet Multiplicity")
 //_efficiency(out, "EfficienciesTotalVsRecMulti", 10, -0.5, 9.5, 0.3, false),
 { }
 
@@ -235,7 +237,6 @@ void  RecoMuon::process(const fwlite::Event& iEvent)
       recMu1EtaVsExclMulti[recjets.size()]->Fill(dau0->eta(), _norm);
       recMu2PtVsExclMulti[recjets.size()]->Fill(dau1->pt(), _norm);
       recMu2EtaVsExclMulti[recjets.size()]->Fill(dau1->eta(), _norm);
-
 
       
    }

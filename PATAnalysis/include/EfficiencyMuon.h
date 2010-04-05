@@ -11,7 +11,7 @@
 #include "MyPatAnalysis.h"
 
 #include "TagAndProbeFiller.h"
-
+#include "RooUnfoldResponse.h"
 
 class EfficiencyMuon : public MyPatAnalysis {
 public :
@@ -85,7 +85,13 @@ private:
 
    bool _requireGenInAcceptance;
 
+   bool _vsGenMulti;
+
+   bool _trainUnfolding;
+
    std::vector<TH1*> _vectorHistos;
+
+   RooUnfoldResponse* _jetmultiResponse;
 /*
    TagAndProbe* _tp_TM_MuT_OC_M_QC;
    TagAndProbe* _tp_TM_MuT_OC_M_QC_DXY;

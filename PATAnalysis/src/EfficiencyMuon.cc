@@ -10,13 +10,15 @@
 #include <iostream>
 
 #include "TParameter.h"
+#include "TMethodCall.h"
 
 using namespace std;
 
 //ClassImp(EfficiencyMuon)
 
 EfficiencyMuon::EfficiencyMuon() : 
-_initiated(false), _outputfile(0), _dirname("EfficiencyMuon"), _isocut(0.3), _ptjetmin(30.), _etajetmax(3.), _nbin(10), _xmin(-0.5), _xmax(9.5)/*, _performfits(performfits), _isocut(isocut)*/{}
+_initiated(false), _outputfile(0), _dirname("EfficiencyMuon"), _isocut(0.3), _ptjetmin(30.), _etajetmax(3.), _nbin(10), _xmin(-0.5), _xmax(9.5),
+_jetmultiResponse(0) /*_isocut(isocut)*/{}
 
 void EfficiencyMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
   _outputfile = out;
@@ -31,6 +33,8 @@ void EfficiencyMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
   _zcandSrc  = iConfig.getParameter<std::string>("Zsource");
   _oppositeCharge = iConfig.getParameter<bool>("OppositeCharge");
   _requireGenInAcceptance = iConfig.getParameter<bool>("RequireGenInAcceptance");
+  _vsGenMulti = iConfig.getParameter<bool>("VsGenMulti");
+  _trainUnfolding = iConfig.getParameter<bool>("TrainUnfolding");
   
 
   _outputfile->cd();
@@ -114,7 +118,17 @@ void EfficiencyMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
   for (std::vector<TH1*>::const_iterator i = ibeg; i != iend; ++i){
     (*i)->Sumw2();
   } 
- 
+
+  _jetmultiResponse = new RooUnfoldResponse(10, -0.5, 9.5, "ResponseMatrix", "ResponseMatrix");
+
+  //debug
+  /*_jetmultiResponse->IsA()->Dump();
+  TMethodCall callEnv;
+  callEnv.InitWithPrototype(_jetmultiResponse->IsA(), "Merge", "TCollection*");
+  if (callEnv.IsValid()) {
+    std::cout << "callEnv IsValid()" << std::endl; 
+  }*/
+
   dir->cd("-");
 
   std::vector<bool (*)(const reco::Candidate&)> tag_cuts;
@@ -168,16 +182,29 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
    fwlite::Handle<std::vector<pat::Jet> > jetHandle;
    jetHandle.getByLabel(iEvent, "selectedJets");
 
+   fwlite::Handle<std::vector<reco::GenJet> > genJetHandle;
+   if (_vsGenMulti){
+      genJetHandle.getByLabel(iEvent, "selectedGenJets");    
+   }   
+
    fwlite::Handle<pat::TriggerEvent> triggerHandle;
    triggerHandle.getByLabel(iEvent, "patTriggerEvent");
 
    fwlite::Handle<std::vector<reco::CompositeCandidate> > zGenHandle;
-   if (_requireGenInAcceptance){
+   if (_requireGenInAcceptance || _trainUnfolding){
       zGenHandle.getByLabel(iEvent, "zmumugenfull");
    }
 
-   std::vector<const pat::Jet*> jets = GetJets<pat::Jet>(*jetHandle, _ptjetmin, _etajetmax);  
-   double size = jets.size();
+   std::vector<const pat::Jet*> jets = GetJets<pat::Jet>(*jetHandle, _ptjetmin, _etajetmax); 
+   double recosize = jets.size();
+   double gensize  = 0;
+   if (_vsGenMulti || _trainUnfolding){
+      std::vector<const reco::GenJet*> genjets = GetJets<reco::GenJet>(*genJetHandle, _ptjetmin, _etajetmax);
+      gensize = genjets.size();
+   }
+   //use reco size unless asked to use gen size.
+   //for the tag and probe use recosize anyway
+   double size = _vsGenMulti ? gensize : recosize;       
 
    bool denominatorCondition = _requireGenInAcceptance ? GenSelectedInAcceptanceMuon(*zGenHandle) : true;
 
@@ -191,7 +218,14 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
 
    if (!denominatorCondition) return;
 
-   bool recselected = zHandle->size()==1 && RecSelectedWithTrigger(*zHandle, *triggerHandle, _isocut);
+   bool recselected = /*zHandle->size()==1 &&*/ RecSelectedWithTrigger(*zHandle, *triggerHandle, _isocut);
+
+   ///unfolding training
+   if (_trainUnfolding){
+      if (recselected)
+        _jetmultiResponse->Fill(recosize, gensize, w);
+      else _jetmultiResponse->Miss(gensize, w);  
+   }
 
    //global efficiency 
    if (recselected) generalefficiency_numerator->Fill(size, w);
@@ -308,7 +342,7 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
       if (zHandle->size() == 1){
         //_tp_TM_MuT_OC_M_QC->fill(_zmuons, _zs, x, w);
         //_tp_TM_MuT_OC_M_QC_DXY->fill(_zmuons, _zs, x, w);
-        _tp_TM_MuT_OC_M_QC_DXY_Iso->fill((*zHandle)[0], size, w);
+        _tp_TM_MuT_OC_M_QC_DXY_Iso->fill((*zHandle)[0], recosize, w);
       }  
    } 
 
@@ -319,6 +353,9 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
 void EfficiencyMuon::finalize()
 {
   _tp_TM_MuT_OC_M_QC_DXY_Iso->finalize();
+  std::cout << "response nbins measured " << _jetmultiResponse->GetNbinsMeasured() << std::endl;
+  std::cout << "response nbins truth " << _jetmultiResponse->GetNbinsTruth() << std::endl;
+  if (_trainUnfolding) _jetmultiResponse->Write();
   _outputfile->Write();
 }
 
