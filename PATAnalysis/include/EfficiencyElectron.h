@@ -42,7 +42,7 @@ public :
    
 private:
 
-  std::string _sample;
+  std::string _sample, _selections;
 
   TDirectory* _dir;
   
@@ -63,6 +63,18 @@ private:
   TagAndProbeFiller* _TagProbe_Electron_1234;
   TagAndProbeFiller* _TagProbe_Electron_12345;
   TagAndProbeFiller* _TagProbe_Electron_123456;
+  
+  TagAndProbeFiller* _TagProbe_Electron0_12;
+  TagAndProbeFiller* _TagProbe_Electron0_123;
+  TagAndProbeFiller* _TagProbe_Electron0_1234;
+  TagAndProbeFiller* _TagProbe_Electron0_12345;
+  TagAndProbeFiller* _TagProbe_Electron0_123456;
+  
+  TagAndProbeFiller* _TagProbe_Electron1_12;
+  TagAndProbeFiller* _TagProbe_Electron1_123;
+  TagAndProbeFiller* _TagProbe_Electron1_1234;
+  TagAndProbeFiller* _TagProbe_Electron1_12345;
+  TagAndProbeFiller* _TagProbe_Electron1_123456;
   
   int _nbin;
   

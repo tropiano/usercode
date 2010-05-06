@@ -35,6 +35,7 @@ class Status3MotherCombiner : public edm::EDProducer {
   edm::InputTag _inTag;
   int _pdgId;
   int _charge;
+  std::vector<int> _requestedStaus3Daughters;
   AddFourMomenta _combiner;
   GreaterByPt<reco::GenParticle>       pTComparator_;
    

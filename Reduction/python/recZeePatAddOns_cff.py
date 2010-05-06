@@ -2,8 +2,8 @@ import FWCore.ParameterSet.Config as cms
 
 ##select muons according to these criteria
 import PhysicsTools.PatAlgos.selectionLayer1.electronSelector_cfi
-selectedElectrons = PhysicsTools.PatAlgos.selectionLayer1.electronSelector_cfi.selectedLayer1Electrons.clone()
-selectedElectrons.src = cms.InputTag("cleanLayer1Electrons")
+selectedElectrons = PhysicsTools.PatAlgos.selectionLayer1.electronSelector_cfi.selectedPatElectrons.clone()
+selectedElectrons.src = cms.InputTag("patElectrons")
 #selectedElectrons.cut = cms.string("pt > 20. & abs(eta) < 2.4 & isGood('GlobalElectronPromptTight') & innerTrack().found()>=11 & abs(globalTrack().d0())<0.2 & (trackIso()+caloIso()+ecalIso())/pt<0.1")
 selectedElectrons.cut = cms.string("pt > 10. & abs(eta) < 3.")
 

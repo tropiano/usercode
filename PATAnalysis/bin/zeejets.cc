@@ -21,16 +21,19 @@ int main() {
 
   //Job
   string cfgName = "config.py";
-  string sourceList = "files_test.txt";
-  string outputName = "test";
+  string sourceList = "Summer09_test.txt";
+  string outputName = "Summer09_test_VBTF";
   string electronID = "eidRobustLoose";
   
   //Sample: mc = MonteCarlo , data = Data
   string sample = "mc";
   
+  //Selections: "VPJ" = V+jets selections (old); "VBTF" = Vector Boson Task Force (new)
+  string selections = "VBTF";
+  
   //Normalization - If Norm = "False" and EventsPerFile = 0 -> Normalization is not applied
   double xsec = 1300.;
-  double targetLumi = 100.;
+  double targetLumi = 50.;
   string Norm = "True";
   int EventsPerFile = 0;
   string Sumw2= "True";
@@ -42,7 +45,7 @@ int main() {
   bool GEN = true;
   bool RECO = true;
   bool EFF = true;
-  bool NTUPLE = false;
+  bool NTUPLE = true;
   
   //Cuts
   int Acc = 1;
@@ -58,16 +61,16 @@ int main() {
   //Log
   bool Log = false;
   
-  //DO NOT FORGET THE SLASH AT THE END OF THE PATH
-  string path = "/raid/sfrosali/Zjets/MC/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/";
+  //Path of PATAnalysis dir - DO NOT FORGET THE SLASH AT THE END OF THE PATH
+  string path = "/data/sfrosali/Zjets/MC/CMSSW_3_5_6/src/Firenze/PATAnalysis/bin/";
   
   if(sample=="data"){
   GenParticleMatch = "False";
   GEN = false;}
 
-  makeCfg(sample, GEN, RECO, EFF, NTUPLE, Acc, Trg, Qual, Imp, Iso, EiD, path.c_str(), cfgName.c_str(), sourceList.c_str(), outputName.c_str(), Norm.c_str(), Sumw2.c_str(), EventsPerFile, electronID.c_str(), xsec, targetLumi, GenParticleMatch.c_str());
+  makeCfg(sample, selections, GEN, RECO, EFF, NTUPLE, Acc, Trg, Qual, Imp, Iso, EiD, path.c_str(), cfgName.c_str(), sourceList.c_str(), outputName.c_str(), Norm.c_str(), Sumw2.c_str(), EventsPerFile, electronID.c_str(), xsec, targetLumi, GenParticleMatch.c_str());
 
-  gEnv->SetValue("Proof.Sandbox", "/raid/sfrosali/.proof");
+  gEnv->SetValue("Proof.Sandbox", "/data/sfrosali/.proof");
 
   TProof * p = TProof::Open("");
   

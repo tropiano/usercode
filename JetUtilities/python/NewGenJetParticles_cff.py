@@ -10,7 +10,7 @@ newGenParticlesForJets = cms.EDFilter("NewGenJetsParticleSelector",
     excludeFromResonancePids = cms.vuint32(12, 13, 14, 16),
     tausAsJets = cms.bool(False),
     checkForStatus3Mother = cms.PSet(
-                            motherIds=cms.vuint32(11, 13, 12, 14, 16),
+                            motherIds=cms.vuint32(22, 11, 13, 12, 14, 16),
                             excludeSameFlavourDaughterOnly=cms.bool(True)),
     reverseAllSelections  = cms.bool(False)                        
 )

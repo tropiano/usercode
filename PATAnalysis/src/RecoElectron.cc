@@ -91,22 +91,24 @@ PixelHit_OC(0), PixelHit_SC(0), FirstPixelBarrelHit_OC(0), FirstPixelBarrelHit_S
 
 DeltaRvsCharge_JetRec(0), DeltaRvsCharge_JetRec_Iso(0), DeltaRvsCharge_JetRec_NotIso(0),
 
-_norm(1.), _dir(0), _charge_dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _Norm(true), _Sumw2(false), _GenParticleMatch(false), _entries(0), _EventsPerFile(0), _Acc(1), _Trg(2), _Qual(3), _Imp(4), _Iso(5), _EiD(6), _electronID("eidRobustTight"), _file(0), _histoVector(), _histoVector2D()
+_norm(1.), _dir(0), _charge_dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _Norm(true), _Sumw2(false), _GenParticleMatch(false), _entries(0), _EventsPerFile(0), _fileCounter(0), _Acc(1), _Trg(2), _Qual(3), _Imp(4), _Iso(5), _EiD(6), _electronID("eidRobustTight"), _selections("VBTF"), _file(0), _histoVector(), _histoVector2D()
 
 { }
 
 void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
     _file = out; 
   
-    std::string dirname = iConfig.getParameter<std::string>("Name");
-    std::string sourceFileList = iConfig.getParameter<std::string>("sourceFileList");
-    _electronID = iConfig.getParameter<std::string>("electronID");
+   std::string dirname = iConfig.getParameter<std::string>("Name");
+   std::string sourceFileList = iConfig.getParameter<std::string>("sourceFileList");
+   _selections = iConfig.getParameter<std::string>("Selections");
+   _electronID = iConfig.getParameter<std::string>("electronID");
    _targetLumi= iConfig.getParameter<double>("targetLumi");
    _xsec      = iConfig.getParameter<double>("CrossSection");
    _Norm      = iConfig.getParameter<bool>("Norm");
    _Sumw2      = iConfig.getParameter<bool>("Sumw2");
    _EventsPerFile    = iConfig.getParameter<int32_t>("EventsPerFile");
    _GenParticleMatch = iConfig.getParameter<bool>("GenParticleMatch");
+   _ReportName = iConfig.getParameter<std::string>("ReportName");
    
    //Selections
    _Acc = iConfig.getParameter<int32_t>("Acc");
@@ -119,12 +121,19 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    for(int i=0; i<7; i++){
    _RecoCutFlags[i] = "_1";}
    
+   if(_selections=="VPJ"){
    _RecoCutFlags[_Acc] =  "_Acc";
+   _RecoCutFlags[_Iso] =  "_Iso";
+   _RecoCutFlags[_EiD] =  "_EiD";}
+   if(_selections=="VBTF"){
+   _RecoCutFlags[_Acc] =  "_AccVBTF";
+   _RecoCutFlags[_Iso] =  "_IsoVBTF";
+   _RecoCutFlags[_EiD] =  "_EiDVBTF";}
+     
    _RecoCutFlags[_Trg] =  "_Trg";
    _RecoCutFlags[_Qual] = "_Qual";
    _RecoCutFlags[_Imp] =  "_Imp";
-   _RecoCutFlags[_Iso] =  "_Iso";
-   _RecoCutFlags[_EiD] =  "_EiD";
+   
    
    cout << "RecoElectron file name : " << _file->GetName() << endl;
    _file->cd();
@@ -772,7 +781,7 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    
    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
  
-  int fileCounter = 0;
+  _fileCounter = 0;
   
   TChain *ch = new TChain("Events");
   ifstream infile;
@@ -780,17 +789,17 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
   string datafile;
   while(getline (infile, datafile)){
     ch->Add(datafile.c_str());
-    fileCounter++;
+    _fileCounter++;
   }
   
   if(_Norm==true){
   _entries = ch->GetEntries();
-  cout<<"RecoElectron analyzing nr. file = "<<fileCounter<<endl;
+  cout<<"RecoElectron analyzing nr. file = "<<_fileCounter<<endl;
   cout<<"RecoElectron analyzing nr. event = "<<_entries<<endl;}
  
   if(_Norm==false){
-  _entries = fileCounter*_EventsPerFile;
-  cout<<"RecoElectron analyzing nr. file = "<<fileCounter<<endl;
+  _entries = _fileCounter*_EventsPerFile;
+  cout<<"RecoElectron analyzing nr. file = "<<_fileCounter<<endl;
   cout<<"RecoElectron analyzing nr. event = "<<_entries<<endl;
   }
   
@@ -1551,6 +1560,22 @@ void RecoElectron::finalize(){
    for (std::vector<TH1D*>::const_iterator i = ibeg; i != iend; ++i){
    if (*i) (*i)->Scale(_norm);
    }
+   
+   ofstream Report;
+   Report.open(_ReportName.c_str());
+   Report<<endl<<endl<<"----- Sample Info -----"<<endl<<endl;
+   Report<<"File number = "<<_fileCounter<<endl;
+   if(_Norm){
+   Report<<"Event number by TChain = "<<_entries<<endl;
+   }else{
+   Report<<"Events per File = "<<_EventsPerFile<<endl;
+   Report<<"Event number by #File*#EventsPerFile = "<<_entries<<endl;
+   }
+   Report<<"Normalized to "<<_targetLumi<<" pb-1"<<endl;
+   Report<<"Cross section = "<<_xsec<<" pb"<<endl;
+   Report<<"Normalization factor = "<<_norm<<endl<<endl;
+   Report<<"Selections used = "<<_selections.c_str()<<endl;
+   Report.close();
 
    
   _file->Write();

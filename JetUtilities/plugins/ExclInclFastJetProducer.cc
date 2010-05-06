@@ -97,7 +97,7 @@ namespace cms
 								edm::
 								InputTag >
 								("src")),
-    mJetType (conf.getUntrackedParameter < string > ("jetType", "CaloJet")),
+    mJetType (conf.getParameter < string > ("jetType")),//, "CaloJet")),
     mVerbose (conf.getUntrackedParameter < bool > ("verbose", false)),
     mEtInputCut (conf.getParameter < double >("inputEtMin")),
     mEInputCut (conf.getParameter < double >("inputEMin")),

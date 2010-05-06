@@ -24,57 +24,66 @@
 
 using namespace std;
 
+//Selections: "VPJ" = V+jets selections (old); "VBTF" = Vector Boson Task Force (new)
 
-void BackPlots(){
+void BackPlots(string selections){
+        
+        //Signal
+        TFile *signal_file = TFile::Open("Summer09_test_VPJ.root");
+        
+        //Background
+        TFile* QCD = TFile::Open("QCDall_norm100.root");
+        TFile* TTbar = TFile::Open("TTbar_norm100.root");
+        TFile* Wenu = TFile::Open("Wenu_norm100.root");
+        
+        //Output
+        TFile* outplots = new TFile("BackgroundPlots_Summer09_test_VPJ.root", "RECREATE");
 	
 	int _Acc  = 1;
 	int _Trg  = 2;
 	int _Qual = 0;
-	int _Imp  = 2;
-	int _Iso  = 3;
-	int _EiD  = 4;
+	int _Imp  = 3;
+	int _Iso  = 4;
+	int _EiD  = 5;
 	
 	string _RecoCutFlags[7];
-	for(int i=0; i<7; i++){
-		_RecoCutFlags[i] = "_1";}
 	
-	_RecoCutFlags[_Acc] =  "_Acc";
-	_RecoCutFlags[_Trg] =  "_Trg";
-	_RecoCutFlags[_Qual] = "_Qual";
-	_RecoCutFlags[_Imp] =  "_Imp";
-	_RecoCutFlags[_Iso] =  "_Iso";
-	_RecoCutFlags[_EiD] =  "_EiD";
-
-TFile *signal_file = TFile::Open("Zee_7TeV_RL01_10234.root");
+	for(int i=0; i<7; i++){
+       _RecoCutFlags[i] = "_1";}
+   
+       if(selections=="VPJ"){
+       _RecoCutFlags[_Acc] =  "_Acc";
+       _RecoCutFlags[_Iso] =  "_Iso";
+       _RecoCutFlags[_EiD] =  "_EiD";}
+       if(selections=="VBTF"){
+       _RecoCutFlags[_Acc] =  "_AccVBTF";
+       _RecoCutFlags[_Iso] =  "_IsoVBTF";
+       _RecoCutFlags[_EiD] =  "_EiDVBTF";}
+     
+       _RecoCutFlags[_Trg] =  "_Trg";
+       _RecoCutFlags[_Qual] = "_Qual";
+       _RecoCutFlags[_Imp] =  "_Imp";
 
         if(!signal_file){
 	cout<<"Error! Signal files doesn't exist!"<<endl;
 	return;
 	}
 
-TFile* QCD = TFile::Open("QCDall_norm100.root");
-
         if(!QCD){
 	cout<<"Error! QCD files doesn't exist!"<<endl;
 	return;
 	}
 	
-TFile* TTbar = TFile::Open("TTbar_norm100.root");
-
         if(!TTbar){
 	cout<<"Error! TTbar files doesn't exist!"<<endl;
 	return;
 	}
 	
-TFile* Wenu = TFile::Open("Wenu_norm100.root");
-
         if(!Wenu){
 	cout<<"Error! Wenu files doesn't exist!"<<endl;
 	return;
 	}
 	
-TFile* outplots = new TFile("TestBackgroundPlots.root", "RECREATE");
-
 TDirectory *Mass, *Jet;
 
 Mass     = outplots->mkdir("ZMass");
@@ -186,14 +195,14 @@ Jet      = outplots->mkdir("JetNumber");
 	
 	cut<<endl<<"Cut level = "<<_RecoCutFlags[1]<<endl;
 	
-	cut<<endl<<"Signal Integral   = "<<Signal_recMassZ_1->IntegralAndError(0,-1,sig_err_1,"")<<endl;
+	/*cut<<endl<<"Signal Integral   = "<<Signal_recMassZ_1->IntegralAndError(0,-1,sig_err_1,"")<<endl;
 	cut<<"Signal Int. error = "<<sig_err_1<<endl<<endl;
 	cut<<"QCD Integral   = "<<QCD_recMassZ_1->IntegralAndError(0,-1,qcd_err_1,"")<<endl;
 	cut<<"QCD Int. error = "<<qcd_err_1<<endl<<endl;
 	cut<<"TTbar Integral   = "<<TTbar_recMassZ_1->IntegralAndError(0,-1,tt_err_1,"")<<endl;
 	cut<<"TTbar Int. error = "<<tt_err_1<<endl<<endl;
 	cut<<"Wenu Integral   = "<<Wenu_recMassZ_1->IntegralAndError(0,-1,w_err_1,"")<<endl;
-	cut<<"Wenu Int. error = "<<w_err_1<<endl<<endl;
+	cut<<"Wenu Int. error = "<<w_err_1<<endl<<endl;*/
 
 	if(_RecoCutFlags[2] != "_1"){
 	TCanvas *ZMass_12 = new TCanvas;
@@ -231,14 +240,14 @@ Jet      = outplots->mkdir("JetNumber");
 	
 	cut<<endl<<"Cut level = "<<_RecoCutFlags[1]<<", "<<_RecoCutFlags[2]<<endl;
 	
-	cut<<endl<<"Signal Integral   = "<<Signal_recMassZ_12->IntegralAndError(0,-1,sig_err_12,"")<<endl;
+	/*cut<<endl<<"Signal Integral   = "<<Signal_recMassZ_12->IntegralAndError(0,-1,sig_err_12,"")<<endl;
 	cut<<"Signal Int. error = "<<sig_err_12<<endl<<endl;
 	cut<<"QCD Integral   = "<<QCD_recMassZ_12->IntegralAndError(0,-1,qcd_err_12,"")<<endl;
 	cut<<"QCD Int. error = "<<qcd_err_12<<endl<<endl;
 	cut<<"TTbar Integral   = "<<TTbar_recMassZ_12->IntegralAndError(0,-1,tt_err_12,"")<<endl;
 	cut<<"TTbar Int. error = "<<tt_err_12<<endl<<endl;
 	cut<<"Wenu Integral   = "<<Wenu_recMassZ_12->IntegralAndError(0,-1,w_err_12,"")<<endl;
-	cut<<"Wenu Int. error = "<<w_err_12<<endl<<endl;
+	cut<<"Wenu Int. error = "<<w_err_12<<endl<<endl;*/
 
 	
 	if(_RecoCutFlags[3] != "_1"){
@@ -277,14 +286,14 @@ Jet      = outplots->mkdir("JetNumber");
 	
 	cut<<endl<<"Cut level = "<<_RecoCutFlags[1]<<", "<<_RecoCutFlags[2]<<", "<<_RecoCutFlags[3]<<endl;
 	
-	cut<<endl<<"Signal Integral   = "<<Signal_recMassZ_123->IntegralAndError(0,-1,sig_err_123,"")<<endl;
+	/*cut<<endl<<"Signal Integral   = "<<Signal_recMassZ_123->IntegralAndError(0,-1,sig_err_123,"")<<endl;
 	cut<<"Signal Int. error = "<<sig_err_123<<endl<<endl;
 	cut<<"QCD Integral   = "<<QCD_recMassZ_123->IntegralAndError(0,-1,qcd_err_123,"")<<endl;
 	cut<<"QCD Int. error = "<<qcd_err_123<<endl<<endl;
 	cut<<"TTbar Integral   = "<<TTbar_recMassZ_123->IntegralAndError(0,-1,tt_err_123,"")<<endl;
 	cut<<"TTbar Int. error = "<<tt_err_123<<endl<<endl;
 	cut<<"Wenu Integral   = "<<Wenu_recMassZ_123->IntegralAndError(0,-1,w_err_123,"")<<endl;
-	cut<<"Wenu Int. error = "<<w_err_123<<endl<<endl;
+	cut<<"Wenu Int. error = "<<w_err_123<<endl<<endl;*/
 	
 	if(_RecoCutFlags[4] != "_1"){
 	TCanvas *ZMass_1234 = new TCanvas;
@@ -322,14 +331,14 @@ Jet      = outplots->mkdir("JetNumber");
 	
 	cut<<endl<<"Cut level = "<<_RecoCutFlags[1]<<", "<<_RecoCutFlags[2]<<", "<<_RecoCutFlags[3]<<", "<<_RecoCutFlags[4]<<endl;
 	
-	cut<<endl<<"Signal Integral   = "<<Signal_recMassZ_1234->IntegralAndError(0,-1,sig_err_1234,"")<<endl;
+	/*cut<<endl<<"Signal Integral   = "<<Signal_recMassZ_1234->IntegralAndError(0,-1,sig_err_1234,"")<<endl;
 	cut<<"Signal Int. error = "<<sig_err_1234<<endl<<endl;
 	cut<<"QCD Integral   = "<<QCD_recMassZ_1234->IntegralAndError(0,-1,qcd_err_1234,"")<<endl;
 	cut<<"QCD Int. error = "<<qcd_err_1234<<endl<<endl;
 	cut<<"TTbar Integral   = "<<TTbar_recMassZ_1234->IntegralAndError(0,-1,tt_err_1234,"")<<endl;
 	cut<<"TTbar Int. error = "<<tt_err_1234<<endl<<endl;
 	cut<<"Wenu Integral   = "<<Wenu_recMassZ_1234->IntegralAndError(0,-1,w_err_1234,"")<<endl;
-	cut<<"Wenu Int. error = "<<w_err_1234<<endl<<endl;
+	cut<<"Wenu Int. error = "<<w_err_1234<<endl<<endl;*/
 
 	if(_RecoCutFlags[5] != "_1"){
 	TCanvas *ZMass_12345 = new TCanvas;
@@ -367,14 +376,14 @@ Jet      = outplots->mkdir("JetNumber");
 	
 	cut<<endl<<"Cut level = "<<_RecoCutFlags[1]<<", "<<_RecoCutFlags[2]<<", "<<_RecoCutFlags[3]<<", "<<_RecoCutFlags[4]<<", "<<_RecoCutFlags[5]<<endl;
 	
-	cut<<endl<<"Signal Integral   = "<<Signal_recMassZ_12345->IntegralAndError(0,-1,sig_err_12345,"")<<endl;
+	/*cut<<endl<<"Signal Integral   = "<<Signal_recMassZ_12345->IntegralAndError(0,-1,sig_err_12345,"")<<endl;
 	cut<<"Signal Int. error = "<<sig_err_12345<<endl<<endl;
 	cut<<"QCD Integral   = "<<QCD_recMassZ_12345->IntegralAndError(0,-1,qcd_err_12345,"")<<endl;
 	cut<<"QCD Int. error = "<<qcd_err_12345<<endl<<endl;
 	cut<<"TTbar Integral   = "<<TTbar_recMassZ_12345->IntegralAndError(0,-1,tt_err_12345,"")<<endl;
 	cut<<"TTbar Int. error = "<<tt_err_12345<<endl<<endl;
 	cut<<"Wenu Integral   = "<<Wenu_recMassZ_12345->IntegralAndError(0,-1,w_err_12345,"")<<endl;
-	cut<<"Wenu Int. error = "<<w_err_12345<<endl<<endl;
+	cut<<"Wenu Int. error = "<<w_err_12345<<endl<<endl;*/
 	
 	if(_RecoCutFlags[6] != "_1"){
 	TCanvas *ZMass_123456 = new TCanvas;
@@ -412,14 +421,14 @@ Jet      = outplots->mkdir("JetNumber");
 	
 	cut<<endl<<"Cut level = "<<_RecoCutFlags[1]<<", "<<_RecoCutFlags[2]<<", "<<_RecoCutFlags[3]<<", "<<_RecoCutFlags[4]<<", "<<_RecoCutFlags[5]<<", "<<_RecoCutFlags[6]<<endl;
 	
-	cut<<endl<<"Signal Integral   = "<<Signal_recMassZ_123456->IntegralAndError(0,-1,sig_err_123456,"")<<endl;
+	/*cut<<endl<<"Signal Integral   = "<<Signal_recMassZ_123456->IntegralAndError(0,-1,sig_err_123456,"")<<endl;
 	cut<<"Signal Int. error = "<<sig_err_123456<<endl<<endl;
 	cut<<"QCD Integral   = "<<QCD_recMassZ_123456->IntegralAndError(0,-1,qcd_err_123456,"")<<endl;
 	cut<<"QCD Int. error = "<<qcd_err_123456<<endl<<endl;
 	cut<<"TTbar Integral   = "<<TTbar_recMassZ_123456->IntegralAndError(0,-1,tt_err_123456,"")<<endl;
 	cut<<"TTbar Int. error = "<<tt_err_123456<<endl<<endl;
 	cut<<"Wenu Integral   = "<<Wenu_recMassZ_123456->IntegralAndError(0,-1,w_err_123456,"")<<endl;
-	cut<<"Wenu Int. error = "<<w_err_123456<<endl<<endl;
+	cut<<"Wenu Int. error = "<<w_err_123456<<endl<<endl;*/
 	
 	cut.close();
 	
@@ -665,7 +674,7 @@ Jet      = outplots->mkdir("JetNumber");
 	TTbar_recJetN_123456->Draw("hist sames");
 	Wenu_recJetN_123456->SetLineColor(6);
 	Wenu_recJetN_123456->SetLineWidth(2);
-	Wenu_recJetN_1234566->SetFillColor(6);
+	Wenu_recJetN_123456->SetFillColor(6);
 	Wenu_recJetN_123456->SetFillStyle(3001);
 	Wenu_recJetN_123456->SetTitle("Wenu");
 	Wenu_recJetN_123456->Draw("hist sames");

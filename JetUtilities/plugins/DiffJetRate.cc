@@ -13,7 +13,7 @@
 //
 // Original Author:  pts/1
 //         Created:  Tue Jun 24 18:05:01 CEST 2008
-// $Id$
+// $Id: DiffJetRate.cc,v 1.1 2009/02/19 10:32:18 lenzip Exp $
 //
 //
 
@@ -47,7 +47,7 @@ class DiffJetRate : public edm::EDProducer {
       ~DiffJetRate();
 
    private:
-      virtual void beginJob(const edm::EventSetup&) ;
+      virtual void beginJob(/*const edm::EventSetup&*/) ;
       virtual void produce(edm::Event&, const edm::EventSetup&);
       virtual void endJob() ;
 
@@ -85,7 +85,7 @@ DiffJetRate::DiffJetRate(const edm::ParameterSet& iConfig)
     std::stringstream label;
     label << "DiffJetRate" << _njets << _njets-1; 
     _label = label.str();
-    produces<double>(_label);
+    produces<double>();//_label);
 
 }
 
@@ -123,7 +123,8 @@ DiffJetRate::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
    //track jet provenance
    edm::Provenance const* prov = pIn.provenance();
    //std::cout << prov->product() << std::endl;
-   edm::ParameterSetID const& psetid = prov->product().psetID();
+   //edm::ParameterSetID const& psetid = prov->product().psetID();
+   edm::ParameterSetID const& psetid = prov->psetID();
    edm::ParameterSet jetpset;
    //pset registry
    const edm::pset::Registry * registry = edm::pset::Registry::instance();
@@ -167,12 +168,12 @@ DiffJetRate::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       edm::LogError("DiffJetRate") << "number of exclusive jets " << pIn->size() << " does not match the requested one " << _njets << endl;
    }
    std::auto_ptr<double> pOut(new double(min));
-   iEvent.put(pOut, _label);
+   iEvent.put(pOut);//, _label);
 }
 
 // ------------ method called once each job just before starting event loop  ------------
 void 
-DiffJetRate::beginJob(const edm::EventSetup&)
+DiffJetRate::beginJob(/*const edm::EventSetup&*/)
 {
 }
 

@@ -154,7 +154,12 @@ Process(Long64_t iEntry) {
      //++tmp; 
   }
 */  
-  const fwlite::Event& test = event_->to(iEntry);
+ // const fwlite::Event& test = event_->to(iEntry);
+  bool success_event = event_->to(iEntry);
+  if (!success_event) {
+    std::cout << "ERRRRROOOORRR in FWLiteTSelector::Process!!!! Cannot go to event " << iEntry << std::endl; 
+  }
+
 /*  
   //std::cout<<test.id()<<std::endl;
   //if(test.id().run()>0) _fwLiteTreeAnalyser->process(const_cast<fwlite::ChainEvent&>(test));
@@ -166,7 +171,8 @@ Process(Long64_t iEntry) {
   _lastEntry = iEntry;
 */
   for (unsigned int i = 0; i < _workers.size(); ++i ){
-    _workers[i]->process(const_cast<fwlite::Event&>(test)); 
+    //_workers[i]->process(const_cast<fwlite::Event&>(test)); 
+    _workers[i]->process(*event_); 
   }  
   
   //_fwLiteTreeAnalyser->analyse(const_cast<fwlite::ChainEvent&>(event_->to(iEntry)));

@@ -7,7 +7,7 @@
 class EfficiencyAnalyzerMuon {
 
   public:
-    EfficiencyAnalyzerMuon(TFile* input, TFile* output, std::string dir);
+    EfficiencyAnalyzerMuon(TFile* input, TFile* output, TFile* sec_input, std::string dir);
     
     ~EfficiencyAnalyzerMuon(){};
 
@@ -15,7 +15,9 @@ class EfficiencyAnalyzerMuon {
 
   private:
     TDirectory* _dir;
+    TDirectory* _dir1;
     TFile* _output;
+    TFile* _sec_input;
 };
 
 

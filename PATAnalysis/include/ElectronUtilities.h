@@ -30,14 +30,28 @@ using namespace pat;
 using namespace pat::helper;
 using namespace TMath;
 
-// Selection Cuts
+////////////////////////// Selection Cuts //////////////////////////////////////////
 
+//Pt - VPJ
 static double ptelcut = 20.;    //Gev/c
+
+//Pt - VBTF
+static double ptelcut0 = 20.;    //Gev/c
+static double ptelcut1 = 10.;
+
+//Eta
 static double etaelcut = 2.4;
 static double eta_el_excl_up = 1.56;               //Excluded Eta region
 static double eta_el_excl_down = 1.4442;           //Excluded Eta region
-static double zmassmin = 50.;   //Gev/c^2
-static double zmassmax = 130.;  //Gev/c^2
+
+//VPJ mass window
+static double zmassmin_vpj = 50.;   //Gev/c^2
+static double zmassmax_vpj = 130.;  //Gev/c^2
+
+//VBTF mass window
+static double zmassmin_vbtf = 60.;   //Gev/c^2
+static double zmassmax_vbtf = 110.;  //Gev/c^2
+
 static double minnhit = 11.;
 static double maxchi2 = 10.;
 static double dxycut = 0.02;     //cm
@@ -45,10 +59,62 @@ static double ptjetmin = 30.;   //Gev/c
 static double etajetmax = 3.0;
 static double isocut = 0.1;                        //CombRelIso
 static double isojetcut = 0.5;                     //Isolation jet - Z electron
+
+//Data Spring10 triggers
+//static string ElectronTrigger = "HLT_L1SingleEG8";
+//static string JetTrigger = "HLT_Jet30U";
+
+//Summer09 triggers
 static string ElectronTrigger = "HLT_Ele10_LW_L1R";
 static string JetTrigger = "HLT_Jet30";
 
-// Tag & Probe cuts
+//electronID for VBTF
+
+//// WP70 (70%)
+
+// EB
+
+static double track_iso_70_EB = 2.5; //GeV
+static double ecal_iso_70_EB = 3.0; //GeV
+static double hcal_iso_70_EB = 5.0; //GeV
+static double sihih_70_EB = 0.01;
+static double Dphi_vtx_70_EB = 0.02;
+static double Deta_vtx_70_EB = 0.006;
+static double HovE_70_EB = 0.02;
+
+// EE
+
+static double track_iso_70_EE = 0.8; //GeV
+static double ecal_iso_70_EE = 2.5; //GeV
+static double hcal_iso_70_EE = 0.25; //GeV
+static double sihih_70_EE = 0.03;
+static double Dphi_vtx_70_EE = 0.02;
+static double Deta_vtx_70_EE = 0.003;
+static double HovE_70_EE = 0.0025;
+
+////// WP95 (95%)
+
+// EB
+
+static double track_iso_95_EB = 7.0; //GeV
+static double ecal_iso_95_EB = 5.0; //GeV
+static double hcal_iso_95_EB = 5.0; //GeV
+static double sihih_95_EB = 0.01;
+static double Dphi_vtx_95_EB = 0.8;
+static double Deta_vtx_95_EB = 0.006;
+static double HovE_95_EB = 0.05;
+
+// EE
+
+static double track_iso_95_EE = 8.0; //GeV
+static double ecal_iso_95_EE = 3.0; //GeV
+static double hcal_iso_95_EE = 2.0; //GeV
+static double sihih_95_EE = 0.03;
+static double Dphi_vtx_95_EE = 0.7;
+static double Deta_vtx_95_EE = 0.008;
+static double HovE_95_EE = 0.04;
+
+// Tag cuts
 
 static double TAG_ptelcut = 25.;    //Gev/c
 static double TAG_etaelcut = 2.4;
@@ -155,22 +221,37 @@ inline void handleConfigStream(std::istream& in, std::map<std::string, std::vect
 // Trigger
 
 inline bool isTriggered(const pat::TriggerEvent& triggers, std::string triggername){
-  std::vector<std::string>::const_iterator i;
+  //std::vector<std::string>::const_iterator i;
   const pat::TriggerPath* path = triggers.path(triggername);
   if (!path) {
     std::cout << "ERROR! trigger path " << triggername << " not found " << std::endl;
-    throw cms::Exception("PATAnalysis:isTriggered") << "ERROR! trigger path " << triggername << " not found ";
     return false;
   }
   return path->wasAccept();
 }
 
+inline bool isElectronTriggerAvailable(const pat::TriggerEvent& triggers){
+  const pat::TriggerPath* path = triggers.path(ElectronTrigger.c_str());
+  if(path){
+  return true;
+  }else{
+  return false;}
+} 
+
+inline bool isJetTriggerAvailable(const pat::TriggerEvent& triggers){
+  const pat::TriggerPath* path = triggers.path(JetTrigger.c_str());
+  if(path){
+  return true;
+  }else{
+  return false;}
+} 
+
 inline bool isElectronTriggered(const pat::TriggerEvent& triggers){
   return isTriggered(triggers, ElectronTrigger.c_str());
 }
 
-inline bool isJetTriggered(const pat::TriggerEvent& triggersREC){
-  return isTriggered(triggersREC, JetTrigger.c_str());
+inline bool isJetTriggered(const pat::TriggerEvent& triggers){
+  return isTriggered(triggers, JetTrigger.c_str());
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -277,16 +358,19 @@ if (!dau1) {
 
 //  GEN SELECTION
 
-inline bool GenSelected(const std::vector<reco::CompositeCandidate>& ZGEN){
+inline bool GenSelected(const std::vector<reco::CompositeCandidate>& ZGEN, string selections){
   if (ZGEN.size() == 0) return false;
   if (ZGEN.size() > 1){
     std::cout << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! " << std::endl;
-    return false;
-  }  
-  return ZGEN.size()==1 && ZGEN[0].mass() > zmassmin && ZGEN[0].mass() < zmassmax;
+    return false;}
+     
+  if(selections=="VPJ")return ZGEN.size()==1 && ZGEN[0].mass() > zmassmin_vpj && ZGEN[0].mass() < zmassmax_vpj;
+  if(selections=="VBTF")return ZGEN.size()==1 && ZGEN[0].mass() > zmassmin_vbtf && ZGEN[0].mass() < zmassmax_vbtf;
+  
+  else return false;
 }
 
-inline bool GenSelectedInAcceptance(const std::vector<reco::CompositeCandidate>& ZGEN){
+inline bool GenSelectedInAcceptance(const std::vector<reco::CompositeCandidate>& ZGEN, string selections){
   if (ZGEN.size() == 0) return false;
   if (ZGEN.size() > 1){
     std::cout << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! " << std::endl;
@@ -302,11 +386,21 @@ inline bool GenSelectedInAcceptance(const std::vector<reco::CompositeCandidate>&
   dau0 = zgendaughters[0];
   dau1 = zgendaughters[1];
   
-  return ZGEN.size()==1 && ZGEN[0].mass() > zmassmin && ZGEN[0].mass() < zmassmax 
+  if(selections=="VPJ"){
+  return ZGEN.size()==1 && ZGEN[0].mass() > zmassmin_vpj && ZGEN[0].mass() < zmassmax_vpj 
          && dau0->pt() > ptelcut && fabs(dau0->eta()) < etaelcut
          && dau1->pt() > ptelcut && fabs(dau1->eta()) < etaelcut
          && (fabs(dau0->eta())<eta_el_excl_down || fabs(dau0->eta())>eta_el_excl_up) && 
 	    (fabs(dau1->eta())<eta_el_excl_down || fabs(dau1->eta())>eta_el_excl_up);
+ }else if(selections=="VBTF"){
+ return ZGEN.size()==1 && ZGEN[0].mass() > zmassmin_vbtf && ZGEN[0].mass() < zmassmax_vbtf 
+         && dau0->pt() > ptelcut0 && fabs(dau0->eta()) < etaelcut
+         && dau1->pt() > ptelcut1 && fabs(dau1->eta()) < etaelcut
+         && (fabs(dau0->eta())<eta_el_excl_down || fabs(dau0->eta())>eta_el_excl_up) && 
+	    (fabs(dau1->eta())<eta_el_excl_down || fabs(dau1->eta())>eta_el_excl_up);
+ }else{
+ return false;
+ }
  }else{
  return false;
  }
@@ -329,20 +423,31 @@ inline bool RecSelected(string Flag, string EID, const reco::CompositeCandidate 
   
   const reco::GsfTrackRef track0 = dau0->gsfTrack();
   const reco::GsfTrackRef track1 = dau1->gsfTrack();
-  assert (track0.isNonnull() && track1.isNonnull());
+  assert (track0.isNonnull() && track1.isNonnull());		
   
+  bool iso0 = false;	
+  bool iso1 = false;
+			
   bool electron_ID0 = false;
   bool electron_ID1 = false;
+
   
   if(dau0->isElectronIDAvailable(EID.c_str()) && dau1->isElectronIDAvailable(EID.c_str())){
   if(dau0->electronID(EID.c_str())==1.0)electron_ID0 = true;
   if(dau1->electronID(EID.c_str())==1.0)electron_ID1 = true;
   }
- 
+
   if(Flag=="_Acc"){
-  return ZREC.mass()>zmassmin && ZREC.mass()<zmassmax
+  return ZREC.mass()>zmassmin_vpj && ZREC.mass()<zmassmax_vpj
          && dau0->pt() > ptelcut && fabs(dau0->eta()) < etaelcut 
          && dau1->pt() > ptelcut && fabs(dau1->eta()) < etaelcut
+         && (fabs(dau0->eta())<eta_el_excl_down || fabs(dau0->eta())>eta_el_excl_up) &&
+            (fabs(dau1->eta())<eta_el_excl_down || fabs(dau1->eta())>eta_el_excl_up);
+         }
+  else if(Flag=="_AccVBTF"){
+  return ZREC.mass()>zmassmin_vbtf && ZREC.mass()<zmassmax_vbtf
+         && dau0->pt() > ptelcut0 && fabs(dau0->eta()) < etaelcut 
+         && dau1->pt() > ptelcut1 && fabs(dau1->eta()) < etaelcut
          && (fabs(dau0->eta())<eta_el_excl_down || fabs(dau0->eta())>eta_el_excl_up) &&
             (fabs(dau1->eta())<eta_el_excl_down || fabs(dau1->eta())>eta_el_excl_up);
          }
@@ -360,12 +465,53 @@ inline bool RecSelected(string Flag, string EID, const reco::CompositeCandidate 
   return (dau0->hcalIso() + dau0->ecalIso() + dau0->trackIso()) / dau0->pt() < isocut &&  
          (dau1->hcalIso() + dau1->ecalIso() + dau1->trackIso()) / dau1->pt() < isocut;
          }
+  else if(Flag=="_IsoVBTF"){
+	if(fabs(dau0->eta())<eta_el_excl_down){// WP70 EB
+	iso0 = (dau0->hcalIso()< hcal_iso_70_EB && dau0->ecalIso() < ecal_iso_70_EB && dau0->trackIso()< track_iso_70_EB);
+	}else if(fabs(dau0->eta())>eta_el_excl_up){// WP70 EE
+	iso0 = (dau0->hcalIso()< hcal_iso_70_EE && dau0->ecalIso() < ecal_iso_70_EE && dau0->trackIso()< track_iso_70_EE) ;
+	}
+	if(fabs(dau1->eta())<eta_el_excl_down){// WP95 EB
+	iso1 = (dau1->hcalIso()< hcal_iso_95_EB && dau1->ecalIso() < ecal_iso_95_EB && dau1->trackIso()< track_iso_95_EB) ;
+	}else if(fabs(dau1->eta())>eta_el_excl_up){// WP95 EE
+	iso1 = (dau1->hcalIso()< hcal_iso_95_EE && dau1->ecalIso() < ecal_iso_95_EE && dau1->trackIso()< track_iso_95_EE);}
+  return iso0 && iso1;         
+  }
   else if(Flag=="_EiD"){
   return electron_ID0 && electron_ID1;
          }
+  else if(Flag=="_EiDVBTF"){
+	if(fabs(dau0->eta())<eta_el_excl_down){// WP70 EB
+	electron_ID0 = 
+		 dau0->sigmaIetaIeta() < sihih_70_EB
+        	 && dau0->deltaPhiSuperClusterTrackAtVtx() < Dphi_vtx_70_EB
+        	 && dau0->deltaEtaSuperClusterTrackAtVtx() < Deta_vtx_70_EB
+		 && dau0->hcalOverEcal() < HovE_70_EB;
+	}else if(fabs(dau0->eta())>eta_el_excl_up){// WP70 EE	
+	electron_ID0 = 
+		 dau0->sigmaIetaIeta() < sihih_70_EE
+        	 && dau0->deltaPhiSuperClusterTrackAtVtx() < Dphi_vtx_70_EE
+        	 && dau0->deltaEtaSuperClusterTrackAtVtx() < Deta_vtx_70_EE
+		 && dau0->hcalOverEcal() < HovE_70_EE;
+	}
+	if(fabs(dau1->eta())<eta_el_excl_down){// WP70 EB
+	electron_ID1 = 
+		 dau1->sigmaIetaIeta() < sihih_95_EB
+        	 && dau1->deltaPhiSuperClusterTrackAtVtx() < Dphi_vtx_95_EB
+        	 && dau1->deltaEtaSuperClusterTrackAtVtx() < Deta_vtx_95_EB
+		 && dau1->hcalOverEcal() < HovE_95_EB;
+	}else if(fabs(dau1->eta())>eta_el_excl_up){// WP70 EE	
+	electron_ID1 = 
+		 dau1->sigmaIetaIeta() < sihih_95_EE
+        	 && dau1->deltaPhiSuperClusterTrackAtVtx() < Dphi_vtx_95_EE
+        	 && dau1->deltaEtaSuperClusterTrackAtVtx() < Deta_vtx_95_EE
+		 && dau1->hcalOverEcal() < HovE_95_EE;
+	}
+  return electron_ID0 && electron_ID1;
+  }
   else if(Flag=="_1"){
   return true;
-         }
+  }
   else{
   return false;
   }
@@ -612,12 +758,10 @@ inline void addHistosVsMulti(unsigned int multi, std::string name, std::string t
 // Tag & Probe
 
 //Conditions required to fill TagAndProbe
-inline bool RecSelected_TagAndProbe(const reco::CompositeCandidate ZREC){
-  if ( ZREC.mass() > zmassmin && ZREC.mass() < zmassmax ){
-  return true;
-  }else{
-  return false;
-  }
+inline bool RecSelected_TagAndProbe(const reco::CompositeCandidate ZREC, string selections){
+  if(selections=="VPJ")return ZREC.mass() > zmassmin_vpj && ZREC.mass() < zmassmax_vpj;
+  if(selections=="VBTF")return ZREC.mass() > zmassmin_vbtf && ZREC.mass() < zmassmax_vbtf;
+  else return false;
 }
 
 //Cuts applied on Tag electron
@@ -648,7 +792,7 @@ inline bool singleEl_Tag(const reco::Candidate& cand){
  return false;}
 }
 
-//Probe cuts
+//Probe cuts VPJ
 inline bool singleEl_Probe_Acc(const reco::Candidate& cand){
   const pat::Electron* electron = dynamic_cast<const pat::Electron*>(&cand);
   if (!electron) {
@@ -658,8 +802,10 @@ inline bool singleEl_Probe_Acc(const reco::Candidate& cand){
      }
     }
   if(electron){
-  return electron->pt() > ptelcut && fabs(electron->eta()) < etaelcut &&
-         (fabs(electron->eta())<eta_el_excl_down || fabs(electron->eta())>eta_el_excl_up);
+  return (          
+          electron->pt() > ptelcut 
+          && fabs(electron->eta()) < etaelcut 
+          && (fabs(electron->eta())<eta_el_excl_down || fabs(electron->eta())>eta_el_excl_up));
   }else{
   return false;}
   }
@@ -727,6 +873,133 @@ inline bool singleEl_Probe_EiD(const reco::Candidate& cand){
   
 inline bool singleEl_Probe_True(const reco::Candidate& cand){
 return true;
+}
+
+//Probe cuts VBTF
+inline bool singleEl_Probe_Acc_VBTF0(const reco::Candidate& cand){
+  const pat::Electron* electron = dynamic_cast<const pat::Electron*>(&cand);
+  if (!electron) {
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (&cand);
+     if (scc && scc->hasMasterClone()){
+       electron = dynamic_cast<const pat::Electron*>(scc->masterClone().get()); 
+     }
+    }
+  if(electron){
+  return (          
+          electron->pt() > ptelcut0
+          && fabs(electron->eta()) < etaelcut 
+          && (fabs(electron->eta())<eta_el_excl_down || fabs(electron->eta())>eta_el_excl_up));
+  }else{
+  return false;}
+  }
+  
+inline bool singleEl_Probe_Acc_VBTF1(const reco::Candidate& cand){
+const pat::Electron* electron = dynamic_cast<const pat::Electron*>(&cand);
+  if (!electron) {
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (&cand);
+     if (scc && scc->hasMasterClone()){
+       electron = dynamic_cast<const pat::Electron*>(scc->masterClone().get()); 
+     }
+    }
+  if(electron){
+  return (          
+          electron->pt() > ptelcut1
+          && fabs(electron->eta()) < etaelcut 
+          && (fabs(electron->eta())<eta_el_excl_down || fabs(electron->eta())>eta_el_excl_up));
+  }else{
+  return false;}
+  }
+
+inline bool singleEl_Probe_Iso_VBTF0(const reco::Candidate& cand){
+const pat::Electron* el0 = dynamic_cast<const pat::Electron*>(&cand);
+  if (!el0) {
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (&cand);
+     if (scc && scc->hasMasterClone()){
+       el0 = dynamic_cast<const pat::Electron*>(scc->masterClone().get()); 
+     }
+    }
+  if(el0){ 
+  if (fabs(el0->eta())<eta_el_excl_down){// WP70 EB
+  return (el0->hcalIso()< hcal_iso_70_EB && el0->ecalIso() < ecal_iso_70_EB && el0->trackIso()< track_iso_70_EB);
+  }else if(fabs(el0->eta())>eta_el_excl_up){// WP70 EE
+  return (el0->hcalIso()< hcal_iso_70_EE && el0->ecalIso() < ecal_iso_70_EE && el0->trackIso()< track_iso_70_EE);
+  }
+  }else{
+  return false;}
+}
+
+inline bool singleEl_Probe_Iso_VBTF1(const reco::Candidate& cand){
+const pat::Electron* el1 = dynamic_cast<const pat::Electron*>(&cand);
+  if (!el1) {
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (&cand);
+     if (scc && scc->hasMasterClone()){
+       el1 = dynamic_cast<const pat::Electron*>(scc->masterClone().get()); 
+     }
+    }
+  if(el1){ 
+  if (fabs(el1->eta())<eta_el_excl_down){// WP95 EB
+  return (el1->hcalIso()< hcal_iso_95_EB && el1->ecalIso() < ecal_iso_95_EB && el1->trackIso()< track_iso_95_EB);
+  }else if(fabs(el1->eta())>eta_el_excl_up){// WP95 EE
+  return (el1->hcalIso()< hcal_iso_95_EE && el1->ecalIso() < ecal_iso_95_EE && el1->trackIso()< track_iso_95_EE);
+  }
+  }else{
+  return false;}
+}
+
+inline bool singleEl_Probe_EiD_VBTF0(const reco::Candidate& cand){
+  const pat::Electron* el0 = dynamic_cast<const pat::Electron*>(&cand);
+  if (!el0) {
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (&cand);
+     if (scc && scc->hasMasterClone()){
+       el0 = dynamic_cast<const pat::Electron*>(scc->masterClone().get()); 
+     }
+    }
+  if(el0){
+  bool el0_ID = false; 
+  if(fabs(el0->eta())<eta_el_excl_down){//WP70 EB
+	el0_ID = 
+		 el0->sigmaIetaIeta() < sihih_70_EB
+        	 && el0->deltaPhiSuperClusterTrackAtVtx() < Dphi_vtx_70_EB
+        	 && el0->deltaEtaSuperClusterTrackAtVtx() < Deta_vtx_70_EB
+		 && el0->hcalOverEcal() < HovE_70_EB;
+  }else if(fabs(el0->eta())>eta_el_excl_up){//WP70 EE	
+	el0_ID = 
+		 el0->sigmaIetaIeta() < sihih_70_EE
+        	 && el0->deltaPhiSuperClusterTrackAtVtx() < Dphi_vtx_70_EE
+        	 && el0->deltaEtaSuperClusterTrackAtVtx() < Deta_vtx_70_EE
+		 && el0->hcalOverEcal() < HovE_70_EE;
+  }
+  return el0_ID;
+  }else{
+  return false;}
+}
+
+inline bool singleEl_Probe_EiD_VBTF1(const reco::Candidate& cand){
+  const pat::Electron* el1 = dynamic_cast<const pat::Electron*>(&cand);
+  if (!el1) {
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (&cand);
+     if (scc && scc->hasMasterClone()){
+       el1 = dynamic_cast<const pat::Electron*>(scc->masterClone().get()); 
+     }
+    }
+  if(el1){
+  bool el1_ID = false; 
+  if(fabs(el1->eta())<eta_el_excl_down){//WP95 EB
+	el1_ID = 
+		 el1->sigmaIetaIeta() < sihih_95_EB
+        	 && el1->deltaPhiSuperClusterTrackAtVtx() < Dphi_vtx_95_EB
+        	 && el1->deltaEtaSuperClusterTrackAtVtx() < Deta_vtx_95_EB
+		 && el1->hcalOverEcal() < HovE_95_EB;
+  }else if(fabs(el1->eta())>eta_el_excl_up){//WP95 EE	
+	el1_ID = 
+		 el1->sigmaIetaIeta() < sihih_95_EE
+        	 && el1->deltaPhiSuperClusterTrackAtVtx() < Dphi_vtx_95_EE
+        	 && el1->deltaEtaSuperClusterTrackAtVtx() < Deta_vtx_95_EE
+		 && el1->hcalOverEcal() < HovE_95_EE;
+  }
+  return el1_ID;
+  }else{
+  return false;}
 }
   
   

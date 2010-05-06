@@ -7,7 +7,7 @@ patPFJetCorrFactors = cms.EDProducer("JetCorrFactorsProducer",
       ## the use of emf in the JEC is not yet implemented
       useEMF     = cms.bool(False),
       ## input collection of jets
-      jetSource  = cms.InputTag("antikt5PFJets"),
+      jetSource  = cms.InputTag("ak5PFJets"),
       ## set of correction factors
       corrSample = cms.string("Summer09_7TeV"),
       ## correction levels
@@ -29,8 +29,8 @@ patPFJetCorrFactors = cms.EDProducer("JetCorrFactorsProducer",
 
 #pat genjet match
 patPFJetGenJetMatch = cms.EDFilter("GenJetMatcher",    # cut on deltaR, deltaPt/Pt; pick best by deltaR
-     src         = cms.InputTag("antikt5PFJets"),       # RECO jets (any View<Jet> is ok)
-     matched     = cms.InputTag("antikt5GenJets"),        # GEN jets  (must be GenJetCollection)
+     src         = cms.InputTag("ak5PFJets"),       # RECO jets (any View<Jet> is ok)
+     matched     = cms.InputTag("ak5GenJets"),        # GEN jets  (must be GenJetCollection)
      mcPdgId     = cms.vint32(),                      # n/a
      mcStatus    = cms.vint32(),                      # n/a
      checkCharge = cms.bool(False),                   # n/a
@@ -40,9 +40,9 @@ patPFJetGenJetMatch = cms.EDFilter("GenJetMatcher",    # cut on deltaR, deltaPt/
      resolveByMatchQuality = cms.bool(False)          # False = just match input in order; True = pick lowest deltaR pair first
 )
 
-from  PhysicsTools.PatAlgos.producersLayer1.jetProducer_cfi import allLayer1Jets
-allLayer1PFJets = allLayer1Jets.clone()
-allLayer1PFJets.jetSource = cms.InputTag('antikt5PFJets')
+from  PhysicsTools.PatAlgos.producersLayer1.jetProducer_cfi import patJets
+allLayer1PFJets = patJets.clone()
+allLayer1PFJets.jetSource = cms.InputTag('ak5PFJets')
 allLayer1PFJets.jetCorrFactorsSource = cms.VInputTag(cms.InputTag('patPFJetCorrFactors') )
 allLayer1PFJets.addGenPartonMatch = cms.bool(False)
 allLayer1PFJets.genJetMatch = cms.InputTag("patPFJetGenJetMatch")

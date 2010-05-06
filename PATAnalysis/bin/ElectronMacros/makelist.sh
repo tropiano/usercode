@@ -1,10 +1,8 @@
 #!/bin/bash
 
-LIST=QCD_30to80_FullSample.txt
+LIST=Summer09_test.txt
 TMPLIST=tmp_list.txt
-#DIR=/raid/sfrosali/PATtuple/QCD_EMEnriched/Pt20to30
-DIR=/raid/sfrosali/PATtuple/Background/QCD_EMEnriched/Pt30to80/
-#DIR=/castor/cern.ch/user/s/sfrosali/ZeeSummer09/background/QCD_EMEnriched_Pt20to30/
+DIR=/data/sfrosali/PATtuple/MC/ZeeSummer09_7TeV_akt5_335_wGenP/
 
 ls -l $DIR > $TMPLIST
 #rfdir $DIR > $TMPLIST

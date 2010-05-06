@@ -73,13 +73,13 @@ private:
   
   bool _Sumw2;
 
-  int _entries, _fileCounter, _EventsPerFile;
+  int _entries, _EventsPerFile;
 
   TFile* _file;  
 
   TDirectory *_dir, *_Zdir, *_Eldir, *_Jetdir;
   
-  std::string _ReportName;
+  std::string _selections;
 
   std::vector<TH1D*> _histovector;
 

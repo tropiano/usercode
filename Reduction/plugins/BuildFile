@@ -7,6 +7,7 @@
     <use name=DataFormats/PatCandidates>
     <use name=PhysicsTools/UtilAlgos>
     <use name=PhysicsTools/StarterKit>
+    <use name=CommonTools/UtilAlgos>
     <use name=root>
     <flags EDM_PLUGIN=1>
 </library>

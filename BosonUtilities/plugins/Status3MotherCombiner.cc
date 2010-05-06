@@ -16,6 +16,7 @@ Status3MotherCombiner::Status3MotherCombiner(const edm::ParameterSet &params ):
   _inTag(params.getParameter<edm::InputTag>("src")),
   _pdgId(params.getParameter<int>("motherId")),
   _charge(params.getParameter<int>("motherCharge")),
+  _requestedStaus3Daughters(params.getParameter<std::vector<int> >("requestedStaus3Daughters")),
   _combiner(params){
   
   produces <reco::CompositeCandidateCollection> ();
@@ -44,7 +45,19 @@ void Status3MotherCombiner::produce (edm::Event &evt, const edm::EventSetup &evt
     GenParticleRef particle( &particles, i );
     if (particle->pdgId()  != _pdgId) continue;
     if (particle->status() != 3) continue;
-    //cout << "Particle " << particle->pdgId() << endl;
+    bool daucheck = true;
+    if (!_requestedStaus3Daughters.empty()){
+      for (unsigned int kk = 0; kk < _requestedStaus3Daughters.size(); ++kk ){
+        reco::GenParticleRefVector status3descendents;
+        GenParticlesHelper::findDescendents(particle, status3descendents, 3, _requestedStaus3Daughters[kk]);
+        if (status3descendents.size() == 0 ){//|| status3descendents.size() == 1) {
+          //cout << "Particle " << particle->pdgId() << " has 0 descendants with pdgId " << _requestedStaus3Daughters[kk] << endl;
+          daucheck = false;
+          continue;
+        }  
+      }
+    }
+    if (!daucheck) continue;
     reco::GenParticleRefVector descendents;
     GenParticlesHelper::findDescendents(particle, descendents, 1);
     //fill a vector with descents (needed for sort)

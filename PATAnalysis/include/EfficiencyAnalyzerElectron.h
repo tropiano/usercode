@@ -7,7 +7,7 @@
 class EfficiencyAnalyzerElectron {
 
   public:
-    EfficiencyAnalyzerElectron(TFile* input, TFile* output, std::string dir, TFile* training_signal=0, TFile* training_background=0);
+    EfficiencyAnalyzerElectron(TFile* input=0, TFile* output=0, std::string dir="", std::string dir1="", TFile* training_signal=0, TFile* training_background=0);
     
     ~EfficiencyAnalyzerElectron(){};
 
@@ -15,6 +15,9 @@ class EfficiencyAnalyzerElectron {
 
   private:
     TDirectory* _dir;
+    TDirectory* _dir1;
+    std::string _dirname;
+    std::string _dirname1;
     TFile* _output;
     TFile* _training_signal;
     TFile* _training_background;

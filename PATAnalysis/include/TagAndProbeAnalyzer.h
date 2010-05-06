@@ -19,23 +19,27 @@
 class TagAndProbeAnalyzer {
 public :
 
-    TagAndProbeAnalyzer(TDirectory* input, TFile* output, std::string name, bool performfits=true, TFile* training_signal=0, TFile* training_background=0);
+    TagAndProbeAnalyzer(TDirectory* input, TFile* output, TDirectory* sec_input, std::string name, bool performfits=true, TFile* training_signal=0, TFile* training_background=0);
 
     ~TagAndProbeAnalyzer();
 
     void analyze(unsigned int nbins, std::string option="signal");
     
-    TGraphAsymmErrors createDoubleMuonEfficiency(const TGraphAsymmErrors& single) const;
+    TGraphAsymmErrors createDoubleEfficiency(const TGraphAsymmErrors& single) const;
+    
+    TGraphAsymmErrors createAsymmCutEfficiency(const TGraphAsymmErrors& single0, const TGraphAsymmErrors& single1) const;
 
 private:  
   std::pair<RooFitResult*, RooRealVar*> fit(RooAbsData* data, const char* name, std::string option = "signal") ;
   bool _initialized;
   TDirectory* _input;
+  TDirectory* _sec_input;
   TFile* _output;
   std::string _name;
   bool _performfits;
   TFile *_training_signal, *_training_background;
-  RooDataSet* _rootree;
+  RooDataSet* _rootree; 
+  RooDataSet* _rootree1;
   //tree vars
   RooRealVar _mass;
   RooRealVar _bin;

@@ -21,9 +21,10 @@
 
 using namespace std;
 
-TagAndProbeAnalyzer::TagAndProbeAnalyzer(TDirectory* input, TFile* output, std::string name, bool performfits, TFile* training_signal, TFile* training_background):
+TagAndProbeAnalyzer::TagAndProbeAnalyzer(TDirectory* input, TFile* output, TDirectory* sec_input, std::string name, bool performfits, TFile* training_signal, TFile* training_background):
 _initialized(false),
 _input(input),
+_sec_input(sec_input),
 _output(output),
 _name(name),
 _performfits(performfits),
@@ -40,18 +41,32 @@ _passprobe_cat("passprobe", "passprobe")
   
   _passprobe_cat.defineType("pass",  1);
   _passprobe_cat.defineType("fail",  0);
+  
+  TTree* tree=0; 
+  TTree* tree1=0;
 
-  TTree* tree = (TTree*) _input->Get("dataset");
+  tree = (TTree*) _input->Get("dataset");
   if (!tree){
     std::cout << "Error in TagAndProbeAnalyzer::TagAndProbeAnalyzer : could not find tree named dataset in input file " << std::endl;
     return;
   }
+  
+  if(_sec_input){
+  tree1 = (TTree*) _sec_input->Get("dataset");
+  if (!tree1){
+    std::cout << "Error in TagAndProbeAnalyzer::TagAndProbeAnalyzer : could not find tree1 named dataset in input file " << std::endl;
+    return;
+  }
+  }
+  
   _initialized = true;
   
   _argset = new RooArgSet(_mass, _bin, _probe, _passprobe_cat, _weight );
  
   _output->cd();
-  _rootree   = new RooDataSet("roodataset", "roodataset", tree, *_argset, "", "weight");
+  _rootree = new RooDataSet("roodataset", "roodataset", tree, *_argset, "", "weight");
+  if(_sec_input)_rootree1 = new RooDataSet("roodataset", "roodataset", tree1, *_argset, "", "weight");
+  
 }
 
 TagAndProbeAnalyzer::~TagAndProbeAnalyzer(){
@@ -66,8 +81,9 @@ void TagAndProbeAnalyzer::analyze(unsigned int nbins, std::string option )
    }
   
    _rootree->Write();
+   if(_sec_input)_rootree1->Write();
    
-   TGraphAsymmErrors singleEfficiency;
+   TGraphAsymmErrors singleEfficiency, singleEfficiency1;
   
    for (unsigned int i = 0; i < nbins; ++i){
       stringstream name_tp;
@@ -78,12 +94,18 @@ void TagAndProbeAnalyzer::analyze(unsigned int nbins, std::string option )
       stringstream formula_tp;
       formula_tp << "bin==" << i << " && probe==1";
      
-      RooAbsData* tagprobe = _rootree->reduce(formula_tp.str().c_str());
+      RooAbsData* tagprobe=0; 
+      RooAbsData* tagprobe1=0;
+      
+      tagprobe = _rootree->reduce(formula_tp.str().c_str());
+      if(_sec_input)tagprobe1 = _rootree1->reduce(formula_tp.str().c_str());
       
       //_mass.setMin(80.); //TRY smaller range
       //_mass.setMax(100.); //TRY smaller range
     
-        std::pair<RooFitResult*, RooRealVar*>  tp_fit  = fit(tagprobe, name_tp.str().c_str(), option);
+        std::pair<RooFitResult*, RooRealVar*>  tp_fit, tp_fit1;
+        tp_fit  = fit(tagprobe, name_tp.str().c_str(), option);
+        if(_sec_input)tp_fit1  = fit(tagprobe1, name_tp.str().c_str(), option);
         
         if(tp_fit.first && tp_fit.first->status() == 0 ){
           cout << "Using backgound correctedvalues for " << _name << " in bin " << i << endl;  
@@ -99,15 +121,41 @@ void TagAndProbeAnalyzer::analyze(unsigned int nbins, std::string option )
           }
           singleEfficiency.SetPointEYhigh(i, errhigh);
           singleEfficiency.SetPointEYlow(i, errlow);
-          } 
+          }
+         
+         if(_sec_input){ 
+         if(tp_fit1.first && tp_fit1.first->status() == 0 ){
+          cout << "Using backgound correctedvalues for " << _name << " in bin " << i << endl;  
+          singleEfficiency1.SetPoint(i, i, tp_fit1.second->getVal());
+          double errlow1 = 0.;
+          double errhigh1 = 0.;
+          if (tp_fit1.second->hasAsymError()){
+            errhigh1 = tp_fit1.second->getAsymErrorHi();
+            errlow1 = tp_fit1.second->getAsymErrorLo();
+          } else {
+            errlow1  = tp_fit1.second->getError();
+            errhigh1 = tp_fit1.second->getError();
+          }
+          singleEfficiency1.SetPointEYhigh(i, errhigh1);
+          singleEfficiency1.SetPointEYlow(i, errlow1);
+          }
+          }
                   
           if (tp_fit.first) delete tp_fit.first;
           if (tp_fit.second) delete tp_fit.second;
+          if(_sec_input){
+          if (tp_fit1.first) delete tp_fit1.first;
+          if (tp_fit1.second) delete tp_fit1.second;
+          }
    }
 
-   //double muon efficiency
-   TGraphAsymmErrors doubleEfficiency = createDoubleMuonEfficiency(singleEfficiency);
-   doubleEfficiency.Write(); 
+   //double efficiency
+   if(!_sec_input){
+   TGraphAsymmErrors doubleEfficiency = createDoubleEfficiency(singleEfficiency);
+   doubleEfficiency.Write();}
+   if(_sec_input){
+   TGraphAsymmErrors doubleEfficiency = createAsymmCutEfficiency(singleEfficiency, singleEfficiency1);
+   doubleEfficiency.Write();}
    
 }
 
@@ -377,7 +425,7 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
 }
 
 
-TGraphAsymmErrors TagAndProbeAnalyzer::createDoubleMuonEfficiency(const TGraphAsymmErrors& single) const {
+TGraphAsymmErrors TagAndProbeAnalyzer::createDoubleEfficiency(const TGraphAsymmErrors& single) const {
   int n = single.GetN();
   TVectorD vx(n);
   TVectorD vy(n);
@@ -396,8 +444,39 @@ TGraphAsymmErrors TagAndProbeAnalyzer::createDoubleMuonEfficiency(const TGraphAs
     veyh(i) = 2 * y * single.GetErrorYhigh(i);
   }
 
-  TGraphAsymmErrors doubleMuEff(vx, vy, vexl, vexh, veyl, veyh);
-  doubleMuEff.SetNameTitle((_name+"DoubleMuTag&Probe").c_str(), (_name+"DoubleMuTag&Probe").c_str());
-  return doubleMuEff;
-} 
+  TGraphAsymmErrors doubleEff(vx, vy, vexl, vexh, veyl, veyh);
+  doubleEff.SetNameTitle((_name+"DoubleTag&Probe").c_str(), (_name+"DoubleTag&Probe").c_str());
+  return doubleEff;
+}
+
+TGraphAsymmErrors TagAndProbeAnalyzer::createAsymmCutEfficiency(const TGraphAsymmErrors& single0, const TGraphAsymmErrors& single1) const {
+
+  int n = single0.GetN();
+  
+  TVectorD vx(n);
+  TVectorD vy(n);
+  TVectorD vexl(n);
+  TVectorD vexh(n);
+  TVectorD veyl(n);
+  TVectorD veyh(n);
+  
+  for ( int i = 0; i < n; ++i ){
+  
+    double x0 = 0., y0 = 0., x1 = 0., y1 = 0.;
+    single0.GetPoint(i, x0, y0);
+    single1.GetPoint(i, x1, y1);
+    
+    vx(i)   = x0;
+    vexl(i) = single0.GetErrorXlow(i);
+    vexh(i) = single0.GetErrorXhigh(i);
+    vy(i)   = y0 * y1;
+    veyl(i) = (y1 * single0.GetErrorYlow(i))+(y0 * single1.GetErrorYlow(i));
+    veyh(i) = (y1 * single0.GetErrorYhigh(i))+(y0 * single1.GetErrorYhigh(i));
+    
+  }
+
+  TGraphAsymmErrors doubleEff(vx, vy, vexl, vexh, veyl, veyh);
+  doubleEff.SetNameTitle((_name+"DoubleTag&Probe").c_str(), (_name+"DoubleTag&Probe").c_str());
+  return doubleEff;
+}
 

@@ -5,9 +5,11 @@
 #include "TH1D.h"
 #include "TGraphAsymmErrors.h"
 
-EfficiencyAnalyzerMuon::EfficiencyAnalyzerMuon(TFile* input, TFile* output, std::string dirname): _dir(0), _output(output){
+EfficiencyAnalyzerMuon::EfficiencyAnalyzerMuon(TFile* input, TFile* output, TFile* sec_input, std::string dirname): _dir(0), _dir1(0), _sec_input(sec_input), _output(output) {
   //file->Open("UPDATE");
   _dir = (TDirectory*) input->Get(dirname.c_str());
+  if(_sec_input)_dir1 = (TDirectory*) _sec_input->Get(dirname.c_str());
+  
 }
 
 

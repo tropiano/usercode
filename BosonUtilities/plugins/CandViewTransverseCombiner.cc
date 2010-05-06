@@ -1,6 +1,6 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "CommonTools/CandAlgos/interface/CandCombiner.h"
-#include "PhysicsTools/UtilAlgos/interface/StringCutObjectSelector.h"
+#include "CommonTools/UtilAlgos/interface/StringCutObjectSelector.h"
 #include "Firenze/BosonUtilities/interface/AddFourMomentaTransversePlane.h"
 
 typedef reco::modules::CandCombiner<

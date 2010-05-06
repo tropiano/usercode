@@ -139,9 +139,9 @@ private:
   
   bool _GenParticleMatch;
   
-  int _entries, _EventsPerFile, _Acc, _Trg, _Qual, _Imp, _Iso, _EiD;
+  int _entries, _EventsPerFile, _fileCounter, _Acc, _Trg, _Qual, _Imp, _Iso, _EiD;
   
-  std::string _electronID;
+  std::string _electronID, _selections, _ReportName;
 
   TFile* _file;  
 

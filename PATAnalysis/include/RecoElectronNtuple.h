@@ -25,7 +25,21 @@ public :
    void zero_ntuple();
 
    // added a simple tree  EG 12.10.09
-   TTree *electrontree;
+   TTree *zeetree;
+   TTree *valideltree;
+   TTree *validjettree;
+   TTree *validel_EventTree;
+   TTree *validjet_EventTree;
+   
+   Float_t valid_ElPt, valid_ElPhi, valid_ElEta, valid_ElCharge, valid_elehcaliso, valid_eleecaliso, valid_eletrackiso, valid_elereliso, valid_elechisq, valid_eledB, valid_elefbrem, valid_eledeltaeta, valid_eledeltaphi, valid_eleHadronicOvEm, valid_eleHcalOvEcal, valid_eleEovP, valid_elesigmaetaeta, valid_elesigmaietaieta;
+   
+   Float_t valid_JetPt, valid_JetPhi, valid_JetEta, valid_JetCharge, valid_JetEmFrac;
+   Float_t valid_JetEl_DeltaR[500];
+   
+   Int_t valid_elenhits, valid_elerobusttight, valid_elerobustloose, valid_eleloose, valid_eletight, valid_ElMult, valid_JetMult_Pt10Cut, valid_JetMult, valid_ElectronTrigger, valid_JetTrigger;
+   
+   Int_t event, run;
+   
    Float_t ptzgen, etazgen, phizgen, zmassgen;
    Float_t elegenpt1, elegeneta1, elegenphi1;
    Float_t elegenpt2, elegeneta2, elegenphi2;
@@ -68,7 +82,7 @@ public :
 
 private:
 
-  std::string _sample;
+  std::string _sample, _selections;
 
   double _ptjetmin;
 

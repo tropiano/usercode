@@ -43,20 +43,20 @@ genLeadElPt_Acc(0), genSecElPt_Acc(0), genLeadElEta_Acc(0), genSecElEta_Acc(0),
 JetMinDeltaRZDau_GEN(0),
 
 _ptjetmin(30.), _etajetmax(3.), _norm(1.), _Norm(true), _Sumw2(false), _EventsPerFile(0),
-_file(0), _dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _histovector()
+_file(0), _dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _selections("VBTF"), _histovector()
 {   }
 
 void GenElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _file = out;
 
-    std::string dirname = iConfig.getParameter<std::string>("Name");
-    std::string sourceFileList = iConfig.getParameter<std::string>("sourceFileList");
+   std::string dirname = iConfig.getParameter<std::string>("Name");
+   std::string sourceFileList = iConfig.getParameter<std::string>("sourceFileList");
+   _selections = iConfig.getParameter<std::string>("Selections");
    _targetLumi= iConfig.getParameter<double>("targetLumi");
    _xsec      = iConfig.getParameter<double>("CrossSection");
    _Norm      = iConfig.getParameter<bool>("Norm");
    _Sumw2      = iConfig.getParameter<bool>("Sumw2");
    _EventsPerFile      = iConfig.getParameter<int32_t>("EventsPerFile");
-   _ReportName = iConfig.getParameter<std::string>("ReportName");
 
     cout << "GenElectron file name : " << _file->GetName() << endl;
    _file->cd();
@@ -125,7 +125,7 @@ void GenElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    JetMinDeltaRZDau_GEN = new TH1D("JetMinDeltaRZDau_GEN", "Min Delta R Z Daughters All Gen Jets", 100, 0, 10);
    _histovector.push_back(JetMinDeltaRZDau_GEN);
    
-   _fileCounter = 0;
+  int fileCounter = 0;
    
    TChain *ch = new TChain("Events");
   ifstream infile;
@@ -133,17 +133,17 @@ void GenElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
   string datafile;
   while(getline (infile, datafile)){
     ch->Add(datafile.c_str());
-    _fileCounter++;
+    fileCounter++;
   }
    
   if(_Norm==true){
   _entries = ch->GetEntries();
-  cout<<"RecoElectron analyzing nr. file = "<<_fileCounter<<endl;
+  cout<<"RecoElectron analyzing nr. file = "<<fileCounter<<endl;
   cout<<"GenElectron analyzing nr. event = "<<_entries<<endl;}
   
   if(_Norm==false){
-  _entries = _fileCounter*_EventsPerFile;
-  cout<<"GenElectron analyzing nr. file = "<<_fileCounter<<endl;
+  _entries = fileCounter*_EventsPerFile;
+  cout<<"GenElectron analyzing nr. file = "<<fileCounter<<endl;
   cout<<"GenElectron analyzing nr. event = "<<_entries<<endl;}
   
   delete ch;
@@ -189,7 +189,7 @@ void  GenElectron::process(const fwlite::Event& iEvent)
    if(GenIsoJet(*zgenHandle,*genjets[i]))isogenjets.push_back(genjets[i]);}
    
    //Events with a selected GEN Zee - NO Acceptance cuts applied
-   if (GenSelected(*zgenHandle)&&zdaughters.size()!=0){
+   if (GenSelected(*zgenHandle, _selections)&&zdaughters.size()!=0){
    
       genPtZ->Fill((*zgenHandle)[0].pt(), weight);
       genEtaZ->Fill((*zgenHandle)[0].eta(), weight);
@@ -228,7 +228,7 @@ void  GenElectron::process(const fwlite::Event& iEvent)
    
 
    //Events with a selected GEN Zee in Acceptance
-   if (GenSelectedInAcceptance(*zgenHandle)&&zdaughters.size()!=0){
+   if (GenSelectedInAcceptance(*zgenHandle, _selections)&&zdaughters.size()!=0){
    
       genPtZ_Acc->Fill((*zgenHandle)[0].pt(), weight);
       genEtaZ_Acc->Fill((*zgenHandle)[0].eta(), weight);
@@ -364,21 +364,6 @@ void GenElectron::finalize(){
    for (std::vector<TH1D*>::const_iterator i = ibeg; i != iend; ++i){     
      if (*i) (*i)->Scale(_norm);
    }
-   
-   ofstream Report;
-   Report.open(_ReportName.c_str());
-   Report<<endl<<endl<<"----- Sample Info -----"<<endl<<endl;
-   Report<<"File number = "<<_fileCounter<<endl;
-   if(_Norm){
-   Report<<"Event number by TChain = "<<_entries<<endl;
-   }else{
-   Report<<"Events per File = "<<_EventsPerFile<<endl;
-   Report<<"Event number by #File*#EventsPerFile = "<<_entries<<endl;
-   }
-   Report<<"Normalized to "<<_targetLumi<<" pb-1"<<endl;
-   Report<<"Cross section = "<<_xsec<<" pb"<<endl;
-   Report<<"Normalization factor = "<<_norm<<endl<<endl;
-   Report.close();
    
    _file->Write();
 

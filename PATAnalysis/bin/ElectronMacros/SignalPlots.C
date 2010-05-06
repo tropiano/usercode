@@ -24,7 +24,13 @@
 using namespace std;
 
 //sample == "mc" -> MonteCarlo , sample == "data" -> Data
-void SignalPlots(string sample){
+//Selections: "VPJ" = V+jets selections (old); "VBTF" = Vector Boson Task Force (new)
+
+void SignalPlots(string sample, string selections){
+
+        TFile *signal_file = TFile::Open("Summer09_test_VPJ.root");
+        
+        TFile* outplots = new TFile("Plot_Summer09_test_VPJ.root.root", "RECREATE");
 	
 	int _Acc  = 1;
 	int _Trg  = 2;
@@ -34,24 +40,27 @@ void SignalPlots(string sample){
 	int _EiD  = 5;
 	
 	string _RecoCutFlags[7];
-	for(int i=0; i<7; i++){
-		_RecoCutFlags[i] = "_1";}
 	
-	_RecoCutFlags[_Acc] =  "_Acc";
-	_RecoCutFlags[_Trg] =  "_Trg";
-	_RecoCutFlags[_Qual] = "_Qual";
-	_RecoCutFlags[_Imp] =  "_Imp";
-	_RecoCutFlags[_Iso] =  "_Iso";
-	_RecoCutFlags[_EiD] =  "_EiD";
-
-    TFile *signal_file = TFile::Open("test_mc.root");
+	for(int i=0; i<7; i++){
+       _RecoCutFlags[i] = "_1";}
+   
+       if(selections=="VPJ"){
+       _RecoCutFlags[_Acc] =  "_Acc";
+       _RecoCutFlags[_Iso] =  "_Iso";
+       _RecoCutFlags[_EiD] =  "_EiD";}
+       if(selections=="VBTF"){
+       _RecoCutFlags[_Acc] =  "_AccVBTF";
+       _RecoCutFlags[_Iso] =  "_IsoVBTF";
+       _RecoCutFlags[_EiD] =  "_EiDVBTF";}
+     
+       _RecoCutFlags[_Trg] =  "_Trg";
+       _RecoCutFlags[_Qual] = "_Qual";
+       _RecoCutFlags[_Imp] =  "_Imp";
     
         if(!signal_file){
 	cout<<"Error! Input files doesn't exist!"<<endl;
 	return;
 	}
-
-    TFile* outplots = new TFile("Plot_test_mc.root", "RECREATE");
 
 TDirectory *GEff, *REff, *Acc, *Pt_Eff, *Eta_Eff, *Jet_Eff, *R_Jet_Eff, *Mass_Eff, *Dist, *GenRec, *IsoJet, *ChargeMisID, *TP, *TP_12, *TP_123, *TP_1234, *TP_12345, *TP_123456;
 
@@ -785,6 +794,8 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         
         string TPDir="EfficiencyElectron/Tag&Probe";
         string TPHisto="/Electron";
+        
+        if(selections=="VBTF")TPDir="EfficiencyElectron/Tag&Probe0";
  
         TPDir+=_RecoCutFlags[1].c_str();   
         TPDir+=_RecoCutFlags[2].c_str();
@@ -836,6 +847,7 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         TGraphAsymmErrors Eff_TP_Single_123456(TP_numerator_123456, TP_denominator_123456);
         
         string Eff_TP_Single_name="SingleEff_TagProbe";
+        if(selections=="VBTF")Eff_TP_Single_name="SingleEff_TagProbe0";
         Eff_TP_Single_name+=_RecoCutFlags[1].c_str();
         Eff_TP_Single_name+=_RecoCutFlags[2].c_str();
         Eff_TP_Single_12.SetNameTitle(Eff_TP_Single_name.c_str(), Eff_TP_Single_name.c_str());
@@ -847,6 +859,78 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         Eff_TP_Single_12345.SetNameTitle(Eff_TP_Single_name.c_str(), Eff_TP_Single_name.c_str());
         Eff_TP_Single_name+=_RecoCutFlags[6].c_str();
         Eff_TP_Single_123456.SetNameTitle(Eff_TP_Single_name.c_str(), Eff_TP_Single_name.c_str());
+        
+        string TPDir1="EfficiencyElectron/Tag&Probe1";;
+        TGraphAsymmErrors Eff_TP_Single1_12, Eff_TP_Single1_123, Eff_TP_Single1_1234, Eff_TP_Single1_12345, Eff_TP_Single1_123456;
+         
+        if(selections=="VBTF"){
+        
+        TPHisto="/Electron";
+        
+        TPDir1+=_RecoCutFlags[1].c_str();   
+        TPDir1+=_RecoCutFlags[2].c_str();
+        TPHisto+=_RecoCutFlags[1].c_str();
+        TPHisto+=_RecoCutFlags[2].c_str();
+       
+        string num_TP1 = TPDir1+TPHisto+"_SingleCandTag&Probe_numerator";
+        string den_TP1 = TPDir1+TPHisto+"_SingleCandTag&Probe_denominator";
+        
+        TH1D* TP_numerator1_12 = (TH1D*) signal_file->Get(num_TP1.c_str());
+        TH1D* TP_denominator1_12 = (TH1D*) signal_file->Get(den_TP1.c_str());
+        
+        TPDir1+=_RecoCutFlags[3].c_str();    
+        TPHisto+=_RecoCutFlags[3].c_str(); 
+        num_TP1 = TPDir1+TPHisto+"_SingleCandTag&Probe_numerator";
+        den_TP1 = TPDir1+TPHisto+"_SingleCandTag&Probe_denominator";
+        
+        TH1D* TP_numerator1_123 = (TH1D*) signal_file->Get(num_TP1.c_str());
+        TH1D* TP_denominator1_123 = (TH1D*) signal_file->Get(den_TP1.c_str());
+        
+        TPDir1+=_RecoCutFlags[4].c_str();    
+        TPHisto+=_RecoCutFlags[4].c_str(); 
+        num_TP1 = TPDir1+TPHisto+"_SingleCandTag&Probe_numerator";
+        den_TP1 = TPDir1+TPHisto+"_SingleCandTag&Probe_denominator";
+       
+        TH1D* TP_numerator1_1234 = (TH1D*) signal_file->Get(num_TP1.c_str());
+        TH1D* TP_denominator1_1234 = (TH1D*) signal_file->Get(den_TP1.c_str());
+        
+        TPDir1+=_RecoCutFlags[5].c_str();    
+        TPHisto+=_RecoCutFlags[5].c_str(); 
+        num_TP1 = TPDir1+TPHisto+"_SingleCandTag&Probe_numerator";
+        den_TP1 = TPDir1+TPHisto+"_SingleCandTag&Probe_denominator";
+        
+        TH1D* TP_numerator1_12345 = (TH1D*) signal_file->Get(num_TP1.c_str());
+        TH1D* TP_denominator1_12345 = (TH1D*) signal_file->Get(den_TP1.c_str());
+        
+        TPDir1+=_RecoCutFlags[6].c_str();    
+        TPHisto+=_RecoCutFlags[6].c_str(); 
+        num_TP1 = TPDir1+TPHisto+"_SingleCandTag&Probe_numerator";
+        den_TP1 = TPDir1+TPHisto+"_SingleCandTag&Probe_denominator";
+        
+        TH1D* TP_numerator1_123456 = (TH1D*) signal_file->Get(num_TP1.c_str());
+        TH1D* TP_denominator1_123456 = (TH1D*) signal_file->Get(den_TP1.c_str());
+        
+        Eff_TP_Single1_12.BayesDivide(TP_numerator1_12, TP_denominator1_12);       
+        Eff_TP_Single1_123.BayesDivide(TP_numerator1_123, TP_denominator1_123);      
+        Eff_TP_Single1_1234.BayesDivide(TP_numerator1_1234, TP_denominator1_1234);        
+        Eff_TP_Single1_12345.BayesDivide(TP_numerator1_12345, TP_denominator1_12345);
+        Eff_TP_Single1_123456.BayesDivide(TP_numerator1_123456, TP_denominator1_123456);
+        
+        string Eff_TP_Single1_name="SingleEff_TagProbe1";
+        Eff_TP_Single1_name+=_RecoCutFlags[1].c_str();
+        Eff_TP_Single1_name+=_RecoCutFlags[2].c_str();
+        Eff_TP_Single1_12.SetNameTitle(Eff_TP_Single1_name.c_str(), Eff_TP_Single1_name.c_str());
+        Eff_TP_Single1_name+=_RecoCutFlags[3].c_str();
+        Eff_TP_Single1_123.SetNameTitle(Eff_TP_Single1_name.c_str(), Eff_TP_Single1_name.c_str());
+        Eff_TP_Single1_name+=_RecoCutFlags[4].c_str();
+        Eff_TP_Single1_1234.SetNameTitle(Eff_TP_Single1_name.c_str(), Eff_TP_Single1_name.c_str());
+        Eff_TP_Single1_name+=_RecoCutFlags[5].c_str();
+        Eff_TP_Single1_12345.SetNameTitle(Eff_TP_Single1_name.c_str(), Eff_TP_Single1_name.c_str());
+        Eff_TP_Single1_name+=_RecoCutFlags[6].c_str();
+        Eff_TP_Single1_123456.SetNameTitle(Eff_TP_Single1_name.c_str(), Eff_TP_Single1_name.c_str());
+        
+        }
+        
           
         int n_12 = Eff_TP_Single_12.GetN();
         TVectorD vx_12(n_12);
@@ -854,16 +938,20 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         TVectorD vexl_12(n_12);
         TVectorD vexh_12(n_12);
         TVectorD veyl_12(n_12);
-        TVectorD veyh_12(n_12);
+        TVectorD veyh_12(n_12);  
         for ( int i = 0; i < n_12; ++i ){
-        double x = 0., y = 0.;
+        double x = 0., y = 0., x1=0., y1=0.;
         Eff_TP_Single_12.GetPoint(i, x, y);
+        if(selections=="VBTF")Eff_TP_Single1_12.GetPoint(i, x1, y1);
         vx_12(i)   = x;
         vexl_12(i) = Eff_TP_Single_12.GetErrorXlow(i);
         vexh_12(i) = Eff_TP_Single_12.GetErrorXhigh(i);
-        vy_12(i)   = y * y;
-        veyl_12(i) = 2 * y * Eff_TP_Single_12.GetErrorYlow(i);
-        veyh_12(i) = 2 * y * Eff_TP_Single_12.GetErrorYhigh(i);
+        if(selections=="VPJ")vy_12(i)   = y * y;
+        if(selections=="VBTF")vy_12(i)   = y * y1;
+        if(selections=="VPJ")veyl_12(i) = 2 * y * Eff_TP_Single_12.GetErrorYlow(i);
+        if(selections=="VBTF")veyl_12(i) = y1 * Eff_TP_Single_12.GetErrorYlow(i) + y * Eff_TP_Single1_12.GetErrorYlow(i);
+        if(selections=="VPJ")veyh_12(i) = 2 * y * Eff_TP_Single_12.GetErrorYhigh(i);
+        if(selections=="VBTF")veyl_12(i) = y1 * Eff_TP_Single_12.GetErrorYhigh(i) + y * Eff_TP_Single1_12.GetErrorYhigh(i);
         }  
         
         int n_123 = Eff_TP_Single_123.GetN();
@@ -874,14 +962,18 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         TVectorD veyl_123(n_123);
         TVectorD veyh_123(n_123);
         for ( int i = 0; i < n_123; ++i ){
-        double x = 0., y = 0.;
+        double x = 0., y = 0., x1=0., y1=0.;
         Eff_TP_Single_123.GetPoint(i, x, y);
+        if(selections=="VBTF")Eff_TP_Single1_123.GetPoint(i, x1, y1);
         vx_123(i)   = x;
         vexl_123(i) = Eff_TP_Single_123.GetErrorXlow(i);
         vexh_123(i) = Eff_TP_Single_123.GetErrorXhigh(i);
-        vy_123(i)   = y * y;
-        veyl_123(i) = 2 * y * Eff_TP_Single_123.GetErrorYlow(i);
-        veyh_123(i) = 2 * y * Eff_TP_Single_123.GetErrorYhigh(i);
+        if(selections=="VPJ")vy_123(i)   = y * y;
+        if(selections=="VBTF")vy_123(i)   = y * y1;
+        if(selections=="VPJ")veyl_123(i) = 2 * y * Eff_TP_Single_123.GetErrorYlow(i);
+        if(selections=="VBTF")veyl_123(i) = y1 * Eff_TP_Single_123.GetErrorYlow(i) + y * Eff_TP_Single1_123.GetErrorYlow(i);
+        if(selections=="VPJ")veyh_123(i) = 2 * y * Eff_TP_Single_123.GetErrorYhigh(i);
+        if(selections=="VBTF")veyl_123(i) = y1 * Eff_TP_Single_123.GetErrorYhigh(i) + y * Eff_TP_Single1_123.GetErrorYhigh(i);
         }
         
         int n_1234 = Eff_TP_Single_1234.GetN();
@@ -892,14 +984,18 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         TVectorD veyl_1234(n_1234);
         TVectorD veyh_1234(n_1234);
         for ( int i = 0; i < n_1234; ++i ){
-        double x = 0., y = 0.;
+        double x = 0., y = 0., x1=0., y1=0.;
         Eff_TP_Single_1234.GetPoint(i, x, y);
+        if(selections=="VBTF")Eff_TP_Single1_1234.GetPoint(i, x1, y1);
         vx_1234(i)   = x;
         vexl_1234(i) = Eff_TP_Single_1234.GetErrorXlow(i);
         vexh_1234(i) = Eff_TP_Single_1234.GetErrorXhigh(i);
-        vy_1234(i)   = y * y;
-        veyl_1234(i) = 2 * y * Eff_TP_Single_1234.GetErrorYlow(i);
-        veyh_1234(i) = 2 * y * Eff_TP_Single_1234.GetErrorYhigh(i);
+        if(selections=="VPJ")vy_1234(i)   = y * y;
+        if(selections=="VBTF")vy_1234(i)   = y * y1;
+        if(selections=="VPJ")veyl_1234(i) = 2 * y * Eff_TP_Single_1234.GetErrorYlow(i);
+        if(selections=="VBTF")veyl_1234(i) = y1 * Eff_TP_Single_1234.GetErrorYlow(i) + y * Eff_TP_Single1_1234.GetErrorYlow(i);
+        if(selections=="VPJ")veyh_1234(i) = 2 * y * Eff_TP_Single_1234.GetErrorYhigh(i);
+        if(selections=="VBTF")veyl_1234(i) = y1 * Eff_TP_Single_1234.GetErrorYhigh(i) + y * Eff_TP_Single1_1234.GetErrorYhigh(i);
         } 
         
         int n_12345 = Eff_TP_Single_12345.GetN();
@@ -910,14 +1006,18 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         TVectorD veyl_12345(n_12345);
         TVectorD veyh_12345(n_12345);
         for ( int i = 0; i < n_12345; ++i ){
-        double x = 0., y = 0.;
+        double x = 0., y = 0., x1=0., y1=0.;
         Eff_TP_Single_12345.GetPoint(i, x, y);
+        if(selections=="VBTF")Eff_TP_Single1_12345.GetPoint(i, x1, y1);
         vx_12345(i)   = x;
         vexl_12345(i) = Eff_TP_Single_12345.GetErrorXlow(i);
         vexh_12345(i) = Eff_TP_Single_12345.GetErrorXhigh(i);
-        vy_12345(i)   = y * y;
-        veyl_12345(i) = 2 * y * Eff_TP_Single_12345.GetErrorYlow(i);
-        veyh_12345(i) = 2 * y * Eff_TP_Single_12345.GetErrorYhigh(i);
+        if(selections=="VPJ")vy_12345(i)   = y * y;
+        if(selections=="VBTF")vy_12345(i)   = y * y1;
+        if(selections=="VPJ")veyl_12345(i) = 2 * y * Eff_TP_Single_12345.GetErrorYlow(i);
+        if(selections=="VBTF")veyl_12345(i) = y1 * Eff_TP_Single_12345.GetErrorYlow(i) + y * Eff_TP_Single1_12345.GetErrorYlow(i);
+        if(selections=="VPJ")veyh_12345(i) = 2 * y * Eff_TP_Single_12345.GetErrorYhigh(i);
+        if(selections=="VBTF")veyl_12345(i) = y1 * Eff_TP_Single_12345.GetErrorYhigh(i) + y * Eff_TP_Single1_12345.GetErrorYhigh(i);
         }
         
         int n_123456 = Eff_TP_Single_123456.GetN();
@@ -928,14 +1028,18 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         TVectorD veyl_123456(n_123456);
         TVectorD veyh_123456(n_123456);
         for ( int i = 0; i < n_123456; ++i ){
-        double x = 0., y = 0.;
+        double x = 0., y = 0., x1=0., y1=0.;
         Eff_TP_Single_123456.GetPoint(i, x, y);
+        if(selections=="VBTF")Eff_TP_Single1_123456.GetPoint(i, x1, y1);
         vx_123456(i)   = x;
         vexl_123456(i) = Eff_TP_Single_123456.GetErrorXlow(i);
         vexh_123456(i) = Eff_TP_Single_123456.GetErrorXhigh(i);
-        vy_123456(i)   = y * y;
-        veyl_123456(i) = 2 * y * Eff_TP_Single_123456.GetErrorYlow(i);
-        veyh_123456(i) = 2 * y * Eff_TP_Single_123456.GetErrorYhigh(i);
+        if(selections=="VPJ")vy_123456(i)   = y * y;
+        if(selections=="VBTF")vy_123456(i)   = y * y1;
+        if(selections=="VPJ")veyl_123456(i) = 2 * y * Eff_TP_Single_123456.GetErrorYlow(i);
+        if(selections=="VBTF")veyl_123456(i) = y1 * Eff_TP_Single_123456.GetErrorYlow(i) + y * Eff_TP_Single1_123456.GetErrorYlow(i);
+        if(selections=="VPJ")veyh_123456(i) = 2 * y * Eff_TP_Single_123456.GetErrorYhigh(i);
+        if(selections=="VBTF")veyl_123456(i) = y1 * Eff_TP_Single_123456.GetErrorYhigh(i) + y * Eff_TP_Single1_123456.GetErrorYhigh(i);
         } 
         
         TGraphAsymmErrors Eff_TP_Double_12(vx_12, vy_12, vexl_12, vexh_12, veyl_12, veyh_12);

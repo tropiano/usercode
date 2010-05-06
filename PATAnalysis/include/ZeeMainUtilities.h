@@ -23,7 +23,7 @@ TDSet* getDS(const char* filename){
   return out; 
 }
 
-void makeCfg(string sample, bool GEN, bool RECO, bool EFF, bool NTUPLE, int Acc, int Trg, int Qual, int Imp, int Iso, int EiD, const char* path, const char *cfgName, const char* sourceList, const char *outFile, const char* Norm, const char* Sumw2, int EventsPerFile, const char* electronID, double xsec, double targetLumi, const char* GenParticleMatch){
+void makeCfg(string sample, string selections, bool GEN, bool RECO, bool EFF, bool NTUPLE, int Acc, int Trg, int Qual, int Imp, int Iso, int EiD, const char* path, const char *cfgName, const char* sourceList, const char *outFile, const char* Norm, const char* Sumw2, int EventsPerFile, const char* electronID, double xsec, double targetLumi, const char* GenParticleMatch){
 
 //cfg
 string cfgPath = path;
@@ -56,8 +56,8 @@ if(GEN){
 cfg<<"process.zeegen = cms.PSet ("<<std::endl;
 cfg<<"type        = cms.string(\"GenElectron\"),"<<std::endl;
 cfg<<"Name        = cms.string(\"GenElectron\"),"<<std::endl;
-cfg<<"ReportName        = cms.string(\""<<RepName.c_str()<<"\"),"<<std::endl;
 cfg<<"sourceFileList = cms.string(\""<<Source.c_str()<<"\"),"<<std::endl;
+cfg<<"Selections = cms.string(\""<<selections.c_str()<<"\"),"<<std::endl;
 cfg<<"CrossSection = cms.double("<<xsec<<"),"<<std::endl;
 cfg<<"targetLumi  = cms.double("<<targetLumi<<"),"<<std::endl;
 cfg<<"Norm        = cms.bool("<<Norm<<"),"<<std::endl;
@@ -71,7 +71,9 @@ cfg<<"process.zeerec = cms.PSet ("<<std::endl;
 cfg<<"type        = cms.string(\"RecoElectron\"),"<<std::endl;
 cfg<<"Name        = cms.string(\"RecoElectron\"),"<<std::endl;
 cfg<<"sourceFileList = cms.string(\""<<Source.c_str()<<"\"),"<<std::endl;
+cfg<<"Selections = cms.string(\""<<selections.c_str()<<"\"),"<<std::endl;
 cfg<<"electronID = cms.string(\""<<electronID<<"\"),"<<std::endl;
+cfg<<"ReportName        = cms.string(\""<<RepName.c_str()<<"\"),"<<std::endl;
 cfg<<"Acc = cms.int32("<<Acc<<"),"<<std::endl;
 cfg<<"Trg = cms.int32("<<Trg<<"),"<<std::endl;
 cfg<<"Qual = cms.int32("<<Qual<<"),"<<std::endl;
@@ -92,6 +94,7 @@ cfg<<"process.zeeeff = cms.PSet ("<<std::endl;
 cfg<<"type        = cms.string(\"EfficiencyElectron\"),"<<std::endl;
 cfg<<"Name        = cms.string(\"EfficiencyElectron\"),"<<std::endl;
 cfg<<"sourceFileList = cms.string(\""<<Source.c_str()<<"\"),"<<std::endl;
+cfg<<"Selections = cms.string(\""<<selections.c_str()<<"\"),"<<std::endl;
 cfg<<"Sample = cms.string(\""<<sample.c_str()<<"\"),"<<std::endl;
 cfg<<"electronID = cms.string(\""<<electronID<<"\"),"<<std::endl;
 cfg<<"CrossSection = cms.double("<<xsec<<"),"<<std::endl;
@@ -112,6 +115,7 @@ cfg<<"process.zeentuple = cms.PSet ("<<std::endl;
 cfg<<"type        = cms.string(\"RecoElectronNtuple\"),"<<std::endl;
 cfg<<"Name        = cms.string(\"RecoElectronNtuple\"),"<<std::endl;
 cfg<<"sourceFileList = cms.string(\""<<Source.c_str()<<"\"),"<<std::endl;
+cfg<<"Selections = cms.string(\""<<selections.c_str()<<"\"),"<<std::endl;
 cfg<<"Sample = cms.string(\""<<sample.c_str()<<"\"),"<<std::endl;
 cfg<<"electronID = cms.string(\""<<electronID<<"\"),"<<std::endl;
 cfg<<"Acc = cms.int32("<<Acc<<"),"<<std::endl;
