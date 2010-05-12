@@ -683,10 +683,9 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    
    if (RecSelected("_Acc", _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)){
    
-   const reco::GsfTrackRef track0ref = recdau0->gsfTrack();   const reco::GsfTrackRef track1ref = recdau1->gsfTrack();   assert(track0ref.isNonnull() && track1ref.isNonnull());
-   
-   const reco::GsfTrack track0 = *(recdau0->gsfTrack());
-   const reco::GsfTrack track1 = *(recdau1->gsfTrack());
+      const reco::GsfTrackRef& track0 = recdau0->gsfTrack();
+      const reco::GsfTrackRef& track1 = recdau1->gsfTrack();
+      assert(track0.isNonnull() && track1.isNonnull());
 
       // fill variables for ntuple
       
@@ -702,8 +701,8 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
       elehcaliso1=recdau0->hcalIso();
       eleecaliso1=recdau0->ecalIso();
       eletrackiso1=recdau0->trackIso();
-      elenhits1=track0.numberOfValidHits();
-      elechisq1=track0.normalizedChi2();
+      elenhits1=track0->numberOfValidHits();
+      elechisq1=track0->normalizedChi2();
       eledB1=recdau0->dB();
       elefbrem1=recdau0->fbrem();
       eledeltaeta1=recdau0->deltaEtaSuperClusterTrackAtVtx();
@@ -731,8 +730,8 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
       eleecaliso2=recdau1->ecalIso();
       eletrackiso2=recdau1->trackIso();
       eledB2=recdau1->dB();
-      elenhits2=track1.numberOfValidHits();
-      elechisq2=track1.normalizedChi2();
+      elenhits2=track1->numberOfValidHits();
+      elechisq2=track1->normalizedChi2();
       elefbrem2=recdau1->fbrem();
       eledeltaeta2=recdau1->deltaEtaSuperClusterTrackAtVtx();
       eledeltaphi2=recdau1->deltaPhiSuperClusterTrackAtVtx();

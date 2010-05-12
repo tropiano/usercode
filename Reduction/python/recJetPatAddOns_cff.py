@@ -14,9 +14,9 @@ selectedPFJets = PhysicsTools.PatAlgos.selectionLayer1.jetSelector_cfi.selectedP
 selectedPFJets.src = cms.InputTag('allLayer1PFJets')
 selectedPFJets.cut = cms.string('pt > 20. & abs(eta) < 10.')
 
-recPFjetsSequence = cms.Sequence(allLayer1PFJetsSequence * selectedPFJets)
+recPFjetsSequence = cms.Sequence(allLayer1PFJetsSequence)
 
-recjetsSequence = cms.Sequence(selectedJets + recPFjetsSequence)
+recjetsSequence = cms.Sequence(selectedPFJets + selectedJets)
 
 
 jetrecEventContent = [

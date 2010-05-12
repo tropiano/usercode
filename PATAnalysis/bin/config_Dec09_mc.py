@@ -1,5 +1,5 @@
 import FWCore.ParameterSet.Config as cms
-from Firenze.PATAnalysis.config_Dec09 import *
+from Firenze.PATAnalysis.config_Dec09_MC import *
 
 #process.load(config_background)
 

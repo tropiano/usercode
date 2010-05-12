@@ -34,7 +34,7 @@ recPtZ(0), recEtaZ(0), recMulti(0), recMassZ(0), recTrackIsoLead(0), recEcalIsoL
 recTrackIsoSec(0), recEcalIsoSec(0), recHcalIsoSec(0), recRelIsoSec(0),
 recLeadMuPt(0), recSecMuPt(0), recLeadMuEta(0), recSecMuEta(0),
 recLeadJetPt(0), recLeadJetEta(0), 
-_ptjetmin(30.), _etajetmax(3.), _isocut(0.3), _norm(1.),
+_ptjetmin(30.), _etajetmax(3.), _isocut(0.15), _norm(1.),
 _file(0), _dir(0), _histoVector()
 //_bayesUnfold("bayesUnfoldedMulti", "Bayes unfolded Jet Multiplicity")
 //_efficiency(out, "EfficienciesTotalVsRecMulti", 10, -0.5, 9.5, 0.3, false),
@@ -42,32 +42,6 @@ _file(0), _dir(0), _histoVector()
 
 void RecoMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
    _file = out; 
-   /*TIter next(fInput);
-   bool factorSet = false;  
-   while (TObject* obj = next()){
-    const TParameter<double>* parDouble = dynamic_cast<const TParameter<double>* >(obj);
-    if (parDouble){
-      if (!strcmp(parDouble->GetName(), "MinPtJet")){
-        _ptjetmin = parDouble->GetVal();
-        cout << "set minimum pt for jets to: " << _ptjetmin << endl;
-      } else if (!strcmp(parDouble->GetName(), "IsoCut")){
-        _isocut = parDouble->GetVal();
-        cout << "set isolation cut to: " << _isocut << endl;
-      } else if (!strcmp(parDouble->GetName(), "MaxEtaJet")) {
-        _etajetmax = parDouble->GetVal();
-        cout << "set maximim eta for jets to: " << _etajetmax << endl;
-      } else if (!strcmp(parDouble->GetName(), "ScaleFactor")) {
-        _norm = parDouble->GetVal();
-        cout << "set scale factor to: " << _norm << endl;
-        factorSet = true;
-      }
-    }
-   }  
-
-   if (!factorSet) {
-     cout << "You did not set the scale factor! " << endl;
-     assert(factorSet);
-   }*/
    std::string dirname = iConfig.getParameter<std::string>("Name");
 
    _ptjetmin  = iConfig.getParameter<double>("MinPtJet");
@@ -95,7 +69,7 @@ void RecoMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
    _histoVector.push_back(recEcalIsoLead);
    recHcalIsoLead  = new TH1D("recHcalIsoLead", "Lead HCAL Isolation SumPt", 30, 0, 30);
    _histoVector.push_back(recHcalIsoLead);
-   recRelIsoLead   = new TH1D("recRelIsoLead", "Lead Comb Relative Isolation", 30, 0, 30);
+   recRelIsoLead   = new TH1D("recRelIsoLead", "Lead Comb Relative Isolation", 30, 0, 3);
    _histoVector.push_back(recRelIsoLead);
    recTrackIsoSec = new TH1D("recTrackIsoSec", "Sec Track Isolation SumPt", 30, 0, 30);
    _histoVector.push_back(recTrackIsoSec);
@@ -103,7 +77,7 @@ void RecoMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
    _histoVector.push_back(recEcalIsoSec);
    recHcalIsoSec  = new TH1D("recHcalIsoSec", "Sec HCAL Isolation SumPt", 30, 0, 30); 
    _histoVector.push_back(recHcalIsoSec);
-   recRelIsoSec   = new TH1D("recRelIsoSec", "Sec Comb Relative Isolation", 30, 0, 30);
+   recRelIsoSec   = new TH1D("recRelIsoSec", "Sec Comb Relative Isolation", 30, 0, 3);
    _histoVector.push_back(recRelIsoSec);
    recLeadMuPt = new TH1D("recLeadMuPt", "Reconstructed Leading #mu p_{T}", 200, 0, 200);
    _histoVector.push_back(recLeadMuPt);
@@ -117,11 +91,6 @@ void RecoMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
    _histoVector.push_back(recLeadJetPt);
    recLeadJetEta = new TH1D("recLeadJetEta", "Reconstructed Leading Jet #eta", 100, -5, 5); 
    _histoVector.push_back(recLeadJetEta);
-  /* std::vector<TH1D*>::const_iterator ibeg = _histoVector.begin(); 
-   std::vector<TH1D*>::const_iterator iend = _histoVector.end(); 
-  for (std::vector<TH1D*>::const_iterator i = ibeg; i != iend; ++i){
-    (*i)->Sumw2();
-  }*/
   _dir->cd("-");
    
   cout << "RecoMuon Worker built." << endl;   
@@ -166,27 +135,10 @@ void  RecoMuon::process(const fwlite::Event& iEvent)
     //take the two muons with all the needed castings
     dau0 = dynamic_cast<const pat::Muon*>((*zHandle)[0].daughter(0));
     dau1 = dynamic_cast<const pat::Muon*>((*zHandle)[0].daughter(1));
-    /*if (!dau0) {
-     //maybe a shallow clone
-     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> ((*zHandle)[0].daughter(0));
-     if (scc && scc->hasMasterClone()){
-       dau0 = dynamic_cast<const pat::Muon*>(scc->masterClone().get());
-     }
-    }
-    if (!dau1) {
-     //maybe a shallow clone
-     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> ((*zHandle)[0].daughter(1));
-     if (scc && scc->hasMasterClone()){
-       dau1 = dynamic_cast<const pat::Muon*>(scc->masterClone().get());
-     }
-    }
-    assert(dau0 && dau1);*/
-   } 
+  }
 
-
-
-   //if (RecSelected(zHandle, zHandleDauMuon, _isocut)){
-   if (RecSelectedWithTrigger(*zHandle, *triggerHandle, _isocut, dau0, dau1)){
+   if (RecSelectedMuonWithTrigger(*zHandle, *triggerHandle, _isocut, dau0, dau1)){
+   //if (RecSelectedMuon(*zHandle, _isocut, dau0, dau1)){
       //cout << "PASSED!" << endl;
       recPtZ->Fill((*zHandle)[0].pt(), _norm);
       recEtaZ->Fill((*zHandle)[0].eta(), _norm);

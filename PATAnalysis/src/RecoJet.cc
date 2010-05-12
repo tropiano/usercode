@@ -73,8 +73,8 @@ void  RecoJet::process(const fwlite::Event& iEvent)
    fwlite::Handle<std::vector<pat::Jet> > jetHandle;
    jetHandle.getByLabel(iEvent, "selectedJets");
 
-   fwlite::Handle<std::vector<pat::MET> > metHandle;
-   metHandle.getByLabel(iEvent, "layer1METs");
+   //fwlite::Handle<std::vector<pat::MET> > metHandle;
+   //metHandle.getByLabel(iEvent, "layer1METs");
 
    fwlite::Handle<std::vector<reco::Vertex> > vertexHandle;
    vertexHandle.getByLabel(iEvent, "offlinePrimaryVertices");
@@ -82,15 +82,6 @@ void  RecoJet::process(const fwlite::Event& iEvent)
    fwlite::Handle<std::vector<reco::Track> > trackHandle;
    trackHandle.getByLabel(iEvent, "generalTracks");
 
-   bool validVertex = vertexHandle->size() && 
-                      vertexHandle->front().isValid() && 
-                      vertexHandle->front().tracksSize() > 1; 
-   
-   //we select events with at least one valid vertex and less than 100 tracks  
-   if (!validVertex || trackHandle->size() > 100 ) return;
-   //if (!validVertex ) return;
-
-  
    std::vector<pat::Jet>::const_iterator ijet;
    std::vector<pat::Jet>::const_iterator jetbeg = jetHandle->begin();
    std::vector<pat::Jet>::const_iterator jetend = jetHandle->end();
@@ -106,10 +97,10 @@ void  RecoJet::process(const fwlite::Event& iEvent)
    }
    _nJet->Fill(countJet);
 
-   _sumEt->Fill(metHandle->front().sumEt());
-   _metPx->Fill(metHandle->front().px());
-   _metPy->Fill(metHandle->front().py());
-   _met  ->Fill(metHandle->front().et());
+   //_sumEt->Fill(metHandle->front().sumEt());
+   //_metPx->Fill(metHandle->front().px());
+   //_metPy->Fill(metHandle->front().py());
+   //_met  ->Fill(metHandle->front().et());
 
 }
 

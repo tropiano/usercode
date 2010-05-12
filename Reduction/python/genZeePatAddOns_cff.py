@@ -5,12 +5,14 @@ import FWCore.ParameterSet.Config as cms
 genEMinusStatus3 = cms.EDFilter('Status3MotherCombiner',
   src = cms.InputTag('genParticles'),
   motherId = cms.int32(11),
+  requestedStaus3Daughters = cms.vint32(),
   motherCharge = cms.int32(-1)
 )
 
 genEPlusStatus3 = cms.EDFilter('Status3MotherCombiner',
   src = cms.InputTag('genParticles'),
   motherId = cms.int32(-11),
+  requestedStaus3Daughters = cms.vint32(),
   motherCharge = cms.int32(1)
 )
 

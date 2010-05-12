@@ -25,6 +25,28 @@
  <lib name=Proof>
 </bin>
 
+<bin name=rapgaps.exe file=rapgaps.cc>
+ <use name=rootphysics>
+ <use name=FWCore/FWLite>
+ <use name=FWCore/Framework>
+ <use name=DataFormats/FWLite>
+ <use name=DataFormats/PatCandidates>
+ <use name=PhysicsTools/FWLite>
+ <use name=Firenze/PATAnalysis>
+ <lib name=Proof>
+</bin>
+
+<bin name=testproof.exe file=testproof.cc>
+ <use name=rootphysics>
+ <use name=FWCore/FWLite>
+ <use name=FWCore/Framework>
+ <use name=DataFormats/FWLite>
+ <use name=DataFormats/PatCandidates>
+ <use name=PhysicsTools/FWLite>
+ <use name=Firenze/PATAnalysis>
+ <lib name=Proof>
+</bin>
+
 <bin name=zeetpana.exe file=zeetpana.cc>
  <use name=rootphysics>
  <use name=FWCore/FWLite>
@@ -35,5 +57,7 @@
  <use name=Firenze/PATAnalysis>
  <lib name=Proof>
 </bin>
+
+
 
 </environment>

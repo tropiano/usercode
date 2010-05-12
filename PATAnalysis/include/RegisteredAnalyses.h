@@ -11,6 +11,9 @@
 #include "RecoElectronNtuple.h"
 #include "EfficiencyElectron.h"
 #include "EfficiencyMuon.h"
+#include "RecoRapidityGaps.h"
+#include "GenRapidityGaps.h"
+#include "TestAnalysis.h"
 #include <map>
 
 typedef MyPatAnalysis* (*anabuilder_fn)();
@@ -28,6 +31,9 @@ inline AnalysisBuilders getAnalysisBuilders(){
   symbols["RecoJet"] = RecoJet::create;
   symbols["EfficiencyElectron"] = EfficiencyElectron::create;
   symbols["EfficiencyMuon"] = EfficiencyMuon::create;
+  symbols["RecoRapidityGaps"] = RecoRapidityGaps::create;
+  symbols["GenRapidityGaps"] = GenRapidityGaps::create;
+  symbols["TestAnalysis"] = TestAnalysis::create;
 
   return symbols;
 }  

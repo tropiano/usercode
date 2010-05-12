@@ -1,6 +1,8 @@
 #include "Firenze/PATAnalysis/include/EfficiencyAnalyzerMuon.h"
 #include "Firenze/PATAnalysis/include/TagAndProbeAnalyzer.h"
 #include <iostream>
+#include <fstream>
+
 
 #include "TH1D.h"
 #include "TGraphAsymmErrors.h"
@@ -13,7 +15,7 @@ EfficiencyAnalyzerMuon::EfficiencyAnalyzerMuon(TFile* input, TFile* output, TFil
 }
 
 
-void EfficiencyAnalyzerMuon::analyze(){
+void EfficiencyAnalyzerMuon::analyze(std::string summaryfile){
   if (!_dir) {
     std::cout << "Error in EfficiencyAnalyzerMuon, dir not found in file" << std::endl;
     return;
@@ -29,9 +31,29 @@ void EfficiencyAnalyzerMuon::analyze(){
   TH1D *TM_MuT_OC_M_QualityCuts = (TH1D *) _dir->Get("TM_MuT_OC_M_QualityCuts");
   TH1D *TM_MuT_OC_M_QC_DXY  = (TH1D *) _dir->Get("TM_MuT_OC_M_QC_DXY");
   TH1D *TM_MuT_OC_M_QC_DXY_Iso = (TH1D *) _dir->Get("TM_MuT_OC_M_QC_DXY_Iso"); 
+
+
+  //print summary info
+  if (!summaryfile.empty()){
+    std::fstream stream(summaryfile.c_str(), fstream::out);
+    stream << "\\documentclass[12pt]{article}\n\\begin{document}\n\\begin{tabular}{c|c|c|c|c|}" << endl;
+    stream << "& 0 jets & 1 jets & 2 jets & 3 jets \\\\ \n \\hline" << endl; 
+    stream << " Two Muons & " << TwoMuons->Integral() << " & " << TwoMuons->Integral(2, 10) << " & " << TwoMuons->Integral(3, 10) << " & " << TwoMuons->Integral(4, 10) << "\\\\" << endl;
+    stream << " Triggered & " << TM_MuTriggered->Integral() << " & " << TM_MuTriggered->Integral(2, 10) << " & " << TM_MuTriggered->Integral(3, 10) << " & " << TM_MuTriggered->Integral(4, 10) << "\\\\" << endl;
+    stream << " Opposite Charge & " << TM_MuT_OppositeCharge->Integral() << " & " << TM_MuT_OppositeCharge->Integral(2, 10) << " & " << TM_MuT_OppositeCharge->Integral(3, 10) << " & " << TM_MuT_OppositeCharge->Integral(4, 10) << "\\\\" << endl;
+    stream << " Mass  & " << TM_MuT_OC_Mass->Integral() << " & " << TM_MuT_OC_Mass->Integral(2, 10) << " & " << TM_MuT_OC_Mass->Integral(3, 10) << " & " << TM_MuT_OC_Mass->Integral(4, 10) << "\\\\" << endl;
+    stream << " Quality cuts & " << TM_MuT_OC_M_QualityCuts->Integral() << " & " << TM_MuT_OC_M_QualityCuts->Integral(2, 10) << " & " << TM_MuT_OC_M_QualityCuts->Integral(3, 10) << " & " << TM_MuT_OC_M_QualityCuts->Integral(4, 10) << "\\\\" << endl;
+    stream << " Impact Parameter & " << TM_MuT_OC_M_QC_DXY->Integral() << " & " << TM_MuT_OC_M_QC_DXY->Integral(2, 10) << " & " << TM_MuT_OC_M_QC_DXY->Integral(3, 10) << " & " << TM_MuT_OC_M_QC_DXY->Integral(4, 10) << "\\\\" << endl;
+    stream << " Isolation & " << TM_MuT_OC_M_QC_DXY_Iso->Integral() << " & " << TM_MuT_OC_M_QC_DXY_Iso->Integral(2, 10) << " & " << TM_MuT_OC_M_QC_DXY_Iso->Integral(3, 10) << " & " << TM_MuT_OC_M_QC_DXY_Iso->Integral(4, 10) << "\\\\" << endl;
+    stream << "\\end{tabular}\n\\end{document}" << endl; 
+    
+    stream.close(); 
+  }
  
   TH1D *generalefficiency_numerator = (TH1D *) _dir->Get("efficiency_numerator"); 
   TH1D *generalefficiency_denominator = (TH1D *) _dir->Get("efficiency_denominator");
+
+  if (!_output) return;
 
   _output->cd();
   TGraphAsymmErrors acceptance(acc_num, acc_den);

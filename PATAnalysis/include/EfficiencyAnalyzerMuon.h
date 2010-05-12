@@ -11,7 +11,7 @@ class EfficiencyAnalyzerMuon {
     
     ~EfficiencyAnalyzerMuon(){};
 
-    void analyze();
+    void analyze(std::string="");
 
   private:
     TDirectory* _dir;

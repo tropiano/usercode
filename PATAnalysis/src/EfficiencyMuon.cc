@@ -7,6 +7,8 @@
 #include "DataFormats/Candidate/interface/CompositeCandidate.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 
+#include "CommonTools/Utils/interface/PtComparator.h"
+
 #include <iostream>
 
 #include "TParameter.h"
@@ -218,7 +220,7 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
 
    if (!denominatorCondition) return;
 
-   bool recselected = /*zHandle->size()==1 &&*/ RecSelectedWithTrigger(*zHandle, *triggerHandle, _isocut);
+   bool recselected = /*zHandle->size()==1 &&*/ RecSelectedMuonWithTrigger(*zHandle, *triggerHandle, _isocut);
 
    ///unfolding training
    if (_trainUnfolding){
@@ -245,7 +247,7 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
    const pat::Muon* dau0 = 0;
    const pat::Muon* dau1 = 0;
    //FEXME!!!!!!!!!!! we need to select the Z candidate
-   if (zHandle->size() == 1){
+   if (zHandle->size() > 0){
     //take the two muons with all the needed castings
     dau0 = dynamic_cast<const pat::Muon*>((*zHandle)[0].daughter(0));
     dau1 = dynamic_cast<const pat::Muon*>((*zHandle)[0].daughter(1));
@@ -267,7 +269,9 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
     muonsfromZ.push_back(dau0);
     muonsfromZ.push_back(dau1);
    }
-   
+  
+   std::sort(muonsfromZ.begin(), muonsfromZ.end(), sortByPt<pat::Muon>); 
+  
    bool isMuTriggered  = isMuonTriggered(*triggerHandle);
    bool isJTriggered = isJetTriggered(*triggerHandle);
 
@@ -276,10 +280,11 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
    //bool recselectedTM_MuT_OppositeCharge = RecSelected_OppositeCharge(allmuons).first && recselectedTM_MuTriggered;
    bool recselectedTM_MuT_Charge = _oppositeCharge ? RecSelected_Charge(allmuons, -1).first && recselectedTM_MuTriggered : 
                                                      RecSelected_Charge(allmuons,  1).first && recselectedTM_MuTriggered;
-   bool recselectedTM_MuT_OC_Mass = zHandle->size()==1 && RecSelected_Mass(*zHandle) && RecSelected_GlobalMuons(muonsfromZ, 2).first && isMuTriggered; //&& RecSelected_OppositeCharge(muonsfromZ).first; these should already have the desired charge assignment
+   bool recselectedTM_MuT_OC_Mass = zHandle->size()>0 && RecSelected_MuonMass(*zHandle) && RecSelected_GlobalMuons(muonsfromZ, 2).first && isMuTriggered; //&& RecSelected_OppositeCharge(muonsfromZ).first; these should already have the desired charge assignment
    bool recselectedTM_MuT_OC_M_QualityCuts = RecSelected_QualityCuts(muonsfromZ, 2).first && recselectedTM_MuT_OC_Mass;
    bool recselectedTM_MuT_OC_M_QC_DXY = RecSelected_DXY(muonsfromZ, 2).first && recselectedTM_MuT_OC_M_QualityCuts;
-   bool recselectedTM_MuT_OC_M_QC_DXY_Iso = RecSelected_Isolation(muonsfromZ, _isocut, 2).first && recselectedTM_MuT_OC_M_QC_DXY;
+   bool recselectedTM_MuT_OC_M_QC_DXY_Iso = (muonsfromZ.size() > 0) ? singleMu_Isolation(*muonsfromZ.front()) && recselectedTM_MuT_OC_M_QC_DXY : false;
+                                            //RecSelected_Isolation(muonsfromZ, _isocut, 1).first && recselectedTM_MuT_OC_M_QC_DXY;
 
    bool recselectedTM_MuJetTriggered = recselectedTwoMuons && isMuTriggered && isJTriggered;
    bool recselectedTM_JetTriggered = recselectedTwoMuons && isJTriggered;
@@ -335,7 +340,7 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
       TM_MuJetTriggeredVsMuPt->Fill(allmuons.front()->pt(), w);
       TM_MuJetTriggeredVsMuEta->Fill(allmuons.front()->eta(), w);
    }   
-
+/*
    //tag and probe 
    if (recselectedTM_MuT_OC_Mass) {
       //FIXME!!!!!!!!!!! we need to select the Z candidate
@@ -345,7 +350,7 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
         _tp_TM_MuT_OC_M_QC_DXY_Iso->fill((*zHandle)[0], recosize, w);
       }  
    } 
-
+*/
    //_initiated= false;
 
 }

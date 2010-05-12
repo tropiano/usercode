@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 process=cms.Process("test")
 
 process.outputFile = cms.PSet(
-  name = cms.string("background.root")
+  name = cms.string("zmumu.root")
 )  
 
 process.zmumurec = cms.PSet (
@@ -22,8 +22,8 @@ process.zmumueff = cms.PSet (
   MinPtJet    = cms.double(30.),
   MaxEtaJet   = cms.double(3.),
   ScaleFactor = cms.double(1.),
-  VsGenMulti  = cms.bool(False),
   RequireGenInAcceptance = cms.bool(False),
+  VsGenMulti  = cms.bool(False),
   TrainUnfolding = cms.bool(False),
   NBin        = cms.uint32(10),
   XMin        = cms.double(-0.5),

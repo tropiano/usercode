@@ -32,12 +32,8 @@ TDSet* getDS(const char* filename){
 
 
 int main(){
-  gEnv->SetValue("Proof.Sandbox", "/data/lenzip/RapGap/CMSSW_3_5_6/src/Firenze/PATAnalysis/bin/proof");
-
   TProof * p = TProof::Open("");
   //p->SetParallel(4);
- 
-  double targetLumi = 100.;
   
 
   gSystem->Load("libFWCoreFWLite");
@@ -47,19 +43,13 @@ int main(){
   p->Exec( ".x /data/lenzip/RapGap/CMSSW_3_5_6/src/Firenze/PATAnalysis/bin/remote.C" );
 
   TProofLog *pl = TProof::Mgr("")->GetSessionLogs();
-  pl->Save("*","/data/lenzip/RapGap/CMSSW_3_5_6/src/Firenze/PATAnalysis/bin/Log.txt");
+  pl->Save("*","/raid/lenzip/CMSSW/test/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/Log.txt");
 
-
-  TDSet* trainingDS = getDS("data.txt");
-  TNamed* configtraining = new TNamed("ConfigFile", "/data/lenzip/RapGap/CMSSW_3_5_6/src/Firenze/PATAnalysis/bin/config_data_zmumu.py");
-  p->AddInput(configtraining);
-  p->Process(trainingDS, "FWLiteTSelector");
-  delete trainingDS;
+  TDSet* dsmc = getDS("testproof.txt") ;
+  TNamed* configmc = new TNamed("ConfigFile", "/data/lenzip/RapGap/CMSSW_3_5_6/src/Firenze/PATAnalysis/bin/testproof.py");
+  p->AddInput(configmc);
+  p->Process(dsmc, "FWLiteTSelector");
+  p->ClearInput();
+  delete dsmc;
   p->Close();
-
-  TFile in("zmumu.root");
-  EfficiencyAnalyzerMuon yield_ana(&in, 0, 0, "EfficiencyMuonVSRecoMulti");
-  yield_ana.analyze("yield.tex");
-
-
 }
