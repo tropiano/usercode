@@ -681,7 +681,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
 
    // loose cuts, only acceptance cuts
    
-   if (RecSelected("_Acc", _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)){
+   if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)){
    
       const reco::GsfTrackRef& track0 = recdau0->gsfTrack();
       const reco::GsfTrackRef& track1 = recdau1->gsfTrack();
