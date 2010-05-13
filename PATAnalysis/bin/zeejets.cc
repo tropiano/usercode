@@ -21,31 +21,34 @@ int main() {
 
   //Job
   string cfgName = "config.py";
-  string sourceList = "Summer09_test.txt";
-  string outputName = "Summer09_test_VBTF";
+  string sourceList = "QCD_Pt80to170.txt";
+  string outputName = "TagProbe_QCD_Pt80to170_Norm50_VPJ";
   string electronID = "eidRobustLoose";
   
   //Sample: mc = MonteCarlo , data = Data
   string sample = "mc";
   
   //Selections: "VPJ" = V+jets selections (old); "VBTF" = Vector Boson Task Force (new)
-  string selections = "VBTF";
+  string selections = "VPJ";
   
   //Normalization - If Norm = "False" and EventsPerFile = 0 -> Normalization is not applied
-  double xsec = 1300.;
+  double xsec = 906000*0.148;
   double targetLumi = 50.;
-  string Norm = "True";
-  int EventsPerFile = 0;
+  string Norm = "False";
+  int EventsPerFile = 50000;
   string Sumw2= "True";
   
+  //Number of events to be processed
+  int events = -1;
+  
   //Gen Particle Matching
-  string GenParticleMatch = "True";
+  string GenParticleMatch = "False";
   
   //Modules
   bool GEN = true;
   bool RECO = true;
   bool EFF = true;
-  bool NTUPLE = true;
+  bool NTUPLE = false;
   
   //Cuts
   int Acc = 1;
@@ -89,7 +92,7 @@ int main() {
   
   TNamed* configsignal = new TNamed("ConfigFile", cfgPath.c_str());
   p->AddInput(configsignal);
-  p->Process(SignalDS, "FWLiteTSelector");
+  p->Process(SignalDS, "FWLiteTSelector","",events);
   
   if(Log){ 
   TProofLog *pl = TProof::Mgr("")->GetSessionLogs();

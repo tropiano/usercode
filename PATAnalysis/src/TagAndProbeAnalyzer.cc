@@ -86,8 +86,12 @@ void TagAndProbeAnalyzer::analyze(unsigned int nbins, std::string option )
    TGraphAsymmErrors singleEfficiency, singleEfficiency1;
   
    for (unsigned int i = 0; i < nbins; ++i){
+   
       stringstream name_tp;
-      name_tp << _name << "TagProbe" << i << "bin";
+      name_tp << _name << "TagProbe" << i << "bin_0";
+      stringstream name_tp1;
+      name_tp1 << _name << "TagProbe" << i << "bin_1";
+      
       stringstream name_tpp;
       name_tpp << _name << "TagPassProbe" << i << "bin";
      
@@ -105,7 +109,7 @@ void TagAndProbeAnalyzer::analyze(unsigned int nbins, std::string option )
     
         std::pair<RooFitResult*, RooRealVar*>  tp_fit, tp_fit1;
         tp_fit  = fit(tagprobe, name_tp.str().c_str(), option);
-        if(_sec_input)tp_fit1  = fit(tagprobe1, name_tp.str().c_str(), option);
+        if(_sec_input)tp_fit1  = fit(tagprobe1, name_tp1.str().c_str(), option);
         
         if(tp_fit.first && tp_fit.first->status() == 0 ){
           cout << "Using backgound correctedvalues for " << _name << " in bin " << i << endl;  
@@ -170,8 +174,12 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
   nllname << "nll_" << name;
 
   //if we have training retrieve results
-  RooFitResult* training_results_signal     = (_training_signal)     ? (RooFitResult*) _training_signal    ->Get(  (dirname + "/" + nllname.str()).c_str()  ) : 0;
-  RooFitResult* training_results_background = (_training_background) ? (RooFitResult*) _training_background->Get(  (dirname + "/" + nllname.str()).c_str()  ) : 0;
+  /*RooFitResult* training_results_signal     = (_training_signal)     ? (RooFitResult*) _training_signal    ->Get(  (dirname + "/" + nllname.str()).c_str()  ) : 0;
+  cout<<"### TRAINING = "<<(dirname + "/" + nllname.str()).c_str()<<endl;
+  RooFitResult* training_results_background = (_training_background) ? (RooFitResult*) _training_background->Get(  (dirname + "/" + nllname.str()).c_str()  ) : 0;*/
+  
+  RooFitResult* training_results_signal = (_training_signal) ? (RooFitResult*)_training_signal->Get(nllname.str().c_str()) : 0;
+  RooFitResult* training_results_background = (_training_background) ? (RooFitResult*)_training_background->Get(nllname.str().c_str()) : 0;
 
   //_mass.setBins(20);
   //RooDataHist roobinned("bdata","Binned Data", RooArgSet(_mass, _passprobe_cat),*data);
@@ -393,6 +401,8 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
 
 
   RooFitResult* fitresult = total_fit.fitTo(*data, RooFit::Save(true), RooFit::Strategy(2), RooFit::NumCPU(8), RooFit::Extended(kTRUE), RooFit::SumW2Error(true));
+  
+  fitresult->SetName(nllname.str().c_str());
 
   fitresult->Write(); 
 
@@ -405,7 +415,7 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
   data->plotOn(mass_pass, RooFit::Cut("passprobe==passprobe::pass"), RooFit::DataError(RooAbsData::SumW2)) ;
   //roobinned.plotOn(mass_pass, RooFit::Cut("passprobe==passprobe::pass"),  RooFit::DataError(RooDataHist::SumW2)) ;
   total_fit.plotOn(mass_pass, RooFit::Slice(_passprobe_cat, "pass"), RooFit::ProjWData(_passprobe_cat,*data));
-  //signal_pass.plotOn(mass_pass);
+  //background_pass.plotOn(mass_pass);
   mass_pass->Write();
 
   RooPlot * mass_fail = _mass.frame() ;

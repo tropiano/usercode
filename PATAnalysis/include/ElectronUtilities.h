@@ -68,8 +68,6 @@ static double isojetcut = 0.5;                     //Isolation jet - Z electron
 static string ElectronTrigger = "HLT_Ele10_LW_L1R";
 static string JetTrigger = "HLT_Jet30";
 
-//electronID for VBTF
-
 //// WP70 (70%)
 
 // EB
@@ -869,7 +867,7 @@ inline bool singleEl_Probe_EiD(const reco::Candidate& cand){
   return electron_ID;
   }else{
   return false;}
-  }
+}
   
 inline bool singleEl_Probe_True(const reco::Candidate& cand){
 return true;
@@ -912,36 +910,40 @@ const pat::Electron* electron = dynamic_cast<const pat::Electron*>(&cand);
 
 inline bool singleEl_Probe_Iso_VBTF0(const reco::Candidate& cand){
 const pat::Electron* el0 = dynamic_cast<const pat::Electron*>(&cand);
-  if (!el0) {
+  if(!el0){
      const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (&cand);
      if (scc && scc->hasMasterClone()){
        el0 = dynamic_cast<const pat::Electron*>(scc->masterClone().get()); 
      }
     }
   if(el0){ 
-  if (fabs(el0->eta())<eta_el_excl_down){// WP70 EB
+  if(fabs(el0->eta())<eta_el_excl_down){// WP70 EB
   return (el0->hcalIso()< hcal_iso_70_EB && el0->ecalIso() < ecal_iso_70_EB && el0->trackIso()< track_iso_70_EB);
   }else if(fabs(el0->eta())>eta_el_excl_up){// WP70 EE
   return (el0->hcalIso()< hcal_iso_70_EE && el0->ecalIso() < ecal_iso_70_EE && el0->trackIso()< track_iso_70_EE);
   }
+  else{
+  return false;} 
   }else{
   return false;}
 }
 
 inline bool singleEl_Probe_Iso_VBTF1(const reco::Candidate& cand){
 const pat::Electron* el1 = dynamic_cast<const pat::Electron*>(&cand);
-  if (!el1) {
+  if(!el1){
      const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (&cand);
      if (scc && scc->hasMasterClone()){
        el1 = dynamic_cast<const pat::Electron*>(scc->masterClone().get()); 
      }
     }
-  if(el1){ 
+  if (el1){ 
   if (fabs(el1->eta())<eta_el_excl_down){// WP95 EB
   return (el1->hcalIso()< hcal_iso_95_EB && el1->ecalIso() < ecal_iso_95_EB && el1->trackIso()< track_iso_95_EB);
   }else if(fabs(el1->eta())>eta_el_excl_up){// WP95 EE
   return (el1->hcalIso()< hcal_iso_95_EE && el1->ecalIso() < ecal_iso_95_EE && el1->trackIso()< track_iso_95_EE);
   }
+  else{
+  return false;}
   }else{
   return false;}
 }

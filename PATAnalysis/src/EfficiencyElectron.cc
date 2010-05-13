@@ -370,13 +370,13 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
   probe_cuts0_123456.clear();
   
   for(unsigned int i = 1; i < 6; i++){
-  if(_RecoCutFlags[i] == "_Acc"){
-  if(i<2)probe_cuts0_1.push_back(singleEl_Probe_Acc);
-  if(i<3)probe_cuts0_12.push_back(singleEl_Probe_Acc);
-  if(i<4)probe_cuts0_123.push_back(singleEl_Probe_Acc);
-  if(i<5)probe_cuts0_1234.push_back(singleEl_Probe_Acc);
-  if(i<6)probe_cuts0_12345.push_back(singleEl_Probe_Acc);
-  if(i<7)probe_cuts0_123456.push_back(singleEl_Probe_Acc);}
+  if(_RecoCutFlags[i] == "_AccVBTF"){
+  if(i<2)probe_cuts0_1.push_back(singleEl_Probe_Acc_VBTF0);
+  if(i<3)probe_cuts0_12.push_back(singleEl_Probe_Acc_VBTF0);
+  if(i<4)probe_cuts0_123.push_back(singleEl_Probe_Acc_VBTF0);
+  if(i<5)probe_cuts0_1234.push_back(singleEl_Probe_Acc_VBTF0);
+  if(i<6)probe_cuts0_12345.push_back(singleEl_Probe_Acc_VBTF0);
+  if(i<7)probe_cuts0_123456.push_back(singleEl_Probe_Acc_VBTF0);}
   if(_RecoCutFlags[i] == "_Qual"){
   if(i<2)probe_cuts0_1.push_back(singleEl_Probe_Qual);
   if(i<3)probe_cuts0_12.push_back(singleEl_Probe_Qual);
@@ -391,20 +391,20 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
   if(i<5)probe_cuts0_1234.push_back(singleEl_Probe_Imp);
   if(i<6)probe_cuts0_12345.push_back(singleEl_Probe_Imp);
   if(i<7)probe_cuts0_123456.push_back(singleEl_Probe_Imp);}
-  if(_RecoCutFlags[i] == "_Iso"){
-  if(i<2)probe_cuts0_1.push_back(singleEl_Probe_Iso);
-  if(i<3)probe_cuts0_12.push_back(singleEl_Probe_Iso);
-  if(i<4)probe_cuts0_123.push_back(singleEl_Probe_Iso);
-  if(i<5)probe_cuts0_1234.push_back(singleEl_Probe_Iso);
-  if(i<6)probe_cuts0_12345.push_back(singleEl_Probe_Iso);
-  if(i<7)probe_cuts0_123456.push_back(singleEl_Probe_Iso);}
-  if(_RecoCutFlags[i] == "_EiD"){
-  if(i<2)probe_cuts0_1.push_back(singleEl_Probe_EiD);
-  if(i<3)probe_cuts0_12.push_back(singleEl_Probe_EiD);
-  if(i<4)probe_cuts0_123.push_back(singleEl_Probe_EiD);
-  if(i<5)probe_cuts0_1234.push_back(singleEl_Probe_EiD);
-  if(i<6)probe_cuts0_12345.push_back(singleEl_Probe_EiD);
-  if(i<7)probe_cuts0_123456.push_back(singleEl_Probe_EiD);}
+  if(_RecoCutFlags[i] == "_IsoVBTF"){
+  if(i<2)probe_cuts0_1.push_back(singleEl_Probe_Iso_VBTF0);
+  if(i<3)probe_cuts0_12.push_back(singleEl_Probe_Iso_VBTF0);
+  if(i<4)probe_cuts0_123.push_back(singleEl_Probe_Iso_VBTF0);
+  if(i<5)probe_cuts0_1234.push_back(singleEl_Probe_Iso_VBTF0);
+  if(i<6)probe_cuts0_12345.push_back(singleEl_Probe_Iso_VBTF0);
+  if(i<7)probe_cuts0_123456.push_back(singleEl_Probe_Iso_VBTF0);}
+  if(_RecoCutFlags[i] == "_EiDVBTF"){
+  if(i<2)probe_cuts0_1.push_back(singleEl_Probe_EiD_VBTF0);
+  if(i<3)probe_cuts0_12.push_back(singleEl_Probe_EiD_VBTF0);
+  if(i<4)probe_cuts0_123.push_back(singleEl_Probe_EiD_VBTF0);
+  if(i<5)probe_cuts0_1234.push_back(singleEl_Probe_EiD_VBTF0);
+  if(i<6)probe_cuts0_12345.push_back(singleEl_Probe_EiD_VBTF0);
+  if(i<7)probe_cuts0_123456.push_back(singleEl_Probe_EiD_VBTF0);}
   if(_RecoCutFlags[i] == "_1"){
   if(i<2)probe_cuts0_1.push_back(singleEl_Probe_True);
   if(i<3)probe_cuts0_12.push_back(singleEl_Probe_True);
@@ -469,13 +469,13 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
   probe_cuts1_123456.clear();
   
   for(unsigned int i = 1; i < 6; i++){
-  if(_RecoCutFlags[i] == "_Acc"){
-  if(i<2)probe_cuts1_1.push_back(singleEl_Probe_Acc);
-  if(i<3)probe_cuts1_12.push_back(singleEl_Probe_Acc);
-  if(i<4)probe_cuts1_123.push_back(singleEl_Probe_Acc);
-  if(i<5)probe_cuts1_1234.push_back(singleEl_Probe_Acc);
-  if(i<6)probe_cuts1_12345.push_back(singleEl_Probe_Acc);
-  if(i<7)probe_cuts1_123456.push_back(singleEl_Probe_Acc);}
+  if(_RecoCutFlags[i] == "_AccVBTF"){
+  if(i<2)probe_cuts1_1.push_back(singleEl_Probe_Acc_VBTF1);
+  if(i<3)probe_cuts1_12.push_back(singleEl_Probe_Acc_VBTF1);
+  if(i<4)probe_cuts1_123.push_back(singleEl_Probe_Acc_VBTF1);
+  if(i<5)probe_cuts1_1234.push_back(singleEl_Probe_Acc_VBTF1);
+  if(i<6)probe_cuts1_12345.push_back(singleEl_Probe_Acc_VBTF1);
+  if(i<7)probe_cuts1_123456.push_back(singleEl_Probe_Acc_VBTF1);}
   if(_RecoCutFlags[i] == "_Qual"){
   if(i<2)probe_cuts1_1.push_back(singleEl_Probe_Qual);
   if(i<3)probe_cuts1_12.push_back(singleEl_Probe_Qual);
@@ -490,20 +490,20 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
   if(i<5)probe_cuts1_1234.push_back(singleEl_Probe_Imp);
   if(i<6)probe_cuts1_12345.push_back(singleEl_Probe_Imp);
   if(i<7)probe_cuts1_123456.push_back(singleEl_Probe_Imp);}
-  if(_RecoCutFlags[i] == "_Iso"){
-  if(i<2)probe_cuts1_1.push_back(singleEl_Probe_Iso);
-  if(i<3)probe_cuts1_12.push_back(singleEl_Probe_Iso);
-  if(i<4)probe_cuts1_123.push_back(singleEl_Probe_Iso);
-  if(i<5)probe_cuts1_1234.push_back(singleEl_Probe_Iso);
-  if(i<6)probe_cuts1_12345.push_back(singleEl_Probe_Iso);
-  if(i<7)probe_cuts1_123456.push_back(singleEl_Probe_Iso);}
-  if(_RecoCutFlags[i] == "_EiD"){
-  if(i<2)probe_cuts1_1.push_back(singleEl_Probe_EiD);
-  if(i<3)probe_cuts1_12.push_back(singleEl_Probe_EiD);
-  if(i<4)probe_cuts1_123.push_back(singleEl_Probe_EiD);
-  if(i<5)probe_cuts1_1234.push_back(singleEl_Probe_EiD);
-  if(i<6)probe_cuts1_12345.push_back(singleEl_Probe_EiD);
-  if(i<7)probe_cuts1_123456.push_back(singleEl_Probe_EiD);}
+  if(_RecoCutFlags[i] == "_IsoVBTF"){
+  if(i<2)probe_cuts1_1.push_back(singleEl_Probe_Iso_VBTF1);
+  if(i<3)probe_cuts1_12.push_back(singleEl_Probe_Iso_VBTF1);
+  if(i<4)probe_cuts1_123.push_back(singleEl_Probe_Iso_VBTF1);
+  if(i<5)probe_cuts1_1234.push_back(singleEl_Probe_Iso_VBTF1);
+  if(i<6)probe_cuts1_12345.push_back(singleEl_Probe_Iso_VBTF1);
+  if(i<7)probe_cuts1_123456.push_back(singleEl_Probe_Iso_VBTF1);}
+  if(_RecoCutFlags[i] == "_EiDVBTF"){
+  if(i<2)probe_cuts1_1.push_back(singleEl_Probe_EiD_VBTF1);
+  if(i<3)probe_cuts1_12.push_back(singleEl_Probe_EiD_VBTF1);
+  if(i<4)probe_cuts1_123.push_back(singleEl_Probe_EiD_VBTF1);
+  if(i<5)probe_cuts1_1234.push_back(singleEl_Probe_EiD_VBTF1);
+  if(i<6)probe_cuts1_12345.push_back(singleEl_Probe_EiD_VBTF1);
+  if(i<7)probe_cuts1_123456.push_back(singleEl_Probe_EiD_VBTF1);}
   if(_RecoCutFlags[i] == "_1"){
   if(i<2)probe_cuts1_1.push_back(singleEl_Probe_True);
   if(i<3)probe_cuts1_12.push_back(singleEl_Probe_True);

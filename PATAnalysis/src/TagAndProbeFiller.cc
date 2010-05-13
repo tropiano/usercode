@@ -74,7 +74,7 @@ bool TagAndProbeFiller::tag(const reco::Candidate& cand){
 void TagAndProbeFiller::probe(const reco::Candidate& cand, double mass, double x, double w){
   if ( applyCuts(cand, _probe_cuts) ) { 
     _denominator->Fill(x,w);
-    int ibin = _denominator->FindBin(x);
+    unsigned int ibin = _denominator->FindBin(x);
     if (ibin > 0 && ibin <= _v_mass_tagprobe.size()){
       _v_mass_tagprobe[ibin-1]->Fill(mass, w);
       _mass = mass;
@@ -85,7 +85,7 @@ void TagAndProbeFiller::probe(const reco::Candidate& cand, double mass, double x
   
   if ( applyCuts(cand, _passprobe_cuts) ) {
     _numerator->Fill(x,w);
-    int ibin = _numerator->FindBin(x);
+    unsigned int ibin = _numerator->FindBin(x);
     if (ibin > 0 && ibin <= _v_mass_tagpassprobe.size()){
       _v_mass_tagpassprobe[ibin-1]->Fill(mass, w);
       _mass = mass;
