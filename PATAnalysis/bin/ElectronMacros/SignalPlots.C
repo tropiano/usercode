@@ -28,6 +28,8 @@ using namespace std;
 
 void SignalPlots(string sample, string selections){
 
+        gROOT->SetStyle("Plain");
+
         TFile *signal_file = TFile::Open("Summer09_test_VPJ.root");
         
         TFile* outplots = new TFile("Plot_Summer09_test_VPJ.root.root", "RECREATE");

@@ -6,6 +6,10 @@ process.source.fileNames = [
 'file:Zee_7TeV_AOD_test.root']
 process.maxEvents.input = 10000          ## (e.g. -1 to run on all events)
 
+##global tag for electron re-reconstruction
+process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
+process.GlobalTag.globaltag = 'MC_31X_V3::All'
+
 #################
 #my modules
 #################
@@ -88,22 +92,8 @@ process.jetTriggerMatch = cms.EDFilter( "PATTriggerMatcherDRLessByR",
     resolveAmbiguities    = cms.bool( True ),
     resolveByMatchQuality = cms.bool( False )
  )
-
-process.pfjetTriggerMatch = cms.EDFilter( "PATTriggerMatcherDRLessByR",
-    src     = cms.InputTag( "allLayer1PFJets" ),
-    matched = cms.InputTag( "patTrigger" ),
-    andOr          = cms.bool( False ),
-    filterIdsEnum  = cms.vstring( 'TriggerJet' ),
-    filterIds      = cms.vint32( 0 ),
-    filterLabels   = cms.vstring( '*' ),
-    pathNames      = cms.vstring( 'HLT_Jet15U', 'HLT_Jet30U' ),
-    collectionTags = cms.vstring( '*' ),
-    maxDeltaR = cms.double( 0.2 ),
-    resolveAmbiguities    = cms.bool( True ),
-    resolveByMatchQuality = cms.bool( False )
- ) 
  
-process.patTriggerMatcher = cms.Sequence(process.electronTriggerMatch + process.jetTriggerMatch + process.pfjetTriggerMatch) # poi cambio la patTriggerMatcher sequence
+process.patTriggerMatcher = cms.Sequence(process.electronTriggerMatch + process.jetTriggerMatch) # poi cambio la patTriggerMatcher sequence
 
 process.patTriggerEvent.patTriggerMatches=cms.VInputTag('electronTriggerMatch', 'jetTriggerMatch') #poi cambio i triggerMatches in patTriggerEvent
 
@@ -122,9 +112,12 @@ process.selectedElectrons.src=cms.InputTag('selectedLayer1ElectronsTriggerMatch'
 process.selectedJets.src=cms.InputTag('selectedLayer1JetsTriggerMatch')  
 
 
+#electrons
 process.electronMatch.checkCharge = False
 
 #load the gsfElectron sequence to rerun electron reconstrunction and make use of majority charge method
+process.load('RecoEgamma.EgammaElectronProducers.gsfElectronSequence_cff')
+process.load('RecoEgamma.ElectronIdentification.electronIdSequence_cff')
 #################
 
 
@@ -133,8 +126,10 @@ process.electronMatch.checkCharge = False
 #################
 
 
+process.skim = cms.Sequence(process.superClusterFilter * process.simpleElectronSelection * process.electronSuperClusterFilter)
 
 process.pattuples = cms.Sequence(
+                process.gsfElectronSequence * process.eIdSequence * (
                 #process.selectedTracks+
                 process.patDefaultSequence+
                 process.zeegenSequence+

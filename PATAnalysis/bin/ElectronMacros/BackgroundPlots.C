@@ -27,6 +27,8 @@ using namespace std;
 //Selections: "VPJ" = V+jets selections (old); "VBTF" = Vector Boson Task Force (new)
 
 void BackPlots(string selections){
+
+        gROOT->SetStyle("Plain");
         
         //Signal
         TFile *signal_file = TFile::Open("Summer09_test_VPJ.root");

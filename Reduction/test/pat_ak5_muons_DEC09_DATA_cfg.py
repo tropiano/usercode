@@ -98,8 +98,8 @@ process.pattuples = cms.Sequence(
                 process.recjetsSequence
             )
 
-#process.p = cms.Path(process.skim*process.pattuples)
-process.p = cms.Path(process.pattuples)
+process.p = cms.Path(process.skim*process.pattuples)
+#process.p = cms.Path(process.pattuples)
 #################            
 
 #################            

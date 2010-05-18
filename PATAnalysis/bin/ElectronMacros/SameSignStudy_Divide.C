@@ -23,6 +23,8 @@
 using namespace std;
 
 void divide() {
+    
+        gROOT->SetStyle("Plain");
 
         int _Acc  = 1;
         int _Trg  = 2;

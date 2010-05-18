@@ -3,21 +3,32 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1000)
 
 process.source.fileNames = [
-'file:7CBA6E3E-874F-DF11-B955-003048D47A0C.root']
+'rfio:/castor/cern.ch/cms/store/data/Commissioning10/MinimumBias/RAW-RECO/v8/000/132/658/205F914C-B241-DF11-9FA7-003048D45FD8.root']
 process.maxEvents.input = -1              ## (e.g. -1 to run on all events)
 #process.source.firstRun = cms.untracked.uint32(122314)
 #process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange('123592:2-123592:14', '') 
 
+#################
+#skim bit 40-41
+#################
+#process.load('L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff')
+#process.load('HLTrigger/HLTfilters/hltLevel1GTSeed_cfi')
+#process.hltLevel1GTSeed.L1TechTriggerSeeding = cms.bool(True)
+#process.hltLevel1GTSeed.L1SeedsLogicalExpression = cms.string('(40 OR 41) AND 0 AND NOT (36 OR 37 OR 38 OR 39)')
+
+#process.load('TKDPG/BXSelect/BXSelect_cfi')
+#process.bxSelect.SelectBXs = [ 51, 2724 ]
 
 #################
 #my modules
 #################
 process.load("Firenze.Reduction.recZmumuPatAddOns_cff")
-process.selectedMuons.cut = cms.string('pt > 0. & abs(eta) < 3.')
+process.selectedMuons.cut = cms.string('pt > 5. & abs(eta) < 3.')
 process.zmumurec.cut = cms.string('0 < mass < 130') 
+process.load("Firenze.Reduction.recZeePatAddOns_cff")
 process.load("Firenze.Reduction.recJetPatAddOns_cff")
-process.selectedJets.cut = cms.string('pt > 3. & abs(eta) < 10. & nConstituents > 0')
-process.selectedPFJets.cut = cms.string('pt > 3. & abs(eta) < 10.')
+process.selectedJets.cut = cms.string('pt > 10. & abs(eta) < 10. & nConstituents > 0')
+process.selectedPFJets.cut = cms.string('pt > 10. & abs(eta) < 10.')
 #################
 
 
@@ -35,7 +46,7 @@ switchOnTrigger(process)
 switchOnTriggerMatchEmbedding( process )
 
 process.muonTriggerMatchHLTL2Mu9 = cms.EDFilter( "PATTriggerMatcherDRDPtLessByR",
-    src     = cms.InputTag( 'patMuons' ),
+    src     = cms.InputTag( "selectedPatMuons" ),
     matched = cms.InputTag( "patTrigger" ),
     andOr          = cms.bool( False ),
     filterIdsEnum  = cms.vstring( 'TriggerMuon' ), 
@@ -61,29 +72,14 @@ process.jetTriggerMatch = cms.EDFilter( "PATTriggerMatcherDRLessByR",
     maxDeltaR = cms.double( 0.2 ),
     resolveAmbiguities    = cms.bool( True ),
     resolveByMatchQuality = cms.bool( False )
-)
-
-process.pfjetTriggerMatch = cms.EDFilter( "PATTriggerMatcherDRLessByR",
-    src     = cms.InputTag( "allLayer1PFJets" ),
-    matched = cms.InputTag( "patTrigger" ),
-    andOr          = cms.bool( False ),
-    filterIdsEnum  = cms.vstring( 'TriggerJet' ),
-    filterIds      = cms.vint32( 0 ),
-    filterLabels   = cms.vstring( '*' ),
-    pathNames      = cms.vstring( 'HLT_Jet15U', 'HLT_Jet30U' ),
-    collectionTags = cms.vstring( '*' ),
-    maxDeltaR = cms.double( 0.2 ),
-    resolveAmbiguities    = cms.bool( True ),
-    resolveByMatchQuality = cms.bool( False )
  )
+ 
+process.patTriggerMatcher = cms.Sequence(process.muonTriggerMatchHLTL2Mu9 + process.jetTriggerMatch) # poi cambio la patTriggerMatcher sequence
 
-
-process.patTriggerMatcher = cms.Sequence(process.muonTriggerMatchHLTL2Mu9 + process.jetTriggerMatch + process.pfjetTriggerMatch) # poi cambio la patTriggerMatcher sequence
-
-process.patTriggerEvent.patTriggerMatches=cms.VInputTag('muonTriggerMatchHLTL2Mu9', 'jetTriggerMatch', 'pfjetTriggerMatch') #poi cambio i triggerMatches in patTriggerEvent
+process.patTriggerEvent.patTriggerMatches=cms.VInputTag('muonTriggerMatchHLTL2Mu9', 'jetTriggerMatch') #poi cambio i triggerMatches in patTriggerEvent
 
 process.selectedLayer1MuonsTriggerMatch = cms.EDProducer( "PATTriggerMatchMuonEmbedder",
-     src     = cms.InputTag( 'patMuons' ),
+     src     = cms.InputTag( "selectedPatMuons" ),
      matches = cms.VInputTag( 'muonTriggerMatchHLTL2Mu9')
 )
 
@@ -92,16 +88,11 @@ process.selectedLayer1JetsTriggerMatch = cms.EDProducer( "PATTriggerMatchJetEmbe
      matches = cms.VInputTag('jetTriggerMatch')
 )
 
-process.selectedLayer1PFJetsTriggerMatch = cms.EDProducer( "PATTriggerMatchJetEmbedder",
-     src     = cms.InputTag( "allLayer1PFJets" ),
-     matches = cms.VInputTag('pfjetTriggerMatch')
-)
-
-process.patTriggerMatchEmbedder=cms.Sequence(process.selectedLayer1MuonsTriggerMatch + process.selectedLayer1JetsTriggerMatch + process.selectedLayer1PFJetsTriggerMatch)
+process.patTriggerMatchEmbedder=cms.Sequence(process.selectedLayer1MuonsTriggerMatch + process.selectedLayer1JetsTriggerMatch)
 process.selectedMuons.src=cms.InputTag('selectedLayer1MuonsTriggerMatch') #uso gli elettroni con il trigger embedding
 process.selectedJets.src=cms.InputTag('selectedLayer1JetsTriggerMatch')
-process.selectedPFJets.src=cms.InputTag('selectedLayer1PFJetsTriggerMatch')
- 
+
+
 process.eleIsoDepositEcalFromHits.ExtractorPSet.barrelEcalHits = cms.InputTag("reducedEcalRecHitsEB", "", "RECO")
 process.eleIsoDepositEcalFromHits.ExtractorPSet.endcapEcalHits = cms.InputTag("reducedEcalRecHitsEE", "", "RECO")
 process.eidRobustHighEnergy.reducedBarrelRecHitCollection = cms.InputTag("reducedEcalRecHitsEB", "", "RECO")
@@ -120,12 +111,30 @@ process.patMuons.embedPickyMuon = cms.bool(False)
 process.patMuons.embedTpfmsMuon = cms.bool(False)
 #################
 
+#################
+#change default jet collection
+#################
+#from PhysicsTools.PatAlgos.tools.jetTools import *
+#switchJetCollection(process, 
+#                    cms.InputTag('sisCone5CaloJets'),   
+#                    doJTA            = True,            
+#                    doBTagging       = True,            
+#                    jetCorrLabel     = ('SC5','Calo900'),  
+#                    doType1MET       = True,            
+#                    genJetCollection = cms.InputTag("sisCone5GenJets")
+#                    )
 process.patJetCorrFactors.corrLevels.L5Flavor='none'
 process.patJetCorrFactors.corrSample='Summer09_7TeV'
 #################
 
-process.patTriggerEvent.triggerResults=cms.InputTag("TriggerResults", "", "HLT") 
-process.patTrigger.triggerResults=cms.InputTag("TriggerResults", "", "HLT") 
+#################
+#Tracks
+#################
+from PhysicsTools.RecoAlgos.recoTrackSelector_cfi import recoTrackSelector
+process.selectedTracks = recoTrackSelector.clone();
+#process.selectedTracks.ptMin = 1. #select tracks with pt > 1 GeV
+process.selectedTracks.quality = cms.vstring('highPurity')
+#################
 
 ################# 
 #Sequences and Paths
@@ -135,9 +144,8 @@ process.patTrigger.triggerResults=cms.InputTag("TriggerResults", "", "HLT")
 
 process.pattuples = cms.Sequence(
                 #process.selectedTracks+
-                process.recPFjetsSequence*
-                process.patDefaultSequence*
-                process.zmumurecSequence*
+                process.patDefaultSequence+
+                process.zmumurecSequence+
                 process.recjetsSequence
             )
 
@@ -157,12 +165,12 @@ process.out.outputCommands.extend(zmumurecEventContent)
 process.out.outputCommands.extend(jetrecEventContent)
 process.out.outputCommands.extend(patTriggerEventContent)
 #process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*', 'keep recoTracks_selectedTracks_*_*', 'keep *_layer1METs_*_*'])
-process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*', 'keep recoTracks_generalTracks_*_*', 'keep *_patMETs_*_*'])
+process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*', 'keep recoTracks_generalTracks_*_*', 'keep *_layer1METs_*_*'])
 #process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*', 'keep recoTracks_generalTracks_*_*'])
 
 process.out.dropMetaData = cms.untracked.string('DROPPED')
 process.out.SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') )
-process.out.fileName = 'Zmumu_MinBias_Comm_10_GOODCOLL_v8.root'
+process.out.fileName = 'Zmumu_MinB_Comm10_May6thPDSkim2_SD_Mu_v1_Run_132440_134987.root'
 process.options.wantSummary = False        ## (to suppress the long output at the end of the job)
 
 print 'Current Event content is:'

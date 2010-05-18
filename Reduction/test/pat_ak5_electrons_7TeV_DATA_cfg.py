@@ -3,8 +3,8 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1000)
 
 process.source.fileNames = [
-'rfio:/castor/cern.ch/cms/store/data/Commissioning10/MinimumBias/RAW-RECO/v8/000/132/716/BC51597C-8042-DF11-8C6A-00E081791871.root']
-process.maxEvents.input = -1          ## (e.g. -1 to run on all events)
+'rfio:/castor/cern.ch/cms/store/data/Commissioning10/MinimumBias/RAW-RECO/v8/000/132/658/205F914C-B241-DF11-9FA7-003048D45FD8.root']
+process.maxEvents.input = 1000          ## (e.g. -1 to run on all events)
 
 ##global tag for electron re-reconstruction
 #process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
@@ -25,10 +25,10 @@ process.maxEvents.input = -1          ## (e.g. -1 to run on all events)
 process.load("Firenze.Reduction.recZmumuPatAddOns_cff")
 process.load("Firenze.Reduction.recZeePatAddOns_cff")
 process.load("Firenze.Reduction.recJetPatAddOns_cff")
-process.selectedElectrons.cut = cms.string('pt > 0. & abs(eta) < 3.')
+process.selectedElectrons.cut = cms.string('pt > 5. & abs(eta) < 3.')
 process.zeerec.cut = cms.string('0 < mass < 130')
-process.selectedJets.cut = cms.string('pt > 5. & abs(eta) < 10. & nConstituents > 0')
-process.selectedPFJets.cut = cms.string('pt > 5. & abs(eta) < 10.')
+process.selectedJets.cut = cms.string('pt > 10. & abs(eta) < 10. & nConstituents > 0')
+process.selectedPFJets.cut = cms.string('pt > 10. & abs(eta) < 10.')
 #################
 
 #egammaskims
@@ -59,6 +59,7 @@ from PhysicsTools.PatAlgos.tools.coreTools import *
 removeMCMatching(process, ['All'])
 process.allLayer1PFJets.addGenJetMatch = cms.bool(False)
 process.allLayer1PFJetsSequence.remove(process.patPFJetGenJetMatch)
+#restrictInputToAOD(process, ['All'])
 from PhysicsTools.PatAlgos.tools.trigTools import *
 switchOnTrigger(process)
 switchOnTriggerMatchEmbedding( process )
@@ -91,25 +92,10 @@ process.jetTriggerMatch = cms.EDFilter( "PATTriggerMatcherDRLessByR",
     resolveAmbiguities    = cms.bool( True ),
     resolveByMatchQuality = cms.bool( False )
  )
+ 
+process.patTriggerMatcher = cms.Sequence(process.electronTriggerMatch + process.jetTriggerMatch) # poi cambio la patTriggerMatcher sequence
 
-process.pfjetTriggerMatch = cms.EDFilter( "PATTriggerMatcherDRLessByR",
-    src     = cms.InputTag( "allLayer1PFJets" ),
-    matched = cms.InputTag( "patTrigger" ),
-    andOr          = cms.bool( False ),
-    filterIdsEnum  = cms.vstring( 'TriggerJet' ),
-    filterIds      = cms.vint32( 0 ),
-    filterLabels   = cms.vstring( '*' ),
-    pathNames      = cms.vstring( 'HLT_Jet15U', 'HLT_Jet30U' ),
-    collectionTags = cms.vstring( '*' ),
-    maxDeltaR = cms.double( 0.2 ),
-    resolveAmbiguities    = cms.bool( True ),
-    resolveByMatchQuality = cms.bool( False )
- )
-
-
-process.patTriggerMatcher = cms.Sequence(process.electronTriggerMatch + process.jetTriggerMatch + process.pfjetTriggerMatch) # poi cambio la patTriggerMatcher sequence
-
-process.patTriggerEvent.patTriggerMatches=cms.VInputTag('electronTriggerMatch', 'jetTriggerMatch', 'pfjetTriggerMatch') #poi cambio i triggerMatches in patTriggerEvent
+process.patTriggerEvent.patTriggerMatches=cms.VInputTag('electronTriggerMatch', 'jetTriggerMatch') #poi cambio i triggerMatches in patTriggerEvent
 
 process.selectedLayer1ElectronsTriggerMatch = cms.EDProducer( "PATTriggerMatchElectronEmbedder",
      src     = cms.InputTag( "selectedPatElectrons" ),
@@ -121,15 +107,9 @@ process.selectedLayer1JetsTriggerMatch = cms.EDProducer( "PATTriggerMatchJetEmbe
      matches = cms.VInputTag('jetTriggerMatch')
 )
 
-process.selectedLayer1PFJetsTriggerMatch = cms.EDProducer( "PATTriggerMatchJetEmbedder",
-     src     = cms.InputTag( "allLayer1PFJets" ),
-     matches = cms.VInputTag('pfjetTriggerMatch')
-)
-
-process.patTriggerMatchEmbedder=cms.Sequence(process.selectedLayer1ElectronsTriggerMatch + process.selectedLayer1JetsTriggerMatch + process.selectedLayer1PFJetsTriggerMatch)
+process.patTriggerMatchEmbedder=cms.Sequence(process.selectedLayer1ElectronsTriggerMatch + process.selectedLayer1JetsTriggerMatch)
 process.selectedElectrons.src=cms.InputTag('selectedLayer1ElectronsTriggerMatch') #uso gli elettroni con il trigger embedding
 process.selectedJets.src=cms.InputTag('selectedLayer1JetsTriggerMatch')
-process.selectedPFJets.src=cms.InputTag('selectedLayer1PFJetsTriggerMatch')
 
 process.eleIsoDepositEcalFromHits.ExtractorPSet.barrelEcalHits = cms.InputTag("reducedEcalRecHitsEB", "", "RECO")
 process.eleIsoDepositEcalFromHits.ExtractorPSet.endcapEcalHits = cms.InputTag("reducedEcalRecHitsEE", "", "RECO")
@@ -147,6 +127,7 @@ process.patMuons.embedCombinedMuon = cms.bool(False)
 process.patMuons.embedPickyMuon = cms.bool(False)
 process.patMuons.embedTpfmsMuon = cms.bool(False)
 
+#restrictInputToAOD31X(process)
 
 #################
 #change default jet collection
@@ -182,9 +163,8 @@ process.selectedTracks.quality = cms.vstring('highPurity')
 
 process.pattuples = cms.Sequence(     
                 #process.selectedTracks+
-                process.recPFjetsSequence*
-                process.patDefaultSequence*
-                process.zeerecSequence*
+                process.patDefaultSequence+
+                process.zeerecSequence+
                 process.recjetsSequence
             )
 
@@ -209,7 +189,7 @@ process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*', 'keep r
 
 process.out.dropMetaData = cms.untracked.string('DROPPED')
 process.out.SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') )
-process.out.fileName = 'Zee_MinBias_Comm10_GOODCOLL-v8.root'
+process.out.fileName = 'Zee_MinB_Comm10_May6thPDSkim2_SD_EG_v1_Run_132440_134987.root'
 process.options.wantSummary = False        ## (to suppress the long output at the end of the job)
 
 print 'Current Event content is:'

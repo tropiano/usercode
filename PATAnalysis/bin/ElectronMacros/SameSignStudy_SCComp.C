@@ -20,6 +20,8 @@ using namespace std;
 
 void SCComp() {
 
+        gROOT->SetStyle("Plain");
+
         int _Acc  = 1;
         int _Trg  = 2;
 	int _Qual = 0;

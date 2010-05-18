@@ -400,7 +400,7 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
   total_fit.addPdf(sumfail, _passprobe_cat.getLabel());
 
 
-  RooFitResult* fitresult = total_fit.fitTo(*data, RooFit::Save(true), RooFit::Strategy(2), RooFit::NumCPU(8), RooFit::Extended(kTRUE), RooFit::SumW2Error(true));
+  RooFitResult* fitresult = total_fit.fitTo(*data, RooFit::Save(true), RooFit::Strategy(1), RooFit::NumCPU(8), RooFit::Extended(kTRUE), RooFit::SumW2Error(true));
   
   fitresult->SetName(nllname.str().c_str());
 
