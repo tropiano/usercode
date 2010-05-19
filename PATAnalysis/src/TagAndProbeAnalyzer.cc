@@ -18,6 +18,7 @@
 #include "TTree.h"
 #include "TH1.h"
 #include "TVectorD.h"
+#include "TMath.h"
 
 using namespace std;
 
@@ -108,6 +109,9 @@ void TagAndProbeAnalyzer::analyze(unsigned int nbins, std::string option )
       //_mass.setMax(100.); //TRY smaller range
     
         std::pair<RooFitResult*, RooRealVar*>  tp_fit, tp_fit1;
+        
+        cout<<endl<<"### Fitting bin n. "<<i<<endl<<endl;
+        
         tp_fit  = fit(tagprobe, name_tp.str().c_str(), option);
         if(_sec_input)tp_fit1  = fit(tagprobe1, name_tp1.str().c_str(), option);
         
@@ -117,11 +121,11 @@ void TagAndProbeAnalyzer::analyze(unsigned int nbins, std::string option )
           double errlow = 0.;
           double errhigh = 0.;
           if (tp_fit.second->hasAsymError()){
-            errhigh = tp_fit.second->getAsymErrorHi();
-            errlow  = tp_fit.second->getAsymErrorLo();
+            errhigh = TMath::Abs(tp_fit.second->getAsymErrorHi());
+            errlow  = TMath::Abs(tp_fit.second->getAsymErrorLo());
           } else {
-            errlow  = tp_fit.second->getError();
-            errhigh = tp_fit.second->getError();
+            errlow  = TMath::Abs(tp_fit.second->getError());
+            errhigh = TMath::Abs(tp_fit.second->getError());
           }
           singleEfficiency.SetPointEYhigh(i, errhigh);
           singleEfficiency.SetPointEYlow(i, errlow);
@@ -134,11 +138,11 @@ void TagAndProbeAnalyzer::analyze(unsigned int nbins, std::string option )
           double errlow1 = 0.;
           double errhigh1 = 0.;
           if (tp_fit1.second->hasAsymError()){
-            errhigh1 = tp_fit1.second->getAsymErrorHi();
-            errlow1 = tp_fit1.second->getAsymErrorLo();
+            errhigh1 = TMath::Abs(tp_fit1.second->getAsymErrorHi());
+            errlow1  = TMath::Abs(tp_fit1.second->getAsymErrorLo());
           } else {
-            errlow1  = tp_fit1.second->getError();
-            errhigh1 = tp_fit1.second->getError();
+            errlow1  = TMath::Abs(tp_fit1.second->getError());
+            errhigh1 = TMath::Abs(tp_fit1.second->getError());
           }
           singleEfficiency1.SetPointEYhigh(i, errhigh1);
           singleEfficiency1.SetPointEYlow(i, errlow1);
@@ -177,6 +181,8 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
   /*RooFitResult* training_results_signal     = (_training_signal)     ? (RooFitResult*) _training_signal    ->Get(  (dirname + "/" + nllname.str()).c_str()  ) : 0;
   cout<<"### TRAINING = "<<(dirname + "/" + nllname.str()).c_str()<<endl;
   RooFitResult* training_results_background = (_training_background) ? (RooFitResult*) _training_background->Get(  (dirname + "/" + nllname.str()).c_str()  ) : 0;*/
+  
+  //string test_name = "fitresult_total_fit_roodataset";
   
   RooFitResult* training_results_signal = (_training_signal) ? (RooFitResult*)_training_signal->Get(nllname.str().c_str()) : 0;
   RooFitResult* training_results_background = (_training_background) ? (RooFitResult*)_training_background->Get(nllname.str().c_str()) : 0;
@@ -400,7 +406,10 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
   total_fit.addPdf(sumfail, _passprobe_cat.getLabel());
 
 
-  RooFitResult* fitresult = total_fit.fitTo(*data, RooFit::Save(true), RooFit::Strategy(1), RooFit::NumCPU(8), RooFit::Extended(kTRUE), RooFit::SumW2Error(true));
+  //RooFitResult* fitresult = total_fit.fitTo(*data, RooFit::Save(true), RooFit::Strategy(2), RooFit::NumCPU(8), RooFit::Extended(kTRUE), RooFit::SumW2Error(true));
+  
+  RooFitResult* fitresult = total_fit.fitTo(*data, RooFit::Minos(RooArgSet(efficiency)), RooFit::Save(true), RooFit::Strategy(1), RooFit::NumCPU(8), RooFit::Extended(kTRUE), RooFit::SumW2Error(true));
+  
   
   fitresult->SetName(nllname.str().c_str());
 
@@ -447,11 +456,11 @@ TGraphAsymmErrors TagAndProbeAnalyzer::createDoubleEfficiency(const TGraphAsymmE
     double x = 0., y = 0.;
     single.GetPoint(i, x, y);
     vx(i)   = x;
-    vexl(i) = single.GetErrorXlow(i);
-    vexh(i) = single.GetErrorXhigh(i);
+    vexl(i) = TMath::Abs(single.GetErrorXlow(i));
+    vexh(i) = TMath::Abs(single.GetErrorXhigh(i));
     vy(i)   = y * y;
-    veyl(i) = 2 * y * single.GetErrorYlow(i);
-    veyh(i) = 2 * y * single.GetErrorYhigh(i);
+    veyl(i) = TMath::Abs(2 * y * single.GetErrorYlow(i));
+    veyh(i) = TMath::Abs(2 * y * single.GetErrorYhigh(i));
   }
 
   TGraphAsymmErrors doubleEff(vx, vy, vexl, vexh, veyl, veyh);
@@ -477,11 +486,11 @@ TGraphAsymmErrors TagAndProbeAnalyzer::createAsymmCutEfficiency(const TGraphAsym
     single1.GetPoint(i, x1, y1);
     
     vx(i)   = x0;
-    vexl(i) = single0.GetErrorXlow(i);
-    vexh(i) = single0.GetErrorXhigh(i);
+    vexl(i) = TMath::Abs(single0.GetErrorXlow(i));
+    vexh(i) = TMath::Abs(single0.GetErrorXhigh(i));
     vy(i)   = y0 * y1;
-    veyl(i) = (y1 * single0.GetErrorYlow(i))+(y0 * single1.GetErrorYlow(i));
-    veyh(i) = (y1 * single0.GetErrorYhigh(i))+(y0 * single1.GetErrorYhigh(i));
+    veyl(i) = TMath::Sqrt(pow(y1 * single0.GetErrorYlow(i),2)+pow(y0 * single1.GetErrorYlow(i),2));
+    veyh(i) = TMath::Sqrt(pow(y1 * single0.GetErrorYhigh(i),2)+pow(y0 * single1.GetErrorYhigh(i),2));
     
   }
 
