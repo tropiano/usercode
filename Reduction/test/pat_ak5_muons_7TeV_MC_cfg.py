@@ -48,18 +48,18 @@ process.patPFMETs = process.patMETs.clone(
     addMuonCorrections = cms.bool(False)
 )
 process.patDefaultSequence.replace( process.patMETs, process.patMETs + process.patPFMETs)
+#remove unneeded sequences
+removeSpecificPATObjects(process, ['Photons', 'Electrons', 'Taus'])
 
-
-process.muonTriggerMatchHLTMu9 = cms.EDFilter( "PATTriggerMatcherDRDPtLessByR",
+process.muonTriggerMatchHLTMu9 = cms.EDFilter( "PATTriggerMatcherDRLessByR",
     src     = cms.InputTag( 'patMuons' ),
     matched = cms.InputTag( "patTrigger" ),
     andOr          = cms.bool( False ),
-    filterIdsEnum  = cms.vstring( 'TriggerMuon' ), 
+    filterIdsEnum  = cms.vstring( 'TriggerL1Mu' ), 
     filterIds      = cms.vint32( 0 ),
     filterLabels   = cms.vstring( '*' ),
-    pathNames      = cms.vstring( 'HLT_Mu9' ),
+    pathNames      = cms.vstring( 'HLT_Mu9', 'HLT_L2Mu11', 'HLT_L1Mu20' ),
     collectionTags = cms.vstring( '*' ),
-     maxDPtRel = cms.double( 1.0 ),
     maxDeltaR = cms.double( 0.2 ),
     resolveAmbiguities    = cms.bool( True ),
      resolveByMatchQuality = cms.bool( False )
@@ -170,12 +170,12 @@ process.out.outputCommands.extend(zmumugenEventContent)
 process.out.outputCommands.extend(jetgenEventContent)
 process.out.outputCommands.extend(zmumurecEventContent)
 process.out.outputCommands.extend(jetrecEventContent)
-process.out.outputCommands.extend(patTriggerEventContent)
-process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*', 'keep *_pat*METs_*_*'])
+#process.out.outputCommands.extend(patTriggerEventContent)
+process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*', 'keep *_pat*METs_*_*', 'keep *_patTriggerEvent_*_*', 'keep patTriggerPaths_patTrigger_*_*'])
 
 process.out.dropMetaData = cms.untracked.string('DROPPED')
 process.out.SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') )
-process.out.fileName = 'Zmumu_MC_fullprov.root'
+process.out.fileName = 'Zmumu_MC.root'
 process.options.wantSummary = False        ## (to suppress the long output at the end of the job)
 
 print 'Current Event content is:'
