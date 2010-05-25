@@ -146,7 +146,6 @@ process.patTriggerEvent.processName = "REDIGI"
 process.recosequence = cms.Sequence(#process.recPFjetsSequence*
                                     process.patDefaultSequence*
                                     process.zmumurecSequence*
-                                    process.zmumurecSequence*
                                     process.recjetsSequence)
 process.gensequence = cms.Sequence(process.ak5generatedJets*process.genjetsSequence*process.zmumugenSequence)                                    
 
