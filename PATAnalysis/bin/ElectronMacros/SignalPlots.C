@@ -20,6 +20,7 @@
 #include "TLegend.h"
 #include "TLegendEntry.h"
 #include "TGraphAsymmErrors.h"
+#include "TMath.h"
 
 using namespace std;
 
@@ -30,9 +31,9 @@ void SignalPlots(string sample, string selections){
 
         gROOT->SetStyle("Plain");
 
-        TFile *signal_file = TFile::Open("Summer09_test_VPJ.root");
+        TFile *signal_file = TFile::Open("Test_VPJ_3.root");
         
-        TFile* outplots = new TFile("Plot_Summer09_test_VPJ.root.root", "RECREATE");
+        TFile* outplots = new TFile("Plot_Test_VPJ_3.root", "RECREATE");
 	
 	int _Acc  = 1;
 	int _Trg  = 2;
@@ -47,9 +48,9 @@ void SignalPlots(string sample, string selections){
        _RecoCutFlags[i] = "_1";}
    
        if(selections=="VPJ"){
-       _RecoCutFlags[_Acc] =  "_Acc";
-       _RecoCutFlags[_Iso] =  "_Iso";
-       _RecoCutFlags[_EiD] =  "_EiD";}
+       _RecoCutFlags[_Acc] =  "_AccVPJ";
+       _RecoCutFlags[_Iso] =  "_IsoVPJ";
+       _RecoCutFlags[_EiD] =  "_EiDVPJ";}
        if(selections=="VBTF"){
        _RecoCutFlags[_Acc] =  "_AccVBTF";
        _RecoCutFlags[_Iso] =  "_IsoVBTF";
@@ -951,9 +952,9 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         if(selections=="VPJ")vy_12(i)   = y * y;
         if(selections=="VBTF")vy_12(i)   = y * y1;
         if(selections=="VPJ")veyl_12(i) = 2 * y * Eff_TP_Single_12.GetErrorYlow(i);
-        if(selections=="VBTF")veyl_12(i) = y1 * Eff_TP_Single_12.GetErrorYlow(i) + y * Eff_TP_Single1_12.GetErrorYlow(i);
+        if(selections=="VBTF")veyl_12(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_12.GetErrorYlow(i),2)+pow(y*Eff_TP_Single1_12.GetErrorYlow(i),2));
         if(selections=="VPJ")veyh_12(i) = 2 * y * Eff_TP_Single_12.GetErrorYhigh(i);
-        if(selections=="VBTF")veyh_12(i) = y1 * Eff_TP_Single_12.GetErrorYhigh(i) + y * Eff_TP_Single1_12.GetErrorYhigh(i);
+        if(selections=="VBTF")veyh_12(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_12.GetErrorYhigh(i),2)+pow(y*Eff_TP_Single1_12.GetErrorYhigh(i),2));
         }  
         
         int n_123 = Eff_TP_Single_123.GetN();
@@ -973,9 +974,9 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         if(selections=="VPJ")vy_123(i)   = y * y;
         if(selections=="VBTF")vy_123(i)   = y * y1;
         if(selections=="VPJ")veyl_123(i) = 2 * y * Eff_TP_Single_123.GetErrorYlow(i);
-        if(selections=="VBTF")veyl_123(i) = y1 * Eff_TP_Single_123.GetErrorYlow(i) + y * Eff_TP_Single1_123.GetErrorYlow(i);
+        if(selections=="VBTF")veyl_123(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_123.GetErrorYlow(i),2)+pow(y*Eff_TP_Single1_123.GetErrorYlow(i),2));
         if(selections=="VPJ")veyh_123(i) = 2 * y * Eff_TP_Single_123.GetErrorYhigh(i);
-        if(selections=="VBTF")veyh_123(i) = y1 * Eff_TP_Single_123.GetErrorYhigh(i) + y * Eff_TP_Single1_123.GetErrorYhigh(i);
+        if(selections=="VBTF")veyh_123(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_123.GetErrorYhigh(i),2)+pow(y*Eff_TP_Single1_123.GetErrorYhigh(i),2));
         }
         
         int n_1234 = Eff_TP_Single_1234.GetN();
@@ -995,9 +996,9 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         if(selections=="VPJ")vy_1234(i)   = y * y;
         if(selections=="VBTF")vy_1234(i)   = y * y1;
         if(selections=="VPJ")veyl_1234(i) = 2 * y * Eff_TP_Single_1234.GetErrorYlow(i);
-        if(selections=="VBTF")veyl_1234(i) = y1 * Eff_TP_Single_1234.GetErrorYlow(i) + y * Eff_TP_Single1_1234.GetErrorYlow(i);
+        if(selections=="VBTF")veyl_1234(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_1234.GetErrorYlow(i),2)+pow(y*Eff_TP_Single1_1234.GetErrorYlow(i),2));
         if(selections=="VPJ")veyh_1234(i) = 2 * y * Eff_TP_Single_1234.GetErrorYhigh(i);
-        if(selections=="VBTF")veyh_1234(i) = y1 * Eff_TP_Single_1234.GetErrorYhigh(i) + y * Eff_TP_Single1_1234.GetErrorYhigh(i);
+        if(selections=="VBTF")veyh_1234(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_1234.GetErrorYhigh(i),2)+pow(y*Eff_TP_Single1_1234.GetErrorYhigh(i),2));
         } 
         
         int n_12345 = Eff_TP_Single_12345.GetN();
@@ -1017,9 +1018,9 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         if(selections=="VPJ")vy_12345(i)   = y * y;
         if(selections=="VBTF")vy_12345(i)   = y * y1;
         if(selections=="VPJ")veyl_12345(i) = 2 * y * Eff_TP_Single_12345.GetErrorYlow(i);
-        if(selections=="VBTF")veyl_12345(i) = y1 * Eff_TP_Single_12345.GetErrorYlow(i) + y * Eff_TP_Single1_12345.GetErrorYlow(i);
+        if(selections=="VBTF")veyl_12345(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_12345.GetErrorYlow(i),2)+pow(y*Eff_TP_Single1_12345.GetErrorYlow(i),2));
         if(selections=="VPJ")veyh_12345(i) = 2 * y * Eff_TP_Single_12345.GetErrorYhigh(i);
-        if(selections=="VBTF")veyh_12345(i) = y1 * Eff_TP_Single_12345.GetErrorYhigh(i) + y * Eff_TP_Single1_12345.GetErrorYhigh(i);
+        if(selections=="VBTF")veyh_12345(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_12345.GetErrorYhigh(i),2)+pow(y*Eff_TP_Single1_12345.GetErrorYhigh(i),2));
         }
         
         int n_123456 = Eff_TP_Single_123456.GetN();
@@ -1039,9 +1040,9 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         if(selections=="VPJ")vy_123456(i)   = y * y;
         if(selections=="VBTF")vy_123456(i)   = y * y1;
         if(selections=="VPJ")veyl_123456(i) = 2 * y * Eff_TP_Single_123456.GetErrorYlow(i);
-        if(selections=="VBTF")veyl_123456(i) = y1 * Eff_TP_Single_123456.GetErrorYlow(i) + y * Eff_TP_Single1_123456.GetErrorYlow(i);
+        if(selections=="VBTF")veyl_123456(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_123456.GetErrorYlow(i),2)+pow(y*Eff_TP_Single1_123456.GetErrorYlow(i),2));
         if(selections=="VPJ")veyh_123456(i) = 2 * y * Eff_TP_Single_123456.GetErrorYhigh(i);
-        if(selections=="VBTF")veyh_123456(i) = y1 * Eff_TP_Single_123456.GetErrorYhigh(i) + y * Eff_TP_Single1_123456.GetErrorYhigh(i);
+        if(selections=="VBTF")veyh_123456(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_123456.GetErrorYhigh(i),2)+pow(y*Eff_TP_Single1_123456.GetErrorYhigh(i),2));
         } 
         
         TGraphAsymmErrors Eff_TP_Double_12(vx_12, vy_12, vexl_12, vexh_12, veyl_12, veyh_12);

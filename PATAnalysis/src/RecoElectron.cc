@@ -91,7 +91,7 @@ PixelHit_OC(0), PixelHit_SC(0), FirstPixelBarrelHit_OC(0), FirstPixelBarrelHit_S
 
 DeltaRvsCharge_JetRec(0), DeltaRvsCharge_JetRec_Iso(0), DeltaRvsCharge_JetRec_NotIso(0),
 
-_norm(1.), _dir(0), _charge_dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _Norm(true), _Sumw2(false), _GenParticleMatch(false), _entries(0), _EventsPerFile(0), _fileCounter(0), _Acc(1), _Trg(2), _Qual(3), _Imp(4), _Iso(5), _EiD(6), _electronID("eidRobustTight"), _selections("VBTF"), _file(0), _histoVector(), _histoVector2D()
+_norm(1.), _dir(0), _charge_dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _Norm(false), _Sumw2(false), _GenParticleMatch(false), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _fileCounter(0), _Acc(1), _Trg(2), _Qual(3), _Imp(4), _Iso(5), _EiD(6), _electronID("eidRobustLoose"), _selections("VBTF"), _file(0), _histoVector(), _histoVector2D()
 
 { }
 
@@ -107,6 +107,8 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _Norm      = iConfig.getParameter<bool>("Norm");
    _Sumw2      = iConfig.getParameter<bool>("Sumw2");
    _EventsPerFile    = iConfig.getParameter<int32_t>("EventsPerFile");
+   _EventNumber    = iConfig.getParameter<int32_t>("EventNumber");
+   _ProcEvents    = iConfig.getParameter<int32_t>("ProcEvents");
    _GenParticleMatch = iConfig.getParameter<bool>("GenParticleMatch");
    _ReportName = iConfig.getParameter<std::string>("ReportName");
    
@@ -122,9 +124,9 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _RecoCutFlags[i] = "_1";}
    
    if(_selections=="VPJ"){
-   _RecoCutFlags[_Acc] =  "_Acc";
-   _RecoCutFlags[_Iso] =  "_Iso";
-   _RecoCutFlags[_EiD] =  "_EiD";}
+   _RecoCutFlags[_Acc] =  "_AccVPJ";
+   _RecoCutFlags[_Iso] =  "_IsoVPJ";
+   _RecoCutFlags[_EiD] =  "_EiDVPJ";}
    if(_selections=="VBTF"){
    _RecoCutFlags[_Acc] =  "_AccVBTF";
    _RecoCutFlags[_Iso] =  "_IsoVBTF";
@@ -792,16 +794,16 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
     _fileCounter++;
   }
   
-  if(_Norm==true){
-  _entries = ch->GetEntries();
-  cout<<"RecoElectron analyzing nr. file = "<<_fileCounter<<endl;
-  cout<<"RecoElectron analyzing nr. event = "<<_entries<<endl;}
+  if(_EventNumber==0 && _EventsPerFile==0)_entries = ch->GetEntries();
+  
+  if(_EventNumber!=0 && _EventsPerFile==0)_entries = _EventNumber;
  
-  if(_Norm==false){
-  _entries = _fileCounter*_EventsPerFile;
+  if(_EventNumber==0 && _EventsPerFile!=0)_entries = _fileCounter*_EventsPerFile;
+  
+  if(_ProcEvents!=-1)_entries = _ProcEvents;
+  
   cout<<"RecoElectron analyzing nr. file = "<<_fileCounter<<endl;
   cout<<"RecoElectron analyzing nr. event = "<<_entries<<endl;
-  }
   
   delete ch; 
    
@@ -1544,7 +1546,7 @@ void RecoElectron::finalize(){
    
    double lumi = _entries/_xsec;
 
-   if(lumi){
+   if(_Norm && lumi!=0){
    _norm = _targetLumi/lumi;
    }
 
@@ -1565,16 +1567,29 @@ void RecoElectron::finalize(){
    Report.open(_ReportName.c_str());
    Report<<endl<<endl<<"----- Sample Info -----"<<endl<<endl;
    Report<<"File number = "<<_fileCounter<<endl;
-   if(_Norm){
-   Report<<"Event number by TChain = "<<_entries<<endl;
-   }else{
-   Report<<"Events per File = "<<_EventsPerFile<<endl;
-   Report<<"Event number by #File*#EventsPerFile = "<<_entries<<endl;
-   }
-   Report<<"Normalized to "<<_targetLumi<<" pb-1"<<endl;
-   Report<<"Cross section = "<<_xsec<<" pb"<<endl;
-   Report<<"Normalization factor = "<<_norm<<endl<<endl;
-   Report<<"Selections used = "<<_selections.c_str()<<endl;
+   Report<<"Number of events = "<<_entries<<endl;
+   Report<<"Number of events obtained from: ";
+   if(_ProcEvents==-1 && _EventNumber==0 && _EventsPerFile==0)Report<<"TChain"<<endl;
+   if(_ProcEvents==-1 && _EventNumber!=0 && _EventsPerFile==0)Report<<"EventNumber"<<endl;
+   if(_ProcEvents==-1 && _EventNumber==0 && _EventsPerFile!=0)Report<<"EventsPerFile = "<<_EventsPerFile<<" * fileCounter"<<endl;
+   if(_ProcEvents==-1 && _EventNumber!=0 && _EventsPerFile!=0)Report<<"ERROR: EventNumber AND EventsPerFile != 0"<<endl;
+   if(_ProcEvents!=-1)Report<<"ProcEvents"<<endl; 
+   Report<<"Cross section = "<<_xsec<<endl;
+   Report<<"Lumi = "<<lumi<<endl;
+   if(_Norm && lumi!=0){ 
+   Report<<"Sample is normalized to Lumi "<<_targetLumi<<" pb-1"<<endl;
+   Report<<"Normalization factor = "<<_norm<<endl;}
+   if(!_Norm || lumi==0)Report<<"Sample not normalized"<<endl;
+   Report<<endl<<"Selections Type used = "<<_selections.c_str()<<endl;
+   if(_selections=="VPJ")Report<<"EiD applied = "<<_electronID.c_str()<<endl;
+   Report<<"Selections applied:"<<endl;
+   Report<<_RecoCutFlags[1].c_str()<<endl;
+   Report<<_RecoCutFlags[2].c_str()<<endl;
+   Report<<_RecoCutFlags[3].c_str()<<endl;
+   Report<<_RecoCutFlags[4].c_str()<<endl;
+   Report<<_RecoCutFlags[5].c_str()<<endl;
+   Report<<_RecoCutFlags[6].c_str()<<endl;
+   Report<<endl;
    Report.close();
 
    

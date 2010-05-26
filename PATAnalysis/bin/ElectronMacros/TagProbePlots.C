@@ -58,9 +58,9 @@ void TPPlots(string sample, string selections){
        _RecoCutFlags[i] = "_1";}
    
        if(selections=="VPJ"){
-       _RecoCutFlags[_Acc] =  "_Acc";
-       _RecoCutFlags[_Iso] =  "_Iso";
-       _RecoCutFlags[_EiD] =  "_EiD";}
+       _RecoCutFlags[_Acc] =  "_AccVPJ";
+       _RecoCutFlags[_Iso] =  "_IsoVPJ";
+       _RecoCutFlags[_EiD] =  "_EiDVPJ";}
        if(selections=="VBTF"){
        _RecoCutFlags[_Acc] =  "_AccVBTF";
        _RecoCutFlags[_Iso] =  "_IsoVBTF";
@@ -705,7 +705,7 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         res2vexh_1234(i) = Eff_Rel_1234.GetErrorXhigh(i);
         res2vy_1234(i)   = y2-y0;
         res2veyl_1234(i) = TMath::Sqrt(pow(Eff_Rel_1234.GetErrorYlow(i),2)+pow(tp_eff_1234->GetErrorYlow(i),2));
-        res2veyh_1234(i) = TMath::Sqrt(pow(Eff_Rel_123.GetErrorYhigh(i),2)+pow(tp_eff_123->GetErrorYhigh(i),2));
+        res2veyh_1234(i) = TMath::Sqrt(pow(Eff_Rel_1234.GetErrorYhigh(i),2)+pow(tp_eff_1234->GetErrorYhigh(i),2));
         }
               
         TP_1234->cd();
@@ -758,7 +758,7 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         res2vexh_12345(i) = Eff_Rel_12345.GetErrorXhigh(i);
         res2vy_12345(i)   = y2-y0;
         res2veyl_12345(i) = TMath::Sqrt(pow(Eff_Rel_12345.GetErrorYlow(i),2)+pow(tp_eff_12345->GetErrorYlow(i),2));
-        res2veyh_12345(i) = TMath::Sqrt(pow(Eff_Rel_123.GetErrorYhigh(i),2)+pow(tp_eff_123->GetErrorYhigh(i),2));
+        res2veyh_12345(i) = TMath::Sqrt(pow(Eff_Rel_12345.GetErrorYhigh(i),2)+pow(tp_eff_12345->GetErrorYhigh(i),2));
         }
               
         TP_12345->cd();

@@ -435,7 +435,7 @@ inline bool RecSelected(string Flag, string EID, const reco::CompositeCandidate 
   if(dau1->electronID(EID.c_str())==1.0)electron_ID1 = true;
   }
 
-  if(Flag=="_Acc"){
+  if(Flag=="_AccVPJ"){
   return ZREC.mass()>zmassmin_vpj && ZREC.mass()<zmassmax_vpj
          && dau0->pt() > ptelcut && fabs(dau0->eta()) < etaelcut 
          && dau1->pt() > ptelcut && fabs(dau1->eta()) < etaelcut
@@ -459,7 +459,7 @@ inline bool RecSelected(string Flag, string EID, const reco::CompositeCandidate 
   else if(Flag=="_Imp"){
   return dau0->dB() < dxycut && dau1->dB() < dxycut;
          }
-  else if(Flag=="_Iso"){
+  else if(Flag=="_IsoVPJ"){
   return (dau0->hcalIso() + dau0->ecalIso() + dau0->trackIso()) / dau0->pt() < isocut &&  
          (dau1->hcalIso() + dau1->ecalIso() + dau1->trackIso()) / dau1->pt() < isocut;
          }
@@ -475,7 +475,7 @@ inline bool RecSelected(string Flag, string EID, const reco::CompositeCandidate 
 	iso1 = (dau1->hcalIso()< hcal_iso_95_EE && dau1->ecalIso() < ecal_iso_95_EE && dau1->trackIso()< track_iso_95_EE);}
   return iso0 && iso1;         
   }
-  else if(Flag=="_EiD"){
+  else if(Flag=="_EiDVPJ"){
   return electron_ID0 && electron_ID1;
          }
   else if(Flag=="_EiDVBTF"){
@@ -791,7 +791,7 @@ inline bool singleEl_Tag(const reco::Candidate& cand){
 }
 
 //Probe cuts VPJ
-inline bool singleEl_Probe_Acc(const reco::Candidate& cand){
+inline bool singleEl_Probe_Acc_VPJ(const reco::Candidate& cand){
   const pat::Electron* electron = dynamic_cast<const pat::Electron*>(&cand);
   if (!electron) {
      const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (&cand);
@@ -838,7 +838,7 @@ inline bool singleEl_Probe_Imp(const reco::Candidate& cand){
   return false;}
   }
   
-inline bool singleEl_Probe_Iso(const reco::Candidate& cand){
+inline bool singleEl_Probe_Iso_VPJ(const reco::Candidate& cand){
   const pat::Electron* electron = dynamic_cast<const pat::Electron*>(&cand);
   if (!electron) {
      const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (&cand);
@@ -852,7 +852,7 @@ inline bool singleEl_Probe_Iso(const reco::Candidate& cand){
   return false;}
   }
   
-inline bool singleEl_Probe_EiD(const reco::Candidate& cand){
+inline bool singleEl_Probe_EiD_VPJ(const reco::Candidate& cand){
   const pat::Electron* electron = dynamic_cast<const pat::Electron*>(&cand);
   if (!electron) {
      const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (&cand);

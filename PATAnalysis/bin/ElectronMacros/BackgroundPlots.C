@@ -54,9 +54,9 @@ void BackPlots(string selections){
        _RecoCutFlags[i] = "_1";}
    
        if(selections=="VPJ"){
-       _RecoCutFlags[_Acc] =  "_Acc";
-       _RecoCutFlags[_Iso] =  "_Iso";
-       _RecoCutFlags[_EiD] =  "_EiD";}
+       _RecoCutFlags[_Acc] =  "_AccVPJ";
+       _RecoCutFlags[_Iso] =  "_IsoVPJ";
+       _RecoCutFlags[_EiD] =  "_EiDVPJ";}
        if(selections=="VBTF"){
        _RecoCutFlags[_Acc] =  "_AccVBTF";
        _RecoCutFlags[_Iso] =  "_IsoVBTF";

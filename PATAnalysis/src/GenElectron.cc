@@ -42,8 +42,7 @@ genLeadElPt_Acc(0), genSecElPt_Acc(0), genLeadElEta_Acc(0), genSecElEta_Acc(0),
 
 JetMinDeltaRZDau_GEN(0),
 
-_ptjetmin(30.), _etajetmax(3.), _norm(1.), _Norm(true), _Sumw2(false), _EventsPerFile(0),
-_file(0), _dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _selections("VBTF"), _histovector()
+_ptjetmin(30.), _etajetmax(3.), _norm(1.), _Norm(false), _Sumw2(false), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _file(0), _dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _selections("VBTF"), _histovector()
 {   }
 
 void GenElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
@@ -57,6 +56,8 @@ void GenElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _Norm      = iConfig.getParameter<bool>("Norm");
    _Sumw2      = iConfig.getParameter<bool>("Sumw2");
    _EventsPerFile      = iConfig.getParameter<int32_t>("EventsPerFile");
+   _EventNumber    = iConfig.getParameter<int32_t>("EventNumber");
+   _ProcEvents    = iConfig.getParameter<int32_t>("ProcEvents");
 
     cout << "GenElectron file name : " << _file->GetName() << endl;
    _file->cd();
@@ -136,15 +137,16 @@ void GenElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
     fileCounter++;
   }
    
-  if(_Norm==true){
-  _entries = ch->GetEntries();
-  cout<<"RecoElectron analyzing nr. file = "<<fileCounter<<endl;
-  cout<<"GenElectron analyzing nr. event = "<<_entries<<endl;}
+  if(_EventNumber==0 && _EventsPerFile==0)_entries = ch->GetEntries();
   
-  if(_Norm==false){
-  _entries = fileCounter*_EventsPerFile;
-  cout<<"GenElectron analyzing nr. file = "<<fileCounter<<endl;
-  cout<<"GenElectron analyzing nr. event = "<<_entries<<endl;}
+  if(_EventNumber!=0 && _EventsPerFile==0)_entries = _EventNumber;
+ 
+  if(_EventNumber==0 && _EventsPerFile!=0)_entries = fileCounter*_EventsPerFile;
+  
+  if(_ProcEvents!=-1)_entries = _ProcEvents;
+  
+  cout<<"RecoElectron analyzing nr. file = "<<fileCounter<<endl;
+  cout<<"RecoElectron analyzing nr. event = "<<_entries<<endl;
   
   delete ch;
 
@@ -351,7 +353,7 @@ void GenElectron::finalize(){
    
    double lumi = _entries/_xsec;
 
-   if(lumi){
+   if(_Norm && lumi!=0){
    _norm = _targetLumi/lumi;
    }
    

@@ -46,7 +46,7 @@ genLeadElPtEff_1(0), genLeadElPtEff_12(0), genLeadElPtEff_123(0), genLeadElPtEff
 AccDenom_genPtZ(0), AccDenom_genMassZ(0), AccDenom_genEtaZ(0), AccDenom_genLeadElEta(0), AccDenom_genLeadElPt(0), AccDenom_GenIsoJetNumber(0),
 EffDenom_genPtZ(0), EffDenom_genMassZ(0), EffDenom_genEtaZ(0), EffDenom_genLeadElEta(0), EffDenom_genLeadElPt(0), EffDenom_GenIsoJetNumber(0),
 
-_sample("mc"), _selections("VBTF"), _dir(0), _electronID("eidRobustTight"), _file(0), _Acc(1), _Trg(2), _Qual(3), _Imp(4), _Iso(5), _EiD(6), _histoVector(), _nbin(10), _xmin(-0.5), _xmax(9.5), _Norm(true), _norm(1.), _entries(0), _EventsPerFile(0) 
+_sample("mc"), _selections("VBTF"), _dir(0), _electronID("eidRobustLoose"), _file(0), _Acc(1), _Trg(2), _Qual(3), _Imp(4), _Iso(5), _EiD(6), _histoVector(), _nbin(10), _xmin(-0.5), _xmax(9.5), _Norm(false), _norm(1.), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1)
 
 { }
 
@@ -60,6 +60,8 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
     _electronID = iConfig.getParameter<std::string>("electronID");
     _Norm      = iConfig.getParameter<bool>("Norm");
     _EventsPerFile    = iConfig.getParameter<int32_t>("EventsPerFile");
+    _EventNumber    = iConfig.getParameter<int32_t>("EventNumber");
+    _ProcEvents    = iConfig.getParameter<int32_t>("ProcEvents");
     _targetLumi= iConfig.getParameter<double>("targetLumi");
     _xsec      = iConfig.getParameter<double>("CrossSection");
     
@@ -75,9 +77,9 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _RecoCutFlags[i] = "_1";}
    
    if(_selections=="VPJ"){
-   _RecoCutFlags[_Acc] =  "_Acc";
-   _RecoCutFlags[_Iso] =  "_Iso";
-   _RecoCutFlags[_EiD] =  "_EiD";}
+   _RecoCutFlags[_Acc] =  "_AccVPJ";
+   _RecoCutFlags[_Iso] =  "_IsoVPJ";
+   _RecoCutFlags[_EiD] =  "_EiDVPJ";}
    if(_selections=="VBTF"){
    _RecoCutFlags[_Acc] =  "_AccVBTF";
    _RecoCutFlags[_Iso] =  "_IsoVBTF";
@@ -267,13 +269,13 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
   probe_cuts_123456.clear();
   
   for(unsigned int i = 1; i < 6; i++){
-  if(_RecoCutFlags[i] == "_Acc"){
-  if(i<2)probe_cuts_1.push_back(singleEl_Probe_Acc);
-  if(i<3)probe_cuts_12.push_back(singleEl_Probe_Acc);
-  if(i<4)probe_cuts_123.push_back(singleEl_Probe_Acc);
-  if(i<5)probe_cuts_1234.push_back(singleEl_Probe_Acc);
-  if(i<6)probe_cuts_12345.push_back(singleEl_Probe_Acc);
-  if(i<7)probe_cuts_123456.push_back(singleEl_Probe_Acc);}
+  if(_RecoCutFlags[i] == "_AccVPJ"){
+  if(i<2)probe_cuts_1.push_back(singleEl_Probe_Acc_VPJ);
+  if(i<3)probe_cuts_12.push_back(singleEl_Probe_Acc_VPJ);
+  if(i<4)probe_cuts_123.push_back(singleEl_Probe_Acc_VPJ);
+  if(i<5)probe_cuts_1234.push_back(singleEl_Probe_Acc_VPJ);
+  if(i<6)probe_cuts_12345.push_back(singleEl_Probe_Acc_VPJ);
+  if(i<7)probe_cuts_123456.push_back(singleEl_Probe_Acc_VPJ);}
   if(_RecoCutFlags[i] == "_Qual"){
   if(i<2)probe_cuts_1.push_back(singleEl_Probe_Qual);
   if(i<3)probe_cuts_12.push_back(singleEl_Probe_Qual);
@@ -288,20 +290,20 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
   if(i<5)probe_cuts_1234.push_back(singleEl_Probe_Imp);
   if(i<6)probe_cuts_12345.push_back(singleEl_Probe_Imp);
   if(i<7)probe_cuts_123456.push_back(singleEl_Probe_Imp);}
-  if(_RecoCutFlags[i] == "_Iso"){
-  if(i<2)probe_cuts_1.push_back(singleEl_Probe_Iso);
-  if(i<3)probe_cuts_12.push_back(singleEl_Probe_Iso);
-  if(i<4)probe_cuts_123.push_back(singleEl_Probe_Iso);
-  if(i<5)probe_cuts_1234.push_back(singleEl_Probe_Iso);
-  if(i<6)probe_cuts_12345.push_back(singleEl_Probe_Iso);
-  if(i<7)probe_cuts_123456.push_back(singleEl_Probe_Iso);}
-  if(_RecoCutFlags[i] == "_EiD"){
-  if(i<2)probe_cuts_1.push_back(singleEl_Probe_EiD);
-  if(i<3)probe_cuts_12.push_back(singleEl_Probe_EiD);
-  if(i<4)probe_cuts_123.push_back(singleEl_Probe_EiD);
-  if(i<5)probe_cuts_1234.push_back(singleEl_Probe_EiD);
-  if(i<6)probe_cuts_12345.push_back(singleEl_Probe_EiD);
-  if(i<7)probe_cuts_123456.push_back(singleEl_Probe_EiD);}
+  if(_RecoCutFlags[i] == "_IsoVPJ"){
+  if(i<2)probe_cuts_1.push_back(singleEl_Probe_Iso_VPJ);
+  if(i<3)probe_cuts_12.push_back(singleEl_Probe_Iso_VPJ);
+  if(i<4)probe_cuts_123.push_back(singleEl_Probe_Iso_VPJ);
+  if(i<5)probe_cuts_1234.push_back(singleEl_Probe_Iso_VPJ);
+  if(i<6)probe_cuts_12345.push_back(singleEl_Probe_Iso_VPJ);
+  if(i<7)probe_cuts_123456.push_back(singleEl_Probe_Iso_VPJ);}
+  if(_RecoCutFlags[i] == "_EiDVPJ"){
+  if(i<2)probe_cuts_1.push_back(singleEl_Probe_EiD_VPJ);
+  if(i<3)probe_cuts_12.push_back(singleEl_Probe_EiD_VPJ);
+  if(i<4)probe_cuts_123.push_back(singleEl_Probe_EiD_VPJ);
+  if(i<5)probe_cuts_1234.push_back(singleEl_Probe_EiD_VPJ);
+  if(i<6)probe_cuts_12345.push_back(singleEl_Probe_EiD_VPJ);
+  if(i<7)probe_cuts_123456.push_back(singleEl_Probe_EiD_VPJ);}
   if(_RecoCutFlags[i] == "_1"){
   if(i<2)probe_cuts_1.push_back(singleEl_Probe_True);
   if(i<3)probe_cuts_12.push_back(singleEl_Probe_True);
@@ -566,16 +568,16 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
     fileCounter++;
   }
   
-  if(_Norm==true){
-  _entries = ch->GetEntries();
-  cout<<"RecoElectron analyzing nr. file = "<<fileCounter<<endl;
-  cout<<"RecoElectron analyzing nr. event = "<<_entries<<endl;}
+  if(_EventNumber==0 && _EventsPerFile==0)_entries = ch->GetEntries();
+  
+  if(_EventNumber!=0 && _EventsPerFile==0)_entries = _EventNumber;
  
-  if(_Norm==false){
-  _entries = fileCounter*_EventsPerFile;
+  if(_EventNumber==0 && _EventsPerFile!=0)_entries = fileCounter*_EventsPerFile;
+  
+  if(_ProcEvents!=-1)_entries = _ProcEvents;
+  
   cout<<"RecoElectron analyzing nr. file = "<<fileCounter<<endl;
   cout<<"RecoElectron analyzing nr. event = "<<_entries<<endl;
-  }
   
   delete ch;
   
@@ -827,7 +829,7 @@ if(RecSelected_TagAndProbe((*zrecHandle)[0], _selections)){
 
 double lumi = _entries/_xsec;
 
-   if(lumi){
+   if(_Norm && lumi!=0){
    _norm = _targetLumi/lumi;
    }
 

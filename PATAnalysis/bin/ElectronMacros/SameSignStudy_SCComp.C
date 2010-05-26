@@ -18,7 +18,7 @@
 
 using namespace std;
 
-void SCComp() {
+void SCComp(string selections) {
 
         gROOT->SetStyle("Plain");
 
@@ -29,16 +29,21 @@ void SCComp() {
 	int _Iso  = 4;
 	int _EiD  = 5;
 	
-	string _RecoCutFlags[7];
 	for(int i=0; i<7; i++){
-		_RecoCutFlags[i] = "_1";}
-	
-	_RecoCutFlags[_Acc] =  "_Acc";
-	_RecoCutFlags[_Trg] =  "_Trg";
-	_RecoCutFlags[_Qual] = "_Qual";
-	_RecoCutFlags[_Imp] =  "_Imp";
-	_RecoCutFlags[_Iso] =  "_Iso";
-	_RecoCutFlags[_EiD] =  "_EiD";
+       _RecoCutFlags[i] = "_1";}
+   
+       if(selections=="VPJ"){
+       _RecoCutFlags[_Acc] =  "_AccVPJ";
+       _RecoCutFlags[_Iso] =  "_IsoVPJ";
+       _RecoCutFlags[_EiD] =  "_EiDVPJ";}
+       if(selections=="VBTF"){
+       _RecoCutFlags[_Acc] =  "_AccVBTF";
+       _RecoCutFlags[_Iso] =  "_IsoVBTF";
+       _RecoCutFlags[_EiD] =  "_EiDVBTF";}
+     
+       _RecoCutFlags[_Trg] =  "_Trg";
+       _RecoCutFlags[_Qual] = "_Qual";
+       _RecoCutFlags[_Imp] =  "_Imp";
 
 gROOT->SetStyle("Plain");
 

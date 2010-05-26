@@ -86,7 +86,7 @@ private:
   
   double _norm;
   
-  int _entries, _EventsPerFile;
+  int _entries, _EventsPerFile, _EventNumber, _ProcEvents;
   
   double _targetLumi;
   

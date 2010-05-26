@@ -96,7 +96,7 @@ private:
   
   double _xsec;
   
-  int _entries, _EventsPerFile, _Acc, _Trg, _Qual, _Imp, _Iso, _EiD;
+  int _entries, _EventsPerFile, _EventNumber, _ProcEvents, _Acc, _Trg, _Qual, _Imp, _Iso, _EiD;
   
   std::string _RecoCutFlags[7];
   

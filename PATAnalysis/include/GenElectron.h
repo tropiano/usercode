@@ -73,7 +73,7 @@ private:
   
   bool _Sumw2;
 
-  int _entries, _EventsPerFile;
+  int _entries, _EventsPerFile, _EventNumber, _ProcEvents;
 
   TFile* _file;  
 

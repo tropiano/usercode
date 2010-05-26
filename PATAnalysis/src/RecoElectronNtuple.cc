@@ -32,7 +32,7 @@ using namespace edm;
 
 RecoElectronNtuple::RecoElectronNtuple(): 
  
-_sample("mc"), _ptjetmin(30.), _etajetmax(3.), _isocut(0.1), _weight(1.), _Acc(1), _Trg(2), _Qual(3), _Imp(4), _Iso(5), _EiD(6)
+_sample("mc"), _ptjetmin(30.), _etajetmax(3.), _isocut(0.1), _weight(1.), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _Acc(1), _Trg(2), _Qual(3), _Imp(4), _Iso(5), _EiD(6), _Norm(false), _electronID("eidRobustLoose")
 
 { }
 
@@ -49,6 +49,8 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    _xsec      = iConfig.getParameter<double>("CrossSection");
    _Norm      = iConfig.getParameter<bool>("Norm");
    _EventsPerFile    = iConfig.getParameter<int32_t>("EventsPerFile");
+   _EventNumber    = iConfig.getParameter<int32_t>("EventNumber");
+   _ProcEvents    = iConfig.getParameter<int32_t>("ProcEvents");
    
    //Selections
    _Acc = iConfig.getParameter<int32_t>("Acc");
@@ -62,9 +64,9 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    _RecoCutFlags[i] = "_1";}
    
    if(_selections=="VPJ"){
-   _RecoCutFlags[_Acc] =  "_Acc";
-   _RecoCutFlags[_Iso] =  "_Iso";
-   _RecoCutFlags[_EiD] =  "_EiD";}
+   _RecoCutFlags[_Acc] =  "_AccVPJ";
+   _RecoCutFlags[_Iso] =  "_IsoVPJ";
+   _RecoCutFlags[_EiD] =  "_EiDVPJ";}
    if(_selections=="VBTF"){
    _RecoCutFlags[_Acc] =  "_AccVBTF";
    _RecoCutFlags[_Iso] =  "_IsoVBTF";
@@ -263,24 +265,24 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
     fileCounter++;
   }
   
-  if(_Norm==true){
-  _entries = ch->GetEntries();
-  cout<<"RecoElectronNtuple analyzing nr. file = "<<fileCounter<<endl;
-  cout<<"RecoElectron analyzing nr. event = "<<_entries<<endl;}
+  if(_EventNumber==0 && _EventsPerFile==0)_entries = ch->GetEntries();
+  
+  if(_EventNumber!=0 && _EventsPerFile==0)_entries = _EventNumber;
  
-  if(_Norm==false){
-  _entries = fileCounter*_EventsPerFile;
+  if(_EventNumber==0 && _EventsPerFile!=0)_entries = fileCounter*_EventsPerFile;
+  
+  if(_ProcEvents!=-1)_entries = _ProcEvents;
+  
   cout<<"RecoElectron analyzing nr. file = "<<fileCounter<<endl;
   cout<<"RecoElectron analyzing nr. event = "<<_entries<<endl;
-  }
   
   delete ch;
   
   double lumi = _entries/_xsec;
 
-  if(lumi){
-  _weight = _targetLumi/lumi;
-  }
+  if(_Norm && lumi!=0){
+   _weight = _targetLumi/lumi;
+   }
   
   cout << "RecoElectron Worker built." << endl;   
  

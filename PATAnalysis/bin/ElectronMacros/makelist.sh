@@ -4,8 +4,7 @@ LIST=Summer09_test.txt
 TMPLIST=tmp_list.txt
 DIR=/data/sfrosali/PATtuple/MC/ZeeSummer09_7TeV_akt5_335_wGenP/
 
-ls -l $DIR > $TMPLIST
-#rfdir $DIR > $TMPLIST
+ls -l $DIR | grep root > $TMPLIST
 
 COUNT=0
 
