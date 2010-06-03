@@ -64,7 +64,7 @@ private:
 
   double _norm;
 
-  std::string _zcandSrc;
+  std::string _zcandSrc, _jetSrc;
 
   TFile* _file; 
 

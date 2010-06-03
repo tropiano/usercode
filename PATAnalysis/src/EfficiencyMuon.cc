@@ -33,6 +33,7 @@ void EfficiencyMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
   _xmin      = iConfig.getParameter<double>("XMin");
   _xmax      = iConfig.getParameter<double>("XMax");
   _zcandSrc  = iConfig.getParameter<std::string>("Zsource");
+  _jetSrc  = iConfig.getParameter<std::string>("JetSource");
   _oppositeCharge = iConfig.getParameter<bool>("OppositeCharge");
   _requireGenInAcceptance = iConfig.getParameter<bool>("RequireGenInAcceptance");
   _vsGenMulti = iConfig.getParameter<bool>("VsGenMulti");
@@ -182,7 +183,7 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
    zHandle.getByLabel(iEvent, _zcandSrc.c_str());
 
    fwlite::Handle<std::vector<pat::Jet> > jetHandle;
-   jetHandle.getByLabel(iEvent, "selectedJets");
+   jetHandle.getByLabel(iEvent, _jetSrc.c_str());
 
    fwlite::Handle<std::vector<reco::GenJet> > genJetHandle;
    if (_vsGenMulti){
@@ -197,52 +198,7 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
       zGenHandle.getByLabel(iEvent, "zmumugenfull");
    }
 
-   std::vector<const pat::Jet*> jets = GetJets<pat::Jet>(*jetHandle, _ptjetmin, _etajetmax); 
-   double recosize = jets.size();
-   double gensize  = 0;
-   if (_vsGenMulti || _trainUnfolding){
-      std::vector<const reco::GenJet*> genjets = GetJets<reco::GenJet>(*genJetHandle, _ptjetmin, _etajetmax);
-      gensize = genjets.size();
-   }
-   //use reco size unless asked to use gen size.
-   //for the tag and probe use recosize anyway
-   double size = _vsGenMulti ? gensize : recosize;       
-
-   bool denominatorCondition = _requireGenInAcceptance ? GenSelectedInAcceptanceMuon(*zGenHandle) : true;
-
-   bool generatedCondition   = _requireGenInAcceptance ? GenSelectedMuon(*zGenHandle): true;
-   if (generatedCondition) _acc_den->Fill(size, w);
-
-   if (denominatorCondition) {
-      generalefficiency_denominator->Fill(size, w);
-      _acc_num->Fill(size, w); 
-   }    
-
-   if (!denominatorCondition) return;
-
-   bool recselected = /*zHandle->size()==1 &&*/ RecSelectedMuonWithTrigger(*zHandle, *triggerHandle, _isocut);
-
-   ///unfolding training
-   if (_trainUnfolding){
-      if (recselected)
-        _jetmultiResponse->Fill(recosize, gensize, w);
-      else _jetmultiResponse->Miss(gensize, w);  
-   }
-
-   //global efficiency 
-   if (recselected) generalefficiency_numerator->Fill(size, w);
-
-   //now the efficiencies step by step
-  
-   //first store vectors of pointers to the muons
-   std::vector<const pat::Muon*> allmuons;
-   std::vector<pat::Muon>::const_iterator imu;
-   std::vector<pat::Muon>::const_iterator imubeg = muonHandle->begin(); 
-   std::vector<pat::Muon>::const_iterator imuend = muonHandle->end(); 
-   for (imu = imubeg; imu != imuend; ++imu){
-    allmuons.push_back(&*imu);
-   }
-
+   //get Z candidate
    std::vector<const pat::Muon*> muonsfromZ;
    const pat::Muon* dau0 = 0;
    const pat::Muon* dau1 = 0;
@@ -265,12 +221,64 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
        dau1 = dynamic_cast<const pat::Muon*>(scc->masterClone().get());
      }
     }
-    //assert(dau0 && dau1);
+    assert(dau0 && dau1);
     muonsfromZ.push_back(dau0);
     muonsfromZ.push_back(dau1);
    }
-  
+
    std::sort(muonsfromZ.begin(), muonsfromZ.end(), sortByPt<pat::Muon>); 
+   
+   bool recselected = RecSelectedMuonWithTrigger(*zHandle, *triggerHandle, _isocut);
+
+   //if this is a good Z event remove Z candidates from jet collection
+   std::vector<pat::Jet> cleanedJets;
+   CleanJets(*jetHandle, muonsfromZ, cleanedJets, 0.5);
+   std::vector<const pat::Jet*> jets = GetJets<pat::Jet>(cleanedJets, _ptjetmin, _etajetmax); 
+
+   double recosize = jets.size();
+   double gensize  = 0;
+   if (_vsGenMulti || _trainUnfolding){
+      std::vector<const reco::GenJet*> genjets = GetJets<reco::GenJet>(*genJetHandle, _ptjetmin, _etajetmax);
+      gensize = genjets.size();
+   }
+   //use reco size unless asked to use gen size.
+   //for the tag and probe use recosize anyway
+   double size = _vsGenMulti ? gensize : recosize;       
+
+   bool denominatorCondition = _requireGenInAcceptance ? GenSelectedInAcceptanceMuon(*zGenHandle) : true;
+
+   bool generatedCondition   = _requireGenInAcceptance ? GenSelectedMuon(*zGenHandle): true;
+   if (generatedCondition) _acc_den->Fill(size, w);
+
+   if (denominatorCondition) {
+      generalefficiency_denominator->Fill(size, w);
+      _acc_num->Fill(size, w); 
+   }    
+
+   if (!denominatorCondition) return;
+
+
+   ///unfolding training
+   if (_trainUnfolding){
+      if (recselected)
+        _jetmultiResponse->Fill(recosize, gensize, w);
+      else _jetmultiResponse->Miss(gensize, w);  
+   }
+
+   //global efficiency 
+   if (recselected) generalefficiency_numerator->Fill(size, w);
+
+   //now the efficiencies step by step
+  
+   //first store vectors of pointers to the muons
+   std::vector<const pat::Muon*> allmuons;
+   std::vector<pat::Muon>::const_iterator imu;
+   std::vector<pat::Muon>::const_iterator imubeg = muonHandle->begin(); 
+   std::vector<pat::Muon>::const_iterator imuend = muonHandle->end(); 
+   for (imu = imubeg; imu != imuend; ++imu){
+    allmuons.push_back(&*imu);
+   }
+
   
    bool isMuTriggered  = isMuonTriggered(*triggerHandle);
    bool isJTriggered = isJetTriggered(*triggerHandle);

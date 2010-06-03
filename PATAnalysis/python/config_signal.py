@@ -21,7 +21,8 @@ process.zmumurec = cms.PSet (
   MaxEtaJet   = cms.double(3.),
   ScaleFactor = cms.double(1.),
   IsoCut      = cms.double(0.3),
-  Zsource     = cms.string("zmumurec")
+  Zsource     = cms.string("zmumurec"),
+  JetSource     = cms.string("selectedJets")
 )
 
 process.zmumueff = cms.PSet (
@@ -38,6 +39,7 @@ process.zmumueff = cms.PSet (
   XMax        = cms.double(9.5),
   IsoCut      = cms.double(0.3),
   Zsource     = cms.string("zmumurec"),
+  JetSource     = cms.string("selectedJets"),
   OppositeCharge = cms.bool(True)
 )
 
@@ -55,6 +57,7 @@ process.zmumueffVsRec = cms.PSet (
   XMax        = cms.double(9.5),
   IsoCut      = cms.double(0.3),
   Zsource     = cms.string("zmumurec"),
+  JetSource     = cms.string("selectedJets"),
   OppositeCharge = cms.bool(True)
 )
 
@@ -73,6 +76,7 @@ process.zmumueffVsGen = cms.PSet (
   XMax        = cms.double(9.5),
   IsoCut      = cms.double(0.3),
   Zsource     = cms.string("zmumurec"),
+  JetSource     = cms.string("selectedJets"),
   OppositeCharge = cms.bool(True)
 )
 

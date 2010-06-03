@@ -8,6 +8,7 @@
 #include "DataFormats/Candidate/interface/CompositeCandidate.h"
 #include "DataFormats/RecoCandidate/interface/IsoDeposit.h"
 #include "DataFormats/Candidate/interface/ShallowCloneCandidate.h"
+#include "DataFormats/Math/interface/deltaR.h"
 
 #include <vector>
 #include <math.h>
@@ -18,11 +19,11 @@
 #include "TMatrixD.h"
 #include "TVectorD.h"
 
-static double ptmucut_leading = 16.; //20.;
-static double ptmucut_second = 16.; //10.;
+static double ptmucut_leading = 20.;
+static double ptmucut_second = 10.;
 static double etamucut_leading = 2.1;
 static double etamucut_second = 2.4;
-static double zmassmin = 25.;
+static double zmassmin = 60.;
 static double zmassmax = 110.;
 static double zmassgenmin = 50.;
 static double minnhit = 10.;
@@ -284,7 +285,20 @@ inline bool RecSelectedMuon(const std::vector<reco::CompositeCandidate>& ZREC, d
     dau0 = dynamic_cast<const pat::Muon*>(ZREC[0].daughter(0));
     dau1 = dynamic_cast<const pat::Muon*>(ZREC[0].daughter(1));
   }  
-  
+  if (!dau0) {
+     //maybe a shallow clone
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (ZREC[0].daughter(0));
+     if (scc && scc->hasMasterClone()){
+       dau0 = dynamic_cast<const pat::Muon*>(scc->masterClone().get());
+     }
+  }
+  if (!dau1) {
+     //maybe a shallow clone
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (ZREC[0].daughter(1));
+     if (scc && scc->hasMasterClone()){
+       dau1 = dynamic_cast<const pat::Muon*>(scc->masterClone().get());
+     }
+  }
   assert(dau0 && dau1);
   const pat::Muon* leading = dau0->pt() > dau1->pt() ? dau0 : dau1;
   const pat::Muon* second  = dau0->pt() > dau1->pt() ? dau1 : dau0;
@@ -340,6 +354,21 @@ GetJets(const std::vector<JET>& jets, double ptmin, double etamax){
     if (jets[i].pt() > ptmin && fabs(jets[i].eta()) < etamax) selectedjets.push_back(&jets[i]);
   }
   return selectedjets;
+}
+
+template<class JET>
+void
+CleanJets(const std::vector<JET>& jets, const std::vector<const pat::Muon*> muons,  std::vector<JET>& cleanedjets, double deltaRmin = 0.5){
+  for (unsigned int i = 0; i < jets.size();  ++i){
+    bool close = false; 
+    for (unsigned int j = 0; j < muons.size();  ++j){
+      if (reco::deltaR(jets[i].p4(), muons[j]->p4()) < deltaRmin){
+        close = true;
+        break;
+      }
+    }
+    if (!close) cleanedjets.push_back(jets[i]);
+  }
 }
 
 

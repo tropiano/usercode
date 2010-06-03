@@ -79,7 +79,7 @@ private:
 
    double _xmax;
 
-   std::string _zcandSrc;
+   std::string _zcandSrc, _jetSrc;
 
    bool _oppositeCharge;
 

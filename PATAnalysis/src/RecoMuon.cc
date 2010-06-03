@@ -49,6 +49,7 @@ void RecoMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
    _etajetmax = iConfig.getParameter<double>("MaxEtaJet");
    _norm      = iConfig.getParameter<double>("ScaleFactor");
    _zcandSrc  = iConfig.getParameter<std::string>("Zsource");
+   _jetSrc  = iConfig.getParameter<std::string>("JetSource");
 
    //_file = proofFile->OpenFile("RECREATE");
    cout << "RecoMuon file name : " << _file->GetName() << endl;
@@ -91,6 +92,13 @@ void RecoMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
    _histoVector.push_back(recLeadJetPt);
    recLeadJetEta = new TH1D("recLeadJetEta", "Reconstructed Leading Jet #eta", 100, -5, 5); 
    _histoVector.push_back(recLeadJetEta);
+   std::vector<TH1D*>::const_iterator ibeg = _histoVector.begin();
+   std::vector<TH1D*>::const_iterator iend = _histoVector.end();
+   //use the errors as they were from real data 
+   for (std::vector<TH1D*>::const_iterator i = ibeg; i != iend; ++i){
+     if (*i) //(*i)->Scale(_norm);
+      (*i)->Sumw2();
+   } 
   _dir->cd("-");
    
   cout << "RecoMuon Worker built." << endl;   
@@ -117,7 +125,7 @@ void  RecoMuon::process(const fwlite::Event& iEvent)
    zHandle.getByLabel(iEvent, _zcandSrc.c_str());//"zmumurec");
 
    fwlite::Handle<std::vector<pat::Jet> > jetHandle;
-   jetHandle.getByLabel(iEvent, "selectedJets");
+   jetHandle.getByLabel(iEvent, _jetSrc.c_str());
 
    fwlite::Handle<pat::TriggerEvent> triggerHandle;
    triggerHandle.getByLabel(iEvent, "patTriggerEvent");
@@ -129,13 +137,32 @@ void  RecoMuon::process(const fwlite::Event& iEvent)
    //we just take the first element in the collection of Z candidates.
    //That is the candidate in which the leading muon has the highest pt
    
+   std::vector<const pat::Muon*> muonsfromZ;
    const pat::Muon* dau0 = 0;
    const pat::Muon* dau1 = 0;
    if (zHandle->size() > 0){
     //take the two muons with all the needed castings
     dau0 = dynamic_cast<const pat::Muon*>((*zHandle)[0].daughter(0));
     dau1 = dynamic_cast<const pat::Muon*>((*zHandle)[0].daughter(1));
+    if (!dau0) {
+     //maybe a shallow clone
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> ((*zHandle)[0].daughter(0));
+     if (scc && scc->hasMasterClone()){
+       dau0 = dynamic_cast<const pat::Muon*>(scc->masterClone().get());
+     }
+    }
+    if (!dau1) {
+     //maybe a shallow clone
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> ((*zHandle)[0].daughter(1));
+     if (scc && scc->hasMasterClone()){
+       dau1 = dynamic_cast<const pat::Muon*>(scc->masterClone().get());
+     }
+    }
+    assert(dau0 && dau1);
+    muonsfromZ.push_back(dau0);
+    muonsfromZ.push_back(dau1);
   }
+  std::sort(muonsfromZ.begin(), muonsfromZ.end(), sortByPt<pat::Muon>); 
 
    if (RecSelectedMuonWithTrigger(*zHandle, *triggerHandle, _isocut, dau0, dau1)){
    //if (RecSelectedMuon(*zHandle, _isocut, dau0, dau1)){
@@ -148,8 +175,10 @@ void  RecoMuon::process(const fwlite::Event& iEvent)
       recSecMuPt->Fill((*zHandle)[0].daughter(1)->pt(), _norm);
       recSecMuEta->Fill((*zHandle)[0].daughter(1)->eta(), _norm);
    
-   
-      std::vector<const pat::Jet*> recjets = GetJets<pat::Jet>(*jetHandle, _ptjetmin, _etajetmax);
+  
+      std::vector<pat::Jet> cleanJets;
+      CleanJets(*jetHandle, muonsfromZ, cleanJets, 0.5);
+      std::vector<const pat::Jet*> recjets = GetJets<pat::Jet>(cleanJets, _ptjetmin, _etajetmax);
 
       _dir->cd();
       addHistosVsMulti(recjets.size(), "recJetPtIncl", " reconstructed jet p_{T} spectrum", 200, 0, 200, recJetPtVsInclMulti);
@@ -208,7 +237,7 @@ void  RecoMuon::process(const fwlite::Event& iEvent)
 }
 
 void RecoMuon::finalize(){
-   _histoVector.insert(_histoVector.end(), recJetPtVsInclMulti.begin(), recJetPtVsInclMulti.end());
+   /*_histoVector.insert(_histoVector.end(), recJetPtVsInclMulti.begin(), recJetPtVsInclMulti.end());
    _histoVector.insert(_histoVector.end(), recJetEtaVsInclMulti.begin(), recJetEtaVsInclMulti.end());
 
    _histoVector.insert(_histoVector.end(), recZPtVsInclMulti.begin(), recZPtVsInclMulti.end());
@@ -236,7 +265,7 @@ void RecoMuon::finalize(){
      if (*i) //(*i)->Scale(_norm);
       (*i)->Sumw2();
    }
-
+   */
    
   _file->Write();
   //_file->Close();
