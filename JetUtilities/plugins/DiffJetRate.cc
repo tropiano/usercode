@@ -13,7 +13,7 @@
 //
 // Original Author:  pts/1
 //         Created:  Tue Jun 24 18:05:01 CEST 2008
-// $Id: DiffJetRate.cc,v 1.1 2009/02/19 10:32:18 lenzip Exp $
+// $Id: DiffJetRate.cc,v 1.2 2010/05/06 09:25:10 sfrosali Exp $
 //
 //
 
@@ -161,7 +161,7 @@ DiffJetRate::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
    }  
 
    double min = -99999;
-   if (pIn->size() == _njets){
+   if ((int) pIn->size() == _njets){
       min = minDistance(*(pIn.product()), corrector);
       min = log10(sqrt(min));
    } else {

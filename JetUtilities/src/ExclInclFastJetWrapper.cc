@@ -173,7 +173,7 @@ void ExclInclFastJetWrapper::run(const JetReco::InputCollection& fInput, JetReco
      else if (theMode==3){
        //if the input collection has less element than requested jets do nothing.
        //An empty jet collection will appear in the event
-       if (fInput.size() < theNjets) return;
+       if ((int) fInput.size() < theNjets) return;
        theJets=clust_AAseq.exclusive_jets(theNjets);
        /*if (theJets.size() != theNjets){
           cout << "number of jets different from expected: requested " << theNjets << " obtained " << theJets.size() << "; items in input collection " << fInput.size() << endl;
@@ -234,7 +234,7 @@ void ExclInclFastJetWrapper::run(const JetReco::InputCollection& fInput, JetReco
        //cout << "Running..." << endl;
        //if the input collection has less element than requested jets do nothing.
        //An empty jet collection will appear in the event 
-       if (fInput.size() < theNjets) return;
+       if ((int) fInput.size() < theNjets) return;
        theJets=clust_seq.exclusive_jets(theNjets);
        /*if (theJets.size() != theNjets){
           cout << "number of jets different from expected: requested " << theNjets << " obtained " << theJets.size() << "; items in input collection " << fInput.size() << endl;

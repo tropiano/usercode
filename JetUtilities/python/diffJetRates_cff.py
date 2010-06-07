@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-from JetMETCorrections.Configuration.L2L3Corrections_Summer09_7TeV_ReReco332_cff import *
+from JetMETCorrections.Configuration.DefaultJEC_cff import *
 #from Firenze.JetUtilities.exclusiveJets_cff import *
 
 diffCaloJetRate10 = cms.EDFilter('DiffJetRate',

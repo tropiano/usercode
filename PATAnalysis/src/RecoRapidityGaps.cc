@@ -114,8 +114,8 @@ void  RecoRapidityGaps::process(const fwlite::Event& iEvent)
       if (isaccept15 && isMatched) _2jnum->Fill(deltay);
     }
   } else {
-    for (int ii = 0; ii < jets.size()-1; ++ii){
-      for (int jj = ii+1; jj < jets.size(); ++jj){
+    for (unsigned int ii = 0; ii < jets.size()-1; ++ii){
+      for (unsigned int jj = ii+1; jj < jets.size(); ++jj){
         reco::CompositeCandidate cc;
         cc.addDaughter(jets[ii], "FWD_jet");
         cc.addDaughter(jets[jj], "BWD_jet");

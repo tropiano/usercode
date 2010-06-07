@@ -10,7 +10,7 @@
 #include "DataFormats/Candidate/interface/ShallowCloneCandidate.h"
 #include "DataFormats/GsfTrackReco/interface/GsfTrack.h"
 #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
-#include "PhysicsTools/PatExamples/plugins/PatTriggerAnalyzer.h"
+//#include "PhysicsTools/PatExamples/plugins/PatTriggerAnalyzer.h"
 #include "PhysicsTools/PatUtils/interface/TriggerHelper.h"
 
 #include <vector>
