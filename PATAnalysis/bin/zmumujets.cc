@@ -32,6 +32,7 @@ TDSet* getDS(const char* filename){
 
 
 int main(){
+/*
   gEnv->SetValue("Proof.Sandbox", "/data/lenzip/RapGap/CMSSW_3_5_8/src/Firenze/PATAnalysis/bin/proof");
 
   TProof * p = TProof::Open("");
@@ -49,7 +50,6 @@ int main(){
 
   TProofLog *pl = TProof::Mgr("")->GetSessionLogs();
   pl->Save("*","/data/lenzip/RapGap/CMSSW_3_5_8/src/Firenze/PATAnalysis/bin/Log.txt");
-  
   TDSet* dataDS = getDS("/data/lenzip/RapGap/CMSSW_3_5_8/src/Firenze/PATAnalysis/bin/data.txt");
   TNamed* configdata = new TNamed("ConfigFile", (pwd+"/config_data_zmumu.py").c_str());
   p->AddInput(configdata);
@@ -62,6 +62,12 @@ int main(){
   p->Process(signalDS, "FWLiteTSelector");
   delete signalDS;
 
+  TDSet* signalMadDS = getDS("/data/lenzip/RapGap/CMSSW_3_5_8/src/Firenze/PATAnalysis/bin/signal_Madgraph.txt");
+  TNamed* configMad = new TNamed("ConfigFile", (pwd+"/config_signal_Madgraph.py").c_str());
+  p->AddInput(configMad);
+  p->Process(signalMadDS, "FWLiteTSelector");
+  delete signalMadDS;
+  
   TDSet* qcdDS = getDS("/data/lenzip/RapGap/CMSSW_3_5_8/src/Firenze/PATAnalysis/bin/qcd.txt");
   TNamed* configqcd = new TNamed("ConfigFile", (pwd+"/config_background_qcd.py").c_str());
   p->AddInput(configqcd);
@@ -103,19 +109,32 @@ int main(){
   p->AddInput(configProQ20);
   p->Process(signalProQ20DS, "FWLiteTSelector");
   delete signalProQ20DS;
-
   p->Close();
-
+*/
   //default tune
   TFile in("signal.root");
   TFile out1("signal_Eff_vsReco.root", "RECREATE");
   TFile out2("signal_Eff_vsGen.root", "RECREATE");
   EfficiencyAnalyzerMuon mueffana1(&in, &out1, 0, "EfficiencyMuonVSRecoMultiNoScale");
-  mueffana1.analyze();
+  mueffana1.analyze("z_yieldVsRec_noscale.tex");
   EfficiencyAnalyzerMuon mueffana2(&in, &out2, 0, "EfficiencyMuonVSGenMultiNoScale");
+  mueffana2.analyze("z_yieldVsGen_noscale.tex");
   mueffana2.analyze();
   out1.Close();
   out2.Close();
+
+  //madgraph
+  TFile inMadgraph("signalMadgraph.root");
+  TFile out1Madgraph("signal_Eff_vsRecoMadgraph.root", "RECREATE");
+  TFile out2Madgraph("signal_Eff_vsGenMadgraph.root", "RECREATE");
+  EfficiencyAnalyzerMuon mueffana1Madgraph(&inMadgraph, &out1Madgraph, 0, "EfficiencyMuonVSRecoMultiNoScale");
+  mueffana1Madgraph.analyze("z_yieldVsRecMadgraph_noscale.tex");
+  EfficiencyAnalyzerMuon mueffana2Madgraph(&inMadgraph, &out2Madgraph, 0, "EfficiencyMuonVSGenMultiNoScale");
+  mueffana2Madgraph.analyze("z_yieldVsGenMadgraph_noscale.tex");
+  out1Madgraph.Close();
+  out2Madgraph.Close();
+
+  /*
   //tune DW
   TFile inDW("signalDW.root");
   TFile out1DW("signal_Eff_vsRecoDW.root", "RECREATE");
@@ -156,26 +175,31 @@ int main(){
   mueffana2ProQ20.analyze();
   out1ProQ20.Close();
   out2ProQ20.Close();
-
+  */
 
   EfficiencyAnalyzerMuon zyield_ana(&in, 0, 0, "EfficiencyMuonVSRecoMulti");
-  zyield_ana.analyze("z_yield.tex");
+  zyield_ana.analyze("z_yield.tex", 0.012);
+
+  EfficiencyAnalyzerMuon zyield_anaMad(&inMadgraph, 0, 0, "EfficiencyMuonVSRecoMulti");
+  zyield_anaMad.analyze("z_yieldMad.tex", 0.012);
 
   TFile inW("w.root");
   EfficiencyAnalyzerMuon wyield_ana(&inW, 0, 0, "EfficiencyMuonVSRecoMulti");
-  wyield_ana.analyze("w_yield.tex");
+  wyield_ana.analyze("w_yield.tex", 1000.*0.012);  ///factor 1000 due to wrong normalization in the cfg (nb in place of pb)
+  wyield_ana.analyze("w_yield_noscale.tex", 9773919/10.312);
 
   TFile inQCD("qcd.root");
   EfficiencyAnalyzerMuon qcdyield_ana(&inQCD, 0, 0, "EfficiencyMuonVSRecoMulti");
-  qcdyield_ana.analyze("qcd_yield.tex");
+  qcdyield_ana.analyze("qcd_yield.tex", 0.012);
+  qcdyield_ana.analyze("qcd_yield_noscale.tex", 6342864/(296500000.*0.00116));
 
   TFile inTTbar("ttbar.root");
   EfficiencyAnalyzerMuon ttbaryield_ana(&inTTbar, 0, 0, "EfficiencyMuonVSRecoMulti");
-  ttbaryield_ana.analyze("ttbar_yield.tex");
+  ttbaryield_ana.analyze("ttbar_yield.tex", 0.012);
+  ttbaryield_ana.analyze("ttbar_yield_noscale.tex", 783404/95.);
 
   //TFile in("zmumu.root");
   //EfficiencyAnalyzerMuon yield_ana(&in, 0, 0, "EfficiencyMuonVSRecoMulti");
   //yield_ana.analyze("yield.tex");
-
 
 }
