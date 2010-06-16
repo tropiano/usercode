@@ -24,7 +24,8 @@ public :
     TagAndProbeFiller(TDirectory* output, std::string name, int nbins, double xmin, double xmax,
                 const std::vector<bool (*)(const reco::Candidate&)>& tag_cuts,
                 const std::vector<bool (*)(const reco::Candidate&)>& probe_cuts,
-                const std::vector<bool (*)(const reco::Candidate&)>& passprobe_cuts);
+                const std::vector<bool (*)(const reco::Candidate&)>& passprobe_cuts,
+                std::string tpflag="");
 
     ~TagAndProbeFiller();
 
@@ -64,6 +65,8 @@ private:
   std::vector<bool (*)(const reco::Candidate&)> _tag_cuts;
   std::vector<bool (*)(const reco::Candidate&)> _probe_cuts;
   std::vector<bool (*)(const reco::Candidate&)> _passprobe_cuts;
+  
+  std::string _tpflag;
 
 };
 

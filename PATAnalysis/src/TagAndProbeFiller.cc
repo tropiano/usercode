@@ -11,7 +11,8 @@ using namespace std;
 TagAndProbeFiller::TagAndProbeFiller(TDirectory* output, std::string name, int nbins, double xmin, double xmax,
                          const std::vector<bool (*)(const reco::Candidate&)>& tag_cuts,
                          const std::vector<bool (*)(const reco::Candidate&)>& probe_cuts,
-                         const std::vector<bool (*)(const reco::Candidate&)>& passprobe_cuts): 
+                         const std::vector<bool (*)(const reco::Candidate&)>& passprobe_cuts,
+                         string tpflag): 
 _output(output),
 _name(name),
 
@@ -22,7 +23,9 @@ _weight(1.),
 _passprobe(0),
 _tag_cuts(tag_cuts),
 _probe_cuts(probe_cuts),
-_passprobe_cuts(passprobe_cuts)
+_passprobe_cuts(passprobe_cuts),
+_tpflag(tpflag)
+
 {
   _output->cd();
   _numerator = new TH1D((name+"SingleCandTag&Probe_numerator").c_str(), (name+"SingleCandTag&Probe_numerator").c_str(), nbins, xmin, xmax);
@@ -53,9 +56,15 @@ void TagAndProbeFiller::fill(const reco::Candidate& Z, double x, double w){
   _mass = 0.;
   _probe = 0.;
   _passprobe = 0;
+  
+  if((*Z.daughter(0)).pt()<(*Z.daughter(1)).pt()){
+  throw cms::Exception("PATAnalysis:PtEl") << "################ ERROR! Pt0 < Pt1";
+  }
  
-  //tag cand 1, probe cand 2 
+  //tag cand 1, probe cand 2
+  if(_tpflag=="" || _tpflag=="soft"){
   if (tag(*(Z.daughter(0)))) probe(*(Z.daughter(1)), Z.mass(), x, w);
+  }
 
   //reset
   _mass = 0.;
@@ -63,7 +72,9 @@ void TagAndProbeFiller::fill(const reco::Candidate& Z, double x, double w){
   _passprobe = 0;
  
   //tag cand 2 probe cand 1
+  if(_tpflag=="" || _tpflag=="hard"){ 
   if (tag(*(Z.daughter(1)))) probe(*(Z.daughter(0)), Z.mass(), x, w);
+  }
   
 }
 

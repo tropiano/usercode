@@ -91,7 +91,7 @@ PixelHit_OC(0), PixelHit_SC(0), FirstPixelBarrelHit_OC(0), FirstPixelBarrelHit_S
 
 DeltaRvsCharge_JetRec(0), DeltaRvsCharge_JetRec_Iso(0), DeltaRvsCharge_JetRec_NotIso(0),
 
-_norm(1.), _dir(0), _charge_dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _Norm(false), _Sumw2(false), _GenParticleMatch(false), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _fileCounter(0), _Acc(1), _Trg(2), _Qual(3), _Imp(4), _Iso(5), _EiD(6), _electronID("eidRobustLoose"), _selections("VBTF"), _file(0), _histoVector(), _histoVector2D()
+_norm(1.), _dir(0), _charge_dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _Norm(false), _Sumw2(false), _GenParticleMatch(false), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _fileCounter(0), _Acc(1), _Trg(2), _Qual(3), _Imp(4), _Iso(5), _EiD(6), _electronID("eidRobustLoose"), _selections("VBTF"), _JetType("CALO"), _file(0), _histoVector(), _histoVector2D()
 
 { }
 
@@ -110,6 +110,7 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _EventNumber    = iConfig.getParameter<int32_t>("EventNumber");
    _ProcEvents    = iConfig.getParameter<int32_t>("ProcEvents");
    _GenParticleMatch = iConfig.getParameter<bool>("GenParticleMatch");
+   _JetType = iConfig.getParameter<std::string>("JetType");
    _ReportName = iConfig.getParameter<std::string>("ReportName");
    
    //Selections
@@ -831,7 +832,8 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
    zrecHandleSC.getByLabel(iEvent, "zeerecSameChargePlus");
   
    fwlite::Handle<std::vector<pat::Jet> > jetrecHandle;
-   jetrecHandle.getByLabel(iEvent, "selectedJets");
+   if(_JetType=="CALO")jetrecHandle.getByLabel(iEvent, "selectedJets");
+   if(_JetType=="PF")jetrecHandle.getByLabel(iEvent, "selectedPFJets");
 
    fwlite::Handle<pat::TriggerEvent> triggerHandle;
    triggerHandle.getByLabel(iEvent, "patTriggerEvent");
@@ -863,6 +865,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
    if(RecoIsoJet((*zrecHandle)[0],*recjets[i]))isorecjets.push_back(recjets[i]);
    if(!RecoIsoJet((*zrecHandle)[0],*recjets[i]))notisorecjets.push_back(recjets[i]);}
    }
+ 
    
    // Same Charge Z study
    
@@ -1179,6 +1182,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
    // End of charge MisID study
    
    // Z->ee events (OC) study: selections applied
+ 
 
      if(zrecHandle->size()){
      
@@ -1330,6 +1334,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
       recSecElIP_123456->Fill(dau1->dB());
       recLeadElfBrem_123456->Fill(dau0->fbrem());
       recSecElfBrem_123456->Fill(dau1->fbrem());
+
            
       //Jet variables     
       JetCounter_123456->Fill(recjets.size());
@@ -1346,14 +1351,14 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
         recLeadIsoJetEta_123456->Fill(isorecjets[0]->eta());
         }
       
-      //Jet properties      
+      //Jet properties
       
       //All jets
       if (recjets.size()){      
       for (unsigned int i = 0; i < recjets.size(); ++i){     
-          Jet_HEnergy->Fill(recjets[i]->energyFractionHadronic());
-          Jet_EMEnergy->Fill(recjets[i]->emEnergyFraction());      
-          MinDeltaR_ZDau->Fill(MinDeltaRZDau((*zrecHandle)[0],*recjets[i]));          
+          if(_JetType=="CALO")Jet_HEnergy->Fill(recjets[i]->energyFractionHadronic());
+          if(_JetType=="CALO")Jet_EMEnergy->Fill(recjets[i]->emEnergyFraction());      
+          MinDeltaR_ZDau->Fill(MinDeltaRZDau((*zrecHandle)[0],*recjets[i]));       
           DeltaRvsCharge_JetRec->Fill(recjets[i]->jetCharge(), MinDeltaRZDau((*zrecHandle)[0],*recjets[i]));
           AllJetCharge->Fill(recjets[i]->jetCharge());                   
       }     
@@ -1368,8 +1373,8 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
       
         //Iso Jets electron-type
         if(isorecjets[i]->jetCharge() < -0.98 || isorecjets[i]->jetCharge() > 0.98){        
-          HEnergy_IsoJet_ElType->Fill(isorecjets[i]->energyFractionHadronic());
-          EMEnergy_IsoJet_ElType->Fill(isorecjets[i]->emEnergyFraction());    
+          if(_JetType=="CALO")HEnergy_IsoJet_ElType->Fill(isorecjets[i]->energyFractionHadronic());
+          if(_JetType=="CALO")EMEnergy_IsoJet_ElType->Fill(isorecjets[i]->emEnergyFraction());    
           DeltaR_IsoJet_ElType->Fill(MinDeltaRZDau((*zrecHandle)[0],*isorecjets[i]));          
           }          
           }     
@@ -1383,7 +1388,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
           DeltaRvsCharge_JetRec_NotIso->Fill(recjets[i]->jetCharge(), MinDeltaRZDau((*zrecHandle)[0],*notisorecjets[i]));        
      }
      }
-     
+   
      
       //Exclusive - Inclusive Histograms
       _Jetdir->cd();
@@ -1404,7 +1409,6 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
       addHistosVsMulti(isorecjets.size(), "recEl2PtIncl", " reconstructed sec electron p_{T} spectrum", 200, 0., 200., recEl2PtVsInclMulti);
       addHistosVsMulti(isorecjets.size(), "recEl2EtaIncl", " reconstructed sec electron #eta spectrum", 100, -5., 5., recEl2EtaVsInclMulti);  
 
-        
       //fill inclusive histograms
       for (unsigned int i = 0; i < isorecjets.size()+1; ++i){
         recZPtVsInclMulti[i]->Fill((*zrecHandle)[0].pt(), weight);
@@ -1588,8 +1592,127 @@ void RecoElectron::finalize(){
    Report<<_RecoCutFlags[3].c_str()<<endl;
    Report<<_RecoCutFlags[4].c_str()<<endl;
    Report<<_RecoCutFlags[5].c_str()<<endl;
-   Report<<_RecoCutFlags[6].c_str()<<endl;
-   Report<<endl;
+   Report<<_RecoCutFlags[6].c_str()<<endl<<endl;
+   Report<<"Jet Type used = "<<_JetType.c_str()<<endl<<endl;
+   
+//   Report<<"Cut values applied:"<<endl<<endl;
+   
+/*   if(_selections=="VPJ"){
+   Report<<"ptelcut = "<<ptelcut<<endl;
+   Report<<"etaelcut = "<<etaelcut<<endl;
+   Report<<"eta_el_excl_up = "<<eta_el_excl_up<<endl;
+   Report<<"eta_el_excl_down = "<<eta_el_excl_down<<endl;
+   Report<<"zmassmin_vpj = "<<zmassmin_vpj<<endl;
+   Report<<"zmassmax_vpj = "<<zmassmax_vpj<<endl;
+   Report<<"minnhit = "<<minnhit<<endl;
+   Report<<"maxchi2 = "<<maxchi2<<endl;
+   Report<<"dxycut = "<<dxycut<<endl;
+   Report<<"ptjetmin = "<<ptjetmin<<endl;
+   Report<<"etajetmax = "etajetmax<<endl;
+   Report<<"isocut = "<<isocut<<endl;
+   Report<<"isojetcut = "<<isojetcut<<endl;
+   Report<<"ElectronTrigger = "<<ElectronTrigger.c_str()<<endl;
+   Report<<"JetTrigger = "<<JetTrigger.c_str()<<endl;
+   Report<<"VPJ_TAG_ptelcut = "<<VPJ_TAG_ptelcut<<endl;
+   Report<<"VPJ_TAG_etaelcut = "<<VPJ_TAG_etaelcut<<endl;
+   Report<<"VPJ_TAG_eta_el_excl_up = "<<VPJ_TAG_eta_el_exc_up<<endl;
+   Report<<"VPJ_TAG_eta_el_excl_down = "<<VPJ_TAG_eta_el_excl_down<<endl;
+   Report<<"VPJ_TAG_minnhit = "<<VPJ_TAG_minnhit<<endl;
+   Report<<"VPJ_TAG_maxchi2 = "<<VPJ_TAG_maxchi2<<endl;
+   Report<<"VPJ_TAG_dxycut = "<<VPJ_TAG_dxycut<<endl;
+   Report<<"VPJ_TAG_isocut = "<<VPJ_TAG_isocut<<endl;
+   Report<<"VPJ_TagEiD = "<<VPJ_TagEiD.c_str()<<endl;
+   }
+   
+   if(_selections=="VBTF"){
+Report<<"ptelcut0 = "<<ptelcut0<<endl;
+Report<<"ptelcut1 = "<<ptelcut1<<endl;
+Report<<"etaelcut = "<<etaelcut<<endl;
+Report<<"eta_el_excl_up = "<<eta_el_excl_up<<endl;
+Report<<"eta_el_excl_down = "<<eta_el_excl_down<<endl;
+Report<<"zmassmin_vbtf = "<<zmassmin_vbtf<<endl;
+Report<<"zmassmax_vbtf = "<<zmassmax_vbtf<<endl;
+Report<<"minnhit = "<<minnhit<<endl;
+Report<<"maxchi2 = "<<maxchi2<<endl;
+Report<<"dxycut = "<<dxycut<<endl;
+Report<<"ptjetmin = "<<ptjetmin<<endl;
+Report<<"etajetmax = "etajetmax<<endl;
+Report<<"isocut = "<<isocut<<endl;
+Report<<"isojetcut = "<<isojetcut<<endl;
+Report<<"ElectronTrigger = "<<ElectronTrigger.c_str()<<endl;
+Report<<"JetTrigger = "<<JetTrigger.c_str()<<endl;
+
+//// WP70 (70%)
+
+// EB
+
+static double track_iso_70_EB = 2.5; //GeV
+static double ecal_iso_70_EB = 3.0; //GeV
+static double hcal_iso_70_EB = 5.0; //GeV
+static double sihih_70_EB = 0.01;
+static double Dphi_vtx_70_EB = 0.02;
+static double Deta_vtx_70_EB = 0.006;
+static double HovE_70_EB = 0.02;
+
+// EE
+
+static double track_iso_70_EE = 0.8; //GeV
+static double ecal_iso_70_EE = 2.5; //GeV
+static double hcal_iso_70_EE = 0.25; //GeV
+static double sihih_70_EE = 0.03;
+static double Dphi_vtx_70_EE = 0.02;
+static double Deta_vtx_70_EE = 0.003;
+static double HovE_70_EE = 0.0025;
+
+////// WP95 (95%)
+
+// EB
+
+static double track_iso_95_EB = 7.0; //GeV
+static double ecal_iso_95_EB = 5.0; //GeV
+static double hcal_iso_95_EB = 5.0; //GeV
+static double sihih_95_EB = 0.01;
+static double Dphi_vtx_95_EB = 0.8;
+static double Deta_vtx_95_EB = 0.006;
+static double HovE_95_EB = 0.05;
+
+// EE
+
+static double track_iso_95_EE = 8.0; //GeV
+static double ecal_iso_95_EE = 3.0; //GeV
+static double hcal_iso_95_EE = 2.0; //GeV
+static double sihih_95_EE = 0.03;
+static double Dphi_vtx_95_EE = 0.7;
+static double Deta_vtx_95_EE = 0.008;
+static double HovE_95_EE = 0.04;
+
+// VBTF0 Tag cuts (for soft electron probe)
+
+Report<<"VPJ_TAG_ptelcut = "<<VPJ_TAG_ptelcut<<endl;
+Report<<"VPJ_TAG_etaelcut = "<<VPJ_TAG_etaelcut<<endl;
+Report<<"VPJ_TAG_eta_el_excl_up = "<<VPJ_TAG_eta_el_exc_up<<endl;
+Report<<"VPJ_TAG_eta_el_excl_down = "<<VPJ_TAG_eta_el_excl_down<<endl;
+Report<<"VPJ_TAG_minnhit = "<<VPJ_TAG_minnhit<<endl;
+Report<<"VPJ_TAG_maxchi2 = "<<VPJ_TAG_maxchi2<<endl;
+Report<<"VPJ_TAG_dxycut = "<<VPJ_TAG_dxycut<<endl;
+Report<<"VPJ_TAG_isocut = "<<VPJ_TAG_isocut<<endl;
+Report<<"VPJ_TagEiD = "<<VPJ_TagEiD.c_str()<<endl;
+
+// VBTF1 Tag cuts (for hard electron probe)
+
+static double VBTF1_TAG_ptelcut = 10.;    //Gev/c
+static double VBTF1_TAG_etaelcut = 2.4;
+static double VBTF1_TAG_eta_el_excl_up = 1.56;               //Excluded Eta region
+static double VBTF1_TAG_eta_el_excl_down = 1.4442;           //Excluded Eta region
+static double VBTF1_TAG_minnhit = 15.;
+static double VBTF1_TAG_maxchi2 = 3.;
+static double VBTF1_TAG_dxycut = 0.02;     //cm
+static double VBTF1_TAG_isocut = 0.05;                        //CombRelIso
+static string VBTF1_TagEiD = "eidRobustLoose";
+
+   }*/
+   
+   
    Report.close();
 
    

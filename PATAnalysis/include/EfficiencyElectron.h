@@ -42,11 +42,9 @@ public :
    
 private:
 
-  std::string _sample, _selections;
+  std::string _sample, _selections, _electronID, _JetType;
 
   TDirectory* _dir;
-  
-  std::string _electronID;
   
   TFile* _file;
   
@@ -57,6 +55,8 @@ private:
   std::string _RecoCutFlags[7];
   
   std::vector<bool (*)(const reco::Candidate&)> tag_cuts;
+  std::vector<bool (*)(const reco::Candidate&)> tag_cuts_0;
+  std::vector<bool (*)(const reco::Candidate&)> tag_cuts_1;
   
   TagAndProbeFiller* _TagProbe_Electron_12;
   TagAndProbeFiller* _TagProbe_Electron_123;

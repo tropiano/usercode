@@ -183,10 +183,10 @@ TGraphAsymmErrors EfficiencyAnalyzerMuon::inclusiveEfficiency(TH1* num, TH1* den
   TH1D inclnum("inclusivenumerator", "inclusivenumerator", num->GetNbinsX(), num->GetXaxis()->GetXmin(), num->GetXaxis()->GetXmax()); 
   TH1D inclden("inclusivedenominator", "inclusivedenominator", num->GetNbinsX(), num->GetXaxis()->GetXmin(), num->GetXaxis()->GetXmax()); 
 
-  for(unsigned int i = 1; i <= num->GetNbinsX(); ++i  ){
+  for(int i = 1; i <= num->GetNbinsX(); ++i  ){
     inclnum.SetBinContent(i, num->Integral(i, 10));  
   }
-  for(unsigned int i = 1; i <= den->GetNbinsX(); ++i  ){
+  for(int i = 1; i <= den->GetNbinsX(); ++i  ){
     inclden.SetBinContent(i, den->Integral(i, 10));
   }
 

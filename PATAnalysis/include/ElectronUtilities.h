@@ -60,69 +60,65 @@ static double etajetmax = 3.0;
 static double isocut = 0.1;                        //CombRelIso
 static double isojetcut = 0.5;                     //Isolation jet - Z electron
 
-//Data Spring10 triggers
-//static string ElectronTrigger = "HLT_L1SingleEG8";
-//static string JetTrigger = "HLT_Jet30U";
+//Data-Spring10 triggers
+static string ElectronTrigger = "HLT_Photon15_L1R";
+static string JetTrigger = "HLT_Jet30U";
 
 //Summer09 triggers
-static string ElectronTrigger = "HLT_Ele10_LW_L1R";
-static string JetTrigger = "HLT_Jet30";
+//static string ElectronTrigger = "HLT_Ele10_LW_L1R";
+//static string JetTrigger = "HLT_Jet30";
 
-//// WP70 (70%)
+//New cuts VBTF: tuned on Spring10. CombRelIso used. WP = 70/80 for dau0, 95 for dau1
 
-// EB
+//// WP70 (70%)// EB
+static double CombIso_70_EB = 0.04;
+static double sihih_70_EB = 0.01;static double Dphi_vtx_70_EB = 0.03;static double Deta_vtx_70_EB = 0.004;static double HovE_70_EB = 0.025;// EE
+static double CombIso_70_EE = 0.03;static double sihih_70_EE = 0.03;static double Dphi_vtx_70_EE = 0.02;static double Deta_vtx_70_EE = 0.005;static double HovE_70_EE = 0.025;//// WP80 (80%)// EB
+static double CombIso_80_EB = 0.07;
+static double sihih_80_EB = 0.01;static double Dphi_vtx_80_EB = 0.06;static double Deta_vtx_80_EB = 0.004;static double HovE_80_EB = 0.04;// EE
+static double CombIso_80_EE = 0.06;
+static double sihih_80_EE = 0.03;static double Dphi_vtx_80_EE = 0.03;static double Deta_vtx_80_EE = 0.007;static double HovE_80_EE = 0.025;///// WP95 (95%)// EB
+static double CombIso_95_EB = 0.15;
+static double sihih_95_EB = 0.01;static double Dphi_vtx_95_EB = 0.8;static double Deta_vtx_95_EB = 0.007;static double HovE_95_EB = 0.5;// EE
+static double CombIso_95_EE = 0.1;
+static double sihih_95_EE = 0.03;static double Dphi_vtx_95_EE = 0.7;static double Deta_vtx_95_EE = 0.01;static double HovE_95_EE = 0.07;
 
-static double track_iso_70_EB = 2.5; //GeV
-static double ecal_iso_70_EB = 3.0; //GeV
-static double hcal_iso_70_EB = 5.0; //GeV
-static double sihih_70_EB = 0.01;
-static double Dphi_vtx_70_EB = 0.02;
-static double Deta_vtx_70_EB = 0.006;
-static double HovE_70_EB = 0.02;
 
-// EE
+// VPJ Tag cuts
 
-static double track_iso_70_EE = 0.8; //GeV
-static double ecal_iso_70_EE = 2.5; //GeV
-static double hcal_iso_70_EE = 0.25; //GeV
-static double sihih_70_EE = 0.03;
-static double Dphi_vtx_70_EE = 0.02;
-static double Deta_vtx_70_EE = 0.003;
-static double HovE_70_EE = 0.0025;
+static double VPJ_TAG_ptelcut = 25.;    //Gev/c
+static double VPJ_TAG_etaelcut = 2.4;
+static double VPJ_TAG_eta_el_excl_up = 1.56;               //Excluded Eta region
+static double VPJ_TAG_eta_el_excl_down = 1.4442;           //Excluded Eta region
+static double VPJ_TAG_minnhit = 15.;
+static double VPJ_TAG_maxchi2 = 3.;
+static double VPJ_TAG_dxycut = 0.02;     //cm
+static double VPJ_TAG_isocut = 0.05;                        //CombRelIso
+static string VPJ_TagEiD = "eidRobustLoose";
 
-////// WP95 (95%)
+// VBTF0 Tag cuts (for soft electron probe)
 
-// EB
+static double VBTF0_TAG_ptelcut = 20.;    //Gev/c
+static double VBTF0_TAG_etaelcut = 2.4;
+static double VBTF0_TAG_eta_el_excl_up = 1.56;               //Excluded Eta region
+static double VBTF0_TAG_eta_el_excl_down = 1.4442;           //Excluded Eta region
+static double VBTF0_TAG_minnhit = 15.;
+static double VBTF0_TAG_maxchi2 = 3.;
+static double VBTF0_TAG_dxycut = 0.02;     //cm
+static double VBTF0_TAG_isocut = 0.05;                        //CombRelIso
+static string VBTF0_TagEiD = "eidRobustLoose";
 
-static double track_iso_95_EB = 7.0; //GeV
-static double ecal_iso_95_EB = 5.0; //GeV
-static double hcal_iso_95_EB = 5.0; //GeV
-static double sihih_95_EB = 0.01;
-static double Dphi_vtx_95_EB = 0.8;
-static double Deta_vtx_95_EB = 0.006;
-static double HovE_95_EB = 0.05;
+// VBTF1 Tag cuts (for hard electron probe)
 
-// EE
-
-static double track_iso_95_EE = 8.0; //GeV
-static double ecal_iso_95_EE = 3.0; //GeV
-static double hcal_iso_95_EE = 2.0; //GeV
-static double sihih_95_EE = 0.03;
-static double Dphi_vtx_95_EE = 0.7;
-static double Deta_vtx_95_EE = 0.008;
-static double HovE_95_EE = 0.04;
-
-// Tag cuts
-
-static double TAG_ptelcut = 25.;    //Gev/c
-static double TAG_etaelcut = 2.4;
-static double TAG_eta_el_excl_up = 1.56;               //Excluded Eta region
-static double TAG_eta_el_excl_down = 1.4442;           //Excluded Eta region
-static double TAG_minnhit = 15.;
-static double TAG_maxchi2 = 3.;
-static double TAG_dxycut = 0.02;     //cm
-static double TAG_isocut = 0.01;                        //CombRelIso
-static string TagEiD = "eidRobustLoose";
+static double VBTF1_TAG_ptelcut = 10.;    //Gev/c
+static double VBTF1_TAG_etaelcut = 2.4;
+static double VBTF1_TAG_eta_el_excl_up = 1.56;               //Excluded Eta region
+static double VBTF1_TAG_eta_el_excl_down = 1.4442;           //Excluded Eta region
+static double VBTF1_TAG_minnhit = 15.;
+static double VBTF1_TAG_maxchi2 = 3.;
+static double VBTF1_TAG_dxycut = 0.02;     //cm
+static double VBTF1_TAG_isocut = 0.05;                        //CombRelIso
+static string VBTF1_TagEiD = "eidRobustLoose";
 
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -464,22 +460,28 @@ inline bool RecSelected(string Flag, string EID, const reco::CompositeCandidate 
          (dau1->hcalIso() + dau1->ecalIso() + dau1->trackIso()) / dau1->pt() < isocut;
          }
   else if(Flag=="_IsoVBTF"){
-	if(fabs(dau0->eta())<eta_el_excl_down){// WP70 EB
-	iso0 = (dau0->hcalIso()< hcal_iso_70_EB && dau0->ecalIso() < ecal_iso_70_EB && dau0->trackIso()< track_iso_70_EB);
+	/*if(fabs(dau0->eta())<eta_el_excl_down){// WP70 EB
+	iso0 = ((dau0->dr03TkSumPt() + max(0., dau0->dr03EcalRecHitSumEt() - 1.) + dau0->dr03HcalTowerSumEt() ) / dau0->p4().Pt()) < CombIso_70_EB;
 	}else if(fabs(dau0->eta())>eta_el_excl_up){// WP70 EE
-	iso0 = (dau0->hcalIso()< hcal_iso_70_EE && dau0->ecalIso() < ecal_iso_70_EE && dau0->trackIso()< track_iso_70_EE) ;
+	iso0 = ((dau0->dr03TkSumPt() + dau0->dr03EcalRecHitSumEt() + dau0->dr03HcalTowerSumEt() ) / dau0->p4().Pt()) < CombIso_70_EE;
+	}*/
+	if(fabs(dau0->eta())<eta_el_excl_down){// WP80 EB
+	iso0 = ((dau0->dr03TkSumPt() + max(0., dau0->dr03EcalRecHitSumEt() - 1.) + dau0->dr03HcalTowerSumEt() ) / dau0->p4().Pt()) < CombIso_80_EB;
+	}else if(fabs(dau0->eta())>eta_el_excl_up){// WP80 EE
+	iso0 = ((dau0->dr03TkSumPt() + dau0->dr03EcalRecHitSumEt() + dau0->dr03HcalTowerSumEt() ) / dau0->p4().Pt()) < CombIso_80_EE;
 	}
 	if(fabs(dau1->eta())<eta_el_excl_down){// WP95 EB
-	iso1 = (dau1->hcalIso()< hcal_iso_95_EB && dau1->ecalIso() < ecal_iso_95_EB && dau1->trackIso()< track_iso_95_EB) ;
+	iso1 = ((dau1->dr03TkSumPt() + max(0., dau1->dr03EcalRecHitSumEt() - 1.) + dau1->dr03HcalTowerSumEt() ) / dau1->p4().Pt()) < CombIso_95_EB;
 	}else if(fabs(dau1->eta())>eta_el_excl_up){// WP95 EE
-	iso1 = (dau1->hcalIso()< hcal_iso_95_EE && dau1->ecalIso() < ecal_iso_95_EE && dau1->trackIso()< track_iso_95_EE);}
+	iso1 = ((dau1->dr03TkSumPt() + dau1->dr03EcalRecHitSumEt() + dau1->dr03HcalTowerSumEt() ) / dau1->p4().Pt()) < CombIso_95_EE;
+	}	
   return iso0 && iso1;         
   }
   else if(Flag=="_EiDVPJ"){
   return electron_ID0 && electron_ID1;
          }
   else if(Flag=="_EiDVBTF"){
-	if(fabs(dau0->eta())<eta_el_excl_down){// WP70 EB
+	/*if(fabs(dau0->eta())<eta_el_excl_down){// WP70 EB
 	electron_ID0 = 
 		 dau0->sigmaIetaIeta() < sihih_70_EB
         	 && dau0->deltaPhiSuperClusterTrackAtVtx() < Dphi_vtx_70_EB
@@ -491,14 +493,27 @@ inline bool RecSelected(string Flag, string EID, const reco::CompositeCandidate 
         	 && dau0->deltaPhiSuperClusterTrackAtVtx() < Dphi_vtx_70_EE
         	 && dau0->deltaEtaSuperClusterTrackAtVtx() < Deta_vtx_70_EE
 		 && dau0->hcalOverEcal() < HovE_70_EE;
+	}*/
+	if(fabs(dau0->eta())<eta_el_excl_down){// WP80 EB
+	electron_ID0 = 
+		 dau0->sigmaIetaIeta() < sihih_80_EB
+        	 && dau0->deltaPhiSuperClusterTrackAtVtx() < Dphi_vtx_80_EB
+        	 && dau0->deltaEtaSuperClusterTrackAtVtx() < Deta_vtx_80_EB
+		 && dau0->hcalOverEcal() < HovE_80_EB;
+	}else if(fabs(dau0->eta())>eta_el_excl_up){// WP80 EE	
+	electron_ID0 = 
+		 dau0->sigmaIetaIeta() < sihih_80_EE
+        	 && dau0->deltaPhiSuperClusterTrackAtVtx() < Dphi_vtx_80_EE
+        	 && dau0->deltaEtaSuperClusterTrackAtVtx() < Deta_vtx_80_EE
+		 && dau0->hcalOverEcal() < HovE_80_EE;
 	}
-	if(fabs(dau1->eta())<eta_el_excl_down){// WP70 EB
+	if(fabs(dau1->eta())<eta_el_excl_down){// WP95 EB
 	electron_ID1 = 
 		 dau1->sigmaIetaIeta() < sihih_95_EB
         	 && dau1->deltaPhiSuperClusterTrackAtVtx() < Dphi_vtx_95_EB
         	 && dau1->deltaEtaSuperClusterTrackAtVtx() < Deta_vtx_95_EB
 		 && dau1->hcalOverEcal() < HovE_95_EB;
-	}else if(fabs(dau1->eta())>eta_el_excl_up){// WP70 EE	
+	}else if(fabs(dau1->eta())>eta_el_excl_up){// WP95 EE	
 	electron_ID1 = 
 		 dau1->sigmaIetaIeta() < sihih_95_EE
         	 && dau1->deltaPhiSuperClusterTrackAtVtx() < Dphi_vtx_95_EE
@@ -763,7 +778,7 @@ inline bool RecSelected_TagAndProbe(const reco::CompositeCandidate ZREC, string 
 }
 
 //Cuts applied on Tag electron
-inline bool singleEl_Tag(const reco::Candidate& cand){
+inline bool singleEl_Tag_VPJ(const reco::Candidate& cand){
   const pat::Electron* electron = dynamic_cast<const pat::Electron*>(&cand);
   if (!electron) {
      const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (&cand);
@@ -775,16 +790,70 @@ inline bool singleEl_Tag(const reco::Candidate& cand){
   const reco::GsfTrackRef track = electron->gsfTrack();
   assert(track.isNonnull());
   bool TAG_EiD = false;
-  if(electron->isElectronIDAvailable(TagEiD.c_str())){
-  if(electron->electronID(TagEiD.c_str())==1.0)TAG_EiD = true;
+  if(electron->isElectronIDAvailable(VPJ_TagEiD.c_str())){
+  if(electron->electronID(VPJ_TagEiD.c_str())==1.0)TAG_EiD = true;
   }
-  return electron->pt() > TAG_ptelcut && 
-  	 fabs(electron->eta()) < TAG_etaelcut &&
-         (fabs(electron->eta())<TAG_eta_el_excl_down || fabs(electron->eta())>TAG_eta_el_excl_up) &&
-         track->numberOfValidHits() > TAG_minnhit && 
-         track->normalizedChi2() < TAG_maxchi2 &&
-         electron->dB() < TAG_dxycut &&
-         (electron->hcalIso() + electron->ecalIso() + electron->trackIso()) / electron->pt() < TAG_isocut &&  
+  return electron->pt() > VPJ_TAG_ptelcut && 
+  	 fabs(electron->eta()) < VPJ_TAG_etaelcut &&
+         (fabs(electron->eta()) < VPJ_TAG_eta_el_excl_down || fabs(electron->eta()) > VPJ_TAG_eta_el_excl_up) &&
+         track->numberOfValidHits() > VPJ_TAG_minnhit && 
+         track->normalizedChi2() < VPJ_TAG_maxchi2 &&
+         electron->dB() < VPJ_TAG_dxycut &&
+         (electron->hcalIso() + electron->ecalIso() + electron->trackIso()) / electron->pt() < VPJ_TAG_isocut &&  
+         TAG_EiD;
+ }else{
+ return false;}
+}
+
+inline bool singleEl_Tag_VBTF0(const reco::Candidate& cand){
+  const pat::Electron* electron = dynamic_cast<const pat::Electron*>(&cand);
+  if (!electron) {
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (&cand);
+     if (scc && scc->hasMasterClone()){
+       electron = dynamic_cast<const pat::Electron*>(scc->masterClone().get()); 
+     }
+    }
+  if(electron){
+  const reco::GsfTrackRef track = electron->gsfTrack();
+  assert(track.isNonnull());
+  bool TAG_EiD = false;
+  if(electron->isElectronIDAvailable(VBTF0_TagEiD.c_str())){
+  if(electron->electronID(VBTF0_TagEiD.c_str())==1.0)TAG_EiD = true;
+  }
+  return electron->pt() > VBTF0_TAG_ptelcut && 
+  	 fabs(electron->eta()) < VBTF0_TAG_etaelcut &&
+         (fabs(electron->eta()) < VBTF0_TAG_eta_el_excl_down || fabs(electron->eta()) > VBTF0_TAG_eta_el_excl_up) &&
+         track->numberOfValidHits() > VBTF0_TAG_minnhit && 
+         track->normalizedChi2() < VBTF0_TAG_maxchi2 &&
+         electron->dB() < VBTF0_TAG_dxycut &&
+         (electron->hcalIso() + electron->ecalIso() + electron->trackIso()) / electron->pt() < VBTF0_TAG_isocut &&  
+         TAG_EiD;
+ }else{
+ return false;}
+}
+
+inline bool singleEl_Tag_VBTF1(const reco::Candidate& cand){
+  const pat::Electron* electron = dynamic_cast<const pat::Electron*>(&cand);
+  if (!electron) {
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (&cand);
+     if (scc && scc->hasMasterClone()){
+       electron = dynamic_cast<const pat::Electron*>(scc->masterClone().get()); 
+     }
+    }
+  if(electron){
+  const reco::GsfTrackRef track = electron->gsfTrack();
+  assert(track.isNonnull());
+  bool TAG_EiD = false;
+  if(electron->isElectronIDAvailable(VBTF1_TagEiD.c_str())){
+  if(electron->electronID(VBTF1_TagEiD.c_str())==1.0)TAG_EiD = true;
+  }
+  return electron->pt() > VBTF1_TAG_ptelcut && 
+  	 fabs(electron->eta()) < VBTF1_TAG_etaelcut &&
+         (fabs(electron->eta()) < VBTF1_TAG_eta_el_excl_down || fabs(electron->eta()) > VBTF1_TAG_eta_el_excl_up) &&
+         track->numberOfValidHits() > VBTF1_TAG_minnhit && 
+         track->normalizedChi2() < VBTF1_TAG_maxchi2 &&
+         electron->dB() < VBTF1_TAG_dxycut &&
+         (electron->hcalIso() + electron->ecalIso() + electron->trackIso()) / electron->pt() < VBTF1_TAG_isocut &&  
          TAG_EiD;
  }else{
  return false;}
@@ -862,8 +931,8 @@ inline bool singleEl_Probe_EiD_VPJ(const reco::Candidate& cand){
     }
   if(electron){
   bool electron_ID = false;
-  if(electron->isElectronIDAvailable(TagEiD.c_str())){
-  if(electron->electronID(TagEiD.c_str())==1.0)electron_ID = true;}
+  if(electron->isElectronIDAvailable(VPJ_TagEiD.c_str())){
+  if(electron->electronID(VPJ_TagEiD.c_str())==1.0)electron_ID = true;}
   return electron_ID;
   }else{
   return false;}
@@ -908,7 +977,7 @@ const pat::Electron* electron = dynamic_cast<const pat::Electron*>(&cand);
   return false;}
   }
 
-inline bool singleEl_Probe_Iso_VBTF0(const reco::Candidate& cand){
+/*inline bool singleEl_Probe_Iso_VBTF0(const reco::Candidate& cand){
 const pat::Electron* el0 = dynamic_cast<const pat::Electron*>(&cand);
   if(!el0){
      const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (&cand);
@@ -918,15 +987,37 @@ const pat::Electron* el0 = dynamic_cast<const pat::Electron*>(&cand);
     }
   if(el0){ 
   if(fabs(el0->eta())<eta_el_excl_down){// WP70 EB
-  return (el0->hcalIso()< hcal_iso_70_EB && el0->ecalIso() < ecal_iso_70_EB && el0->trackIso()< track_iso_70_EB);
+  return(((el0->dr03TkSumPt() + max(0., el0->dr03EcalRecHitSumEt() - 1.) + el0->dr03HcalTowerSumEt() ) / el0->p4().Pt()) < CombIso_70_EB);
   }else if(fabs(el0->eta())>eta_el_excl_up){// WP70 EE
-  return (el0->hcalIso()< hcal_iso_70_EE && el0->ecalIso() < ecal_iso_70_EE && el0->trackIso()< track_iso_70_EE);
+  return(((el0->dr03TkSumPt() + el0->dr03EcalRecHitSumEt() + el0->dr03HcalTowerSumEt() ) / el0->p4().Pt()) < CombIso_70_EE);
+  }
+  else{
+  return false;} 
+  }else{
+  return false;}
+}*/
+
+inline bool singleEl_Probe_Iso_VBTF0(const reco::Candidate& cand){
+const pat::Electron* el0 = dynamic_cast<const pat::Electron*>(&cand);
+  if(!el0){
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (&cand);
+     if (scc && scc->hasMasterClone()){
+       el0 = dynamic_cast<const pat::Electron*>(scc->masterClone().get()); 
+     }
+    }
+  if(el0){ 
+  if(fabs(el0->eta())<eta_el_excl_down){// WP80 EB
+  return(((el0->dr03TkSumPt() + max(0., el0->dr03EcalRecHitSumEt() - 1.) + el0->dr03HcalTowerSumEt() ) / el0->p4().Pt()) < CombIso_80_EB);
+  }else if(fabs(el0->eta())>eta_el_excl_up){// WP80 EE
+  return(((el0->dr03TkSumPt() + el0->dr03EcalRecHitSumEt() + el0->dr03HcalTowerSumEt() ) / el0->p4().Pt()) < CombIso_80_EE);
   }
   else{
   return false;} 
   }else{
   return false;}
 }
+
+
 
 inline bool singleEl_Probe_Iso_VBTF1(const reco::Candidate& cand){
 const pat::Electron* el1 = dynamic_cast<const pat::Electron*>(&cand);
@@ -936,11 +1027,11 @@ const pat::Electron* el1 = dynamic_cast<const pat::Electron*>(&cand);
        el1 = dynamic_cast<const pat::Electron*>(scc->masterClone().get()); 
      }
     }
-  if (el1){ 
-  if (fabs(el1->eta())<eta_el_excl_down){// WP95 EB
-  return (el1->hcalIso()< hcal_iso_95_EB && el1->ecalIso() < ecal_iso_95_EB && el1->trackIso()< track_iso_95_EB);
+  if(el1){ 
+  if(fabs(el1->eta())<eta_el_excl_down){// WP95 EB
+  return(((el1->dr03TkSumPt() + max(0., el1->dr03EcalRecHitSumEt() - 1.) + el1->dr03HcalTowerSumEt() ) / el1->p4().Pt()) < CombIso_95_EB);
   }else if(fabs(el1->eta())>eta_el_excl_up){// WP95 EE
-  return (el1->hcalIso()< hcal_iso_95_EE && el1->ecalIso() < ecal_iso_95_EE && el1->trackIso()< track_iso_95_EE);
+  return(((el1->dr03TkSumPt() + el1->dr03EcalRecHitSumEt() + el1->dr03HcalTowerSumEt() ) / el1->p4().Pt()) < CombIso_95_EE);
   }
   else{
   return false;}
@@ -948,7 +1039,7 @@ const pat::Electron* el1 = dynamic_cast<const pat::Electron*>(&cand);
   return false;}
 }
 
-inline bool singleEl_Probe_EiD_VBTF0(const reco::Candidate& cand){
+/*inline bool singleEl_Probe_EiD_VBTF0(const reco::Candidate& cand){
   const pat::Electron* el0 = dynamic_cast<const pat::Electron*>(&cand);
   if (!el0) {
      const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (&cand);
@@ -970,6 +1061,34 @@ inline bool singleEl_Probe_EiD_VBTF0(const reco::Candidate& cand){
         	 && el0->deltaPhiSuperClusterTrackAtVtx() < Dphi_vtx_70_EE
         	 && el0->deltaEtaSuperClusterTrackAtVtx() < Deta_vtx_70_EE
 		 && el0->hcalOverEcal() < HovE_70_EE;
+  }
+  return el0_ID;
+  }else{
+  return false;}
+}*/
+
+inline bool singleEl_Probe_EiD_VBTF0(const reco::Candidate& cand){
+  const pat::Electron* el0 = dynamic_cast<const pat::Electron*>(&cand);
+  if (!el0) {
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (&cand);
+     if (scc && scc->hasMasterClone()){
+       el0 = dynamic_cast<const pat::Electron*>(scc->masterClone().get()); 
+     }
+    }
+  if(el0){
+  bool el0_ID = false; 
+  if(fabs(el0->eta())<eta_el_excl_down){//WP80 EB
+	el0_ID = 
+		 el0->sigmaIetaIeta() < sihih_80_EB
+        	 && el0->deltaPhiSuperClusterTrackAtVtx() < Dphi_vtx_80_EB
+        	 && el0->deltaEtaSuperClusterTrackAtVtx() < Deta_vtx_80_EB
+		 && el0->hcalOverEcal() < HovE_80_EB;
+  }else if(fabs(el0->eta())>eta_el_excl_up){//WP80 EE	
+	el0_ID = 
+		 el0->sigmaIetaIeta() < sihih_80_EE
+        	 && el0->deltaPhiSuperClusterTrackAtVtx() < Dphi_vtx_80_EE
+        	 && el0->deltaEtaSuperClusterTrackAtVtx() < Deta_vtx_80_EE
+		 && el0->hcalOverEcal() < HovE_80_EE;
   }
   return el0_ID;
   }else{

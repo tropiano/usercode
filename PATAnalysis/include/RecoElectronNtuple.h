@@ -82,7 +82,7 @@ public :
 
 private:
 
-  std::string _sample, _selections;
+  std::string _sample, _selections, _electronID, _JetType;
 
   double _ptjetmin;
 
@@ -101,8 +101,6 @@ private:
   std::string _RecoCutFlags[7];
   
   bool _Norm;
-  
-  std::string _electronID;
   
   TDirectory* _dir;
 

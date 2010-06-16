@@ -32,7 +32,7 @@ using namespace edm;
 
 RecoElectronNtuple::RecoElectronNtuple(): 
  
-_sample("mc"), _ptjetmin(30.), _etajetmax(3.), _isocut(0.1), _weight(1.), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _Acc(1), _Trg(2), _Qual(3), _Imp(4), _Iso(5), _EiD(6), _Norm(false), _electronID("eidRobustLoose")
+_sample("mc"), _selections("VBTF"), _electronID("eidRobustLoose"), _JetType("CALO"), _ptjetmin(30.), _etajetmax(3.), _isocut(0.1), _weight(1.), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _Acc(1), _Trg(2), _Qual(3), _Imp(4), _Iso(5), _EiD(6), _Norm(false)
 
 { }
 
@@ -51,6 +51,7 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    _EventsPerFile    = iConfig.getParameter<int32_t>("EventsPerFile");
    _EventNumber    = iConfig.getParameter<int32_t>("EventNumber");
    _ProcEvents    = iConfig.getParameter<int32_t>("ProcEvents");
+   _JetType = iConfig.getParameter<std::string>("JetType");
    
    //Selections
    _Acc = iConfig.getParameter<int32_t>("Acc");
@@ -578,7 +579,8 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    zrecHandle.getByLabel(iEvent, "zeerec");
 
    fwlite::Handle<std::vector<pat::Jet> > jetrecHandle;
-   jetrecHandle.getByLabel(iEvent, "selectedJets");
+   if(_JetType=="CALO")jetrecHandle.getByLabel(iEvent, "selectedJets");
+   if(_JetType=="PF")jetrecHandle.getByLabel(iEvent, "selectedPFJets");
 
    fwlite::Handle<pat::TriggerEvent> triggerHandle;
    triggerHandle.getByLabel(iEvent, "patTriggerEvent");
@@ -648,7 +650,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    valid_JetPhi = (*jetrecHandle)[i].phi();
    valid_JetEta = (*jetrecHandle)[i].eta();
    valid_JetCharge = (*jetrecHandle)[i].charge();
-   valid_JetEmFrac= (*jetrecHandle)[i].emEnergyFraction();
+   if(_JetType=="CALO")valid_JetEmFrac= (*jetrecHandle)[i].emEnergyFraction();
    for(unsigned n = 0; n != electronHandle->size(); n++){valid_JetEl_DeltaR[n]=Delta_R((*electronHandle)[n], (*jetrecHandle)[i]);}
    
    validjettree->Fill();
@@ -763,7 +765,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
         jetcharge1=isorecjets[0]->jetCharge();
         jetDeltaRa1=Delta_R(*recdau0, *isorecjets[0]);
         jetDeltaRb1=Delta_R(*recdau1, *isorecjets[0]);
-	jetEmFrac1=isorecjets[0]->emEnergyFraction();
+	if(_JetType=="CALO")jetEmFrac1=isorecjets[0]->emEnergyFraction();
       }
       if (isorecjets.size()>1){
         jetpt2=isorecjets[1]->pt();
@@ -772,7 +774,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
         jetcharge2=isorecjets[1]->jetCharge();
         jetDeltaRa2=Delta_R(*recdau0, *isorecjets[1]);
         jetDeltaRb2=Delta_R(*recdau1, *isorecjets[1]);
-	jetEmFrac2=isorecjets[1]->emEnergyFraction();
+	if(_JetType=="CALO")jetEmFrac2=isorecjets[1]->emEnergyFraction();
       }
       if (isorecjets.size()>2){
         jetpt3=isorecjets[2]->pt();
@@ -781,7 +783,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
         jetcharge3=isorecjets[2]->jetCharge();
         jetDeltaRa3=Delta_R(*recdau0, *isorecjets[2]);
         jetDeltaRb3=Delta_R(*recdau1, *isorecjets[2]);
-	jetEmFrac3=isorecjets[2]->emEnergyFraction();
+	if(_JetType=="CALO")jetEmFrac3=isorecjets[2]->emEnergyFraction();
 
       }
       

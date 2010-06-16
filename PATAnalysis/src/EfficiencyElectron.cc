@@ -46,7 +46,7 @@ genLeadElPtEff_1(0), genLeadElPtEff_12(0), genLeadElPtEff_123(0), genLeadElPtEff
 AccDenom_genPtZ(0), AccDenom_genMassZ(0), AccDenom_genEtaZ(0), AccDenom_genLeadElEta(0), AccDenom_genLeadElPt(0), AccDenom_GenIsoJetNumber(0),
 EffDenom_genPtZ(0), EffDenom_genMassZ(0), EffDenom_genEtaZ(0), EffDenom_genLeadElEta(0), EffDenom_genLeadElPt(0), EffDenom_GenIsoJetNumber(0),
 
-_sample("mc"), _selections("VBTF"), _dir(0), _electronID("eidRobustLoose"), _file(0), _Acc(1), _Trg(2), _Qual(3), _Imp(4), _Iso(5), _EiD(6), _histoVector(), _nbin(10), _xmin(-0.5), _xmax(9.5), _Norm(false), _norm(1.), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1)
+_sample("mc"), _selections("VBTF"), _electronID("eidRobustLoose"), _JetType("CALO"), _dir(0), _file(0), _Acc(1), _Trg(2), _Qual(3), _Imp(4), _Iso(5), _EiD(6), _histoVector(), _nbin(10), _xmin(-0.5), _xmax(9.5), _Norm(false), _norm(1.), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1)
 
 { }
 
@@ -64,6 +64,7 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
     _ProcEvents    = iConfig.getParameter<int32_t>("ProcEvents");
     _targetLumi= iConfig.getParameter<double>("targetLumi");
     _xsec      = iConfig.getParameter<double>("CrossSection");
+    _JetType = iConfig.getParameter<std::string>("JetType");
     
     //Selections
    _Acc = iConfig.getParameter<int32_t>("Acc");
@@ -249,8 +250,10 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    
 // Tag & Probe
 
-  //std::vector<bool (*)(const reco::Candidate&)> tag_cuts;
-  tag_cuts.push_back(singleEl_Tag);
+  if(_selections=="VPJ")tag_cuts.push_back(singleEl_Tag_VPJ);
+  if(_selections=="VBTF"){
+  tag_cuts_0.push_back(singleEl_Tag_VBTF0);
+  tag_cuts_1.push_back(singleEl_Tag_VBTF1);}
   
   if(_selections=="VPJ"){
   
@@ -426,35 +429,35 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
   string name_TPFiller0_12 = name_TPFiller0+"_";
   TDirectory *TagDir0_12 = _dir->mkdir(name_TagDir0.c_str());
   
-  _TagProbe_Electron0_12 = new TagAndProbeFiller(TagDir0_12, string(name_TPFiller0_12.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts0_1, probe_cuts0_12);
+  _TagProbe_Electron0_12 = new TagAndProbeFiller(TagDir0_12, string(name_TPFiller0_12.c_str()), _nbin, _xmin, _xmax, tag_cuts_1, probe_cuts0_1, probe_cuts0_12, "hard");
   
   name_TagDir0+=_RecoCutFlags[3].c_str();
   name_TPFiller0+=_RecoCutFlags[3].c_str();
   string name_TPFiller0_123 = name_TPFiller0+"_";
   TDirectory *TagDir0_123 = _dir->mkdir(name_TagDir0.c_str());
   
-  _TagProbe_Electron0_123 = new TagAndProbeFiller(TagDir0_123, string(name_TPFiller0_123.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts0_12, probe_cuts0_123);
+  _TagProbe_Electron0_123 = new TagAndProbeFiller(TagDir0_123, string(name_TPFiller0_123.c_str()), _nbin, _xmin, _xmax, tag_cuts_1, probe_cuts0_12, probe_cuts0_123, "hard");
   
   name_TagDir0+=_RecoCutFlags[4].c_str();
   name_TPFiller0+=_RecoCutFlags[4].c_str();
   string name_TPFiller0_1234 = name_TPFiller0+"_";
   TDirectory *TagDir0_1234 = _dir->mkdir(name_TagDir0.c_str());
   
-  _TagProbe_Electron0_1234 = new TagAndProbeFiller(TagDir0_1234, string(name_TPFiller0_1234.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts0_123, probe_cuts0_1234);
+  _TagProbe_Electron0_1234 = new TagAndProbeFiller(TagDir0_1234, string(name_TPFiller0_1234.c_str()), _nbin, _xmin, _xmax, tag_cuts_1, probe_cuts0_123, probe_cuts0_1234, "hard");
   
   name_TagDir0+=_RecoCutFlags[5].c_str();
   name_TPFiller0+=_RecoCutFlags[5].c_str();
   string name_TPFiller0_12345 = name_TPFiller0+"_";
   TDirectory *TagDir0_12345 = _dir->mkdir(name_TagDir0.c_str());
   
-  _TagProbe_Electron0_12345 = new TagAndProbeFiller(TagDir0_12345, string(name_TPFiller0_12345.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts0_1234, probe_cuts0_12345);
+  _TagProbe_Electron0_12345 = new TagAndProbeFiller(TagDir0_12345, string(name_TPFiller0_12345.c_str()), _nbin, _xmin, _xmax, tag_cuts_1, probe_cuts0_1234, probe_cuts0_12345, "hard");
   
   name_TagDir0+=_RecoCutFlags[6].c_str();
   name_TPFiller0+=_RecoCutFlags[6].c_str();
   string name_TPFiller0_123456 = name_TPFiller0+"_";
   TDirectory *TagDir0_123456 = _dir->mkdir(name_TagDir0.c_str());
   
-  _TagProbe_Electron0_123456 = new TagAndProbeFiller(TagDir0_123456, string(name_TPFiller0_123456.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts0_12345, probe_cuts0_123456);
+  _TagProbe_Electron0_123456 = new TagAndProbeFiller(TagDir0_123456, string(name_TPFiller0_123456.c_str()), _nbin, _xmin, _xmax, tag_cuts_1, probe_cuts0_12345, probe_cuts0_123456, "hard");
   
   std::vector<bool (*)(const reco::Candidate&)> probe_cuts1_1;
   std::vector<bool (*)(const reco::Candidate&)> probe_cuts1_12;
@@ -525,35 +528,35 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
   string name_TPFiller1_12 = name_TPFiller1+"_";
   TDirectory *TagDir1_12 = _dir->mkdir(name_TagDir1.c_str());
   
-  _TagProbe_Electron1_12 = new TagAndProbeFiller(TagDir1_12, string(name_TPFiller1_12.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts1_1, probe_cuts1_12);
+  _TagProbe_Electron1_12 = new TagAndProbeFiller(TagDir1_12, string(name_TPFiller1_12.c_str()), _nbin, _xmin, _xmax, tag_cuts_0, probe_cuts1_1, probe_cuts1_12, "soft");
   
   name_TagDir1+=_RecoCutFlags[3].c_str();
   name_TPFiller1+=_RecoCutFlags[3].c_str();
   string name_TPFiller1_123 = name_TPFiller1+"_";
   TDirectory *TagDir1_123 = _dir->mkdir(name_TagDir1.c_str());
   
-  _TagProbe_Electron1_123 = new TagAndProbeFiller(TagDir1_123, string(name_TPFiller1_123.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts1_12, probe_cuts1_123);
+  _TagProbe_Electron1_123 = new TagAndProbeFiller(TagDir1_123, string(name_TPFiller1_123.c_str()), _nbin, _xmin, _xmax, tag_cuts_0, probe_cuts1_12, probe_cuts1_123, "soft");
   
   name_TagDir1+=_RecoCutFlags[4].c_str();
   name_TPFiller1+=_RecoCutFlags[4].c_str();
   string name_TPFiller1_1234 = name_TPFiller1+"_";
   TDirectory *TagDir1_1234 = _dir->mkdir(name_TagDir1.c_str());
   
-  _TagProbe_Electron1_1234 = new TagAndProbeFiller(TagDir1_1234, string(name_TPFiller1_1234.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts1_123, probe_cuts1_1234);
+  _TagProbe_Electron1_1234 = new TagAndProbeFiller(TagDir1_1234, string(name_TPFiller1_1234.c_str()), _nbin, _xmin, _xmax, tag_cuts_0, probe_cuts1_123, probe_cuts1_1234, "soft");
   
   name_TagDir1+=_RecoCutFlags[5].c_str();
   name_TPFiller1+=_RecoCutFlags[5].c_str();
   string name_TPFiller1_12345 = name_TPFiller1+"_";
   TDirectory *TagDir1_12345 = _dir->mkdir(name_TagDir1.c_str());
   
-  _TagProbe_Electron1_12345 = new TagAndProbeFiller(TagDir1_12345, string(name_TPFiller1_12345.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts1_1234, probe_cuts1_12345);
+  _TagProbe_Electron1_12345 = new TagAndProbeFiller(TagDir1_12345, string(name_TPFiller1_12345.c_str()), _nbin, _xmin, _xmax, tag_cuts_0, probe_cuts1_1234, probe_cuts1_12345, "soft");
   
   name_TagDir1+=_RecoCutFlags[6].c_str();
   name_TPFiller1+=_RecoCutFlags[6].c_str();
   string name_TPFiller1_123456 = name_TPFiller1+"_";
   TDirectory *TagDir1_123456 = _dir->mkdir(name_TagDir1.c_str());
   
-  _TagProbe_Electron1_123456 = new TagAndProbeFiller(TagDir1_123456, string(name_TPFiller1_123456.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts1_12345, probe_cuts1_123456);
+  _TagProbe_Electron1_123456 = new TagAndProbeFiller(TagDir1_123456, string(name_TPFiller1_123456.c_str()), _nbin, _xmin, _xmax, tag_cuts_0, probe_cuts1_12345, probe_cuts1_123456, "soft");
   
   }
   
@@ -603,7 +606,8 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
    electronHandle.getByLabel(iEvent, "selectedElectrons");
   
    fwlite::Handle<std::vector<pat::Jet> > jetrecHandle;
-   jetrecHandle.getByLabel(iEvent, "selectedJets");
+   if(_JetType=="CALO")jetrecHandle.getByLabel(iEvent, "selectedJets");
+   if(_JetType=="PF")jetrecHandle.getByLabel(iEvent, "selectedPFJets");
    
    fwlite::Handle<std::vector<reco::GenJet> > jetgenHandle;
    jetgenHandle.getByLabel(iEvent, "selectedGenJets");
