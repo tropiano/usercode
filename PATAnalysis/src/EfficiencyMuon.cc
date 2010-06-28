@@ -227,12 +227,18 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
    }
 
    std::sort(muonsfromZ.begin(), muonsfromZ.end(), sortByPt<pat::Muon>); 
-   
+  
+   std::vector<const pat::Muon*> allHardMuons;
+   for (unsigned int j = 0; j < muonHandle->size(); ++j){
+     if ((*muonHandle)[j].pt()>10.) allHardMuons.push_back(&(*muonHandle)[j]);
+   }
+
    bool recselected = RecSelectedMuonWithTrigger(*zHandle, *triggerHandle, _isocut);
 
    //if this is a good Z event remove Z candidates from jet collection
    std::vector<pat::Jet> cleanedJets;
-   CleanJets(*jetHandle, muonsfromZ, cleanedJets, 0.5);
+   //CleanJets(*jetHandle, muonsfromZ, cleanedJets, 0.5);
+   CleanJets(*jetHandle, allHardMuons, cleanedJets, 0.5);
    std::vector<const pat::Jet*> jets = GetJets<pat::Jet>(cleanedJets, _ptjetmin, _etajetmax); 
 
    double recosize = jets.size();
@@ -280,7 +286,7 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
    }
 
   
-   bool isMuTriggered  = isMuonTriggered(*triggerHandle);
+   bool isMuTriggered  = isMuonTriggered(*triggerHandle, allmuons);
    bool isJTriggered = isJetTriggered(*triggerHandle);
 
    bool recselectedTwoMuons = RecSelected_GlobalMuons(allmuons,2).first;
@@ -288,7 +294,7 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
    //bool recselectedTM_MuT_OppositeCharge = RecSelected_OppositeCharge(allmuons).first && recselectedTM_MuTriggered;
    bool recselectedTM_MuT_Charge = _oppositeCharge ? RecSelected_Charge(allmuons, -1).first && recselectedTM_MuTriggered : 
                                                      RecSelected_Charge(allmuons,  1).first && recselectedTM_MuTriggered;
-   bool recselectedTM_MuT_OC_Mass = zHandle->size()>0 && RecSelected_MuonMass(*zHandle) && RecSelected_GlobalMuons(muonsfromZ, 2).first && isMuTriggered; //&& RecSelected_OppositeCharge(muonsfromZ).first; these should already have the desired charge assignment
+   bool recselectedTM_MuT_OC_Mass = zHandle->size()>0 && RecSelected_MuonMass(*zHandle) && RecSelected_GlobalMuons(muonsfromZ, 2).first && isMuonTriggered(*triggerHandle, muonsfromZ); //&& RecSelected_OppositeCharge(muonsfromZ).first; these should already have the desired charge assignment
    bool recselectedTM_MuT_OC_M_QualityCuts = RecSelected_QualityCuts(muonsfromZ, 2).first && recselectedTM_MuT_OC_Mass;
    bool recselectedTM_MuT_OC_M_QC_DXY = RecSelected_DXY(muonsfromZ, 2).first && recselectedTM_MuT_OC_M_QualityCuts;
    bool recselectedTM_MuT_OC_M_QC_DXY_Iso = (muonsfromZ.size() > 0) ? singleMu_Isolation(*muonsfromZ.front()) && recselectedTM_MuT_OC_M_QC_DXY : false;

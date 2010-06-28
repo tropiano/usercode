@@ -65,14 +65,16 @@ inline bool singleMu_QualityCuts(const reco::Candidate& cand){
   if (!muon) throw cms::Exception("PATAnalysis:singleMu_QualityCuts") << "singleMu_QualityCuts is run on an object which is not a muon ";
   
   //reco::TrackRef gm = muon->globalTrack() ; 
- 
+
+
+
   //is this the same as before? or this is total track hits
   return muon->isGlobalMuon() && muon->isTrackerMuon() && 
          //muon->track()->hitPattern().numberOfValidMuonHits() > 0 && muon->track()->hitPattern().numberOfValidTrackerHits() > minnhit &&
          muon->numberOfValidHits() > minnhit &&
          //muon->numberOfChambers() > 0 && 
          //muon->numberOfMatches() > 1 &&               
-         muon->normChi2() < maxchi2 ;
+         muon->normChi2() < maxchi2;
 }
 
 inline bool singleMu_DXY(const reco::Candidate& cand){
@@ -177,8 +179,21 @@ inline bool isTriggered(const pat::TriggerEvent& triggers, std::string triggerna
   //return path->wasAccept();
 }
 
-inline bool isMuonTriggered(const pat::TriggerEvent& triggers){
-  return isTriggered(triggers, "HLT_Mu5");
+inline bool isMuonTriggered(const pat::TriggerEvent& triggers, const std::vector<const pat::Muon*>& MuREC){
+  bool hasFired = isTriggered(triggers, "HLT_Mu9");
+  if (MuREC.empty()) return false;
+  //now we check that the leading muon is matched to that trigger
+  const pat::TriggerObjectStandAloneCollection trigMatches = MuREC.front()->triggerObjectMatchesByPath("HLT_Mu9");
+  /*std::cout << "trigMatches.size() " << trigMatches.size() << std::endl;
+  for (unsigned j = 0; j < trigMatches.size(); ++j ){
+    std::cout << "Matched paths for collection : " << trigMatches[j].collection() << std::endl;
+    std::vector< std::string > pathNames = trigMatches[j].pathNames();
+    for (unsigned k = 0; k < pathNames.size(); ++k){
+      std::cout << pathNames[k] << std::endl;
+    }
+  } 
+  */
+  return hasFired && trigMatches.size();
 }
 
 inline bool isJetTriggered(const pat::TriggerEvent& triggersREC){
@@ -317,8 +332,39 @@ inline bool RecSelectedMuon(const std::vector<reco::CompositeCandidate>& ZREC, d
 
 inline bool RecSelectedMuonWithTrigger(const std::vector<reco::CompositeCandidate>& ZREC, const pat::TriggerEvent& triggers, double isocut, 
                                    const pat::Muon* extdau0 = 0, const pat::Muon* extdau1 = 0){
-  
-  bool isTriggered = isMuonTriggered(triggers);
+  if (ZREC.size() == 0) return false;
+  const pat::Muon* dau0 = 0;
+  const pat::Muon* dau1 = 0;
+  if (extdau0 && extdau1){
+    dau0 = extdau0;
+    dau1 = extdau1;
+  } else {
+    dau0 = dynamic_cast<const pat::Muon*>(ZREC[0].daughter(0));
+    dau1 = dynamic_cast<const pat::Muon*>(ZREC[0].daughter(1));
+  }
+  if (!dau0) {
+     //maybe a shallow clone
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (ZREC[0].daughter(0));
+     if (scc && scc->hasMasterClone()){
+       dau0 = dynamic_cast<const pat::Muon*>(scc->masterClone().get());
+     }
+  }
+  if (!dau1) {
+     //maybe a shallow clone
+     const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (ZREC[0].daughter(1));
+     if (scc && scc->hasMasterClone()){
+       dau1 = dynamic_cast<const pat::Muon*>(scc->masterClone().get());
+     }
+  }
+  assert(dau0 && dau1);
+  const pat::Muon* leading = dau0->pt() > dau1->pt() ? dau0 : dau1;
+  const pat::Muon* second  = dau0->pt() > dau1->pt() ? dau1 : dau0;
+
+  std::vector<const pat::Muon*> muons;
+  muons.push_back(leading);
+  muons.push_back(second);
+ 
+  bool isTriggered = isMuonTriggered(triggers, muons);
   if (!isTriggered) return false;
   return RecSelectedMuon(ZREC, isocut, extdau0, extdau1);
 }
