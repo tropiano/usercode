@@ -15,12 +15,19 @@ selectedPFJets = PhysicsTools.PatAlgos.selectionLayer1.jetSelector_cfi.selectedP
 selectedPFJets.src = cms.InputTag('patPFJets')
 selectedPFJets.cut = cms.string('pt > 20. & abs(eta) < 10.')
 
+import PhysicsTools.PatAlgos.selectionLayer1.jetSelector_cfi
+selectedJPTJets = PhysicsTools.PatAlgos.selectionLayer1.jetSelector_cfi.selectedPatJets.clone()
+#selectedPFJets.src = cms.InputTag('allLayer1PFJets')
+selectedJPTJets.src = cms.InputTag('patJPTJets')
+selectedJPTJets.cut = cms.string('pt > 20. & abs(eta) < 10.')
+
 #recPFjetsSequence = cms.Sequence(allLayer1PFJetsSequence)
 
-recjetsSequence = cms.Sequence(selectedPFJets + selectedJets)
+recjetsSequence = cms.Sequence(selectedPFJets + selectedJets + selectedJPTJets)
 
 
 jetrecEventContent = [
   'keep *_selectedJets_*_*',
-  'keep *_selectedPFJets_*_*'
+  'keep *_selectedPFJets_*_*',
+  'keep *_selectedJPTJets_*_*'
 ]  
