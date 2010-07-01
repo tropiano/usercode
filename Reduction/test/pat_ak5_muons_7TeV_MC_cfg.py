@@ -28,10 +28,6 @@ process.selectedPFJets.cut = cms.string('pt > 10. & abs(eta) < 10.')
 #################
 #customizartion
 #################
-###fix missing ak5 genJets collection
-process.load("RecoJets.Configuration.GenJetParticles_cff")
-process.load("RecoJets.JetProducers.ak5GenJets_cfi")
-process.ak5generatedJets = cms.Sequence(process.genParticlesForJets * process.ak5GenJets)
 from PhysicsTools.PatAlgos.tools.coreTools import *
 #add JPT and PF jet colelctions
 from PhysicsTools.PatAlgos.tools.jetTools import *
@@ -71,8 +67,6 @@ process.patMuons.embedTpfmsMuon = cms.bool(False)
 from PhysicsTools.PatAlgos.tools.metTools import *
 addTcMET(process)
 addPfMET(process)
-process.patMETsTC.genMETSource=cms.InputTag('')
-process.patMETsPF.genMETSource=cms.InputTag('')
 removeSpecificPATObjects(process, ['Photons', 'Electrons', 'Taus'])
 
 #trigger matching
@@ -95,8 +89,8 @@ print process.patTriggerMatchEmbedder
 
 #################
 
-process.patTrigger.processName = "REDIGI"  ###WHAT DO WE NEED TO PUT HERE FOR THE 36X SAMPLES???????????????????????????
-process.patTriggerEvent.processName = "REDIGI"
+process.patTrigger.processName = "REDIGI36X"  ###WHAT DO WE NEED TO PUT HERE FOR THE 36X SAMPLES???????????????????????????
+process.patTriggerEvent.processName = "REDIGI36X"
 
 ################# 
 #Sequences and Paths
@@ -106,7 +100,7 @@ process.patTriggerEvent.processName = "REDIGI"
 process.recosequence = cms.Sequence(process.patDefaultSequence*
                                     process.zmumurecSequence*
                                     process.recjetsSequence)
-process.gensequence = cms.Sequence(process.ak5generatedJets*process.genjetsSequence*process.zmumugenSequence)                                    
+process.gensequence = cms.Sequence(process.genjetsSequence*process.zmumugenSequence)                                    
 
 process.pattuples = cms.Sequence(process.gensequence + process.recosequence)
 
