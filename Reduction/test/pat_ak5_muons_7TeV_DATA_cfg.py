@@ -18,7 +18,7 @@ process.zmumurec.cut = cms.string('0 < mass < 130')
 process.load("Firenze.Reduction.recJetPatAddOns_cff")
 process.selectedJets.cut = cms.string('pt > 10. & abs(eta) < 10. & nConstituents > 0')
 process.selectedPFJets.cut = cms.string('pt > 10. & abs(eta) < 10.')
-process.selectedJPTJets.cut = cms.string('pt > 10. & abs(eta) < 10.')
+#process.selectedJPTJets.cut = cms.string('pt > 10. & abs(eta) < 10.')
 #################
 
 
@@ -41,18 +41,18 @@ addJetCollection(process, cms.InputTag('ak5PFJets'),
                  genJetCollection=cms.InputTag(''), 
                  doJetID = True, 
                  jetIdLabel   = "ak5")
-addJetCollection(process,cms.InputTag('JetPlusTrackZSPCorJetAntiKt5'),
-                 'JPT', '',
-                 doJTA        = True,
-                 doBTagging   = False,
-                 jetCorrLabel = ('AK5','JPT'),
-                 doType1MET   = False,
-                 doL1Cleaning = False,
-                 doL1Counters = False,                 
-                 genJetCollection = cms.InputTag(''),
-                 doJetID      = True,
-                 jetIdLabel   = "ak5"
-                 )
+#addJetCollection(process,cms.InputTag('JetPlusTrackZSPCorJetAntiKt5'),
+#                 'JPT', '',
+#                 doJTA        = True,
+#                 doBTagging   = False,
+#                 jetCorrLabel = ('AK5','JPT'),
+#                 doType1MET   = False,
+#                 doL1Cleaning = False,
+#                 doL1Counters = False,                 
+#                 genJetCollection = cms.InputTag(''),
+#                 doJetID      = True,
+#                 jetIdLabel   = "ak5"
+#                 )
 #steer a few parameters for muons
 process.patMuons.embedTrack = cms.bool(True)
 process.patMuons.embedStandAloneMuon = cms.bool(True)
@@ -77,7 +77,7 @@ from Firenze.Reduction.jetTriggerTools import *
 from Firenze.Reduction.muonTriggerTools import *
 jetTriggerTools(process, cms.InputTag('patJets'), 'calo', 'selectedJets')
 jetTriggerTools(process, cms.InputTag('patJetsPF'), 'pf', 'selectedPFJets')
-jetTriggerTools(process, cms.InputTag('patJetsJPT'), 'jpt', 'selectedJPTJets')
+#jetTriggerTools(process, cms.InputTag('patJetsJPT'), 'jpt', 'selectedJPTJets')
 muonTriggerTools(process, cms.InputTag('patMuons'), '', 'selectedMuons')
 process.patTriggerMatcher = process.NEWpatTriggerMatcher
 process.patTriggerMatchEmbedder = process.NEWpatTriggerMatchEmbedder
@@ -103,8 +103,8 @@ process.recosequence = cms.Sequence(#process.recPFjetsSequence*
 
 process.pattuples = cms.Sequence(process.recosequence)
 
-#process.p = cms.Path(process.skim*process.pattuples)
-process.p = cms.Path(process.pattuples)
+process.p = cms.Path(process.skim*process.pattuples)
+#process.p = cms.Path(process.pattuples)
 #################            
 
 #################            
@@ -124,7 +124,7 @@ process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*', 'keep *
 
 process.out.dropMetaData = cms.untracked.string('DROPPED')
 process.out.SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') )
-process.out.fileName = 'Zmumu_DATA_skim_reducedtrigger.root'
+process.out.fileName = 'Zmumu_DATA_skim.root'
 process.options.wantSummary = False        ## (to suppress the long output at the end of the job)
 
 print 'Current Event content is:'

@@ -23,11 +23,11 @@ selectedJPTJets.cut = cms.string('pt > 20. & abs(eta) < 10.')
 
 #recPFjetsSequence = cms.Sequence(allLayer1PFJetsSequence)
 
-recjetsSequence = cms.Sequence(selectedPFJets + selectedJets + selectedJPTJets)
+recjetsSequence = cms.Sequence(selectedPFJets + selectedJets )#+ selectedJPTJets)
 
 
 jetrecEventContent = [
   'keep *_selectedJets_*_*',
-  'keep *_selectedPFJets_*_*',
-  'keep *_selectedJPTJets_*_*'
+  'keep *_selectedPFJets_*_*'#,
+  #'keep *_selectedJPTJets_*_*'
 ]  

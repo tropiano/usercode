@@ -21,7 +21,7 @@ process.zmumurec.cut = cms.string('0 < mass < 130')
 process.load("Firenze.Reduction.recJetPatAddOns_cff")
 process.selectedJets.cut = cms.string('pt > 10. & abs(eta) < 10. & nConstituents > 0')
 process.selectedPFJets.cut = cms.string('pt > 10. & abs(eta) < 10.')
-process.selectedJPTJets.cut = cms.string('pt > 10. & abs(eta) < 10.')
+#process.selectedJPTJets.cut = cms.string('pt > 10. & abs(eta) < 10.')
 #################
 
 
@@ -46,18 +46,18 @@ addJetCollection(process, cms.InputTag('ak5PFJets'),
                  genJetCollection=cms.InputTag('ak5GenJets'),
                  doJetID = True,
                  jetIdLabel   = "ak5")
-addJetCollection(process,cms.InputTag('JetPlusTrackZSPCorJetAntiKt5'),
-                 'JPT', '',
-                 doJTA        = True,
-                 doBTagging   = False,
-                 jetCorrLabel = ('AK5','JPT'),
-                 doType1MET   = False,
-                 doL1Cleaning = False,
-                 doL1Counters = False,
-                 genJetCollection = cms.InputTag('ak5GenJets'),
-                 doJetID      = True,
-                 jetIdLabel   = "ak5"
-                 )
+#addJetCollection(process,cms.InputTag('JetPlusTrackZSPCorJetAntiKt5'),
+#                 'JPT', '',
+#                 doJTA        = True,
+#                 doBTagging   = False,
+#                 jetCorrLabel = ('AK5','JPT'),
+#                 doType1MET   = False,
+#                 doL1Cleaning = False,
+#                 doL1Counters = False,
+#                 genJetCollection = cms.InputTag('ak5GenJets'),
+#                 doJetID      = True,
+#                 jetIdLabel   = "ak5"
+#                 )
 
 #steer a few parameters for muons
 process.patMuons.embedTrack = cms.bool(True)
@@ -84,7 +84,7 @@ from Firenze.Reduction.jetTriggerTools import *
 from Firenze.Reduction.muonTriggerTools import *
 jetTriggerTools(process, cms.InputTag('patJets'), 'calo', 'selectedJets')
 jetTriggerTools(process, cms.InputTag('patJetsPF'), 'pf', 'selectedPFJets')
-jetTriggerTools(process, cms.InputTag('patJetsJPT'), 'jpt', 'selectedJPTJets')
+#jetTriggerTools(process, cms.InputTag('patJetsJPT'), 'jpt', 'selectedJPTJets')
 muonTriggerTools(process, cms.InputTag('patMuons'), '', 'selectedMuons')
 process.patTriggerMatcher = process.NEWpatTriggerMatcher
 process.patTriggerMatchEmbedder = process.NEWpatTriggerMatchEmbedder
