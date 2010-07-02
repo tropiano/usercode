@@ -12,18 +12,39 @@
 #include "TROOT.h"
 #include "TProof.h"
 #include "TProofLog.h"
-#include "Firenze/PATAnalysis/include/ZeeMainUtilities.h"
+#include "Firenze/PATAnalysis/include/zeejets.h"
 #include "FWCore/FWLite/interface/AutoLibraryLoader.h"
 
 using namespace std;
 
+/*
+-1. Unknown
+0.  Data
+1.  ZJets_Madgraph_Spring10
+2.  Zee_Pythia_Spring10
+3.  WJets_Madgraph_Spring10
+4.  Wenu_Pythia_Spring10
+5.  TTbarJets_Madgraph_Spring10
+6.  TTbar_Pythia_Spring10
+7.  QCD_BCtoE_Pythia_Pt20to30_Spring10
+8.  QCD_BCtoE_Pythia_Pt30to80_Spring10
+9.  QCD_BCtoE_Pythia_Pt80to170_Spring10
+10. QCD_EMEnriched_Pythia_Pt20to30_Spring10  (skimmed)
+11. QCD_EMEnriched_Pythia_Pt30to80_Spring10  (skimmed)
+12. QCD_EMEnriched_Pythia_Pt80to170_Spring10 (skimmed)
+*/
+
 int main() {
 
   //Job
-  string cfgName = "config.py";
-  string sourceList = "test.txt";
-  string outputName = "test";
-  string electronID = "eidRobustLoose";
+  
+  int PreDefName = 1;
+  
+  string sourceList = "Zpj_Madgraph_Spring10.txt";
+  string outNameSuf="_TEST";
+  name(PreDefName);
+  string outputName = SampleName;
+  outputName+=outNameSuf;
   
   //Sample: mc = MonteCarlo , data = Data
   string sample = "mc";
@@ -35,12 +56,23 @@ int main() {
   string JetType = "PF";
   
   //Normalization
-  double xsec = 1300; //pb
-  double targetLumi = 100.; //pb-1
   string Norm = "True";
-  int EventsPerFile = 0;
-  int EventNumber = 0;
   string Sumw2= "True";
+  double targetLumi = 50.; //pb-1
+  
+  //Parameters
+  Parameters(PreDefName, &ParStruct);
+  double xsec=ParStruct._xsec;
+  double EventFilter=ParStruct._EventFilter;
+  int EventsPerFile=ParStruct._EventsPerFile;
+  int EventNumber=ParStruct._EventNumber;
+  
+  //Parameters defined by user
+  if(PreDefName==-1){
+  xsec = 1667; //pb
+  EventFilter = 1.;
+  EventsPerFile = 0;
+  EventNumber = 0;}
   
   //Number of events to be processed
   int ProcEvents = -1;
@@ -69,13 +101,13 @@ int main() {
   bool Log = false;
   
   //Path of PATAnalysis dir - DO NOT FORGET THE SLASH AT THE END OF THE PATH
-  string path = "/data/sfrosali/Zjets/Commit/CMSSW_3_6_2/src/Firenze/PATAnalysis/bin/";
+  string path = "/data/sfrosali/Zjets/Commit/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/";
   
   if(sample=="data"){
   GenParticleMatch = "False";
   GEN = false;}
 
-  makeCfg(sample, selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Qual, Imp, Iso, EiD, path.c_str(), cfgName.c_str(), sourceList.c_str(), outputName.c_str(), Norm.c_str(), Sumw2.c_str(), EventsPerFile, EventNumber, ProcEvents, electronID.c_str(), xsec, targetLumi, GenParticleMatch.c_str());
+  makeCfg(sample, selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Qual, Imp, Iso, EiD, path.c_str(), sourceList.c_str(), outputName.c_str(), Norm.c_str(), Sumw2.c_str(), EventsPerFile, EventNumber, ProcEvents, xsec*EventFilter, targetLumi, GenParticleMatch.c_str());
 
   gEnv->SetValue("Proof.Sandbox", "/data/sfrosali/.proof");
 
@@ -92,7 +124,8 @@ int main() {
   TDSet* SignalDS = getDS(sourceList.c_str());
   
   string cfgPath = path;
-  cfgPath+=cfgName;
+  cfgPath+=outputName;
+  cfgPath+=".py";
   
   TNamed* configsignal = new TNamed("ConfigFile", cfgPath.c_str());
   p->AddInput(configsignal);

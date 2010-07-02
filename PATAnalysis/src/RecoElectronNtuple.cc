@@ -32,7 +32,7 @@ using namespace edm;
 
 RecoElectronNtuple::RecoElectronNtuple(): 
  
-_sample("mc"), _selections("VBTF"), _electronID("eidRobustLoose"), _JetType("CALO"), _ptjetmin(30.), _etajetmax(3.), _isocut(0.1), _weight(1.), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _Acc(1), _Trg(2), _Qual(3), _Imp(4), _Iso(5), _EiD(6), _Norm(false)
+_sample("mc"), _selections("VBTF"), _JetType("CALO"), _ptjetmin(30.), _etajetmax(3.), _isocut(0.1), _weight(1.), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _Acc(1), _Trg(2), _Qual(3), _Imp(4), _Iso(5), _EiD(6), _Norm(false)
 
 { }
 
@@ -44,7 +44,6 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    std::string sourceFileList = iConfig.getParameter<std::string>("sourceFileList");
    _selections = iConfig.getParameter<std::string>("Selections");
    _sample = iConfig.getParameter<std::string>("Sample");
-   _electronID = iConfig.getParameter<std::string>("electronID");
    _targetLumi= iConfig.getParameter<double>("targetLumi");
    _xsec      = iConfig.getParameter<double>("CrossSection");
    _Norm      = iConfig.getParameter<bool>("Norm");
@@ -324,8 +323,6 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    valid_JetMult=-1;
    valid_JetMult_Pt10Cut=-1;
    valid_ElMult=-1;
-   valid_ElectronTrigger=-1;
-   valid_JetTrigger=-1;
    
    valid_JetPt=-99.;
    valid_JetPhi=-99.;
@@ -474,11 +471,10 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    fwlite::Handle<std::vector<reco::GenJet> > jetgenHandle;
    jetgenHandle.getByLabel(iEvent, "selectedGenJets");
    
-   if(_sample=="mc"){
-
-   if (zgenHandle->size() > 1) return;
+   if(_sample=="mc" && zgenHandle->size()!=0){
    
-   std::vector<const reco::Candidate*> zgendaughters = ZGENDaughters(*zgenHandle);
+   std::vector<const reco::Candidate*> zgendaughters;
+   if(zgenHandle->size())zgendaughters = ZGENDaughters((*zgenHandle)[0]);
    const reco::Candidate *gendau0 = 0;
    const reco::Candidate *gendau1 = 0;
    
@@ -491,9 +487,9 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    std::vector<const reco::GenJet*> isogenjets;
    
    for(unsigned int i = 0; i < genjets.size(); i++){
-   if(GenIsoJet(*zgenHandle,*genjets[i]))isogenjets.push_back(genjets[i]);}
+   if(IsoJet((*zgenHandle)[0],*genjets[i],"GEN"))isogenjets.push_back(genjets[i]);}
 
-   if (GenSelected(*zgenHandle, _selections)&&zgendaughters.size()!=0){   
+   if (GenSelected((*zgenHandle)[0], _selections)&&zgendaughters.size()!=0){   
 
       ptzgen=(*zgenHandle)[0].pt();
       etazgen=(*zgenHandle)[0].eta();
@@ -521,7 +517,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
       
    }   // end one Z gen
 
-   if (GenSelectedInAcceptance(*zgenHandle, _selections)&&zgendaughters.size()!=0){
+   if (GenSelectedInAcceptance((*zgenHandle)[0], _selections)&&zgendaughters.size()!=0){
    
       acc_ptzgen=(*zgenHandle)[0].pt();
       acc_etazgen=(*zgenHandle)[0].eta();
@@ -598,16 +594,10 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    valid_JetMult = jetrecHandle->size();
    valid_JetMult_Pt10Cut = jetspt10cut.size();
    
-   if(isElectronTriggerAvailable(*triggerHandle)){
-   valid_ElectronTrigger=0;
    if(isElectronTriggered(*triggerHandle))valid_ElectronTrigger = 1;
-   }
    
-   if(isJetTriggerAvailable(*triggerHandle)){
-   valid_JetTrigger=0;
    if(isJetTriggered(*triggerHandle))valid_JetTrigger = 1;
-   }
-   
+ 
    validel_EventTree->Fill();
    validjet_EventTree->Fill();
    
@@ -665,10 +655,10 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
      std::vector<const pat::Jet*> notisorecjets;
       
      for(unsigned int i = 0; i < recjets.size(); i++){     
-     if(RecoIsoJet((*zrecHandle)[0],*recjets[i]))isorecjets.push_back(recjets[i]);
-     if(!RecoIsoJet((*zrecHandle)[0],*recjets[i]))notisorecjets.push_back(recjets[i]);}
+     if(IsoJet((*zrecHandle)[0],*recjets[i],"RECO"))isorecjets.push_back(recjets[i]);
+     if(!IsoJet((*zrecHandle)[0],*recjets[i],"RECO"))notisorecjets.push_back(recjets[i]);}
    
-     std::vector<const pat::Electron*> zrecdaughters = ZDaughters((*zrecHandle)[0]);
+     std::vector<const pat::Electron*> zrecdaughters = ZRECDaughters((*zrecHandle)[0]);
      const pat::Electron *recdau0 = 0;
      const pat::Electron *recdau1 = 0;
     
@@ -685,7 +675,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
 
    // loose cuts, only acceptance cuts
    
-   if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)){
+   if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle)){
    
       const reco::GsfTrackRef& track0 = recdau0->gsfTrack();
       const reco::GsfTrackRef& track1 = recdau1->gsfTrack();
@@ -792,7 +782,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
 
    // now starts the stricter cuts
       
-   if (RecSelected(_RecoCutFlags[1].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[2].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[3].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[4].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[5].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[6].c_str(), _electronID.c_str(), (*zrecHandle)[0], *triggerHandle)){
+   if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[6].c_str(), (*zrecHandle)[0], *triggerHandle)){
   
       zmass_AllCuts=(*zrecHandle)[0].mass();
       

@@ -82,7 +82,7 @@ public :
 
 private:
 
-  std::string _sample, _selections, _electronID, _JetType;
+  std::string _sample, _selections, _JetType;
 
   double _ptjetmin;
 

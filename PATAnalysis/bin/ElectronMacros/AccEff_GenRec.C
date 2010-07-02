@@ -27,13 +27,18 @@ using namespace std;
 //sample == "mc" -> MonteCarlo , sample == "data" -> Data
 //Selections: "VPJ" = V+jets selections (old); "VBTF" = Vector Boson Task Force (new)
 
-void SignalPlots(string sample, string selections){
+void AccEff_GenRec(string sample, string selections){
 
         gROOT->SetStyle("Plain");
 
-        TFile *signal_file = TFile::Open("Test_VPJ_3.root");
+        TFile *signal_file = TFile::Open("ZJets_Madgraph_Spring10_TEST.root");
         
-        TFile* outplots = new TFile("Plot_Test_VPJ_3.root", "RECREATE");
+        //Output
+        string out = "Plot_TEST";
+        //string out = "Test";
+        string output = out;
+        output+=".root";
+        TFile* outplots = new TFile(output.c_str(), "RECREATE");
 	
 	int _Acc  = 1;
 	int _Trg  = 2;
@@ -65,7 +70,7 @@ void SignalPlots(string sample, string selections){
 	return;
 	}
 
-TDirectory *GEff, *REff, *Acc, *Pt_Eff, *Eta_Eff, *Jet_Eff, *R_Jet_Eff, *Mass_Eff, *Dist, *GenRec, *IsoJet, *ChargeMisID, *TP, *TP_12, *TP_123, *TP_1234, *TP_12345, *TP_123456;
+TDirectory *GEff, *REff, *Acc, *Pt_Eff, *Eta_Eff, *GenExclJet_Eff, *RecoInclJet_Eff, *RecoExclJet_Eff, *R_GenExclJet_Eff, *R_RecoInclJet_Eff, *R_RecoExclJet_Eff, *Mass_Eff, *Dist, *GenRec, *IsoJet, *ChargeMisID, *TP, *TP_12, *TP_123, *TP_1234, *TP_12345, *TP_123456;
 
 GEff      = outplots->mkdir("Global_Efficiency");
 REff      = outplots->mkdir("Relative_Efficiency");
@@ -75,9 +80,13 @@ IsoJet   = outplots->mkdir("JetIsolation");
 Mass_Eff = GEff->mkdir("Efficiency_vs_ZMass");
 Pt_Eff = GEff->mkdir("Efficiency_vs_ZPt");
 Eta_Eff = GEff->mkdir("Efficiency_vs_ZEta");
-Jet_Eff = GEff->mkdir("Efficiency_vs_GenJet");
+GenExclJet_Eff = GEff->mkdir("Efficiency_vs_GenExclJet");
+RecoInclJet_Eff = GEff->mkdir("Efficiency_vs_RecoInclJet");
+RecoExclJet_Eff = GEff->mkdir("Efficiency_vs_RecoExclJet");
 Dist    = GEff->mkdir("Distributions");
-R_Jet_Eff = REff->mkdir("Relative_Efficiency_vs_GenJet");
+R_GenExclJet_Eff = REff->mkdir("Relative_Efficiency_vs_GenExclJet");
+R_RecoInclJet_Eff = REff->mkdir("Relative_Efficiency_vs_RecoInclJet");
+R_RecoExclJet_Eff = REff->mkdir("Relative_Efficiency_vs_RecoExclJet");
 ChargeMisID = outplots->mkdir("ChargeMisID");
 TP          = outplots->mkdir("Tag&Probe");
 string TPdir_name = "Tag&Probe";
@@ -92,6 +101,20 @@ TPdir_name += _RecoCutFlags[5];
 TP_12345     = TP->mkdir(TPdir_name.c_str());
 TPdir_name += _RecoCutFlags[6];
 TP_123456     = TP->mkdir(TPdir_name.c_str());
+
+        ofstream effincl;
+	string outeffincl="EffInclReport_";
+	outeffincl+=out;
+	outeffincl+=".txt";
+	effincl.open(outeffincl.c_str());
+	effincl<<endl;
+	
+	ofstream effexcl;
+	string outeffexcl="EffExclReport_";
+	outeffexcl+=out;
+	outeffexcl+=".txt";
+	effexcl.open(outeffexcl.c_str());
+	effexcl<<endl;
 	
    /////////////Efficiency - MC
 
@@ -101,11 +124,15 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
    TH1D* AccDenom_genPtZ = (TH1D*) signal_file->Get("EfficiencyElectron/AccDenom_genPtZ");
    TH1D* AccDenom_genEtaZ = (TH1D*) signal_file->Get("EfficiencyElectron/AccDenom_genEtaZ");
    TH1D* AccDenom_GenIsoJetNumber = (TH1D*) signal_file->Get("EfficiencyElectron/AccDenom_GenIsoJetNumber");
+   TH1D* AccDenom_RecoInclJetNumber = (TH1D*) signal_file->Get("EfficiencyElectron/AccDenom_RecoInclJetNumber");
+   TH1D* AccDenom_RecoExclJetNumber = (TH1D*) signal_file->Get("EfficiencyElectron/AccDenom_RecoExclJetNumber");
 	
    TH1D* EffDenom_genMassZ = (TH1D*) signal_file->Get("EfficiencyElectron/EffDenom_genMassZ");
    TH1D* EffDenom_genPtZ = (TH1D*) signal_file->Get("EfficiencyElectron/EffDenom_genPtZ");
    TH1D* EffDenom_genEtaZ = (TH1D*) signal_file->Get("EfficiencyElectron/EffDenom_genEtaZ");
    TH1D* EffDenom_GenIsoJetNumber = (TH1D*) signal_file->Get("EfficiencyElectron/EffDenom_GenIsoJetNumber");
+   TH1D* EffDenom_RecoInclJetNumber = (TH1D*) signal_file->Get("EfficiencyElectron/EffDenom_RecoInclJetNumber");
+   TH1D* EffDenom_RecoExclJetNumber = (TH1D*) signal_file->Get("EfficiencyElectron/EffDenom_RecoExclJetNumber");
 	
    //Reco in acc. efficiency
     
@@ -169,6 +196,34 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	TH1D* GenIsoJetNumber_12345 = (TH1D*) signal_file->Get(genIsoJetEff_name.c_str());
 	genIsoJetEff_name+=_RecoCutFlags[6].c_str();
 	TH1D* GenIsoJetNumber_123456 = (TH1D*) signal_file->Get(genIsoJetEff_name.c_str());
+	
+	string RecoInclJetEff_name = "EfficiencyElectron/RecoInclJetEff";
+	RecoInclJetEff_name+=_RecoCutFlags[1].c_str();
+        TH1D* RecoInclJetNumber_1 = (TH1D*) signal_file->Get(RecoInclJetEff_name.c_str());
+	RecoInclJetEff_name+=_RecoCutFlags[2].c_str();
+        TH1D* RecoInclJetNumber_12 = (TH1D*) signal_file->Get(RecoInclJetEff_name.c_str());
+	RecoInclJetEff_name+=_RecoCutFlags[3].c_str();
+	TH1D* RecoInclJetNumber_123 = (TH1D*) signal_file->Get(RecoInclJetEff_name.c_str());
+	RecoInclJetEff_name+=_RecoCutFlags[4].c_str();
+	TH1D* RecoInclJetNumber_1234 = (TH1D*) signal_file->Get(RecoInclJetEff_name.c_str());
+	RecoInclJetEff_name+=_RecoCutFlags[5].c_str();
+	TH1D* RecoInclJetNumber_12345 = (TH1D*) signal_file->Get(RecoInclJetEff_name.c_str());
+	RecoInclJetEff_name+=_RecoCutFlags[6].c_str();
+	TH1D* RecoInclJetNumber_123456 = (TH1D*) signal_file->Get(RecoInclJetEff_name.c_str());
+	
+	string RecoExclJetEff_name = "EfficiencyElectron/RecoExclJetEff";
+	RecoExclJetEff_name+=_RecoCutFlags[1].c_str();
+        TH1D* RecoExclJetNumber_1 = (TH1D*) signal_file->Get(RecoExclJetEff_name.c_str());
+	RecoExclJetEff_name+=_RecoCutFlags[2].c_str();
+        TH1D* RecoExclJetNumber_12 = (TH1D*) signal_file->Get(RecoExclJetEff_name.c_str());
+	RecoExclJetEff_name+=_RecoCutFlags[3].c_str();
+	TH1D* RecoExclJetNumber_123 = (TH1D*) signal_file->Get(RecoExclJetEff_name.c_str());
+	RecoExclJetEff_name+=_RecoCutFlags[4].c_str();
+	TH1D* RecoExclJetNumber_1234 = (TH1D*) signal_file->Get(RecoExclJetEff_name.c_str());
+	RecoExclJetEff_name+=_RecoCutFlags[5].c_str();
+	TH1D* RecoExclJetNumber_12345 = (TH1D*) signal_file->Get(RecoExclJetEff_name.c_str());
+	RecoExclJetEff_name+=_RecoCutFlags[6].c_str();
+	TH1D* RecoExclJetNumber_123456 = (TH1D*) signal_file->Get(RecoExclJetEff_name.c_str());
 		
 	if(sample=="mc"){
 	
@@ -183,14 +238,36 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	TGraphAsymmErrors Acc_VsZEta(EffDenom_genEtaZ, AccDenom_genEtaZ);
 	Acc_VsZEta.SetNameTitle("Acc_ZEta", "Acceptance vs gen Z Eta");
 	TGraphAsymmErrors Acc_VsJetN(EffDenom_GenIsoJetNumber, AccDenom_GenIsoJetNumber);
-	Acc_VsJetN.SetNameTitle("Acc_VsJetN", "Acceptance vs gen Iso Jet Number");
+	Acc_VsJetN.SetNameTitle("Acc_VsGenExclJetN", "Acceptance vs Gen Exclusive Iso Jet Number");
+	TGraphAsymmErrors Acc_VsRecoInclJetN(EffDenom_RecoInclJetNumber, AccDenom_RecoInclJetNumber);
+	Acc_VsRecoInclJetN.SetNameTitle("Acc_VsRecoInclJetN", "Acceptance vs Reco Inclusive Iso Jet Number");
+	TGraphAsymmErrors Acc_VsRecoExclJetN(EffDenom_RecoExclJetNumber, AccDenom_RecoExclJetNumber);
+	Acc_VsRecoExclJetN.SetNameTitle("Acc_VsRecoExclJetN", "Acceptance vs Reco Exclusive Iso Jet Number");
 	
 	Acc_VsZMass.Write();
 	Acc_VsZPt.Write();
 	Acc_VsZEta.Write();
 	Acc_VsJetN.Write();
+	Acc_VsRecoInclJetN.Write();
+	Acc_VsRecoExclJetN.Write();
 	
-   //Efficiency calculation vs Z Mass
+        effincl<<"Acceptance vs Reco Inclusive Jet number"<<endl<<endl;
+        for(int i=0; i<7; i++){
+        double x = 0., y = 0.;
+        Acc_VsRecoInclJetN.GetPoint(i,x,y);
+        effincl<<"Jet# >= "<<i<<" Acc. = "<<y<<" Error High = "<<Acc_VsRecoInclJetN.GetErrorYhigh(i)<<" Error Low = "<<Acc_VsRecoInclJetN.GetErrorYlow(i)<<endl;
+        }
+        effincl<<endl;
+        
+        effexcl<<"Acceptance vs Gen Exclusive Jet number"<<endl<<endl;
+        for(int i=0; i<7; i++){
+        double x = 0., y = 0.;
+        Acc_VsJetN.GetPoint(i,x,y);
+        effexcl<<"Jet# >= "<<i<<" Acc. = "<<y<<" Error High = "<<Acc_VsJetN.GetErrorYhigh(i)<<" Error Low = "<<Acc_VsJetN.GetErrorYlow(i)<<endl;
+        }
+        effexcl<<endl;
+	
+   //Global Efficiency calculation vs Z Mass
 	
 	Mass_Eff->cd();
 	
@@ -222,7 +299,7 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	Eff_ZMass_123456.Write(); 
 	
 		
-   //Efficiency calculation vs Z Pt
+   //Global Efficiency calculation vs Z Pt
 	
 	Pt_Eff->cd();
 	
@@ -254,7 +331,7 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         Eff_ZPt_123456.Write();
 	
 		
-   //Efficiency calculation vs Z Eta
+   //Global Efficiency calculation vs Z Eta
 	
 	Eta_Eff->cd();
 	
@@ -286,76 +363,231 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	Eff_ZEta_123456.Write();
 	
 		
-   //Efficiency calculation vs Jet Number
+   //Global Efficiency calculation vs Gen Jet Number
 	
-	Jet_Eff->cd();
+	GenExclJet_Eff->cd();
 	
-	string EffVsJetN_name = "EffVsJetN";
-	EffVsJetN_name+=_RecoCutFlags[1].c_str();
-	TGraphAsymmErrors Eff_Jet_1(GenIsoJetNumber_1, EffDenom_GenIsoJetNumber);
-	Eff_Jet_1.SetNameTitle(EffVsJetN_name.c_str(), _RecoCutFlags[1].c_str());
-	EffVsJetN_name+=_RecoCutFlags[2].c_str();
-	TGraphAsymmErrors Eff_Jet_12(GenIsoJetNumber_12, EffDenom_GenIsoJetNumber);
-	Eff_Jet_12.SetNameTitle(EffVsJetN_name.c_str(), _RecoCutFlags[2].c_str());
-	EffVsJetN_name+=_RecoCutFlags[3].c_str();
-	TGraphAsymmErrors Eff_Jet_123(GenIsoJetNumber_123, EffDenom_GenIsoJetNumber);
-	Eff_Jet_123.SetNameTitle(EffVsJetN_name.c_str(), _RecoCutFlags[3].c_str());
-	EffVsJetN_name+=_RecoCutFlags[4].c_str();
-	TGraphAsymmErrors Eff_Jet_1234(GenIsoJetNumber_1234, EffDenom_GenIsoJetNumber);
-	Eff_Jet_1234.SetNameTitle(EffVsJetN_name.c_str(), _RecoCutFlags[4].c_str());
-	EffVsJetN_name+=_RecoCutFlags[5].c_str();
-	TGraphAsymmErrors Eff_Jet_12345(GenIsoJetNumber_12345, EffDenom_GenIsoJetNumber);
-	Eff_Jet_12345.SetNameTitle(EffVsJetN_name.c_str(), _RecoCutFlags[5].c_str());
-	EffVsJetN_name+=_RecoCutFlags[6].c_str();
-	TGraphAsymmErrors Eff_Jet_123456(GenIsoJetNumber_123456, EffDenom_GenIsoJetNumber);
-	Eff_Jet_123456.SetNameTitle(EffVsJetN_name.c_str(), _RecoCutFlags[6].c_str());
+	string EffVsGenExclJetN_name = "EffVsGenExclJetN";
+	EffVsGenExclJetN_name+=_RecoCutFlags[1].c_str();
+	TGraphAsymmErrors Eff_GenExclJet_1(GenIsoJetNumber_1, EffDenom_GenIsoJetNumber);
+	Eff_GenExclJet_1.SetNameTitle(EffVsGenExclJetN_name.c_str(), _RecoCutFlags[1].c_str());
+	EffVsGenExclJetN_name+=_RecoCutFlags[2].c_str();
+	TGraphAsymmErrors Eff_GenExclJet_12(GenIsoJetNumber_12, EffDenom_GenIsoJetNumber);
+	Eff_GenExclJet_12.SetNameTitle(EffVsGenExclJetN_name.c_str(), _RecoCutFlags[2].c_str());
+	EffVsGenExclJetN_name+=_RecoCutFlags[3].c_str();
+	TGraphAsymmErrors Eff_GenExclJet_123(GenIsoJetNumber_123, EffDenom_GenIsoJetNumber);
+	Eff_GenExclJet_123.SetNameTitle(EffVsGenExclJetN_name.c_str(), _RecoCutFlags[3].c_str());
+	EffVsGenExclJetN_name+=_RecoCutFlags[4].c_str();
+	TGraphAsymmErrors Eff_GenExclJet_1234(GenIsoJetNumber_1234, EffDenom_GenIsoJetNumber);
+	Eff_GenExclJet_1234.SetNameTitle(EffVsGenExclJetN_name.c_str(), _RecoCutFlags[4].c_str());
+	EffVsGenExclJetN_name+=_RecoCutFlags[5].c_str();
+	TGraphAsymmErrors Eff_GenExclJet_12345(GenIsoJetNumber_12345, EffDenom_GenIsoJetNumber);
+	Eff_GenExclJet_12345.SetNameTitle(EffVsGenExclJetN_name.c_str(), _RecoCutFlags[5].c_str());
+	EffVsGenExclJetN_name+=_RecoCutFlags[6].c_str();
+	TGraphAsymmErrors Eff_GenExclJet_123456(GenIsoJetNumber_123456, EffDenom_GenIsoJetNumber);
+	Eff_GenExclJet_123456.SetNameTitle(EffVsGenExclJetN_name.c_str(), _RecoCutFlags[6].c_str());
 	
-	Eff_Jet_1.Write();
-	Eff_Jet_12.Write();
-	Eff_Jet_123.Write();
-	Eff_Jet_1234.Write();
-	Eff_Jet_12345.Write();
-	Eff_Jet_123456.Write();
+	Eff_GenExclJet_1.Write();
+	Eff_GenExclJet_12.Write();
+	Eff_GenExclJet_123.Write();
+	Eff_GenExclJet_1234.Write();
+	Eff_GenExclJet_12345.Write();
+	Eff_GenExclJet_123456.Write();
 	
-	//Efficiency cut plots
+	//Global Efficiency calculation vs Reco Exclusive Jet Number
 	
-	Jet_Eff->cd();
-	TCanvas *EffJet = new TCanvas;
-	Eff_Jet_1.GetYaxis()->SetRangeUser(0.3,1);
-	Eff_Jet_1.GetXaxis()->SetTitle("gen Jet number");
-	Eff_Jet_1.SetMarkerStyle(20);
-	Eff_Jet_1.Draw("AP");
+	RecoExclJet_Eff->cd();
+	
+	string EffVsRecoExclJetN_name = "EffVsRecoExclJetN";
+	EffVsRecoExclJetN_name+=_RecoCutFlags[1].c_str();
+	TGraphAsymmErrors Eff_RecoExclJet_1(RecoExclJetNumber_1, EffDenom_RecoExclJetNumber);
+	Eff_RecoExclJet_1.SetNameTitle(EffVsRecoExclJetN_name.c_str(), _RecoCutFlags[1].c_str());
+	EffVsRecoExclJetN_name+=_RecoCutFlags[2].c_str();
+	TGraphAsymmErrors Eff_RecoExclJet_12(RecoExclJetNumber_12, EffDenom_RecoExclJetNumber);
+	Eff_RecoExclJet_12.SetNameTitle(EffVsRecoExclJetN_name.c_str(), _RecoCutFlags[2].c_str());
+	EffVsRecoExclJetN_name+=_RecoCutFlags[3].c_str();
+	TGraphAsymmErrors Eff_RecoExclJet_123(RecoExclJetNumber_123, EffDenom_RecoExclJetNumber);
+	Eff_RecoExclJet_123.SetNameTitle(EffVsRecoExclJetN_name.c_str(), _RecoCutFlags[3].c_str());
+	EffVsRecoExclJetN_name+=_RecoCutFlags[4].c_str();
+	TGraphAsymmErrors Eff_RecoExclJet_1234(RecoExclJetNumber_1234, EffDenom_RecoExclJetNumber);
+	Eff_RecoExclJet_1234.SetNameTitle(EffVsRecoExclJetN_name.c_str(), _RecoCutFlags[4].c_str());
+	EffVsRecoExclJetN_name+=_RecoCutFlags[5].c_str();
+	TGraphAsymmErrors Eff_RecoExclJet_12345(RecoExclJetNumber_12345, EffDenom_RecoExclJetNumber);
+	Eff_RecoExclJet_12345.SetNameTitle(EffVsRecoExclJetN_name.c_str(), _RecoCutFlags[5].c_str());
+	EffVsRecoExclJetN_name+=_RecoCutFlags[6].c_str();
+	TGraphAsymmErrors Eff_RecoExclJet_123456(RecoExclJetNumber_123456, EffDenom_RecoExclJetNumber);
+	Eff_RecoExclJet_123456.SetNameTitle(EffVsRecoExclJetN_name.c_str(), _RecoCutFlags[6].c_str());
+	
+	Eff_RecoExclJet_1.Write();
+	Eff_RecoExclJet_12.Write();
+	Eff_RecoExclJet_123.Write();
+	Eff_RecoExclJet_1234.Write();
+	Eff_RecoExclJet_12345.Write();
+	Eff_RecoExclJet_123456.Write();
+	
+       //Global Efficiency calculation vs Reco Inclusive Jet Number
+	
+	RecoInclJet_Eff->cd();
+	
+	string EffVsRecoInclJetN_name = "EffVsRecoInclJetN";
+	EffVsRecoInclJetN_name+=_RecoCutFlags[1].c_str();
+	TGraphAsymmErrors Eff_RecoInclJet_1(RecoInclJetNumber_1, EffDenom_RecoInclJetNumber);
+	Eff_RecoInclJet_1.SetNameTitle(EffVsRecoInclJetN_name.c_str(), _RecoCutFlags[1].c_str());
+	EffVsRecoInclJetN_name+=_RecoCutFlags[2].c_str();
+	TGraphAsymmErrors Eff_RecoInclJet_12(RecoInclJetNumber_12, EffDenom_RecoInclJetNumber);
+	Eff_RecoInclJet_12.SetNameTitle(EffVsRecoInclJetN_name.c_str(), _RecoCutFlags[2].c_str());
+	EffVsRecoInclJetN_name+=_RecoCutFlags[3].c_str();
+	TGraphAsymmErrors Eff_RecoInclJet_123(RecoInclJetNumber_123, EffDenom_RecoInclJetNumber);
+	Eff_RecoInclJet_123.SetNameTitle(EffVsRecoInclJetN_name.c_str(), _RecoCutFlags[3].c_str());
+	EffVsRecoInclJetN_name+=_RecoCutFlags[4].c_str();
+	TGraphAsymmErrors Eff_RecoInclJet_1234(RecoInclJetNumber_1234, EffDenom_RecoInclJetNumber);
+	Eff_RecoInclJet_1234.SetNameTitle(EffVsRecoInclJetN_name.c_str(), _RecoCutFlags[4].c_str());
+	EffVsRecoInclJetN_name+=_RecoCutFlags[5].c_str();
+	TGraphAsymmErrors Eff_RecoInclJet_12345(RecoInclJetNumber_12345, EffDenom_RecoInclJetNumber);
+	Eff_RecoInclJet_12345.SetNameTitle(EffVsRecoInclJetN_name.c_str(), _RecoCutFlags[5].c_str());
+	EffVsRecoInclJetN_name+=_RecoCutFlags[6].c_str();
+	TGraphAsymmErrors Eff_RecoInclJet_123456(RecoInclJetNumber_123456, EffDenom_RecoInclJetNumber);
+	Eff_RecoInclJet_123456.SetNameTitle(EffVsRecoInclJetN_name.c_str(), _RecoCutFlags[6].c_str());
+	
+	Eff_RecoInclJet_1.Write();
+	Eff_RecoInclJet_12.Write();
+	Eff_RecoInclJet_123.Write();
+	Eff_RecoInclJet_1234.Write();
+	Eff_RecoInclJet_12345.Write();
+	Eff_RecoInclJet_123456.Write();
+	
+	effincl<<"Global efficiency (Acc+Trg+Imp+Iso+EiD) vs Reco Inclusive Jet number"<<endl<<endl;
+        for(int i=0; i<7; i++){
+        double x = 0., y = 0.;
+        Eff_RecoInclJet_123456.GetPoint(i,x,y);
+        effincl<<"Jet# >= "<<i<<" Global Eff. = "<<y<<" Error High = "<<Eff_RecoInclJet_123456.GetErrorYhigh(i)<<" Error Low = "<<Eff_RecoInclJet_123456.GetErrorYlow(i)<<endl;
+        }
+        effincl<<endl;
+        
+        effexcl<<"Global efficiency (Acc+Trg+Imp+Iso+EiD) vs Gen Exclusive Jet number"<<endl<<endl;
+        for(int i=0; i<7; i++){
+        double x = 0., y = 0.;
+        Eff_GenExclJet_123456.GetPoint(i,x,y);
+        effexcl<<"Jet# >= "<<i<<" Global Eff. = "<<y<<" Error High = "<<Eff_GenExclJet_123456.GetErrorYhigh(i)<<" Error Low = "<<Eff_GenExclJet_123456.GetErrorYlow(i)<<endl;
+        }
+        effexcl<<endl;
+	
+     //Global Efficiency cut plots
+	
+	GenExclJet_Eff->cd();
+	TCanvas *EffGenExclJet = new TCanvas;
+	Eff_GenExclJet_1.GetYaxis()->SetRangeUser(0.3,1);
+	Eff_GenExclJet_1.GetXaxis()->SetTitle("gen Jet number");
+	Eff_GenExclJet_1.SetMarkerStyle(20);
+	Eff_GenExclJet_1.Draw("AP");
 	if(_RecoCutFlags[2] != "_1"){
-	Eff_Jet_12.SetLineColor(2);
-	Eff_Jet_12.SetMarkerStyle(21);
-	Eff_Jet_12.SetMarkerColor(2);
-	Eff_Jet_12.Draw("PSAME");}
+	Eff_GenExclJet_12.SetLineColor(2);
+	Eff_GenExclJet_12.SetMarkerStyle(21);
+	Eff_GenExclJet_12.SetMarkerColor(2);
+	Eff_GenExclJet_12.Draw("PSAME");}
 	if(_RecoCutFlags[3] != "_1"){
-	Eff_Jet_123.SetLineColor(3);
-	Eff_Jet_123.SetMarkerStyle(22);
-	Eff_Jet_123.SetMarkerColor(3);
-        Eff_Jet_123.Draw("PSAME");}
+	Eff_GenExclJet_123.SetLineColor(3);
+	Eff_GenExclJet_123.SetMarkerStyle(22);
+	Eff_GenExclJet_123.SetMarkerColor(3);
+        Eff_GenExclJet_123.Draw("PSAME");}
 	if(_RecoCutFlags[4] != "_1"){
-	Eff_Jet_1234.SetLineColor(4);
-	Eff_Jet_1234.SetMarkerStyle(23);
-	Eff_Jet_1234.SetMarkerColor(4);
-	Eff_Jet_1234.Draw("PSAME");}
+	Eff_GenExclJet_1234.SetLineColor(4);
+	Eff_GenExclJet_1234.SetMarkerStyle(23);
+	Eff_GenExclJet_1234.SetMarkerColor(4);
+	Eff_GenExclJet_1234.Draw("PSAME");}
 	if(_RecoCutFlags[5] != "_1"){
-        Eff_Jet_12345.SetLineColor(5);
-	Eff_Jet_12345.SetMarkerStyle(24);
-	Eff_Jet_12345.SetMarkerColor(5);
-	Eff_Jet_12345.Draw("PSAME");}
+        Eff_GenExclJet_12345.SetLineColor(6);
+	Eff_GenExclJet_12345.SetMarkerStyle(24);
+	Eff_GenExclJet_12345.SetMarkerColor(6);
+	Eff_GenExclJet_12345.Draw("PSAME");}
 	if(_RecoCutFlags[6] != "_1"){
-        Eff_Jet_123456.SetLineColor(6);
-	Eff_Jet_123456.SetMarkerStyle(25);
-	Eff_Jet_123456.SetMarkerColor(6);
-	Eff_Jet_123456.Draw("PSAME");}
-	TLegend *LegEffJ = EffJet->BuildLegend(0.5,0.67,0.88,0.88,"Legenda");
-	LegEffJ->Draw();
-	Eff_Jet_1.SetTitle("Cut Efficiency vs Jet Number");
-	EffJet->Write("CutEfficiencyVsJet.root");
-	EffJet->Close();                                                           
+        Eff_GenExclJet_123456.SetLineColor(9);
+	Eff_GenExclJet_123456.SetMarkerStyle(25);
+	Eff_GenExclJet_123456.SetMarkerColor(9);
+	Eff_GenExclJet_123456.Draw("PSAME");}
+	TLegend *LegEffJ = EffGenExclJet->BuildLegend(0.5,0.67,0.88,0.88,"Legenda");
+	LegEffJ->SetFillColor(0);
+	LegEffJ->Draw("LP");
+	Eff_GenExclJet_1.SetTitle("Cut Efficiency vs Gen Excl Jet Number");
+	EffGenExclJet->Write("CutEfficiencyVsGenExclJet.root");
+	EffGenExclJet->Close();
 	
+	RecoInclJet_Eff->cd();
+	TCanvas *EffRecoInclJet = new TCanvas;
+	Eff_RecoInclJet_1.GetYaxis()->SetRangeUser(0.3,1);
+	Eff_RecoInclJet_1.GetXaxis()->SetTitle("reco Inclusive Jet number");
+	Eff_RecoInclJet_1.SetMarkerStyle(20);
+	Eff_RecoInclJet_1.Draw("AP");
+	if(_RecoCutFlags[2] != "_1"){
+	Eff_RecoInclJet_12.SetLineColor(2);
+	Eff_RecoInclJet_12.SetMarkerStyle(21);
+	Eff_RecoInclJet_12.SetMarkerColor(2);
+	Eff_RecoInclJet_12.Draw("PSAME");}
+	if(_RecoCutFlags[3] != "_1"){
+	Eff_RecoInclJet_123.SetLineColor(3);
+	Eff_RecoInclJet_123.SetMarkerStyle(22);
+	Eff_RecoInclJet_123.SetMarkerColor(3);
+        Eff_RecoInclJet_123.Draw("PSAME");}
+	if(_RecoCutFlags[4] != "_1"){
+	Eff_RecoInclJet_1234.SetLineColor(4);
+	Eff_RecoInclJet_1234.SetMarkerStyle(23);
+	Eff_RecoInclJet_1234.SetMarkerColor(4);
+	Eff_RecoInclJet_1234.Draw("PSAME");}
+	if(_RecoCutFlags[5] != "_1"){
+        Eff_RecoInclJet_12345.SetLineColor(6);
+	Eff_RecoInclJet_12345.SetMarkerStyle(24);
+	Eff_RecoInclJet_12345.SetMarkerColor(6);
+	Eff_RecoInclJet_12345.Draw("PSAME");}
+	if(_RecoCutFlags[6] != "_1"){
+        Eff_RecoInclJet_123456.SetLineColor(9);
+	Eff_RecoInclJet_123456.SetMarkerStyle(25);
+	Eff_RecoInclJet_123456.SetMarkerColor(9);
+	Eff_RecoInclJet_123456.Draw("PSAME");}
+	TLegend *LegEffRecoInclJ = EffRecoInclJet->BuildLegend(0.5,0.67,0.88,0.88,"");
+	LegEffRecoInclJ->SetFillColor(0);
+	LegEffRecoInclJ->Draw("LP");
+	Eff_RecoInclJet_1.SetTitle("Cut Efficiency vs Reco Inclusive Jet Number");
+	EffRecoInclJet->Write("CutEfficiencyVsRecoInclJet.root");
+	EffRecoInclJet->Close();
+		
+	RecoExclJet_Eff->cd();
+	TCanvas *EffRecoExclJet = new TCanvas;
+	Eff_RecoExclJet_1.GetYaxis()->SetRangeUser(0.3,1);
+	Eff_RecoExclJet_1.GetXaxis()->SetTitle("reco Exclusive Jet number");
+	Eff_RecoExclJet_1.SetMarkerStyle(20);
+	Eff_RecoExclJet_1.Draw("AP");
+	if(_RecoCutFlags[2] != "_1"){
+	Eff_RecoExclJet_12.SetLineColor(2);
+	Eff_RecoExclJet_12.SetMarkerStyle(21);
+	Eff_RecoExclJet_12.SetMarkerColor(2);
+	Eff_RecoExclJet_12.Draw("PSAME");}
+	if(_RecoCutFlags[3] != "_1"){
+	Eff_RecoExclJet_123.SetLineColor(3);
+	Eff_RecoExclJet_123.SetMarkerStyle(22);
+	Eff_RecoExclJet_123.SetMarkerColor(3);
+        Eff_RecoExclJet_123.Draw("PSAME");}
+	if(_RecoCutFlags[4] != "_1"){
+	Eff_RecoExclJet_1234.SetLineColor(4);
+	Eff_RecoExclJet_1234.SetMarkerStyle(23);
+	Eff_RecoExclJet_1234.SetMarkerColor(4);
+	Eff_RecoExclJet_1234.Draw("PSAME");}
+	if(_RecoCutFlags[5] != "_1"){
+        Eff_RecoExclJet_12345.SetLineColor(6);
+	Eff_RecoExclJet_12345.SetMarkerStyle(24);
+	Eff_RecoExclJet_12345.SetMarkerColor(6);
+	Eff_RecoExclJet_12345.Draw("PSAME");}
+	if(_RecoCutFlags[6] != "_1"){
+        Eff_RecoExclJet_123456.SetLineColor(9);
+	Eff_RecoExclJet_123456.SetMarkerStyle(25);
+	Eff_RecoExclJet_123456.SetMarkerColor(9);
+	Eff_RecoExclJet_123456.Draw("PSAME");}
+	TLegend *LegEffRecoExclJ = EffRecoExclJet->BuildLegend(0.5,0.67,0.88,0.88,"");
+	LegEffRecoExclJ->SetFillColor(0);
+	LegEffRecoExclJ->Draw("LP");
+	Eff_RecoExclJet_1.SetTitle("Cut Efficiency vs Reco Exclusive Jet Number");
+	EffRecoExclJet->Write("CutEfficiencyVsRecoExclJet.root");
+	EffRecoExclJet->Close();
+	                                                   	
 	Mass_Eff->cd();
 	TCanvas *EffZMass = new TCanvas;
 	Eff_ZMass_1.GetYaxis()->SetRangeUser(0.2,1);
@@ -378,17 +610,18 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	Eff_ZMass_1234.SetMarkerColor(4);
 	Eff_ZMass_1234.Draw("PSAME");}
 	if(_RecoCutFlags[5] != "_1"){
-	Eff_ZMass_12345.SetLineColor(5);
+	Eff_ZMass_12345.SetLineColor(6);
 	Eff_ZMass_12345.SetMarkerStyle(24);
-	Eff_ZMass_12345.SetMarkerColor(5);
+	Eff_ZMass_12345.SetMarkerColor(6);
 	Eff_ZMass_12345.Draw("PSAME");}
 	if(_RecoCutFlags[6] != "_1"){
-	Eff_ZMass_123456.SetLineColor(6);
+	Eff_ZMass_123456.SetLineColor(9);
 	Eff_ZMass_123456.SetMarkerStyle(25);
-	Eff_ZMass_123456.SetMarkerColor(6);
+	Eff_ZMass_123456.SetMarkerColor(9);
 	Eff_ZMass_123456.Draw("PSAME");}
 	TLegend *LegEffZM = EffZMass->BuildLegend(0.5,0.67,0.88,0.88,"Legenda");
-	LegEffZM->Draw();
+	LegEffZM->SetFillColor(0);
+	LegEffZM->Draw("LP");
 	Eff_ZMass_1.SetTitle("Cut Efficiency vs Z Mass");
 	EffZMass->Write("CutEfficiencyVsZMass.root");
 	EffZMass->Close();  
@@ -415,17 +648,18 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	Eff_ZPt_1234.SetMarkerColor(4);
 	Eff_ZPt_1234.Draw("PSAME");}
 	if(_RecoCutFlags[5] != "_1"){
-	Eff_ZPt_12345.SetLineColor(5);
+	Eff_ZPt_12345.SetLineColor(6);
 	Eff_ZPt_12345.SetMarkerStyle(24);
-	Eff_ZPt_12345.SetMarkerColor(5);
+	Eff_ZPt_12345.SetMarkerColor(6);
 	Eff_ZPt_12345.Draw("PSAME");}
 	if(_RecoCutFlags[6] != "_1"){
-	Eff_ZPt_123456.SetLineColor(6);
+	Eff_ZPt_123456.SetLineColor(9);
 	Eff_ZPt_123456.SetMarkerStyle(25);
-	Eff_ZPt_123456.SetMarkerColor(6);
+	Eff_ZPt_123456.SetMarkerColor(9);
 	Eff_ZPt_123456.Draw("PSAME");}
 	TLegend *LegEffZPt = EffZPt->BuildLegend(0.5,0.67,0.88,0.88,"Legenda");
-	LegEffZPt->Draw();
+	LegEffZPt->SetFillColor(0);
+	LegEffZPt->Draw("LP");
 	Eff_ZPt_1.SetTitle("Cut Efficiency vs Z Pt");
 	EffZPt->Write("CutEfficiencyVsZPt.root");
 	EffZPt->Close();
@@ -452,23 +686,24 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	Eff_ZEta_1234.SetMarkerColor(4);
 	Eff_ZEta_1234.Draw("PSAME");}
 	if(_RecoCutFlags[5] != "_1"){
-	Eff_ZEta_12345.SetLineColor(5);
+	Eff_ZEta_12345.SetLineColor(6);
 	Eff_ZEta_12345.SetMarkerStyle(24);
-	Eff_ZEta_12345.SetMarkerColor(5);
+	Eff_ZEta_12345.SetMarkerColor(6);
 	Eff_ZEta_12345.Draw("PSAME");}
 	if(_RecoCutFlags[6] != "_1"){
-	Eff_ZEta_123456.SetLineColor(6);
+	Eff_ZEta_123456.SetLineColor(9);
 	Eff_ZEta_123456.SetMarkerStyle(25);
-	Eff_ZEta_123456.SetMarkerColor(6);
+	Eff_ZEta_123456.SetMarkerColor(9);
 	Eff_ZEta_123456.Draw("PSAME");}
 	TLegend *LegEffZEta = EffZEta->BuildLegend(0.5,0.67,0.88,0.88,"Legenda");
-	LegEffZEta->Draw();
+	LegEffZEta->SetFillColor(0);
+	LegEffZEta->Draw("LP");
 	Eff_ZEta_1.SetTitle("Cut Efficiency vs Z Eta");
 	EffZEta->Write("CutEfficiencyVsZEta.root");
 	EffZEta->Close();
 	
 	}
-	
+		
 	//////////// Distributions
 	
 	Dist->cd();
@@ -502,10 +737,10 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	recMassZ_1234->SetLineColor(4);
 		recMassZ_1234->Draw("sames");}
 	if(_RecoCutFlags[5] != "_1"){
-	recMassZ_12345->SetLineColor(5);
+	recMassZ_12345->SetLineColor(6);
 		recMassZ_12345->Draw("sames");}
 	if(_RecoCutFlags[6] != "_1"){
-	recMassZ_123456->SetLineColor(6);
+	recMassZ_123456->SetLineColor(9);
 		recMassZ_123456->Draw("sames");}
 	ZMass->Write("ZMass.root");
 	ZMass->Close();
@@ -539,10 +774,10 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	recPtZ_1234->SetLineColor(4);
 		recPtZ_1234->Draw("sames");}
 	if(_RecoCutFlags[5] != "_1"){
-	recPtZ_12345->SetLineColor(5);
+	recPtZ_12345->SetLineColor(6);
 		recPtZ_12345->Draw("sames");}
 	if(_RecoCutFlags[6] != "_1"){
-	recPtZ_123456->SetLineColor(6);
+	recPtZ_123456->SetLineColor(9);
 		recPtZ_123456->Draw("sames");}
 	ZPt->Write("ZPt.root");
 	ZPt->Close();
@@ -576,61 +811,59 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	recEtaZ_1234->SetLineColor(4);
 		recEtaZ_1234->Draw("sames");}
 	if(_RecoCutFlags[5] != "_1"){
-	recEtaZ_12345->SetLineColor(5);
+	recEtaZ_12345->SetLineColor(6);
 		recEtaZ_12345->Draw("sames");}
 	if(_RecoCutFlags[6] != "_1"){
-	recEtaZ_123456->SetLineColor(6);
+	recEtaZ_123456->SetLineColor(9);
 		recEtaZ_123456->Draw("sames");}
 	ZEta->Write("ZEta.root");
 	ZEta->Close();
-	
-	string recJetN_name = "RecoElectron/recJet_Plots/IsoJetCounter";
-	recJetN_name+=_RecoCutFlags[1].c_str();
-	TH1D* recJetN_1 = (TH1D*) signal_file->Get(recJetN_name.c_str());
-	recJetN_name+=_RecoCutFlags[2].c_str();
-	TH1D* recJetN_12 = (TH1D*) signal_file->Get(recJetN_name.c_str());
-	recJetN_name+=_RecoCutFlags[3].c_str();
-	TH1D* recJetN_123 = (TH1D*) signal_file->Get(recJetN_name.c_str());
-	recJetN_name+=_RecoCutFlags[4].c_str();
-	TH1D* recJetN_1234 = (TH1D*) signal_file->Get(recJetN_name.c_str());
-	recJetN_name+=_RecoCutFlags[5].c_str();
-	TH1D* recJetN_12345 = (TH1D*) signal_file->Get(recJetN_name.c_str());
-	recJetN_name+=_RecoCutFlags[6].c_str();
-	TH1D* recJetN_123456 = (TH1D*) signal_file->Get(recJetN_name.c_str());
-	
+		
+	string recExclJetN_name = "RecoElectron/recJet_Plots/IsoJetCounter";
+	recExclJetN_name+=_RecoCutFlags[1].c_str();
+	TH1D* recExclJetN_1 = (TH1D*) signal_file->Get(recExclJetN_name.c_str());
+	recExclJetN_name+=_RecoCutFlags[2].c_str();
+	TH1D* recExclJetN_12 = (TH1D*) signal_file->Get(recExclJetN_name.c_str());
+	recExclJetN_name+=_RecoCutFlags[3].c_str();
+	TH1D* recExclJetN_123 = (TH1D*) signal_file->Get(recExclJetN_name.c_str());
+	recExclJetN_name+=_RecoCutFlags[4].c_str();
+	TH1D* recExclJetN_1234 = (TH1D*) signal_file->Get(recExclJetN_name.c_str());
+	recExclJetN_name+=_RecoCutFlags[5].c_str();
+	TH1D* recExclJetN_12345 = (TH1D*) signal_file->Get(recExclJetN_name.c_str());
+	recExclJetN_name+=_RecoCutFlags[6].c_str();
+	TH1D* recExclJetN_123456 = (TH1D*) signal_file->Get(recExclJetN_name.c_str());
+
 	TCanvas *JetN = new TCanvas;
-	recJetN_1->SetLineColor(1);
-	recJetN_1->GetXaxis()->SetTitle("rec Jet number");
-	recJetN_1->SetTitle("Reconstructed Jet number vs cuts applied");
-	recJetN_1->Draw();
+	recExclJetN_1->SetLineColor(1);
+	recExclJetN_1->GetXaxis()->SetTitle("rec Jet number");
+	recExclJetN_1->SetTitle("Reconstructed Jet number vs cuts applied");
+	recExclJetN_1->Draw();
 	if(_RecoCutFlags[2] != "_1"){
-	recJetN_12->SetLineColor(2);
-		recJetN_12->Draw("sames");}
+	recExclJetN_12->SetLineColor(2);
+	recExclJetN_12->Draw("sames");}
 	if(_RecoCutFlags[3] != "_1"){
-	recJetN_123->SetLineColor(3);
-		recJetN_123->Draw("sames");}
+	recExclJetN_123->SetLineColor(3);
+	recExclJetN_123->Draw("sames");}
 	if(_RecoCutFlags[4] != "_1"){
-	recJetN_1234->SetLineColor(4);
-		recJetN_1234->Draw("sames");}
+	recExclJetN_1234->SetLineColor(4);
+	recExclJetN_1234->Draw("sames");}
 	if(_RecoCutFlags[5] != "_1"){
-	recJetN_12345->SetLineColor(5);
-		recJetN_12345->Draw("sames");}
+	recExclJetN_12345->SetLineColor(6);
+	recExclJetN_12345->Draw("sames");}
 	if(_RecoCutFlags[6] != "_1"){
-	recJetN_123456->SetLineColor(6);
-		recJetN_123456->Draw("sames");}
+	recExclJetN_123456->SetLineColor(9);
+	recExclJetN_123456->Draw("sames");}
 	JetN->Write("JetN.root");
 	JetN->Close();
-	
+
 	if(sample=="mc"){
-	
 	////////////////// Gen - Rec Plots
-	
 	GenRec->cd();
 	
 	TH1D* GENMassZ_Acc = (TH1D*) signal_file->Get("GenElectron/genZ_Plots/genMassZ_Acc");
         TH1D* GENPtZ_Acc = (TH1D*) signal_file->Get("GenElectron/genZ_Plots/genPtZ_Acc");
         TH1D* GENEtaZ_Acc = (TH1D*) signal_file->Get("GenElectron/genZ_Plots/genEtaZ_Acc");
-        TH1D* GENJetN_Acc = (TH1D*) signal_file->Get("GenElectron/genJet_Plots/GenIsoJetCounter_Acc");
+        TH1D* GENExclJetN_Acc = (TH1D*) signal_file->Get("GenElectron/genJet_Plots/GenIsoJetCounter_Acc");
 	
 	TCanvas *GenRec_ZMass = new TCanvas;
 	recMassZ_123456->SetLineColor(1);
@@ -661,22 +894,22 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	GENEtaZ_Acc->Draw("sames");
 	GenRec_ZEta->Write("GenRec_ZEta.root");
 	GenRec_ZEta->Close();
-	
-	TCanvas *GenRec_JetN = new TCanvas;
-	recJetN_123456->SetLineColor(1);
-	recJetN_123456->GetXaxis()->SetTitle("Jet number");
-	recJetN_123456->SetTitle("Reconstructed (black) and Generated (red) Jet Number");
-	recJetN_123456->Draw();
-	GENJetN_Acc->SetLineColor(2);
-	GENJetN_Acc->Draw("sames");
-	GenRec_JetN->Write("GenRec_JetN.root");
-	GenRec_JetN->Close();
+		
+	TCanvas *GenRec_ExclJetN = new TCanvas;
+	recExclJetN_123456->SetLineColor(1);
+	recExclJetN_123456->GetXaxis()->SetTitle("Jet number");
+	recExclJetN_123456->SetTitle("Reconstructed (black) and Generated (red) Exclusive Jet Number");
+	recExclJetN_123456->Draw();
+	GENExclJetN_Acc->SetLineColor(2);
+	GENExclJetN_Acc->Draw("sames");
+	GenRec_ExclJetN->Write("GenRec_ExclJetN.root");
+	GenRec_ExclJetN->Close();
 	
 	////////// Jet Isolation
-	
+		
 	IsoJet->cd();
 	
-	TH1D* GENJetPt = (TH1D*) signal_file->Get("GenElectron/genJet_Plots/GenJetPt_Acc");
+	TH1D* GENExclJetPt = (TH1D*) signal_file->Get("GenElectron/genJet_Plots/GenJetPt_Acc");
 	TH1D* GENIsoJetPt = (TH1D*) signal_file->Get("GenElectron/genJet_Plots/GenIsoJetPt_Acc");
 	
 	string RECJetPt_name = "RecoElectron/recJet_Plots/RecoJetPt";
@@ -701,8 +934,8 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	RECJetPt_123456->GetXaxis()->SetTitle("Jet Pt");
 	RECJetPt_123456->SetTitle("Reconstructed (black) and Generated (red) Jet Pt, NO jet-isolation cut applied");
 	RECJetPt_123456->Draw();
-	GENJetPt->SetLineColor(2);
-	GENJetPt->Draw("sames");
+	GENExclJetPt->SetLineColor(2);
+	GENExclJetPt->Draw("sames");
 	AllJetPt->Write("AllJetPt.root");
 	AllJetPt->Close();
 	
@@ -716,77 +949,282 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	IsoJetPt->Close();
 	
 	}
-//////////////////////////////////////////////////////////////////
+	
+//////////////////////////////////////////////////////////////////////////////////////////////7
    
         //Relative Efficiency from MC
         
-        R_Jet_Eff->cd();
+        R_GenExclJet_Eff->cd();
             
-        TGraphAsymmErrors Eff_Rel_1(GenIsoJetNumber_1, EffDenom_GenIsoJetNumber);
-        TGraphAsymmErrors Eff_Rel_12(GenIsoJetNumber_12, GenIsoJetNumber_1);
-        TGraphAsymmErrors Eff_Rel_123(GenIsoJetNumber_123, GenIsoJetNumber_12);
-        TGraphAsymmErrors Eff_Rel_1234(GenIsoJetNumber_1234, GenIsoJetNumber_123);
-        TGraphAsymmErrors Eff_Rel_12345(GenIsoJetNumber_12345, GenIsoJetNumber_1234);
-        TGraphAsymmErrors Eff_Rel_123456(GenIsoJetNumber_123456, GenIsoJetNumber_12345);
+        TGraphAsymmErrors RelEff_GenExclJet_1(GenIsoJetNumber_1, EffDenom_GenIsoJetNumber);
+        TGraphAsymmErrors RelEff_GenExclJet_12(GenIsoJetNumber_12, GenIsoJetNumber_1);
+        TGraphAsymmErrors RelEff_GenExclJet_123(GenIsoJetNumber_123, GenIsoJetNumber_12);
+        TGraphAsymmErrors RelEff_GenExclJet_1234(GenIsoJetNumber_1234, GenIsoJetNumber_123);
+        TGraphAsymmErrors RelEff_GenExclJet_12345(GenIsoJetNumber_12345, GenIsoJetNumber_1234);
+        TGraphAsymmErrors RelEff_GenExclJet_123456(GenIsoJetNumber_123456, GenIsoJetNumber_12345);
+        
+        TGraphAsymmErrors RelEff_RecoInclJet_1(RecoInclJetNumber_1, EffDenom_RecoInclJetNumber);
+        TGraphAsymmErrors RelEff_RecoInclJet_12(RecoInclJetNumber_12, RecoInclJetNumber_1);
+        TGraphAsymmErrors RelEff_RecoInclJet_123(RecoInclJetNumber_123, RecoInclJetNumber_12);
+        TGraphAsymmErrors RelEff_RecoInclJet_1234(RecoInclJetNumber_1234, RecoInclJetNumber_123);
+        TGraphAsymmErrors RelEff_RecoInclJet_12345(RecoInclJetNumber_12345, RecoInclJetNumber_1234);
+        TGraphAsymmErrors RelEff_RecoInclJet_123456(RecoInclJetNumber_123456, RecoInclJetNumber_12345);
+        
+        TGraphAsymmErrors RelEff_RecoExclJet_1(RecoExclJetNumber_1, EffDenom_RecoExclJetNumber);
+        TGraphAsymmErrors RelEff_RecoExclJet_12(RecoExclJetNumber_12, RecoExclJetNumber_1);
+        TGraphAsymmErrors RelEff_RecoExclJet_123(RecoExclJetNumber_123, RecoExclJetNumber_12);
+        TGraphAsymmErrors RelEff_RecoExclJet_1234(RecoExclJetNumber_1234, RecoExclJetNumber_123);
+        TGraphAsymmErrors RelEff_RecoExclJet_12345(RecoExclJetNumber_12345, RecoExclJetNumber_1234);
+        TGraphAsymmErrors RelEff_RecoExclJet_123456(RecoExclJetNumber_123456, RecoExclJetNumber_12345);
+        
+        //Gen exclusive jet number
         
         if(sample=="mc"){
         
-        string Eff_Rel_name="RelativeEff_MC";
-        Eff_Rel_name+=_RecoCutFlags[1].c_str();
-        Eff_Rel_1.SetNameTitle(Eff_Rel_name.c_str(), Eff_Rel_name.c_str());
-        Eff_Rel_name+=_RecoCutFlags[2].c_str();  
-        Eff_Rel_12.SetNameTitle(Eff_Rel_name.c_str(), Eff_Rel_name.c_str());
-        Eff_Rel_name+=_RecoCutFlags[3].c_str();  
-        Eff_Rel_123.SetNameTitle(Eff_Rel_name.c_str(), Eff_Rel_name.c_str());
-        Eff_Rel_name+=_RecoCutFlags[4].c_str();  
-        Eff_Rel_1234.SetNameTitle(Eff_Rel_name.c_str(), Eff_Rel_name.c_str());
-        Eff_Rel_name+=_RecoCutFlags[5].c_str();  
-        Eff_Rel_12345.SetNameTitle(Eff_Rel_name.c_str(), Eff_Rel_name.c_str());
-        Eff_Rel_name+=_RecoCutFlags[6].c_str();  
-        Eff_Rel_123456.SetNameTitle(Eff_Rel_name.c_str(), Eff_Rel_name.c_str());
+        string RelEff_GenExclJet_name="RelativeEff_MC";
+        RelEff_GenExclJet_name+=_RecoCutFlags[1].c_str();
+        RelEff_GenExclJet_1.SetNameTitle(RelEff_GenExclJet_name.c_str(), RelEff_GenExclJet_name.c_str());
+        RelEff_GenExclJet_name+=_RecoCutFlags[2].c_str();  
+        RelEff_GenExclJet_12.SetNameTitle(RelEff_GenExclJet_name.c_str(), RelEff_GenExclJet_name.c_str());
+        RelEff_GenExclJet_name+=_RecoCutFlags[3].c_str();  
+        RelEff_GenExclJet_123.SetNameTitle(RelEff_GenExclJet_name.c_str(), RelEff_GenExclJet_name.c_str());
+        RelEff_GenExclJet_name+=_RecoCutFlags[4].c_str();  
+        RelEff_GenExclJet_1234.SetNameTitle(RelEff_GenExclJet_name.c_str(), RelEff_GenExclJet_name.c_str());
+        RelEff_GenExclJet_name+=_RecoCutFlags[5].c_str();  
+        RelEff_GenExclJet_12345.SetNameTitle(RelEff_GenExclJet_name.c_str(), RelEff_GenExclJet_name.c_str());
+        RelEff_GenExclJet_name+=_RecoCutFlags[6].c_str();  
+        RelEff_GenExclJet_123456.SetNameTitle(RelEff_GenExclJet_name.c_str(), RelEff_GenExclJet_name.c_str());
         
-        Eff_Rel_1.Write();
-        Eff_Rel_12.Write();
-        Eff_Rel_123.Write();
-        Eff_Rel_1234.Write();
-        Eff_Rel_123456.Write();
+        RelEff_GenExclJet_1.Write();
+        RelEff_GenExclJet_12.Write();
+        RelEff_GenExclJet_123.Write();
+        RelEff_GenExclJet_1234.Write();
+        RelEff_GenExclJet_123456.Write();
         
 	TCanvas *REffJet = new TCanvas;
-	Eff_Rel_1.GetYaxis()->SetRangeUser(0.3,1);
-	Eff_Rel_1.GetXaxis()->SetTitle("gen Jet number");
-	Eff_Rel_1.SetMarkerStyle(20);
-	Eff_Rel_1.Draw("AP");
+	RelEff_GenExclJet_1.GetYaxis()->SetRangeUser(0.3,1);
+	RelEff_GenExclJet_1.GetXaxis()->SetTitle("gen Jet number");
+	RelEff_GenExclJet_1.SetMarkerStyle(20);
+	RelEff_GenExclJet_1.Draw("AP");
 	if(_RecoCutFlags[2] != "_1"){
-	Eff_Rel_12.SetLineColor(2);
-	Eff_Rel_12.SetMarkerStyle(21);
-	Eff_Rel_12.SetMarkerColor(2);
-	Eff_Rel_12.Draw("PSAME");}
+	RelEff_GenExclJet_12.SetLineColor(2);
+	RelEff_GenExclJet_12.SetMarkerStyle(21);
+	RelEff_GenExclJet_12.SetMarkerColor(2);
+	RelEff_GenExclJet_12.Draw("PSAME");}
 	if(_RecoCutFlags[3] != "_1"){
-	Eff_Rel_123.SetLineColor(3);
-	Eff_Rel_123.SetMarkerStyle(22);
-	Eff_Rel_123.SetMarkerColor(3);
-        Eff_Rel_123.Draw("PSAME");}
+	RelEff_GenExclJet_123.SetLineColor(3);
+	RelEff_GenExclJet_123.SetMarkerStyle(22);
+	RelEff_GenExclJet_123.SetMarkerColor(3);
+        RelEff_GenExclJet_123.Draw("PSAME");}
 	if(_RecoCutFlags[4] != "_1"){
-	Eff_Rel_1234.SetLineColor(4);
-	Eff_Rel_1234.SetMarkerStyle(23);
-	Eff_Rel_1234.SetMarkerColor(4);
-	Eff_Rel_1234.Draw("PSAME");}
+	RelEff_GenExclJet_1234.SetLineColor(4);
+	RelEff_GenExclJet_1234.SetMarkerStyle(23);
+	RelEff_GenExclJet_1234.SetMarkerColor(4);
+	RelEff_GenExclJet_1234.Draw("PSAME");}
 	if(_RecoCutFlags[5] != "_1"){
-        Eff_Rel_12345.SetLineColor(5);
-	Eff_Rel_12345.SetMarkerStyle(24);
-	Eff_Rel_12345.SetMarkerColor(5);
-	Eff_Rel_12345.Draw("PSAME");}
+        RelEff_GenExclJet_12345.SetLineColor(6);
+	RelEff_GenExclJet_12345.SetMarkerStyle(24);
+	RelEff_GenExclJet_12345.SetMarkerColor(6);
+	RelEff_GenExclJet_12345.Draw("PSAME");}
 	if(_RecoCutFlags[6] != "_1"){
-        Eff_Rel_123456.SetLineColor(6);
-	Eff_Rel_123456.SetMarkerStyle(25);
-	Eff_Rel_123456.SetMarkerColor(6);
-	Eff_Rel_123456.Draw("PSAME");}
+        RelEff_GenExclJet_123456.SetLineColor(9);
+	RelEff_GenExclJet_123456.SetMarkerStyle(25);
+	RelEff_GenExclJet_123456.SetMarkerColor(9);
+	RelEff_GenExclJet_123456.Draw("PSAME");}
 	TLegend *LegREffJ = REffJet->BuildLegend(0.5,0.67,0.88,0.88,"Legenda");
-	LegREffJ->Draw();
-	Eff_Rel_1.SetTitle("Cut Relative Efficiency vs Gen Jet Number");
-	REffJet->Write("Cut_RelativeEfficiency_VsGenJet.root");
+	LegREffJ->SetFillColor(0);
+	LegREffJ->Draw("LP");
+	RelEff_GenExclJet_1.SetTitle("Cut Relative Efficiency vs Gen Excl Jet Number");
+	REffJet->Write("Cut_RelativeEfficiency_VsGenExclJet.root");
 	REffJet->Close();
 	
+	//Reco exclusive jet number
+	
+	R_RecoExclJet_Eff->cd();
+                 
+        string RelEff_RecoExclJet_name="RelativeEff_MC";
+        RelEff_RecoExclJet_name+=_RecoCutFlags[1].c_str();
+        RelEff_RecoExclJet_1.SetNameTitle(RelEff_RecoExclJet_name.c_str(), RelEff_RecoExclJet_name.c_str());
+        RelEff_RecoExclJet_name+=_RecoCutFlags[2].c_str();  
+        RelEff_RecoExclJet_12.SetNameTitle(RelEff_RecoExclJet_name.c_str(), RelEff_RecoExclJet_name.c_str());
+        RelEff_RecoExclJet_name+=_RecoCutFlags[3].c_str();  
+        RelEff_RecoExclJet_123.SetNameTitle(RelEff_RecoExclJet_name.c_str(), RelEff_RecoExclJet_name.c_str());
+        RelEff_RecoExclJet_name+=_RecoCutFlags[4].c_str();  
+        RelEff_RecoExclJet_1234.SetNameTitle(RelEff_RecoExclJet_name.c_str(), RelEff_RecoExclJet_name.c_str());
+        RelEff_RecoExclJet_name+=_RecoCutFlags[5].c_str();  
+        RelEff_RecoExclJet_12345.SetNameTitle(RelEff_RecoExclJet_name.c_str(), RelEff_RecoExclJet_name.c_str());
+        RelEff_RecoExclJet_name+=_RecoCutFlags[6].c_str();  
+        RelEff_RecoExclJet_123456.SetNameTitle(RelEff_RecoExclJet_name.c_str(), RelEff_RecoExclJet_name.c_str());
+        
+        RelEff_RecoExclJet_1.Write();
+        RelEff_RecoExclJet_12.Write();
+        RelEff_RecoExclJet_123.Write();
+        RelEff_RecoExclJet_1234.Write();
+        RelEff_RecoExclJet_12345.Write();
+        RelEff_RecoExclJet_123456.Write();
+        
+        TCanvas *REffRecoExclJet = new TCanvas;
+	RelEff_RecoExclJet_1.GetYaxis()->SetRangeUser(0.3,1);
+	RelEff_RecoExclJet_1.GetXaxis()->SetTitle("reco Exclusive Jet number");
+	RelEff_RecoExclJet_1.SetMarkerStyle(20);
+	RelEff_RecoExclJet_1.Draw("AP");
+	if(_RecoCutFlags[2] != "_1"){
+	RelEff_RecoExclJet_12.SetLineColor(2);
+	RelEff_RecoExclJet_12.SetMarkerStyle(21);
+	RelEff_RecoExclJet_12.SetMarkerColor(2);
+	RelEff_RecoExclJet_12.Draw("PSAME");}
+	if(_RecoCutFlags[3] != "_1"){
+	RelEff_RecoExclJet_123.SetLineColor(3);
+	RelEff_RecoExclJet_123.SetMarkerStyle(22);
+	RelEff_RecoExclJet_123.SetMarkerColor(3);
+        RelEff_RecoExclJet_123.Draw("PSAME");}
+	if(_RecoCutFlags[4] != "_1"){
+	RelEff_RecoExclJet_1234.SetLineColor(4);
+	RelEff_RecoExclJet_1234.SetMarkerStyle(23);
+	RelEff_RecoExclJet_1234.SetMarkerColor(4);
+	RelEff_RecoExclJet_1234.Draw("PSAME");}
+	if(_RecoCutFlags[5] != "_1"){
+        RelEff_RecoExclJet_12345.SetLineColor(6);
+	RelEff_RecoExclJet_12345.SetMarkerStyle(24);
+	RelEff_RecoExclJet_12345.SetMarkerColor(6);
+	RelEff_RecoExclJet_12345.Draw("PSAME");}
+	if(_RecoCutFlags[6] != "_1"){
+        RelEff_RecoExclJet_123456.SetLineColor(9);
+	RelEff_RecoExclJet_123456.SetMarkerStyle(25);
+	RelEff_RecoExclJet_123456.SetMarkerColor(9);
+	RelEff_RecoExclJet_123456.Draw("PSAME");}
+	TLegend *LegREffRecoExclJ = REffRecoExclJet->BuildLegend(0.5,0.67,0.88,0.88,"");
+	LegREffRecoExclJ->SetFillColor(0);
+	LegREffRecoExclJ->Draw("LP");
+	RelEff_RecoExclJet_1.SetTitle("Cut Relative Efficiency vs Reco Exclusive Jet Number");
+	REffRecoExclJet->Write("Cut_RelativeEfficiency_VsRecoExclJet.root");
+	REffRecoExclJet->Close();
+	
+	//Reco inclusive jet number
+	
+	R_RecoInclJet_Eff->cd();
+                 
+        string RelEff_RecoInclJet_name="RelativeEff_MC";
+        RelEff_RecoInclJet_name+=_RecoCutFlags[1].c_str();
+        RelEff_RecoInclJet_1.SetNameTitle(RelEff_RecoInclJet_name.c_str(), RelEff_RecoInclJet_name.c_str());
+        RelEff_RecoInclJet_name+=_RecoCutFlags[2].c_str();  
+        RelEff_RecoInclJet_12.SetNameTitle(RelEff_RecoInclJet_name.c_str(), RelEff_RecoInclJet_name.c_str());
+        RelEff_RecoInclJet_name+=_RecoCutFlags[3].c_str();  
+        RelEff_RecoInclJet_123.SetNameTitle(RelEff_RecoInclJet_name.c_str(), RelEff_RecoInclJet_name.c_str());
+        RelEff_RecoInclJet_name+=_RecoCutFlags[4].c_str();  
+        RelEff_RecoInclJet_1234.SetNameTitle(RelEff_RecoInclJet_name.c_str(), RelEff_RecoInclJet_name.c_str());
+        RelEff_RecoInclJet_name+=_RecoCutFlags[5].c_str();  
+        RelEff_RecoInclJet_12345.SetNameTitle(RelEff_RecoInclJet_name.c_str(), RelEff_RecoInclJet_name.c_str());
+        RelEff_RecoInclJet_name+=_RecoCutFlags[6].c_str();  
+        RelEff_RecoInclJet_123456.SetNameTitle(RelEff_RecoInclJet_name.c_str(), RelEff_RecoInclJet_name.c_str());
+        
+        RelEff_RecoInclJet_1.Write();
+        RelEff_RecoInclJet_12.Write();
+        RelEff_RecoInclJet_123.Write();
+        RelEff_RecoInclJet_1234.Write();
+        RelEff_RecoInclJet_12345.Write();
+        RelEff_RecoInclJet_123456.Write();
+       
+        effincl<<"Relative efficiency vs Reco Inclusive Jet number"<<endl;
+        effincl<<endl<<"Selection: Acc"<<endl;
+        for(int i=0; i<7; i++){
+        double x = 0., y = 0.;
+        RelEff_RecoInclJet_1.GetPoint(i,x,y);
+        effincl<<"Jet# >= "<<i<<" Relative Eff. = "<<y<<" Error High = "<<RelEff_RecoInclJet_1.GetErrorYhigh(i)<<" Error Low = "<<RelEff_RecoInclJet_1.GetErrorYlow(i)<<endl;}
+        
+        effincl<<endl<<"Selection: Trg"<<endl;
+        for(int i=0; i<7; i++){
+        double x = 0., y = 0.;
+        RelEff_RecoInclJet_12.GetPoint(i,x,y);
+        effincl<<"Jet# >= "<<i<<" Relative Eff. = "<<y<<" Error High = "<<RelEff_RecoInclJet_12.GetErrorYhigh(i)<<" Error Low = "<<RelEff_RecoInclJet_12.GetErrorYlow(i)<<endl;}
+        
+        effincl<<endl<<"Selection: Imp"<<endl;
+        for(int i=0; i<7; i++){
+        double x = 0., y = 0.;
+        RelEff_RecoInclJet_123.GetPoint(i,x,y);
+        effincl<<"Jet# >= "<<i<<" Relative Eff. = "<<y<<" Error High = "<<RelEff_RecoInclJet_123.GetErrorYhigh(i)<<" Error Low = "<<RelEff_RecoInclJet_123.GetErrorYlow(i)<<endl;}
+        
+        effincl<<endl<<"Selection: Iso"<<endl;
+        for(int i=0; i<7; i++){
+        double x = 0., y = 0.;
+        RelEff_RecoInclJet_1234.GetPoint(i,x,y);
+        effincl<<"Jet# >= "<<i<<" Relative Eff. = "<<y<<" Error High = "<<RelEff_RecoInclJet_1234.GetErrorYhigh(i)<<" Error Low = "<<RelEff_RecoInclJet_1234.GetErrorYlow(i)<<endl;}
+        
+        effincl<<endl<<"Selection: EiD"<<endl;
+        for(int i=0; i<7; i++){
+        double x = 0., y = 0.;
+        RelEff_RecoInclJet_12345.GetPoint(i,x,y);
+        effincl<<"Jet# >= "<<i<<" Relative Eff. = "<<y<<" Error High = "<<RelEff_RecoInclJet_12345.GetErrorYhigh(i)<<" Error Low = "<<RelEff_RecoInclJet_12345.GetErrorYlow(i)<<endl;}
+        
+        effexcl<<"Relative efficiency vs Gen Exclusive Jet number"<<endl;
+        effexcl<<endl<<"Selection: Acc"<<endl;
+        for(int i=0; i<7; i++){
+        double x = 0., y = 0.;
+        RelEff_GenExclJet_1.GetPoint(i,x,y);
+        effexcl<<"Jet# >= "<<i<<" Relative Eff. = "<<y<<" Error High = "<<RelEff_GenExclJet_1.GetErrorYhigh(i)<<" Error Low = "<<RelEff_GenExclJet_1.GetErrorYlow(i)<<endl;}
+        
+        effexcl<<endl<<"Selection: Trg"<<endl;
+        for(int i=0; i<7; i++){
+        double x = 0., y = 0.;
+        RelEff_GenExclJet_12.GetPoint(i,x,y);
+        effexcl<<"Jet# >= "<<i<<" Relative Eff. = "<<y<<" Error High = "<<RelEff_GenExclJet_12.GetErrorYhigh(i)<<" Error Low = "<<RelEff_GenExclJet_12.GetErrorYlow(i)<<endl;}
+        
+        effexcl<<endl<<"Selection: Imp"<<endl;
+        for(int i=0; i<7; i++){
+        double x = 0., y = 0.;
+        RelEff_GenExclJet_123.GetPoint(i,x,y);
+        effexcl<<"Jet# >= "<<i<<" Relative Eff. = "<<y<<" Error High = "<<RelEff_GenExclJet_123.GetErrorYhigh(i)<<" Error Low = "<<RelEff_GenExclJet_123.GetErrorYlow(i)<<endl;}
+        
+        effexcl<<endl<<"Selection: Iso"<<endl;
+        for(int i=0; i<7; i++){
+        double x = 0., y = 0.;
+        RelEff_GenExclJet_1234.GetPoint(i,x,y);
+        effexcl<<"Jet# >= "<<i<<" Relative Eff. = "<<y<<" Error High = "<<RelEff_GenExclJet_1234.GetErrorYhigh(i)<<" Error Low = "<<RelEff_GenExclJet_1234.GetErrorYlow(i)<<endl;}
+        
+        effexcl<<endl<<"Selection: EiD"<<endl;
+        for(int i=0; i<7; i++){
+        double x = 0., y = 0.;
+        RelEff_GenExclJet_12345.GetPoint(i,x,y);
+        effexcl<<"Jet# >= "<<i<<" Relative Eff. = "<<y<<" Error High = "<<RelEff_GenExclJet_12345.GetErrorYhigh(i)<<" Error Low = "<<RelEff_GenExclJet_12345.GetErrorYlow(i)<<endl;}
+        
+        
+	TCanvas *REffRecoInclJet = new TCanvas;
+	RelEff_RecoInclJet_1.GetYaxis()->SetRangeUser(0.3,1);
+	RelEff_RecoInclJet_1.GetXaxis()->SetTitle("reco Inclusive Jet number");
+	RelEff_RecoInclJet_1.SetMarkerStyle(20);
+	RelEff_RecoInclJet_1.Draw("AP");
+	if(_RecoCutFlags[2] != "_1"){
+	RelEff_RecoInclJet_12.SetLineColor(2);
+	RelEff_RecoInclJet_12.SetMarkerStyle(21);
+	RelEff_RecoInclJet_12.SetMarkerColor(2);
+	RelEff_RecoInclJet_12.Draw("PSAME");}
+	if(_RecoCutFlags[3] != "_1"){
+	RelEff_RecoInclJet_123.SetLineColor(3);
+	RelEff_RecoInclJet_123.SetMarkerStyle(22);
+	RelEff_RecoInclJet_123.SetMarkerColor(3);
+        RelEff_RecoInclJet_123.Draw("PSAME");}
+	if(_RecoCutFlags[4] != "_1"){
+	RelEff_RecoInclJet_1234.SetLineColor(4);
+	RelEff_RecoInclJet_1234.SetMarkerStyle(23);
+	RelEff_RecoInclJet_1234.SetMarkerColor(4);
+	RelEff_RecoInclJet_1234.Draw("PSAME");}
+	if(_RecoCutFlags[5] != "_1"){
+        RelEff_RecoInclJet_12345.SetLineColor(6);
+	RelEff_RecoInclJet_12345.SetMarkerStyle(24);
+	RelEff_RecoInclJet_12345.SetMarkerColor(6);
+	RelEff_RecoInclJet_12345.Draw("PSAME");}
+	if(_RecoCutFlags[6] != "_1"){
+        RelEff_RecoInclJet_123456.SetLineColor(9);
+	RelEff_RecoInclJet_123456.SetMarkerStyle(25);
+	RelEff_RecoInclJet_123456.SetMarkerColor(9);
+	RelEff_RecoInclJet_123456.Draw("PSAME");}
+	TLegend *LegREffRecoInclJ = REffRecoInclJet->BuildLegend(0.5,0.67,0.88,0.88,"");
+	LegREffRecoInclJ->SetFillColor(0);
+	LegREffRecoInclJ->Draw("LP");
+	RelEff_RecoInclJet_1.SetTitle("Cut Relative Efficiency vs Reco Inclusive Jet Number");
+	REffRecoInclJet->Write("Cut_RelativeEfficiency_VsRecoInclJet.root");
+	REffRecoInclJet->Close();
+		
 	}
         
 ////////////////////////////////////////////////////////////////////////////////////	
@@ -1069,15 +1507,15 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         Eff_TP_Double_12.Write();
         if(sample=="mc"){
         TCanvas *EffTP_12 = new TCanvas;
-        Eff_Rel_12.SetLineColor(1);
-	Eff_Rel_12.SetMarkerStyle(20);
-	Eff_Rel_12.SetMarkerColor(1);
-	Eff_Rel_12.Draw("AP");
+        RelEff_GenExclJet_12.SetLineColor(1);
+	RelEff_GenExclJet_12.SetMarkerStyle(20);
+	RelEff_GenExclJet_12.SetMarkerColor(1);
+	RelEff_GenExclJet_12.Draw("AP");
 	Eff_TP_Double_12.SetLineColor(2);
 	Eff_TP_Double_12.SetMarkerStyle(21);
 	Eff_TP_Double_12.SetMarkerColor(2);
 	Eff_TP_Double_12.Draw("PSAME");
-	Eff_Rel_12.SetTitle("Cut eff: MC (black), TP w/o back (red)");
+	RelEff_GenExclJet_12.SetTitle("Cut eff: MC (black), TP w/o back (red)");
 	string EffTP_12_name = "EffGenRecoVsTP";
 	EffTP_12_name+=_RecoCutFlags[1].c_str();
         EffTP_12_name+=_RecoCutFlags[2].c_str();
@@ -1091,15 +1529,15 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         Eff_TP_Double_123.Write();
         if(sample=="mc"){
         TCanvas *EffTP_123 = new TCanvas;
-        Eff_Rel_123.SetLineColor(1);
-	Eff_Rel_123.SetMarkerStyle(20);
-	Eff_Rel_123.SetMarkerColor(1);
-	Eff_Rel_123.Draw("AP");
+        RelEff_GenExclJet_123.SetLineColor(1);
+	RelEff_GenExclJet_123.SetMarkerStyle(20);
+	RelEff_GenExclJet_123.SetMarkerColor(1);
+	RelEff_GenExclJet_123.Draw("AP");
 	Eff_TP_Double_123.SetLineColor(2);
 	Eff_TP_Double_123.SetMarkerStyle(21);
 	Eff_TP_Double_123.SetMarkerColor(2);
 	Eff_TP_Double_123.Draw("PSAME");
-	Eff_Rel_123.SetTitle("Cut eff: MC (black), TP w/o back (red)");
+	RelEff_GenExclJet_123.SetTitle("Cut eff: MC (black), TP w/o back (red)");
 	string EffTP_123_name = "EffGenRecoVsTP";
 	EffTP_123_name+=_RecoCutFlags[1].c_str();
         EffTP_123_name+=_RecoCutFlags[2].c_str();
@@ -1114,15 +1552,15 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         Eff_TP_Double_1234.Write();
         if(sample=="mc"){
         TCanvas *EffTP_1234 = new TCanvas;
-        Eff_Rel_1234.SetLineColor(1);
-	Eff_Rel_1234.SetMarkerStyle(20);
-	Eff_Rel_1234.SetMarkerColor(1);
-	Eff_Rel_1234.Draw("AP");
+        RelEff_GenExclJet_1234.SetLineColor(1);
+	RelEff_GenExclJet_1234.SetMarkerStyle(20);
+	RelEff_GenExclJet_1234.SetMarkerColor(1);
+	RelEff_GenExclJet_1234.Draw("AP");
 	Eff_TP_Double_1234.SetLineColor(2);
 	Eff_TP_Double_1234.SetMarkerStyle(21);
 	Eff_TP_Double_1234.SetMarkerColor(2);
 	Eff_TP_Double_1234.Draw("PSAME");
-	Eff_Rel_1234.SetTitle("Cut eff: MC (black), TP w/o back (red)");
+	RelEff_GenExclJet_1234.SetTitle("Cut eff: MC (black), TP w/o back (red)");
 	string EffTP_1234_name = "EffGenRecoVsTP";
 	EffTP_1234_name+=_RecoCutFlags[1].c_str();
         EffTP_1234_name+=_RecoCutFlags[2].c_str();
@@ -1138,15 +1576,15 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         Eff_TP_Double_12345.Write();
         if(sample=="mc"){
         TCanvas *EffTP_12345 = new TCanvas;
-        Eff_Rel_12345.SetLineColor(1);
-	Eff_Rel_12345.SetMarkerStyle(20);
-	Eff_Rel_12345.SetMarkerColor(1);
-	Eff_Rel_12345.Draw("AP");
+        RelEff_GenExclJet_12345.SetLineColor(1);
+	RelEff_GenExclJet_12345.SetMarkerStyle(20);
+	RelEff_GenExclJet_12345.SetMarkerColor(1);
+	RelEff_GenExclJet_12345.Draw("AP");
 	Eff_TP_Double_12345.SetLineColor(2);
 	Eff_TP_Double_12345.SetMarkerStyle(21);
 	Eff_TP_Double_12345.SetMarkerColor(2);
 	Eff_TP_Double_12345.Draw("PSAME");
-	Eff_Rel_12345.SetTitle("Cut eff: MC (black), TP w/o back (red)");
+	RelEff_GenExclJet_12345.SetTitle("Cut eff: MC (black), TP w/o back (red)");
 	string EffTP_12345_name = "EffGenRecoVsTP";
 	EffTP_12345_name+=_RecoCutFlags[1].c_str();
         EffTP_12345_name+=_RecoCutFlags[2].c_str();
@@ -1163,15 +1601,15 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         Eff_TP_Double_123456.Write();
         if(sample=="mc"){
         TCanvas *EffTP_123456 = new TCanvas;
-        Eff_Rel_123456.SetLineColor(1);
-	Eff_Rel_123456.SetMarkerStyle(20);
-	Eff_Rel_123456.SetMarkerColor(1);
-	Eff_Rel_123456.Draw("AP");
+        RelEff_GenExclJet_123456.SetLineColor(1);
+	RelEff_GenExclJet_123456.SetMarkerStyle(20);
+	RelEff_GenExclJet_123456.SetMarkerColor(1);
+	RelEff_GenExclJet_123456.Draw("AP");
 	Eff_TP_Double_123456.SetLineColor(2);
 	Eff_TP_Double_123456.SetMarkerStyle(21);
 	Eff_TP_Double_123456.SetMarkerColor(2);
 	Eff_TP_Double_123456.Draw("PSAME");
-	Eff_Rel_123456.SetTitle("Cut eff: MC (black), TP w/o back (red)");
+	RelEff_GenExclJet_123456.SetTitle("Cut eff: MC (black), TP w/o back (red)");
 	string EffTP_123456_name = "EffGenRecoVsTP";
 	EffTP_123456_name+=_RecoCutFlags[1].c_str();
         EffTP_123456_name+=_RecoCutFlags[2].c_str();
@@ -1222,7 +1660,8 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	ChargeMisID_fBrem_Acc->GetXaxis()->SetTitle("fBrem");
 	ChargeMisID_fBrem_Acc->SetName("ChargeMisID_fBrem");
 	ChargeMisID_fBrem_Acc->Write();	
-		
+	
+	effincl.close();	
 
   outplots->Write();
   outplots->Close();
