@@ -69,11 +69,10 @@ inline bool singleMu_QualityCuts(const reco::Candidate& cand){
 
 
   //is this the same as before? or this is total track hits
-  return muon->isGlobalMuon() && muon->isTrackerMuon() && 
-         //muon->track()->hitPattern().numberOfValidMuonHits() > 0 && muon->track()->hitPattern().numberOfValidTrackerHits() > minnhit &&
-         muon->numberOfValidHits() > minnhit &&
-         //muon->numberOfChambers() > 0 && 
-         //muon->numberOfMatches() > 1 &&               
+  return muon->isGlobalMuon() && muon->isTrackerMuon() &&
+         muon->globalTrack()->hitPattern().numberOfValidPixelHits() > 0 &&
+         muon->globalTrack()->hitPattern().numberOfValidMuonHits() > 0 && muon->track()->hitPattern().numberOfValidTrackerHits() > minnhit &&
+         muon->numberOfMatches() > 1 &&               
          muon->normChi2() < maxchi2;
 }
 

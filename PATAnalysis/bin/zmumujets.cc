@@ -47,6 +47,7 @@ int main(){
 
 
   p->Exec( ".x /data01/lenzip/Zjets/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/remote.C" );
+  gEnv->SetValue("Proof.Sandbox", "/data01/lenzip/Zjets/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/proof");
 
   //TProofLog *pl = TProof::Mgr("")->GetSessionLogs();
   //pl->Save("*","/data01/lenzip/Zjets/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/Log.txt");
@@ -61,8 +62,9 @@ int main(){
   p->AddInput(configsignal);
   p->Process(signalDS, "FWLiteTSelector");
   delete signalDS;
-
-  gEnv->SetValue("Proof.Sandbox", "/data01/lenzip/Zjets/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/proof");
+*/
+  
+/*
   TDSet* signalMadDS = getDS("/data01/lenzip/Zjets/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/signal_Madgraph.txt");
   TNamed* configMad = new TNamed("ConfigFile", (pwd+"/config_signal_Madgraph.py").c_str());
   p->AddInput(configMad);
