@@ -673,12 +673,22 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
    
    //Reco jets
    std::vector<const pat::Jet*> recjets = GetJets<pat::Jet>(*jetrecHandle);
-   std::vector<const pat::Jet*> isorecjets;
+   std::vector<const pat::Jet*> geniso_recjets;
+   std::vector<const pat::Jet*> reciso_recjets;
    
    //Reco Jets isolated from GEN Z electrons
+   if(_sample=="mc"){
    if(zgenHandle->size()){
    for(unsigned int i = 0; i < recjets.size(); i++){
-   if(IsoJet((*zgenHandle)[0],*recjets[i],"GEN"))isorecjets.push_back(recjets[i]);
+   if(IsoJet((*zgenHandle)[0],*recjets[i],"GEN"))geniso_recjets.push_back(recjets[i]);
+   }
+   }
+   }//end if(_sample)
+   
+   //Reco Jets isolated from RECO Z electrons
+   if(zrecHandle->size()){
+   for(unsigned int i = 0; i < recjets.size(); i++){
+   if(IsoJet((*zrecHandle)[0],*recjets[i],"RECO"))reciso_recjets.push_back(recjets[i]);
    }
    }
    
@@ -745,8 +755,8 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
      AccDenom_genLeadElEta->Fill(genleadeleta);
      AccDenom_genLeadElPt->Fill(genleadelpt);
      AccDenom_GenIsoJetNumber->Fill(isogenjets.size());     
-     for(unsigned int i = 0; i < isorecjets.size()+1; i++)AccDenom_RecoInclJetNumber->AddBinContent(i+1,1);
-     AccDenom_RecoExclJetNumber->Fill(isorecjets.size());
+     for(unsigned int i = 0; i < geniso_recjets.size()+1; i++)AccDenom_RecoInclJetNumber->AddBinContent(i+1,1);
+     AccDenom_RecoExclJetNumber->Fill(geniso_recjets.size());
      
      }
      
@@ -759,8 +769,8 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
      EffDenom_genLeadElEta->Fill(genleadeleta);
      EffDenom_genLeadElPt->Fill(genleadelpt);
      EffDenom_GenIsoJetNumber->Fill(isogenjets.size());    
-     for(unsigned int i = 0; i < isorecjets.size()+1; i++)EffDenom_RecoInclJetNumber->AddBinContent(i+1,1);
-     EffDenom_RecoExclJetNumber->Fill(isorecjets.size());
+     for(unsigned int i = 0; i < geniso_recjets.size()+1; i++)EffDenom_RecoInclJetNumber->AddBinContent(i+1,1);
+     EffDenom_RecoExclJetNumber->Fill(geniso_recjets.size());
       
      }
      
@@ -782,8 +792,8 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
      GenIsoJetEff_1->Fill(isogenjets.size());
      
      //Eff vs Reco Jet variables
-     for(unsigned int i = 0; i < isorecjets.size()+1; i++)RecoInclJetEff_1->AddBinContent(i+1,1);
-     RecoExclJetEff_1->Fill(isorecjets.size());
+     for(unsigned int i = 0; i < geniso_recjets.size()+1; i++)RecoInclJetEff_1->AddBinContent(i+1,1);
+     RecoExclJetEff_1->Fill(geniso_recjets.size());
      
      }
      
@@ -803,8 +813,8 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
      GenIsoJetEff_12->Fill(isogenjets.size());
      
      //Eff vs Reco Jet variables
-     for(unsigned int i = 0; i < isorecjets.size()+1; i++)RecoInclJetEff_12->AddBinContent(i+1,1);
-     RecoExclJetEff_12->Fill(isorecjets.size());
+     for(unsigned int i = 0; i < geniso_recjets.size()+1; i++)RecoInclJetEff_12->AddBinContent(i+1,1);
+     RecoExclJetEff_12->Fill(geniso_recjets.size());
         
      }
      
@@ -824,8 +834,8 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
      GenIsoJetEff_123->Fill(isogenjets.size());
      
      //Eff vs Reco Jet variables
-     for(unsigned int i = 0; i < isorecjets.size()+1; i++)RecoInclJetEff_123->AddBinContent(i+1,1);
-     RecoExclJetEff_123->Fill(isorecjets.size());
+     for(unsigned int i = 0; i < geniso_recjets.size()+1; i++)RecoInclJetEff_123->AddBinContent(i+1,1);
+     RecoExclJetEff_123->Fill(geniso_recjets.size());
      
      }
      
@@ -845,8 +855,8 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
      GenIsoJetEff_1234->Fill(isogenjets.size());
      
      //Eff vs Reco Jet variables
-     for(unsigned int i = 0; i < isorecjets.size()+1; i++)RecoInclJetEff_1234->AddBinContent(i+1,1);
-     RecoExclJetEff_1234->Fill(isorecjets.size());
+     for(unsigned int i = 0; i < geniso_recjets.size()+1; i++)RecoInclJetEff_1234->AddBinContent(i+1,1);
+     RecoExclJetEff_1234->Fill(geniso_recjets.size());
      
      }
      
@@ -866,8 +876,8 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
       GenIsoJetEff_12345->Fill(isogenjets.size());
       
       //Eff vs Reco Jet variables
-      for(unsigned int i = 0; i < isorecjets.size()+1; i++)RecoInclJetEff_12345->AddBinContent(i+1,1);
-      RecoExclJetEff_12345->Fill(isorecjets.size());
+      for(unsigned int i = 0; i < geniso_recjets.size()+1; i++)RecoInclJetEff_12345->AddBinContent(i+1,1);
+      RecoExclJetEff_12345->Fill(geniso_recjets.size());
       
 }
 
@@ -887,8 +897,8 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
       GenIsoJetEff_123456->Fill(isogenjets.size());
       
       //Eff vs Reco Jet variables
-      for(unsigned int i = 0; i < isorecjets.size()+1; i++)RecoInclJetEff_123456->AddBinContent(i+1,1);
-      RecoExclJetEff_123456->Fill(isorecjets.size());
+      for(unsigned int i = 0; i < geniso_recjets.size()+1; i++)RecoInclJetEff_123456->AddBinContent(i+1,1);
+      RecoExclJetEff_123456->Fill(geniso_recjets.size());
       
 }
 
@@ -908,25 +918,25 @@ double lumi = _entries/_xsec;
    }
 
 if(_selections=="VPJ"){
-_TagProbe_Electron_12->fill((*zrecHandle)[0], isorecjets.size(), _norm);
-_TagProbe_Electron_123->fill((*zrecHandle)[0], isorecjets.size(), _norm);
-_TagProbe_Electron_1234->fill((*zrecHandle)[0], isorecjets.size(), _norm);
-_TagProbe_Electron_12345->fill((*zrecHandle)[0], isorecjets.size(), _norm);
-_TagProbe_Electron_123456->fill((*zrecHandle)[0], isorecjets.size(), _norm);
+_TagProbe_Electron_12->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
+_TagProbe_Electron_123->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
+_TagProbe_Electron_1234->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
+_TagProbe_Electron_12345->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
+_TagProbe_Electron_123456->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
 }
 
 if(_selections=="VBTF"){
-_TagProbe_Electron0_12->fill((*zrecHandle)[0], isorecjets.size(), _norm);
-_TagProbe_Electron0_123->fill((*zrecHandle)[0], isorecjets.size(), _norm);
-_TagProbe_Electron0_1234->fill((*zrecHandle)[0], isorecjets.size(), _norm);
-_TagProbe_Electron0_12345->fill((*zrecHandle)[0], isorecjets.size(), _norm);
-_TagProbe_Electron0_123456->fill((*zrecHandle)[0], isorecjets.size(), _norm);
+_TagProbe_Electron0_12->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
+_TagProbe_Electron0_123->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
+_TagProbe_Electron0_1234->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
+_TagProbe_Electron0_12345->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
+_TagProbe_Electron0_123456->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
 
-_TagProbe_Electron1_12->fill((*zrecHandle)[0], isorecjets.size(), _norm);
-_TagProbe_Electron1_123->fill((*zrecHandle)[0], isorecjets.size(), _norm);
-_TagProbe_Electron1_1234->fill((*zrecHandle)[0], isorecjets.size(), _norm);
-_TagProbe_Electron1_12345->fill((*zrecHandle)[0], isorecjets.size(), _norm);
-_TagProbe_Electron1_123456->fill((*zrecHandle)[0], isorecjets.size(), _norm);
+_TagProbe_Electron1_12->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
+_TagProbe_Electron1_123->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
+_TagProbe_Electron1_1234->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
+_TagProbe_Electron1_12345->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
+_TagProbe_Electron1_123456->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
 }
 
 }
