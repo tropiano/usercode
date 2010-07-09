@@ -177,6 +177,8 @@ void  GenElectron::process(const fwlite::Event& iEvent)
    
    if(zgenHandle->size()){
    
+   if(zgenHandle->size()>1)throw cms::Exception("PATAnalysis:GenElectron_MoreThanOneGENZ") << "ERROR! More than one GEN Z found!";
+   
    zdaughters = ZGENDaughters((*zgenHandle)[0]);
    const reco::Candidate *dau0 = 0;
    const reco::Candidate *dau1 = 0;
@@ -202,22 +204,12 @@ void  GenElectron::process(const fwlite::Event& iEvent)
       genMassZ->Fill((*zgenHandle)[0].mass(), weight);
    
       double leadelpt, leadeleta, secondelpt, secondeleta;
-      double pt0  = dau0->pt(); 
-      double pt1  = dau1->pt();
-      double eta0 = dau0->eta();
-      double eta1 = dau1->eta();
+      leadelpt  = dau0->pt(); 
+      secondelpt  = dau1->pt();
+      leadeleta = dau0->eta();
+      secondeleta = dau1->eta();
       
-      if (pt0 > pt1) {
-        leadelpt    = pt0;
-        leadeleta   = eta0;
-        secondelpt  = pt1;
-        secondeleta = eta1;
-      } else {
-        leadelpt    = pt1;
-        leadeleta   = eta1;
-        secondelpt  = pt0;
-        secondeleta = eta0;
-      }
+      if(secondelpt>leadelpt)throw cms::Exception("PATAnalysis:GenElectron_WrongElectronOrder") << "ERROR! Z electrons are in wrong order!";
       
       genLeadElPt->Fill(leadelpt, weight);
       genLeadElEta->Fill(leadeleta, weight);
@@ -227,8 +219,6 @@ void  GenElectron::process(const fwlite::Event& iEvent)
       GenJetCounter->Fill(genjets.size());
       
       GenIsoJetCounter->Fill(isogenjets.size());
-   
-   
    
    }
    
@@ -241,22 +231,13 @@ void  GenElectron::process(const fwlite::Event& iEvent)
       genMassZ_Acc->Fill((*zgenHandle)[0].mass(), weight);
       
       double leadelpt, leadeleta, secondelpt, secondeleta;
-      double pt0  = dau0->pt(); 
-      double pt1  = dau1->pt();
-      double eta0 = dau0->eta();
-      double eta1 = dau1->eta();
+      leadelpt  = dau0->pt(); 
+      secondelpt  = dau1->pt();
+      leadeleta = dau0->eta();
+      secondeleta = dau1->eta();
       
-      if (pt0 > pt1) {
-        leadelpt    = pt0;
-        leadeleta   = eta0;
-        secondelpt  = pt1;
-        secondeleta = eta1;
-      } else {
-        leadelpt    = pt1;
-        leadeleta   = eta1;
-        secondelpt  = pt0;
-        secondeleta = eta0;
-      }
+      if(secondelpt>leadelpt)throw cms::Exception("PATAnalysis:GenElectron_WrongElectronOrder") << "ERROR! Z electrons are in wrong order!";
+      
       genLeadElPt_Acc->Fill(leadelpt, weight);
       genLeadElEta_Acc->Fill(leadeleta, weight);
       genSecElPt_Acc->Fill(secondelpt, weight);

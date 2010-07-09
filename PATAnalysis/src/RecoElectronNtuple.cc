@@ -473,6 +473,8 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    
    if(_sample=="mc" && zgenHandle->size()!=0){
    
+   if(zgenHandle->size()>1)throw cms::Exception("PATAnalysis:RecoElectronNtuple_MoreThanOneGENZ") << "ERROR! More than one GEN Z found!";
+   
    std::vector<const reco::Candidate*> zgendaughters;
    if(zgenHandle->size())zgendaughters = ZGENDaughters((*zgenHandle)[0]);
    const reco::Candidate *gendau0 = 0;
@@ -495,23 +497,18 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
       etazgen=(*zgenHandle)[0].eta();
       phizgen=(*zgenHandle)[0].phi();
       zmassgen=(*zgenHandle)[0].mass();
+      
       double genpt1= gendau0->pt();
       double genpt2= gendau1->pt();
-      if(genpt1>=genpt2){
+      
+      if(genpt2>genpt1)throw cms::Exception("PATAnalysis:RecoElectronNtuple_WrongElectronOrder") << "ERROR! Z electrons are in wrong order!";
+ 
         elegenpt1  = gendau0->pt(); 
         elegeneta1 = gendau0->eta();
         elegenphi1 = gendau0->phi();
         elegenpt2  = gendau1->pt();
         elegeneta2 = gendau1->eta();
         elegenphi2 = gendau1->phi();
-      }else{
-        elegenpt1  = gendau1->pt(); 
-        elegeneta1 = gendau1->eta();
-        elegenphi1 = gendau1->phi();
-        elegenpt2  = gendau0->pt();
-        elegeneta2 = gendau0->eta();
-        elegenphi2 = gendau0->phi();
-        } 
         
         gennjetsele=isogenjets.size();
       
@@ -523,23 +520,18 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
       acc_etazgen=(*zgenHandle)[0].eta();
       acc_phizgen=(*zgenHandle)[0].phi();
       acc_zmassgen=(*zgenHandle)[0].mass();
+      
       double acc_genpt1= gendau0->pt();
       double acc_genpt2= gendau1->pt();
-      if(acc_genpt1>=acc_genpt2){
+      
+      if(acc_genpt2>acc_genpt1)throw cms::Exception("PATAnalysis:RecoElectronNtuple_WrongElectronOrder") << "ERROR! Z electrons are in wrong order!";
+      
       acc_elegenpt1  = gendau0->pt(); 
       acc_elegeneta1 = gendau0->eta();
       acc_elegenphi1 = gendau0->phi();
       acc_elegenpt2  = gendau1->pt();
       acc_elegeneta2 = gendau1->eta();
       acc_elegenphi2 = gendau1->phi();
-      }else{
-      acc_elegenpt1  = gendau1->pt(); 
-      acc_elegeneta1 = gendau1->eta();
-      acc_elegenphi1 = gendau1->phi();
-      acc_elegenpt2  = gendau0->pt();
-      acc_elegeneta2 = gendau0->eta();
-      acc_elegenphi2 = gendau0->phi();
-      }
 	 
       acc_gennjetsele=isogenjets.size();
 

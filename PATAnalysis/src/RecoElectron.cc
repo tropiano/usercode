@@ -1195,6 +1195,8 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      dau1 = zdaughters[1];
      
      //Pre selections events
+     
+     if(dau1->pt()>dau0->pt())throw cms::Exception("PATAnalysis:RecoElectron_WrongElectronOrder") << "ERROR! Z electrons are in wrong order!";
     
    
     

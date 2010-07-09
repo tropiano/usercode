@@ -162,26 +162,46 @@ const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCa
 }
 
 inline std::vector<const reco::Candidate*> ZGENDaughters(const reco::CompositeCandidate& ZGEN){
-std::vector<const reco::Candidate*> zdaughters;
 
-const reco::Candidate *dau = 0;
-const reco::Candidate *daudau = 0;
+  std::vector<const reco::Candidate*> zdaughters;
   
-  for(unsigned i = 0; i != ZGEN.numberOfDaughters(); i++){ 
-  dau = ZGEN.daughter(i);
+  const reco::Candidate* dau0 = ZGEN.daughter(0);
+  const reco::Candidate* dau1 = ZGEN.daughter(1);
+
+  const reco::Candidate* finaldau0 = 0; //dau0;
+  const reco::Candidate* finaldau1 = 0; //dau1;
+
+  if (dau0->numberOfDaughters()){
+    bool el0set = false;
+    for (unsigned int i = 0; i < dau0->numberOfDaughters(); ++i ){
+      if (fabs(dau0->daughter(i)->pdgId()) == 11){
+        if (el0set) {
+          std::cout << "something wrong in GenSelectedInAcceptance: a daughter electron was already found for dau0 " << std::endl; 
+        }
+        finaldau0 = dau0->daughter(i);
+        el0set = true;
+      }
+    }
+  }
+
+  if (dau1->numberOfDaughters()){
+    bool el1set = false;
+    for (unsigned int i = 0; i < dau1->numberOfDaughters(); ++i ){
+      if (fabs(dau1->daughter(i)->pdgId()) == 11){
+        if (el1set) {
+          std::cout << "something wrong in GenSelectedInAcceptance: a daughter electron was already found for dau1 " << std::endl;
+        }
+        finaldau1 = dau1->daughter(i);
+        el1set = true;
+      }
+    }
+  }
+ 
+  const reco::Candidate* leading = finaldau0->pt() > finaldau1->pt() ? finaldau0 : finaldau1;
+  const reco::Candidate* second  = finaldau0->pt() > finaldau1->pt() ? finaldau1 : finaldau0;
   
-  if(!dau->numberOfDaughters()){
-  if((dau->pdgId() == 11) || (dau->pdgId() == -11))zdaughters.push_back(dau);
-  }
-  
-  if(dau->numberOfDaughters()){
-  for(unsigned i = 0; i != dau->numberOfDaughters(); i++){
-  daudau = dau->daughter(i);
-  if((daudau->pdgId() == 11) || (daudau->pdgId() == -11))zdaughters.push_back(daudau);
-  }
-  }
-  
-  }
+  zdaughters.push_back(leading);
+  zdaughters.push_back(second);
   
   if(zdaughters.size()==1 || zdaughters.size()>2){
   std::cout<<"ERROR! Wrong Z daughters association. Z daughters number = "<<zdaughters.size()<<std::endl;
@@ -199,13 +219,25 @@ inline std::vector<const pat::Electron*> ZRECDaughters(const reco::CompositeCand
   
   const pat::Electron* dau0 = CloneCandidate(*(ZREC.daughter(0)));
   const pat::Electron* dau1 = CloneCandidate(*(ZREC.daughter(1)));
-
- if(dau0 && dau1){
-  zdaughters.push_back(dau0);
-  zdaughters.push_back(dau1);
-  }
   
-    return zdaughters;
+  const pat::Electron* leading = 0;
+  const pat::Electron* second = 0;
+  
+ if(dau0 && dau1){
+ 
+ if(dau0->pt()>dau1->pt()){
+ leading=dau0;
+ second=dau1;
+ }else{
+ leading=dau1;
+ second=dau0;}
+  
+ zdaughters.push_back(leading);
+ zdaughters.push_back(second);
+  
+ }
+  
+ return zdaughters;
   
 }
 

@@ -40,26 +40,26 @@ string Tab_cut = "True";
         
                 
         //Background MC
-        TFile* QCD_EMEnriched_all_TF = TFile::Open("QCD_EMEnriched_all_Skimmed_WP80_95_VBTF.root");
-        TFile* QCD_BCtoE_all_TF = TFile::Open("QCD_BCtoE_all_WP80_95_VBTF.root");
-        TFile* TTbar_TF = TFile::Open("TTbar_plus_jets_Madgraph_WP80_95_VBTF.root");
-        TFile* W_TF = TFile::Open("W_plus_jets_Madgraph_WP80_95_VBTF.root");
+        TFile* QCD_EMEnriched_all_TF = TFile::Open("QCD_EMEnriched_all_Skimmed_Calo30_Eta2e5_WP80_95_VBTF.root");
+        TFile* QCD_BCtoE_all_TF = TFile::Open("QCD_BCtoE_all_Calo30_Eta2e5_WP80_95_VBTF.root");
+        TFile* TTbar_TF = TFile::Open("TTbar_plus_jets_Madgraph_Calo30_Eta2e5_WP80_95_VBTF.root");
+        TFile* W_TF = TFile::Open("W_plus_jets_Madgraph_Calo30_Eta2e5_WP80_95_VBTF.root");
         
 	//Signal MC
-        TFile *Z_TF = TFile::Open("Z_plus_jets_Madgraph_WP80_95_VBTF.root");
+        TFile *Z_TF = TFile::Open("Z_plus_jets_Madgraph_Calo30_Eta2e5_WP80_95_VBTF.root");
 
         //Data
-        TFile *Data_TF = TFile::Open("Zee_5june_all_WP80_95_VBTF.root");
+        TFile *Data_TF = TFile::Open("Zee_06Jul_all_Calo30_Eta2e5_WP80_95_VBTF.root");
         
         //Output
-        string out = "ZChild_test";        
+        string out = "recZElectrons_Plots_Calo30_Eta2e5_WP80_95_VBTF_56e23invnb";        
         string output = out;
         output+=".root";
         TFile* outplots = new TFile(output.c_str(), "RECREATE");
 	      
         //Normalization factor
         double iniLumi = 50.; //pb-1
-        double targetLumi = 0.01188; //pb-1
+        double targetLumi = 0.05623; //pb-1
         double scale = 1.;
         if(iniLumi!=0)scale = targetLumi/iniLumi;
 
@@ -91,42 +91,42 @@ string Tab_cut = "True";
 	double nminX_recLeadElPt= 0.0; 
 	double nmaxX_recLeadElPt = 200.0;
 	double nminY_recLeadElPt = 0.001; 
-	double nmaxY_recLeadElPt = 100.0;
+	double nmaxY_recLeadElPt = 300.0;
 	//LeadElEta
 	double nminX_recLeadElEta = -10.0; 
 	double nmaxX_recLeadElEta = 10.0;
 	double nminY_recLeadElEta = 0.001; 
-	double nmaxY_recLeadElEta = 100.0;
+	double nmaxY_recLeadElEta = 300.0;
 	//LeadElIP
 	double nminX_recLeadElIP = 0.0; 
 	double nmaxX_recLeadElIP = 1.0;
 	double nminY_recLeadElIP = 0.001; 
-	double nmaxY_recLeadElIP = 100.0;
+	double nmaxY_recLeadElIP = 300.0;
 	//LeadElfBrem	
 	double nminX_recLeadElfBrem = 0.0; 
 	double nmaxX_recLeadElfBrem = 4.0;
 	double nminY_recLeadElfBrem = 0.001; 
-	double nmaxY_recLeadElfBrem = 100.0;
+	double nmaxY_recLeadElfBrem = 300.0;
 	//SecElPt
 	double nminX_recSecElPt= 0.0; 
 	double nmaxX_recSecElPt = 200.0;
 	double nminY_recSecElPt = 0.001; 
-	double nmaxY_recSecElPt = 100.0;
+	double nmaxY_recSecElPt = 300.0;
 	//SecElEta
 	double nminX_recSecElEta = -10.0; 
 	double nmaxX_recSecElEta = 10.0;
 	double nminY_recSecElEta = 0.001; 
-	double nmaxY_recSecElEta = 100.0;
+	double nmaxY_recSecElEta = 300.0;
 	//SecElIP
 	double nminX_recSecElIP = 0.0; 
 	double nmaxX_recSecElIP = 1.0;
 	double nminY_recSecElIP = 0.001; 
-	double nmaxY_recSecElIP = 100.0;
+	double nmaxY_recSecElIP = 300.0;
 	//SecElfBrem	
 	double nminX_recSecElfBrem = 0.0; 
 	double nmaxX_recSecElfBrem = 4.0;
 	double nminY_recSecElfBrem = 0.001; 
-	double nmaxY_recSecElfBrem = 100.0;
+	double nmaxY_recSecElfBrem = 300.0;
 	
 	//Legenda
 	string Leg_QCD_EMEnriched_all = "QCD EM Enriched (PYTHIA6)";
@@ -150,6 +150,8 @@ string Tab_cut = "True";
 	string Tabcut_Z_Int = "Z+jets (MADGRAPH) Integral = ";
 	string Tabcut_Z_Int_err = "Z+jets (MADGRAPH) Integral error = ";
 	string Tabcut_riga = "-----------------------------------------------------------------------------";
+	string Tabcut_Total_Int = "Total Integral = ";
+	string Tabcut_Total_Int_err = "Total Integral error = ";
 	string Tabcut_Data_Int = "Data Integral = ";
 	string Tabcut_Data_Int_err = "Data Integral error = ";
 	string Tabcut_end = "#############################################################################";
@@ -252,7 +254,7 @@ string asseX_name_Cartella2a_recLeadElPt = "Reconstructed Leading Electron P_{T}
 string asseY_name_Cartella2a_recLeadElPt = Form("Events/(%.0f GeV/c)", 1.0*rebin_recLeadElPt); //bins da 1 GeV/c
 string asseX_name_Cartella2a_recLeadElEta = "Reconstructed Leading Electron #eta"; 
 string asseY_name_Cartella2a_recLeadElEta = Form("Events/(%.1f)", 0.05*rebin_recLeadElEta); //bins da 0.05
-string asseX_name_Cartella2a_recLeadElIP = "Reconstructed Leading Electron IP";
+string asseX_name_Cartella2a_recLeadElIP = "Reconstructed Leading Electron IP (cm)";
 string asseY_name_Cartella2a_recLeadElIP = Form("Events/(%.3f)", 0.001*rebin_recLeadElIP); //bins da 0.001
 string asseX_name_Cartella2a_recLeadElfBrem = "Reconstructed Leading Electron fBrem";
 string asseY_name_Cartella2a_recLeadElfBrem = Form("Events/(%.2f)", 0.02*rebin_recLeadElfBrem); //bins da 0.02
@@ -260,7 +262,7 @@ string asseX_name_Cartella2a_recSecElPt = "Reconstructed Second Electron P_{T} (
 string asseY_name_Cartella2a_recSecElPt = Form("Events/(%.0f GeV/c)", 1.0*rebin_recSecElPt); //bins da 1 GeV/c
 string asseX_name_Cartella2a_recSecElEta = "Reconstructed Second Electron #eta"; 
 string asseY_name_Cartella2a_recSecElEta = Form("Events/(%.1f)", 0.05*rebin_recSecElEta); //bins da 0.05
-string asseX_name_Cartella2a_recSecElIP = "Reconstructed Second Electron IP";
+string asseX_name_Cartella2a_recSecElIP = "Reconstructed Second Electron IP (cm)";
 string asseY_name_Cartella2a_recSecElIP = Form("Events/(%.3f)", 0.001*rebin_recSecElIP); //bins da 0.001
 string asseX_name_Cartella2a_recSecElfBrem = "Reconstructed Second Electron fBrem";
 string asseY_name_Cartella2a_recSecElfBrem = Form("Events/(%.2f)", 0.02*rebin_recSecElfBrem); //bins da 0.02
@@ -624,6 +626,8 @@ Dir_4a->cd();
 	cut<<Tabcut_Z_Int.c_str()<<((float)((int)(histoZ_1->IntegralAndError(0,-1,err_Z_1,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_Z_Int_err.c_str()<<((float)((int)(err_Z_1*cut_decimal)))/cut_decimal<<endl;
 	cut<<endl<<Tabcut_riga.c_str()<<endl<<endl;
+	cut<<Tabcut_Total_Int.c_str()<<((float)((int)((histoQCD_EMEnriched_all_1->IntegralAndError(0,-1,err_QCD_EMEnriched_all_1,"") + histoQCD_BCtoE_all_1->IntegralAndError(0,-1,err_QCD_BCtoE_all_1,"") + histoTTbar_1->IntegralAndError(0,-1,err_TTbar_1,"") + histoW_1->IntegralAndError(0,-1,err_W_1,"") + histoZ_1->IntegralAndError(0,-1,err_Z_1,""))*cut_decimal)))/cut_decimal<<endl;
+	cut<<Tabcut_Total_Int_err.c_str()<<((float)((int)(sqrt(pow((err_QCD_EMEnriched_all_1),2)+pow((err_QCD_BCtoE_all_1),2) + pow((err_TTbar_1),2) + pow((err_W_1),2) + pow((err_Z_1),2))*cut_decimal)))/cut_decimal<<endl<<endl;
 	cut<<Tabcut_Data_Int.c_str()<<((float)((int)(histoData_1->IntegralAndError(0,-1,err_Data_1,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_Data_Int_err.c_str()<<((float)((int)(err_Data_1*cut_decimal)))/cut_decimal<<endl;
 	cut<<endl<<Tabcut_end.c_str()<<endl;
@@ -708,6 +712,8 @@ Dir_4a->cd();
 	cut<<Tabcut_Z_Int.c_str()<<((float)((int)(histoZ_12->IntegralAndError(0,-1,err_Z_12,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_Z_Int_err.c_str()<<((float)((int)(err_Z_12*cut_decimal)))/cut_decimal<<endl;
 	cut<<endl<<Tabcut_riga.c_str()<<endl<<endl;
+	cut<<Tabcut_Total_Int.c_str()<<((float)((int)((histoQCD_EMEnriched_all_12->IntegralAndError(0,-1,err_QCD_EMEnriched_all_12,"") + histoQCD_BCtoE_all_12->IntegralAndError(0,-1,err_QCD_BCtoE_all_12,"") + histoTTbar_12->IntegralAndError(0,-1,err_TTbar_12,"") + histoW_12->IntegralAndError(0,-1,err_W_12,"") + histoZ_12->IntegralAndError(0,-1,err_Z_12,""))*cut_decimal)))/cut_decimal<<endl;
+	cut<<Tabcut_Total_Int_err.c_str()<<((float)((int)(sqrt(pow((err_QCD_EMEnriched_all_12),2)+pow((err_QCD_BCtoE_all_12),2) + pow((err_TTbar_12),2) + pow((err_W_12),2) + pow((err_Z_12),2))*cut_decimal)))/cut_decimal<<endl<<endl;
 	cut<<Tabcut_Data_Int.c_str()<<((float)((int)(histoData_12->IntegralAndError(0,-1,err_Data_12,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_Data_Int_err.c_str()<<((float)((int)(err_Data_12*cut_decimal)))/cut_decimal<<endl;
 	cut<<endl<<Tabcut_end.c_str()<<endl;
@@ -794,6 +800,8 @@ Dir_4a->cd();
 	cut<<Tabcut_Z_Int.c_str()<<((float)((int)(histoZ_123->IntegralAndError(0,-1,err_Z_123,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_Z_Int_err.c_str()<<((float)((int)(err_Z_123*cut_decimal)))/cut_decimal<<endl;
 	cut<<endl<<Tabcut_riga.c_str()<<endl<<endl;
+	cut<<Tabcut_Total_Int.c_str()<<((float)((int)((histoQCD_EMEnriched_all_123->IntegralAndError(0,-1,err_QCD_EMEnriched_all_123,"") + histoQCD_BCtoE_all_123->IntegralAndError(0,-1,err_QCD_BCtoE_all_123,"") + histoTTbar_123->IntegralAndError(0,-1,err_TTbar_123,"") + histoW_123->IntegralAndError(0,-1,err_W_123,"") + histoZ_123->IntegralAndError(0,-1,err_Z_123,""))*cut_decimal)))/cut_decimal<<endl;
+	cut<<Tabcut_Total_Int_err.c_str()<<((float)((int)(sqrt(pow((err_QCD_EMEnriched_all_123),2)+pow((err_QCD_BCtoE_all_123),2) + pow((err_TTbar_123),2) + pow((err_W_123),2) + pow((err_Z_123),2))*cut_decimal)))/cut_decimal<<endl<<endl;
 	cut<<Tabcut_Data_Int.c_str()<<((float)((int)(histoData_123->IntegralAndError(0,-1,err_Data_123,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_Data_Int_err.c_str()<<((float)((int)(err_Data_123*cut_decimal)))/cut_decimal<<endl;
 	cut<<endl<<Tabcut_end.c_str()<<endl;
@@ -881,6 +889,8 @@ Dir_4a->cd();
 	cut<<Tabcut_Z_Int.c_str()<<((float)((int)(histoZ_1234->IntegralAndError(0,-1,err_Z_1234,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_Z_Int_err.c_str()<<((float)((int)(err_Z_1234*cut_decimal)))/cut_decimal<<endl;
 	cut<<endl<<Tabcut_riga.c_str()<<endl<<endl;
+	cut<<Tabcut_Total_Int.c_str()<<((float)((int)((histoQCD_EMEnriched_all_1234->IntegralAndError(0,-1,err_QCD_EMEnriched_all_1234,"") + histoQCD_BCtoE_all_1234->IntegralAndError(0,-1,err_QCD_BCtoE_all_1234,"") + histoTTbar_1234->IntegralAndError(0,-1,err_TTbar_1234,"") + histoW_1234->IntegralAndError(0,-1,err_W_1234,"") + histoZ_1234->IntegralAndError(0,-1,err_Z_1234,""))*cut_decimal)))/cut_decimal<<endl;
+	cut<<Tabcut_Total_Int_err.c_str()<<((float)((int)(sqrt(pow((err_QCD_EMEnriched_all_1234),2)+pow((err_QCD_BCtoE_all_1234),2) + pow((err_TTbar_1234),2) + pow((err_W_1234),2) + pow((err_Z_1234),2))*cut_decimal)))/cut_decimal<<endl<<endl;
 	cut<<Tabcut_Data_Int.c_str()<<((float)((int)(histoData_1234->IntegralAndError(0,-1,err_Data_1234,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_Data_Int_err.c_str()<<((float)((int)(err_Data_1234*cut_decimal)))/cut_decimal<<endl;
 	cut<<endl<<Tabcut_end.c_str()<<endl;
@@ -969,6 +979,8 @@ Dir_4a->cd();
 	cut<<Tabcut_Z_Int.c_str()<<((float)((int)(histoZ_12345->IntegralAndError(0,-1,err_Z_12345,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_Z_Int_err.c_str()<<((float)((int)(err_Z_12345*cut_decimal)))/cut_decimal<<endl;
 	cut<<endl<<Tabcut_riga.c_str()<<endl<<endl;
+	cut<<Tabcut_Total_Int.c_str()<<((float)((int)((histoQCD_EMEnriched_all_12345->IntegralAndError(0,-1,err_QCD_EMEnriched_all_12345,"") + histoQCD_BCtoE_all_12345->IntegralAndError(0,-1,err_QCD_BCtoE_all_12345,"") + histoTTbar_12345->IntegralAndError(0,-1,err_TTbar_12345,"") + histoW_12345->IntegralAndError(0,-1,err_W_12345,"") + histoZ_12345->IntegralAndError(0,-1,err_Z_12345,""))*cut_decimal)))/cut_decimal<<endl;
+	cut<<Tabcut_Total_Int_err.c_str()<<((float)((int)(sqrt(pow((err_QCD_EMEnriched_all_12345),2)+pow((err_QCD_BCtoE_all_12345),2) + pow((err_TTbar_12345),2) + pow((err_W_12345),2) + pow((err_Z_12345),2))*cut_decimal)))/cut_decimal<<endl<<endl;
 	cut<<Tabcut_Data_Int.c_str()<<((float)((int)(histoData_12345->IntegralAndError(0,-1,err_Data_12345,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_Data_Int_err.c_str()<<((float)((int)(err_Data_12345*cut_decimal)))/cut_decimal<<endl;
 	cut<<endl<<Tabcut_end.c_str()<<endl;
@@ -1057,6 +1069,8 @@ Dir_4a->cd();
 	cut<<Tabcut_Z_Int.c_str()<<((float)((int)(histoZ_123456->IntegralAndError(0,-1,err_Z_123456,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_Z_Int_err.c_str()<<((float)((int)(err_Z_123456*cut_decimal)))/cut_decimal<<endl;
 	cut<<endl<<Tabcut_riga.c_str()<<endl<<endl;
+	cut<<Tabcut_Total_Int.c_str()<<((float)((int)((histoQCD_EMEnriched_all_123456->IntegralAndError(0,-1,err_QCD_EMEnriched_all_123456,"") + histoQCD_BCtoE_all_123456->IntegralAndError(0,-1,err_QCD_BCtoE_all_123456,"") + histoTTbar_123456->IntegralAndError(0,-1,err_TTbar_123456,"") + histoW_123456->IntegralAndError(0,-1,err_W_123456,"") + histoZ_123456->IntegralAndError(0,-1,err_Z_123456,""))*cut_decimal)))/cut_decimal<<endl;
+	cut<<Tabcut_Total_Int_err.c_str()<<((float)((int)(sqrt(pow((err_QCD_EMEnriched_all_123456),2)+pow((err_QCD_BCtoE_all_123456),2) + pow((err_TTbar_123456),2) + pow((err_W_123456),2) + pow((err_Z_123456),2))*cut_decimal)))/cut_decimal<<endl<<endl;
 	cut<<Tabcut_Data_Int.c_str()<<((float)((int)(histoData_123456->IntegralAndError(0,-1,err_Data_123456,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_Data_Int_err.c_str()<<((float)((int)(err_Data_123456*cut_decimal)))/cut_decimal<<endl;
 	cut<<endl<<Tabcut_end.c_str()<<endl;

@@ -40,7 +40,7 @@ int main() {
   
   int PreDefName = 1;
   
-  string sourceList = "Zpj_Madgraph_Spring10.txt";
+  string sourceList = "Zpj_Madgraph_train.txt";
   string outNameSuf="_TEST";
   name(PreDefName);
   string outputName = SampleName;

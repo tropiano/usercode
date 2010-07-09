@@ -34,8 +34,7 @@ void AccEff_GenRec(string sample, string selections){
         TFile *signal_file = TFile::Open("ZJets_Madgraph_Spring10_TEST.root");
         
         //Output
-        string out = "Plot_TEST";
-        //string out = "Test";
+        string out = "Plot_test";
         string output = out;
         output+=".root";
         TFile* outplots = new TFile(output.c_str(), "RECREATE");
@@ -1489,6 +1488,7 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         TGraphAsymmErrors Eff_TP_Double_12345(vx_12345, vy_12345, vexl_12345, vexh_12345, veyl_12345, veyh_12345);
         TGraphAsymmErrors Eff_TP_Double_123456(vx_123456, vy_123456, vexl_123456, vexh_123456, veyl_123456, veyh_123456);
         
+        
         string Eff_TP_Double_name="DoubleEff_TagProbe";
         Eff_TP_Double_name+=_RecoCutFlags[1].c_str();
         Eff_TP_Double_name+=_RecoCutFlags[2].c_str();
@@ -1524,6 +1524,23 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	EffTP_12->Close();
 	}
 	
+	TP_12->cd();
+        if(sample=="mc"){
+        TCanvas *EffTP_12 = new TCanvas;
+        RelEff_RecoExclJet_12.SetLineColor(1);
+	RelEff_RecoExclJet_12.SetMarkerStyle(20);
+	RelEff_RecoExclJet_12.SetMarkerColor(1);
+	RelEff_RecoExclJet_12.Draw("AP");
+	Eff_TP_Double_12.Draw("PSAME");
+	RelEff_RecoExclJet_12.SetTitle("Cut eff vs Reco Jet: MC (black), TP w/o back (red)");
+	string EffTP_12_name = "EffRecoJetMCVsTP";
+	EffTP_12_name+=_RecoCutFlags[1].c_str();
+        EffTP_12_name+=_RecoCutFlags[2].c_str();
+        EffTP_12_name+=".root";
+	EffTP_12->Write(EffTP_12_name.c_str());
+	EffTP_12->Close();
+	}
+	
 	TP_123->cd();
         Eff_TP_Single_123.Write();
         Eff_TP_Double_123.Write();
@@ -1547,6 +1564,26 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	EffTP_123->Close();
 	}
 	
+	TP_123->cd();
+        if(sample=="mc"){
+        TCanvas *EffTP_123 = new TCanvas;
+        RelEff_RecoExclJet_123.SetLineColor(1);
+	RelEff_RecoExclJet_123.SetMarkerStyle(20);
+	RelEff_RecoExclJet_123.SetMarkerColor(1);
+	RelEff_RecoExclJet_123.GetXaxis()->SetRangeUser(-0.5,3.5);
+	RelEff_RecoExclJet_123.GetYaxis()->SetRangeUser(0.95,0.99);
+	RelEff_RecoExclJet_123.Draw("AP");
+	Eff_TP_Double_123.Draw("PSAME");
+	RelEff_RecoExclJet_123.SetTitle("Cut eff vs RECO Excl Jet: MC (black), TP w/o back (red)");
+	string EffTP_123_name = "EffRecoJetMCVsTP";
+	EffTP_123_name+=_RecoCutFlags[1].c_str();
+        EffTP_123_name+=_RecoCutFlags[2].c_str();
+        EffTP_123_name+=_RecoCutFlags[3].c_str();
+        EffTP_123_name+=".root";
+	EffTP_123->Write(EffTP_123_name.c_str());
+	EffTP_123->Close();
+	}
+	
 	TP_1234->cd();
         Eff_TP_Single_1234.Write();
         Eff_TP_Double_1234.Write();
@@ -1562,6 +1599,27 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	Eff_TP_Double_1234.Draw("PSAME");
 	RelEff_GenExclJet_1234.SetTitle("Cut eff: MC (black), TP w/o back (red)");
 	string EffTP_1234_name = "EffGenRecoVsTP";
+	EffTP_1234_name+=_RecoCutFlags[1].c_str();
+        EffTP_1234_name+=_RecoCutFlags[2].c_str();
+        EffTP_1234_name+=_RecoCutFlags[3].c_str();
+        EffTP_1234_name+=_RecoCutFlags[4].c_str();
+        EffTP_1234_name+=".root";
+	EffTP_1234->Write(EffTP_1234_name.c_str());
+	EffTP_1234->Close();
+	}
+	
+	TP_1234->cd();
+        if(sample=="mc"){
+        TCanvas *EffTP_1234 = new TCanvas;
+        RelEff_RecoExclJet_1234.SetLineColor(1);
+	RelEff_RecoExclJet_1234.SetMarkerStyle(20);
+	RelEff_RecoExclJet_1234.SetMarkerColor(1);
+	RelEff_RecoExclJet_1234.GetXaxis()->SetRangeUser(-0.5,3.5);
+	RelEff_RecoExclJet_1234.GetYaxis()->SetRangeUser(0.84,0.93);
+	RelEff_RecoExclJet_1234.Draw("AP");
+	Eff_TP_Double_1234.Draw("PSAME");
+	RelEff_RecoExclJet_1234.SetTitle("Cut eff vs RECO Excl #Jet: MC Reco (black), TP w/o back (red)");
+	string EffTP_1234_name = "EffRecoJetMCVsTP";
 	EffTP_1234_name+=_RecoCutFlags[1].c_str();
         EffTP_1234_name+=_RecoCutFlags[2].c_str();
         EffTP_1234_name+=_RecoCutFlags[3].c_str();
@@ -1596,6 +1654,28 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	EffTP_12345->Close();
 	}
 	
+	TP_12345->cd();
+        if(sample=="mc"){
+        TCanvas *EffTP_12345 = new TCanvas;
+        RelEff_RecoExclJet_12345.SetLineColor(1);
+	RelEff_RecoExclJet_12345.SetMarkerStyle(20);
+	RelEff_RecoExclJet_12345.SetMarkerColor(1);
+	RelEff_RecoExclJet_12345.GetXaxis()->SetRangeUser(-0.5,3.5);
+	RelEff_RecoExclJet_12345.GetYaxis()->SetRangeUser(0.84,0.93);
+	RelEff_RecoExclJet_12345.Draw("AP");
+	Eff_TP_Double_12345.Draw("PSAME");
+	RelEff_RecoExclJet_12345.SetTitle("Cut eff vs RECO Excl Jet: MC (black), TP w/o back (red)");
+	string EffTP_12345_name = "EffRecoJetMCVsTP";
+	EffTP_12345_name+=_RecoCutFlags[1].c_str();
+        EffTP_12345_name+=_RecoCutFlags[2].c_str();
+        EffTP_12345_name+=_RecoCutFlags[3].c_str();
+        EffTP_12345_name+=_RecoCutFlags[4].c_str();
+        EffTP_12345_name+=_RecoCutFlags[5].c_str();
+        EffTP_12345_name+=".root";
+	EffTP_12345->Write(EffTP_12345_name.c_str());
+	EffTP_12345->Close();
+	}
+	
 	TP_123456->cd();
         Eff_TP_Single_123456.Write();
         Eff_TP_Double_123456.Write();
@@ -1611,6 +1691,29 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	Eff_TP_Double_123456.Draw("PSAME");
 	RelEff_GenExclJet_123456.SetTitle("Cut eff: MC (black), TP w/o back (red)");
 	string EffTP_123456_name = "EffGenRecoVsTP";
+	EffTP_123456_name+=_RecoCutFlags[1].c_str();
+        EffTP_123456_name+=_RecoCutFlags[2].c_str();
+        EffTP_123456_name+=_RecoCutFlags[3].c_str();
+        EffTP_123456_name+=_RecoCutFlags[4].c_str();
+        EffTP_123456_name+=_RecoCutFlags[5].c_str();
+        EffTP_123456_name+=_RecoCutFlags[6].c_str();
+        EffTP_123456_name+=".root";
+	EffTP_123456->Write(EffTP_123456_name.c_str());
+	EffTP_123456->Close();
+	}
+	
+	TP_123456->cd();
+        if(sample=="mc"){
+        TCanvas *EffTP_123456 = new TCanvas;
+        RelEff_RecoExclJet_123456.SetLineColor(1);
+	RelEff_RecoExclJet_123456.SetMarkerStyle(20);
+	RelEff_RecoExclJet_123456.SetMarkerColor(1);
+	RelEff_RecoExclJet_123456.GetXaxis()->SetRangeUser(-0.5,3.5);
+	RelEff_RecoExclJet_123456.GetYaxis()->SetRangeUser(0.84,0.93);
+	RelEff_RecoExclJet_123456.Draw("AP");
+	Eff_TP_Double_123456.Draw("PSAME");
+	RelEff_RecoExclJet_123456.SetTitle("Cut eff vs RECO Excl Jet: MC (black), TP w/o back (red)");
+	string EffTP_123456_name = "EffRecoJetMCVsTP";
 	EffTP_123456_name+=_RecoCutFlags[1].c_str();
         EffTP_123456_name+=_RecoCutFlags[2].c_str();
         EffTP_123456_name+=_RecoCutFlags[3].c_str();

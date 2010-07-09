@@ -705,10 +705,14 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
    
    if(_sample=="mc" && zgenHandle->size()!=0){
    
+   if(zgenHandle->size()>1)throw cms::Exception("PATAnalysis:EfficiencyElectron_MoreThanOneGENZ") << "ERROR! More than one GEN Z found!";
+   
    //Z Gen daughters
    std::vector<const reco::Candidate*> zgendaughters = ZGENDaughters((*zgenHandle)[0]);
+   
    const reco::Candidate *gendau0 = 0;
    const reco::Candidate *gendau1 = 0;
+   
    double genleadelpt = 0; 
    double genleadeleta = 0; 
    double gensecondelpt = 0;
@@ -716,26 +720,16 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
    
      if(zgendaughters.size() != 0){ 
             
-     gendau0 = zgendaughters[0];
-     gendau1 = zgendaughters[1];
+      gendau0 = zgendaughters[0];
+      gendau1 = zgendaughters[1];
           
-      double pt0  = gendau0->pt(); 
-      double pt1  = gendau1->pt();
-      double eta0 = gendau0->eta();
-      double eta1 = gendau1->eta();
+      genleadelpt  = gendau0->pt(); 
+      gensecondelpt  = gendau1->pt();
+      genleadeleta = gendau0->eta();
+      gensecondeleta = gendau1->eta();
       
-      if (pt0 > pt1) {
-        genleadelpt    = pt0;
-        genleadeleta   = eta0;
-        gensecondelpt  = pt1;
-        gensecondeleta = eta1;
-      } else {
-        genleadelpt    = pt1;
-        genleadeleta   = eta1;
-        gensecondelpt  = pt0;
-        gensecondeleta = eta0;
-      }
-      
+      if(gensecondelpt>genleadelpt)throw cms::Exception("PATAnalysis:EfficiencyElectron_WrongElectronOrder") << "ERROR! Z electrons are in wrong order!";
+          
      }
      
      //Generated jets
