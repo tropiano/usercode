@@ -189,31 +189,31 @@ int main(){
 */  
 
   EfficiencyAnalyzerMuon zyield_ana(&in, 0, 0, "EfficiencyMuonVSRecoMulti");
-  zyield_ana.analyze("z_yield.tex", 0.05228);
+  zyield_ana.analyze("z_yield.tex", 0.07765);
 
 /*
   EfficiencyAnalyzerMuon zyield_anaMad(&inMadgraph, 0, 0, "EfficiencyMuonVSRecoMulti");
-  zyield_anaMad.analyze("z_yieldMad.tex", 0.05228);
+  zyield_anaMad.analyze("z_yieldMad.tex", 0.07765);
 */
 
   TFile inW("w.root");
   EfficiencyAnalyzerMuon wyield_ana(&inW, 0, 0, "EfficiencyMuonVSRecoMulti");
-  wyield_ana.analyze("w_yield.tex", 0.05228);  
+  wyield_ana.analyze("w_yield.tex", 0.07765);  
   wyield_ana.analyze("w_yield_noscale.tex", 2087693/(10312.*0.742));
 
   TFile inQCD("qcd.root");
   EfficiencyAnalyzerMuon qcdyield_ana(&inQCD, 0, 0, "EfficiencyMuonVSRecoMulti");
-  qcdyield_ana.analyze("qcd_yield.tex", 0.05228);
+  qcdyield_ana.analyze("qcd_yield.tex", 0.07765);
   qcdyield_ana.analyze("qcd_yield_noscale.tex", 5120334/(296900000.*2.684e-4));
 
   TFile inTTbar("ttbar.root");
   EfficiencyAnalyzerMuon ttbaryield_ana(&inTTbar, 0, 0, "EfficiencyMuonVSRecoMulti");
-  ttbaryield_ana.analyze("ttbar_yield.tex", 0.05228);
+  ttbaryield_ana.analyze("ttbar_yield.tex", 0.07765);
   ttbaryield_ana.analyze("ttbar_yield_noscale.tex", 632010/95.);
 
   TFile intau("ztautau.root");
   EfficiencyAnalyzerMuon tauyield_ana(&intau, 0, 0, "EfficiencyMuonVSRecoMulti");
-  tauyield_ana.analyze("ztautau_yield.tex", 0.05228);
+  tauyield_ana.analyze("ztautau_yield.tex", 0.07765);
   tauyield_ana.analyze("ztautau_yield_noscale.tex", 1369709/1667.);
 
   //TFile in("zmumu.root");
