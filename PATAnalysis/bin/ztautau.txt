@@ -1,0 +1,15 @@
+/raid/lenzip/PATtuples/Summer10/ZtautauTuneD6T/Zmumu_MC_10_1_cM3.root
+/raid/lenzip/PATtuples/Summer10/ZtautauTuneD6T/Zmumu_MC_11_1_mqp.root
+/raid/lenzip/PATtuples/Summer10/ZtautauTuneD6T/Zmumu_MC_1_1_xKQ.root
+/raid/lenzip/PATtuples/Summer10/ZtautauTuneD6T/Zmumu_MC_12_1_ERR.root
+/raid/lenzip/PATtuples/Summer10/ZtautauTuneD6T/Zmumu_MC_13_1_iQR.root
+/raid/lenzip/PATtuples/Summer10/ZtautauTuneD6T/Zmumu_MC_14_1_gsg.root
+/raid/lenzip/PATtuples/Summer10/ZtautauTuneD6T/Zmumu_MC_15_1_vWQ.root
+/raid/lenzip/PATtuples/Summer10/ZtautauTuneD6T/Zmumu_MC_2_1_nGA.root
+/raid/lenzip/PATtuples/Summer10/ZtautauTuneD6T/Zmumu_MC_3_1_Nxq.root
+/raid/lenzip/PATtuples/Summer10/ZtautauTuneD6T/Zmumu_MC_4_1_ONb.root
+/raid/lenzip/PATtuples/Summer10/ZtautauTuneD6T/Zmumu_MC_5_1_Pge.root
+/raid/lenzip/PATtuples/Summer10/ZtautauTuneD6T/Zmumu_MC_6_1_1uR.root
+/raid/lenzip/PATtuples/Summer10/ZtautauTuneD6T/Zmumu_MC_7_1_oX1.root
+/raid/lenzip/PATtuples/Summer10/ZtautauTuneD6T/Zmumu_MC_8_1_wSt.root
+/raid/lenzip/PATtuples/Summer10/ZtautauTuneD6T/Zmumu_MC_9_1_2Hg.root

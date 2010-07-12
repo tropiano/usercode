@@ -1,0 +1,8 @@
+/raid/lenzip/PATtuples/Summer10/TTbar/Zmumu_MC_1_1_H23.root
+/raid/lenzip/PATtuples/Summer10/TTbar/Zmumu_MC_2_1_SSk.root
+/raid/lenzip/PATtuples/Summer10/TTbar/Zmumu_MC_3_1_2Ul.root
+/raid/lenzip/PATtuples/Summer10/TTbar/Zmumu_MC_4_1_1FC.root
+/raid/lenzip/PATtuples/Summer10/TTbar/Zmumu_MC_5_1_dh6.root
+/raid/lenzip/PATtuples/Summer10/TTbar/Zmumu_MC_6_1_CnX.root
+/raid/lenzip/PATtuples/Summer10/TTbar/Zmumu_MC_7_1_SL8.root
+/raid/lenzip/PATtuples/Summer10/TTbar/Zmumu_MC_8_1_yAs.root

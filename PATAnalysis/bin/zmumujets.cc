@@ -32,7 +32,7 @@ TDSet* getDS(const char* filename){
 
 
 int main(){
-  gEnv->SetValue("Proof.Sandbox", "/data01/lenzip/Zjets/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/proof");
+  gEnv->SetValue("Proof.Sandbox", "/data01/lenzip/Zjets/localCMSSW/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/proof");
 
   TProof * p = TProof::Open("");
   //p->SetParallel(4);
@@ -46,68 +46,75 @@ int main(){
   gSystem->Load("libFirenzePATAnalysis");
 
 
-  p->Exec( ".x /data01/lenzip/Zjets/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/remote.C" );
-  gEnv->SetValue("Proof.Sandbox", "/data01/lenzip/Zjets/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/proof");
-
+  p->Exec( ".x /data01/lenzip/Zjets/localCMSSW/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/remote.C" );
   //TProofLog *pl = TProof::Mgr("")->GetSessionLogs();
-  //pl->Save("*","/data01/lenzip/Zjets/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/Log.txt");
-  TDSet* dataDS = getDS("/data01/lenzip/Zjets/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/data.txt");
+  //pl->Save("*","/data01/lenzip/Zjets/localCMSSW/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/Log.txt");
+  TDSet* dataDS = getDS("/data01/lenzip/Zjets/localCMSSW/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/data.txt");
   TNamed* configdata = new TNamed("ConfigFile", (pwd+"/config_data_zmumu.py").c_str());
   p->AddInput(configdata);
   p->Process(dataDS, "FWLiteTSelector");
   delete dataDS;
-/*  
-  TDSet* signalDS = getDS("/data01/lenzip/Zjets/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/signal.txt");
+  
+/*
+  TDSet* signalDS = getDS("/data01/lenzip/Zjets/localCMSSW/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/signal.txt");
   TNamed* configsignal = new TNamed("ConfigFile", (pwd+"/config_signal.py").c_str());
   p->AddInput(configsignal);
   p->Process(signalDS, "FWLiteTSelector");
   delete signalDS;
-*/
-  
+*/  
 /*
-  TDSet* signalMadDS = getDS("/data01/lenzip/Zjets/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/signal_Madgraph.txt");
+  TDSet* signalMadDS = getDS("/data01/lenzip/Zjets/localCMSSW/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/signal_Madgraph.txt");
   TNamed* configMad = new TNamed("ConfigFile", (pwd+"/config_signal_Madgraph.py").c_str());
   p->AddInput(configMad);
   p->Process(signalMadDS, "FWLiteTSelector");
   delete signalMadDS;
-  
-  TDSet* qcdDS = getDS("/data01/lenzip/Zjets/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/qcd.txt");
+*/ 
+/*
+  TDSet* qcdDS = getDS("/data01/lenzip/Zjets/localCMSSW/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/qcd.txt");
   TNamed* configqcd = new TNamed("ConfigFile", (pwd+"/config_background_qcd.py").c_str());
   p->AddInput(configqcd);
   p->Process(qcdDS, "FWLiteTSelector");
   delete qcdDS;
-
-  TDSet* ttbarDS = getDS("/data01/lenzip/Zjets/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/ttbar.txt");
+*/
+/*
+  TDSet* ttbarDS = getDS("/data01/lenzip/Zjets/localCMSSW/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/ttbar.txt");
   TNamed* configttbar = new TNamed("ConfigFile", (pwd+"/config_background_ttbar.py").c_str());
   p->AddInput(configttbar);
   p->Process(ttbarDS, "FWLiteTSelector");
   delete ttbarDS;
   
-  TDSet* wDS = getDS("/data01/lenzip/Zjets/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/w.txt");
+  TDSet* wDS = getDS("/data01/lenzip/Zjets/localCMSSW/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/w.txt");
   TNamed* configw = new TNamed("ConfigFile", (pwd+"/config_background_w.py").c_str());
   p->AddInput(configw);
   p->Process(wDS, "FWLiteTSelector");
   delete wDS;
-  
-  TDSet* signalDWDS = getDS("/data01/lenzip/Zjets/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/signal_DW.txt");
+
+  TDSet* tauDS = getDS("/data01/lenzip/Zjets/localCMSSW/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/ztautau.txt");
+  TNamed* configtau = new TNamed("ConfigFile", (pwd+"/config_background_ztautau.py").c_str());
+  p->AddInput(configtau);
+  p->Process(tauDS, "FWLiteTSelector");
+  delete tauDS;
+*/  
+/*  
+  TDSet* signalDWDS = getDS("/data01/lenzip/Zjets/localCMSSW/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/signal_DW.txt");
   TNamed* configDW = new TNamed("ConfigFile", (pwd+"/config_signal_DW.py").c_str());
   p->AddInput(configDW);
   p->Process(signalDWDS, "FWLiteTSelector");
   delete signalDWDS; 
 
-  TDSet* signalP0DS = getDS("/data01/lenzip/Zjets/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/signal_P0.txt");
+  TDSet* signalP0DS = getDS("/data01/lenzip/Zjets/localCMSSW/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/signal_P0.txt");
   TNamed* configP0 = new TNamed("ConfigFile", (pwd+"/config_signal_P0.py").c_str());
   p->AddInput(configP0);
   p->Process(signalP0DS, "FWLiteTSelector");
   delete signalP0DS;
 
-  TDSet* signalProPT0DS = getDS("/data01/lenzip/Zjets/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/signal_ProPT0.txt");
+  TDSet* signalProPT0DS = getDS("/data01/lenzip/Zjets/localCMSSW/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/signal_ProPT0.txt");
   TNamed* configProPT0 = new TNamed("ConfigFile", (pwd+"/config_signal_ProPT0.py").c_str());
   p->AddInput(configProPT0);
   p->Process(signalProPT0DS, "FWLiteTSelector");
   delete signalProPT0DS; 
 
-  TDSet* signalProQ20DS = getDS("/data01/lenzip/Zjets/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/signal_ProQ20.txt");
+  TDSet* signalProQ20DS = getDS("/data01/lenzip/Zjets/localCMSSW/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/signal_ProQ20.txt");
   TNamed* configProQ20 = new TNamed("ConfigFile", (pwd+"/config_signal_ProQ20.py").c_str());
   p->AddInput(configProQ20);
   p->Process(signalProQ20DS, "FWLiteTSelector");
@@ -126,7 +133,7 @@ int main(){
   mueffana2.analyze();
   out1.Close();
   out2.Close();
-
+/*
   //madgraph
   TFile inMadgraph("signalMadgraph.root");
   TFile out1Madgraph("signal_Eff_vsRecoMadgraph.root", "RECREATE");
@@ -137,8 +144,8 @@ int main(){
   mueffana2Madgraph.analyze("z_yieldVsGenMadgraph_noscale.tex");
   out1Madgraph.Close();
   out2Madgraph.Close();
-
-  
+*/
+/*  
   //tune DW
   TFile inDW("signalDW.root");
   TFile out1DW("signal_Eff_vsRecoDW.root", "RECREATE");
@@ -179,28 +186,35 @@ int main(){
   mueffana2ProQ20.analyze("z_yieldVsGenProQ20_noscale.tex");
   out1ProQ20.Close();
   out2ProQ20.Close();
-  
+*/  
 
   EfficiencyAnalyzerMuon zyield_ana(&in, 0, 0, "EfficiencyMuonVSRecoMulti");
-  zyield_ana.analyze("z_yield.tex", 0.012);
+  zyield_ana.analyze("z_yield.tex", 0.05228);
 
+/*
   EfficiencyAnalyzerMuon zyield_anaMad(&inMadgraph, 0, 0, "EfficiencyMuonVSRecoMulti");
-  zyield_anaMad.analyze("z_yieldMad.tex", 0.012);
+  zyield_anaMad.analyze("z_yieldMad.tex", 0.05228);
+*/
 
   TFile inW("w.root");
   EfficiencyAnalyzerMuon wyield_ana(&inW, 0, 0, "EfficiencyMuonVSRecoMulti");
-  wyield_ana.analyze("w_yield.tex", 1000.*0.012);  ///factor 1000 due to wrong normalization in the cfg (nb in place of pb)
-  wyield_ana.analyze("w_yield_noscale.tex", 9773919/10.312);
+  wyield_ana.analyze("w_yield.tex", 0.05228);  
+  wyield_ana.analyze("w_yield_noscale.tex", 2087693/(10312.*0.742));
 
   TFile inQCD("qcd.root");
   EfficiencyAnalyzerMuon qcdyield_ana(&inQCD, 0, 0, "EfficiencyMuonVSRecoMulti");
-  qcdyield_ana.analyze("qcd_yield.tex", 0.012);
-  qcdyield_ana.analyze("qcd_yield_noscale.tex", 6342864/(296500000.*0.00116));
+  qcdyield_ana.analyze("qcd_yield.tex", 0.05228);
+  qcdyield_ana.analyze("qcd_yield_noscale.tex", 5120334/(296900000.*2.684e-4));
 
   TFile inTTbar("ttbar.root");
   EfficiencyAnalyzerMuon ttbaryield_ana(&inTTbar, 0, 0, "EfficiencyMuonVSRecoMulti");
-  ttbaryield_ana.analyze("ttbar_yield.tex", 0.012);
-  ttbaryield_ana.analyze("ttbar_yield_noscale.tex", 783404/95.);
+  ttbaryield_ana.analyze("ttbar_yield.tex", 0.05228);
+  ttbaryield_ana.analyze("ttbar_yield_noscale.tex", 632010/95.);
+
+  TFile intau("ztautau.root");
+  EfficiencyAnalyzerMuon tauyield_ana(&intau, 0, 0, "EfficiencyMuonVSRecoMulti");
+  tauyield_ana.analyze("ztautau_yield.tex", 0.05228);
+  tauyield_ana.analyze("ztautau_yield_noscale.tex", 1369709/1667.);
 
   //TFile in("zmumu.root");
   //EfficiencyAnalyzerMuon yield_ana(&in, 0, 0, "EfficiencyMuonVSRecoMulti");
