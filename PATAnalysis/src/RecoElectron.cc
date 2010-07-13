@@ -1610,7 +1610,7 @@ void RecoElectron::finalize(){
    Report<<"dxycut = "<<dxycut<<endl;
    Report<<"ptjetmin = "<<ptjetmin<<endl;
    Report<<"etajetmax = "<<etajetmax<<endl;
-   Report<<"isocut = "<<isocut<<endl;
+   Report<<"isocut = "<<vpj_isocut<<endl;
    Report<<"isojetcut = "<<isojetcut<<endl;
    Report<<"ElectronTrigger = "<<ElectronTrigger.c_str()<<endl;
    Report<<"JetTrigger = "<<JetTrigger.c_str()<<endl;
@@ -1638,7 +1638,6 @@ void RecoElectron::finalize(){
    Report<<"dxycut = "<<dxycut<<endl<<endl;
    Report<<"ptjetmin = "<<ptjetmin<<endl;
    Report<<"etajetmax = "<<etajetmax<<endl<<endl;
-   Report<<"isocut = "<<isocut<<endl;
    Report<<"isojetcut = "<<isojetcut<<endl<<endl;
    Report<<"ElectronTrigger = "<<ElectronTrigger.c_str()<<endl;
    Report<<"JetTrigger = "<<JetTrigger.c_str()<<endl<<endl;

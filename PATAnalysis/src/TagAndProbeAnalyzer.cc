@@ -80,12 +80,12 @@ void TagAndProbeAnalyzer::analyze(unsigned int nbins, std::string option )
       std::cout << "Error in TagAndProbeAnalyzer::Analyze, unable to initialize the RooDataSet. Are you sure that the TagAndProbeFiller has been run?" << std::endl;
       return;  
    }
-  
+ 
    _rootree->Write();
    if(_sec_input)_rootree1->Write();
    
    TGraphAsymmErrors singleEfficiency, singleEfficiency1;
-  
+ 
    for (unsigned int i = 0; i < nbins; ++i){
    
       stringstream name_tp;
@@ -148,7 +148,7 @@ void TagAndProbeAnalyzer::analyze(unsigned int nbins, std::string option )
           singleEfficiency1.SetPointEYlow(i, errlow1);
           }
           }
-                  
+               
           if (tp_fit.first) delete tp_fit.first;
           if (tp_fit.second) delete tp_fit.second;
           if(_sec_input){
@@ -160,11 +160,17 @@ void TagAndProbeAnalyzer::analyze(unsigned int nbins, std::string option )
    //double efficiency
    if(!_sec_input){
    TGraphAsymmErrors doubleEfficiency = createDoubleEfficiency(singleEfficiency);
+   singleEfficiency.SetNameTitle("SingleTag&ProbeEff","SingleTag&ProbeEff");
+   singleEfficiency.Write();
    doubleEfficiency.Write();}
    if(_sec_input){
    TGraphAsymmErrors doubleEfficiency = createAsymmCutEfficiency(singleEfficiency, singleEfficiency1);
+   singleEfficiency.SetNameTitle("SingleTag&ProbeEff_0","SingleTag&ProbeEff_0");
+   singleEfficiency1.SetNameTitle("SingleTag&ProbeEff_1","SingleTag&ProbeEff_1");
+   singleEfficiency.Write();
+   singleEfficiency1.Write();
    doubleEfficiency.Write();}
-   
+  
 }
 
 
@@ -191,6 +197,7 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
   //RooDataHist roobinned("bdata","Binned Data", RooArgSet(_mass, _passprobe_cat),*data);
 
   TH1* hmass = data->createHistogram("mass", 100);
+  
 /*
   RooRealVar mu_pass("mu_pass", "average_pass", hmass->GetMean(),  80, 100);
   RooRealVar mu_pass2("mu_pass2", "average_pass2", hmass->GetMean(), 80, 100);
@@ -238,7 +245,7 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
   RooBifurGauss bifurgauss_fail("bifurgauss_fail", "bifurgauss_fail", _mass, mu_fail2, widthL_fail, widthR_fail);
   RooAddPdf signal_fail("signal_fail", "signal_fail", voigtian_fail, bifurgauss_fail, fraction_fail);
   //RooVoigtian signal_fail("voigtian_fail", "voigtian_fail", _mass, mu_fail, width_fail, sigma_fail);;
-   
+  
   // if we are using signal shape from training 
   if (_training_signal) {
   cout<<"TRAINING SIGNAL 1"<<endl;
@@ -396,7 +403,7 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
 
   RooAddPdf sumpass("sumpass", "sumpass", components_pass, coefficients_pass);
   RooAddPdf sumfail("sumfail", "sumfail", components_fail, coefficients_fail);
-
+  
   RooSimultaneous total_fit("total_fit","total_fit", _passprobe_cat);
   _passprobe_cat.setLabel("pass");
   //total_fit.addPdf(signal_pass, _passprobe_cat.getLabel());
@@ -405,12 +412,10 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
   //total_fit.addPdf(signal_fail, _passprobe_cat.getLabel());
   total_fit.addPdf(sumfail, _passprobe_cat.getLabel());
 
-
-  //RooFitResult* fitresult = total_fit.fitTo(*data, RooFit::Save(true), RooFit::Strategy(2), RooFit::NumCPU(8), RooFit::Extended(kTRUE), RooFit::SumW2Error(true));
+ // RooFitResult* fitresult = total_fit.fitTo(*data, RooFit::Save(true), RooFit::Strategy(2), RooFit::NumCPU(8), RooFit::Extended(kTRUE), RooFit::SumW2Error(true));
   
   RooFitResult* fitresult = total_fit.fitTo(*data, RooFit::Minos(RooArgSet(efficiency)), RooFit::Save(true), RooFit::Strategy(1), RooFit::NumCPU(8), RooFit::Extended(kTRUE), RooFit::SumW2Error(true));
-  
-  
+    
   fitresult->SetName(nllname.str().c_str());
 
   fitresult->Write(); 
@@ -441,6 +446,7 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
   delete mass_pass;
   delete mass_fail;
   return std::make_pair(fitresult, (RooRealVar*) efficiency.Clone() );
+ 
 }
 
 

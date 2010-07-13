@@ -22,14 +22,14 @@ void EfficiencyAnalyzerElectron::analyze(int bin, std::string fitOptions){
   
   if(_dirname!=""){
   if (!_dir) {
-    std::cout << "### Error in EfficiencyAnalyzerElectron, dir not found in file" << std::endl;
+    std::cout << "### Error in EfficiencyAnalyzerElectron, dir \""<<_dirname.c_str()<<"\" not found in file"<< std::endl;
     return;
   }
   }
   
   if(_dirname1!=""){
   if (!_dir1) {
-    std::cout << "### Error in EfficiencyAnalyzerElectron, dir1 not found in file" << std::endl;
+    std::cout << "### Error in EfficiencyAnalyzerElectron, dir \""<<_dirname.c_str()<<"\" not found in file"<< std::endl;
     return;
   }
   }

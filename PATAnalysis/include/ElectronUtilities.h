@@ -32,38 +32,7 @@ using namespace TMath;
 
 ////////////////////////////////// Selection Cuts ////////////////////////////////////////////////
 
-//Pt - VPJ
-static double ptelcut = 20.;    //Gev/c
-
-//Pt - VBTF
-static double ptelcut0 = 20.;    //Gev/c
-static double ptelcut1 = 10.;
-
-//Eta
-static double etaelcut = 2.4;
-static double eta_el_excl_up = 1.56;               //Excluded Eta region
-static double eta_el_excl_down = 1.4442;           //Excluded Eta region
-
-//VPJ mass window
-static double zmassmin_vpj = 50.;   //Gev/c^2
-static double zmassmax_vpj = 130.;  //Gev/c^2
-
-//VBTF mass window
-static double zmassmin_vbtf = 60.;   //Gev/c^2
-static double zmassmax_vbtf = 110.;  //Gev/c^2
-
-static double minnhit = 11.;
-static double maxchi2 = 10.;
-static double dxycut = 0.02;     //cm
-static double ptjetmin = 30.;   //Gev/c
-static double etajetmax = 3.0;
-static double isocut = 0.1;   //CombRelIso
-static double isojetcut = 0.5; //Isolation jet - Z electron
-
-//VPJ electron ID
-static string eID_VPJ = "eidRobustLoose";
-
-//Data-Spring10 triggers
+//Data-Spring10 TRIGGER
 static string ElectronTrigger = "HLT_Photon15_L1R";
 static string JetTrigger = "HLT_Jet30U";
 
@@ -71,22 +40,25 @@ static string JetTrigger = "HLT_Jet30U";
 //static string ElectronTrigger = "HLT_Ele10_LW_L1R";
 //static string JetTrigger = "HLT_Jet30";
 
-//New cuts VBTF: tuned on Spring10. CombRelIso used. WP = 70/80 for dau0, 95 for dau1
+//Common cuts
+static double etaelcut = 2.4;
+static double eta_el_excl_up = 1.56;               //Excluded Eta region
+static double eta_el_excl_down = 1.4442;           //Excluded Eta region
+static double minnhit = 11.;
+static double maxchi2 = 10.;
+static double dxycut = 0.02;     //cm
+static double ptjetmin = 30.;   //Gev/c
+static double etajetmax = 2.5;
+static double isojetcut = 0.5; //Isolation jet - Z electron
 
-/*
-//// Dau0 - WP70 (70%)// EB
-static double Dau0_CombIso_EB = 0.04;static double Dau0_sihih_EB = 0.01;static double Dau0_Dphi_vtx_EB = 0.03;static double Dau0_Deta_vtx_EB = 0.004;static double Dau0_HovE_EB = 0.025;// EE
-static double Dau0_CombIso_EE = 0.03;static double Dau0_sihih_EE = 0.03;static double Dau0_Dphi_vtx_EE = 0.02;static double Dau0_Deta_vtx_EE = 0.005;static double Dau0_HovE_EE = 0.025;*/
-//// Dau0 - WP80 (80%)// EB
-static double Dau0_CombIso_EB = 0.07;static double Dau0_sihih_EB = 0.01;static double Dau0_Dphi_vtx_EB = 0.06;static double Dau0_Deta_vtx_EB = 0.004;static double Dau0_HovE_EB = 0.04;// EE
-static double Dau0_CombIso_EE = 0.06;static double Dau0_sihih_EE = 0.03;static double Dau0_Dphi_vtx_EE = 0.03;static double Dau0_Deta_vtx_EE = 0.007;static double Dau0_HovE_EE = 0.025;
-///// Dau1 - WP95 (95%)// EB
-static double Dau1_CombIso_EB = 0.15;static double Dau1_sihih_EB = 0.01;static double Dau1_Dphi_vtx_EB = 0.8;static double Dau1_Deta_vtx_EB = 0.007;static double Dau1_HovE_EB = 0.5;
-//EEstatic double Dau1_CombIso_EE = 0.1;static double Dau1_sihih_EE = 0.03;static double Dau1_Dphi_vtx_EE = 0.7;static double Dau1_Deta_vtx_EE = 0.01;static double Dau1_HovE_EE = 0.07;
-
+//VPJ cuts
+static double ptelcut = 20.;    //Gev/c
+static double zmassmin_vpj = 50.;   //Gev/c^2
+static double zmassmax_vpj = 130.;  //Gev/c^2
+static double vpj_isocut = 0.1;   //CombRelIso
+static string eID_VPJ = "eidRobustLoose";
 
 // VPJ Tag cuts
-
 static double VPJ_TAG_ptelcut = 25.;    //Gev/c
 static double VPJ_TAG_etaelcut = 2.4;
 static double VPJ_TAG_eta_el_excl_up = 1.56;               //Excluded Eta region
@@ -95,32 +67,50 @@ static double VPJ_TAG_minnhit = 15.;
 static double VPJ_TAG_maxchi2 = 3.;
 static double VPJ_TAG_dxycut = 0.02;     //cm
 static double VPJ_TAG_isocut = 0.05;                        //CombRelIso
-static string VPJ_TagEiD = "eidRobustLoose";
+static string VPJ_TagEiD = "eidRobustLoose"; //if "" no EiD cut applied
+
+//VBTF cuts
+static double ptelcut0 = 20.;    //Gev/c
+static double ptelcut1 = 10.;
+static double zmassmin_vbtf = 60.;   //Gev/c^2
+static double zmassmax_vbtf = 110.;  //Gev/c^2
+
+//New cuts VBTF: tuned on Spring10. CombRelIso used. WP = 70/80 for dau0, 95 for dau1
+//// Dau0 - WP80 (80%)// EB
+static double Dau0_CombIso_EB = 0.07;static double Dau0_sihih_EB = 0.01;static double Dau0_Dphi_vtx_EB = 0.06;static double Dau0_Deta_vtx_EB = 0.004;static double Dau0_HovE_EB = 0.04;// EE
+static double Dau0_CombIso_EE = 0.06;static double Dau0_sihih_EE = 0.03;static double Dau0_Dphi_vtx_EE = 0.03;static double Dau0_Deta_vtx_EE = 0.007;static double Dau0_HovE_EE = 0.025;
+///// Dau1 - WP95 (95%)
+// EB
+static double Dau1_CombIso_EB = 0.15;static double Dau1_sihih_EB = 0.01;static double Dau1_Dphi_vtx_EB = 0.8;static double Dau1_Deta_vtx_EB = 0.007;static double Dau1_HovE_EB = 0.5;
+//EE
+static double Dau1_CombIso_EE = 0.1;static double Dau1_sihih_EE = 0.03;static double Dau1_Dphi_vtx_EE = 0.7;static double Dau1_Deta_vtx_EE = 0.01;static double Dau1_HovE_EE = 0.07;
+
+/*
+//// Dau0 - WP70 (70%)// EB
+static double Dau0_CombIso_EB = 0.04;static double Dau0_sihih_EB = 0.01;static double Dau0_Dphi_vtx_EB = 0.03;static double Dau0_Deta_vtx_EB = 0.004;static double Dau0_HovE_EB = 0.025;// EE
+static double Dau0_CombIso_EE = 0.03;static double Dau0_sihih_EE = 0.03;static double Dau0_Dphi_vtx_EE = 0.02;static double Dau0_Deta_vtx_EE = 0.005;static double Dau0_HovE_EE = 0.025;*/
 
 // VBTF0 Tag cuts (for soft electron probe)
-
 static double VBTF0_TAG_ptelcut = 20.;    //Gev/c
 static double VBTF0_TAG_etaelcut = 2.4;
 static double VBTF0_TAG_eta_el_excl_up = 1.56;               //Excluded Eta region
 static double VBTF0_TAG_eta_el_excl_down = 1.4442;           //Excluded Eta region
-static double VBTF0_TAG_minnhit = 15.;
-static double VBTF0_TAG_maxchi2 = 3.;
-static double VBTF0_TAG_dxycut = 0.02;     //cm
+static double VBTF0_TAG_minnhit = 0.;
+static double VBTF0_TAG_maxchi2 = 9999.;
+static double VBTF0_TAG_dxycut = 0.1;     //cm
 static double VBTF0_TAG_isocut = 0.05;                        //CombRelIso
-static string VBTF0_TagEiD = "eidRobustLoose";
+static string VBTF0_TagEiD = ""; //if "" no EiD cut applied
 
 // VBTF1 Tag cuts (for hard electron probe)
-
 static double VBTF1_TAG_ptelcut = 10.;    //Gev/c
 static double VBTF1_TAG_etaelcut = 2.4;
 static double VBTF1_TAG_eta_el_excl_up = 1.56;               //Excluded Eta region
 static double VBTF1_TAG_eta_el_excl_down = 1.4442;           //Excluded Eta region
-static double VBTF1_TAG_minnhit = 15.;
-static double VBTF1_TAG_maxchi2 = 3.;
-static double VBTF1_TAG_dxycut = 0.02;     //cm
-static double VBTF1_TAG_isocut = 0.05;                        //CombRelIso
-static string VBTF1_TagEiD = "eidRobustLoose";
-
+static double VBTF1_TAG_minnhit = 0.;
+static double VBTF1_TAG_maxchi2 = 9999.;
+static double VBTF1_TAG_dxycut = 0.1;     //cm
+static double VBTF1_TAG_isocut = 0.1;                        //CombRelIso
+static string VBTF1_TagEiD = ""; //if "" no EiD cut applied
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -334,8 +324,8 @@ inline bool RecSelected(string Flag, const reco::CompositeCandidate ZREC, const 
   return dau0->dB() < dxycut && dau1->dB() < dxycut;
          }
   else if(Flag=="_IsoVPJ"){
-  return (dau0->hcalIso() + dau0->ecalIso() + dau0->trackIso()) / dau0->pt() < isocut &&  
-         (dau1->hcalIso() + dau1->ecalIso() + dau1->trackIso()) / dau1->pt() < isocut;
+  return (dau0->hcalIso() + dau0->ecalIso() + dau0->trackIso()) / dau0->pt() < vpj_isocut &&  
+         (dau1->hcalIso() + dau1->ecalIso() + dau1->trackIso()) / dau1->pt() < vpj_isocut;
          }
   else if(Flag=="_IsoVBTF"){
 	if(fabs(dau0->eta())<eta_el_excl_down){
@@ -564,8 +554,9 @@ inline bool singleEl_Tag_VPJ(const reco::Candidate& cand){
   if(electron){
   const reco::GsfTrackRef track = electron->gsfTrack();
   assert(track.isNonnull());
-  bool TAG_EiD = false;
+  bool TAG_EiD = true;
   if(electron->isElectronIDAvailable(VPJ_TagEiD.c_str())){
+  TAG_EiD = false;
   if(electron->electronID(VPJ_TagEiD.c_str())==1.0)TAG_EiD = true;
   }
   return electron->pt() > VPJ_TAG_ptelcut && 
@@ -587,8 +578,9 @@ inline bool singleEl_Tag_VBTF0(const reco::Candidate& cand){
   if(electron){
   const reco::GsfTrackRef track = electron->gsfTrack();
   assert(track.isNonnull());
-  bool TAG_EiD = false;
+  bool TAG_EiD = true;
   if(electron->isElectronIDAvailable(VBTF0_TagEiD.c_str())){
+  TAG_EiD = false;
   if(electron->electronID(VBTF0_TagEiD.c_str())==1.0)TAG_EiD = true;
   }
   return electron->pt() > VBTF0_TAG_ptelcut && 
@@ -610,9 +602,9 @@ inline bool singleEl_Tag_VBTF1(const reco::Candidate& cand){
   if(electron){ 
   const reco::GsfTrackRef track = electron->gsfTrack();
   assert(track.isNonnull());
-  
-  bool TAG_EiD = false;
+  bool TAG_EiD = true;
   if(electron->isElectronIDAvailable(VBTF1_TagEiD.c_str())){
+  TAG_EiD = false;
   if(electron->electronID(VBTF1_TagEiD.c_str())==1.0)TAG_EiD = true;
   }
   
@@ -669,7 +661,7 @@ inline bool singleEl_Probe_Iso_VPJ(const reco::Candidate& cand){
   const pat::Electron* electron = CloneCandidate(cand);
   
   if(electron){
-  return (electron->hcalIso() + electron->ecalIso() + electron->trackIso()) / electron->pt() < isocut;
+  return (electron->hcalIso() + electron->ecalIso() + electron->trackIso()) / electron->pt() < vpj_isocut;
   }else{
   return false;}
   }
