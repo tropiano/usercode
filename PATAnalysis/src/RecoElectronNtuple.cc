@@ -15,7 +15,6 @@
 #include <fstream>
 
 //CMSSW headers
-#include "DataFormats/FWLite/interface/ChainEvent.h"
 #include "DataFormats/FWLite/interface/Handle.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/RecoCandidate/interface/IsoDeposit.h"
@@ -32,7 +31,7 @@ using namespace edm;
 
 RecoElectronNtuple::RecoElectronNtuple(): 
  
-_sample("mc"), _selections("VBTF"), _JetType("CALO"), _ptjetmin(30.), _etajetmax(3.), _isocut(0.1), _weight(1.), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _Acc(1), _Trg(2), _Qual(3), _Imp(4), _Iso(5), _EiD(6), _Norm(false)
+_sample("mc"), _selections("VBTF"), _ptjetmin(30.), _etajetmax(3.), _isocut(0.1), _weight(1.), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _Acc(1), _Trg(2), _Qual(3), _Imp(4), _Iso(5), _EiD(6), _Norm(false)
 
 { }
 
@@ -50,7 +49,6 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    _EventsPerFile    = iConfig.getParameter<int32_t>("EventsPerFile");
    _EventNumber    = iConfig.getParameter<int32_t>("EventNumber");
    _ProcEvents    = iConfig.getParameter<int32_t>("ProcEvents");
-   _JetType = iConfig.getParameter<std::string>("JetType");
    
    //Selections
    _Acc = iConfig.getParameter<int32_t>("Acc");
@@ -82,62 +80,18 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    _dir->cd();
 
    zeetree= new TTree("ZeeTree","ZeeTree");
-   valideltree = new TTree("ValidElTree","ValidElTree");
-   validjettree = new TTree("ValidJetTree","ValidJetTree");
-   validel_EventTree = new TTree("ValidEl_EventTree","ValidEl_EventTree");
-   validjet_EventTree = new TTree("ValidJet_EventTree","ValidJet_EventTree");
-   
-   valideltree->Branch("run",&run,"run/I");
-   valideltree->Branch("event",&event,"event/I");
-   valideltree->Branch("valid_ElPt", &valid_ElPt, "valid_ElPt/F");
-   valideltree->Branch("valid_ElPhi", &valid_ElPhi, "valid_ElPhi/F");
-   valideltree->Branch("valid_ElEta", &valid_ElEta, "valid_ElEta/F");
-   valideltree->Branch("valid_ElCharge", &valid_ElCharge, "valid_ElCharge/F");
-   valideltree->Branch("valid_elehcaliso",&valid_elehcaliso,"valid_elehcaliso/F");
-   valideltree->Branch("valid_eleecaliso",&valid_eleecaliso,"valid_eleecaliso/F");
-   valideltree->Branch("valid_eletrackiso",&valid_eletrackiso,"valid_eletrackiso/F");
-   valideltree->Branch("valid_elereliso",&valid_elereliso,"valid_elereliso/F");
-   valideltree->Branch("valid_elechisq",&valid_elechisq,"valid_elechisq/F");
-   valideltree->Branch("valid_elenhits",&valid_elenhits,"valid_elenhits/I");
-   valideltree->Branch("valid_eledB",&valid_eledB,"valid_eledB/F");
-   valideltree->Branch("valid_elefbrem",&valid_elefbrem,"valid_elefbrem/F");
-   valideltree->Branch("valid_eledeltaeta",&valid_eledeltaeta,"valid_eledeltaeta/F");
-   valideltree->Branch("valid_eledeltaphi",&valid_eledeltaphi,"valid_eledeltaphi/F");
-   valideltree->Branch("valid_eleHadronicOvEm",&valid_eleHadronicOvEm,"valid_eleHadronicOvEm/F");
-   valideltree->Branch("valid_eleHcalOvEcal",&valid_eleHcalOvEcal,"valid_eleHcalOvEcal/F");
-   valideltree->Branch("valid_eleEovP",&valid_eleEovP,"valid_eleEovP/F");
-   valideltree->Branch("valid_elesigmaetaeta",&valid_elesigmaetaeta,"valid_elesigmaetaeta/F");
-   valideltree->Branch("valid_elesigmaietaieta",&valid_elesigmaietaieta,"valid_elesigmaietaieta/F");
-   valideltree->Branch("valid_elerobusttight",&valid_elerobusttight,"valid_elerobusttight/I"); 
-   valideltree->Branch("valid_elerobustloose",&valid_elerobustloose,"valid_elerobustloose/I"); 
-   valideltree->Branch("valid_eletight",&valid_eletight,"valid_eletight/I"); 
-   valideltree->Branch("valid_eleloose",&valid_eleloose,"valid_eleloose/I"); 
-   
-   validjettree->Branch("run",&run,"run/I");
-   validjettree->Branch("event",&event,"event/I");
-   validjettree->Branch("valid_ElMult",&valid_ElMult,"valid_ElMult/I");
-   validjettree->Branch("valid_JetPt", &valid_JetPt, "valid_JetPt/F");
-   validjettree->Branch("valid_JetPhi", &valid_JetPhi, "valid_JetPhi/F");
-   validjettree->Branch("valid_JetEta", &valid_JetEta, "valid_JetEta/F");
-   validjettree->Branch("valid_JetCharge", &valid_JetCharge, "valid_JetCharge/F"); 
-   validjettree->Branch("valid_JetEl_DeltaR",valid_JetEl_DeltaR,"valid_JetEl_DeltaR[valid_ElMult]/F");
-   validjettree->Branch("valid_JetEmFrac",&valid_JetEmFrac,"valid_JetEmFrac/F");
-   
-   validel_EventTree->Branch("run",&run,"run/I");
-   validel_EventTree->Branch("event",&event,"event/I");
-   validel_EventTree->Branch("valid_ElMult",&valid_ElMult,"valid_ElMult/I");
-   validel_EventTree->Branch("valid_ElectronTrigger",&valid_ElectronTrigger,"valid_ElectronTrigger/I");
-   
-   validjet_EventTree->Branch("run",&run,"run/I");
-   validjet_EventTree->Branch("event",&event,"event/I");
-   validjet_EventTree->Branch("valid_JetMult",&valid_JetMult,"valid_JetMult/I");
-   validjet_EventTree->Branch("valid_JetMult_Pt10Cut",&valid_JetMult_Pt10Cut,"valid_JetMult_Pt10Cut/I");
-   validjet_EventTree->Branch("valid_JetTrigger",&valid_JetTrigger,"valid_JetTrigger/I"); 
-   
    
    zeetree->Branch("run",&run,"run/I");
    zeetree->Branch("event",&event,"event/I");
+   zeetree->Branch("lumi",&lumi,"lumi/I");
+   
+   zeetree->Branch("TrgBit",&TrgBit,"TrgBit/I");
+   zeetree->Branch("OneElTrgMatch",&OneElTrgMatch,"OneElTrgMatch/I");
+   zeetree->Branch("TRG_Photon15",&TRG_Photon15,"TRG_Photon15/I");
+   zeetree->Branch("TRG_Ele15",&TRG_Ele15,"TRG_Ele15/I");
+   
    zeetree->Branch("weight", &_weight, "weight/F");
+   
    //quantities at generator level 
    zeetree->Branch("ptzgen",&ptzgen,"ptzgen/F");
    zeetree->Branch("etazgen",&etazgen,"etazgen/F");
@@ -178,7 +132,7 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    zeetree->Branch("numberOfZ",&numberOfZ,"numberOfZ/I");
    zeetree->Branch("nelesall",&nelesall,"nelesall/I");
    zeetree->Branch("neles",&neles,"neles/I");
-   zeetree->Branch("loosezmass",&loosezmass,"loosezmass/F");
+   zeetree->Branch("zmass",&zmass,"zmass/F");
    zeetree->Branch("zmass_AllCuts",&zmass_AllCuts,"zmass_AllCuts/F");
    zeetree->Branch("zpt",&zpt,"zpt/F");
    zeetree->Branch("zeta",&zeta,"zeta/F");
@@ -229,28 +183,54 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    zeetree->Branch("eletight2",&eletight2,"eletight2/I"); 
    zeetree->Branch("eleloose2",&eleloose2,"eleloose2/I"); 
 
-   zeetree->Branch("njetsele",&njetsele,"njetsele/I");   
-   zeetree->Branch("jetpt1",&jetpt1,"jetpt1/F");
-   zeetree->Branch("jeteta1",&jeteta1,"jeteta1/F");
-   zeetree->Branch("jetphi1",&jetphi1,"jetphi1/F");
-   zeetree->Branch("jetcharge1",&jetcharge1,"jetcharge1/F");
-   zeetree->Branch("jetDeltaRa1",&jetDeltaRa1,"jetDeltaRa1/F");
-   zeetree->Branch("jetDeltaRb1",&jetDeltaRb1,"jetDeltaRb1/F");
-   zeetree->Branch("jetEmFrac1",&jetEmFrac1,"jetEmFrac1/F");
-   zeetree->Branch("jetpt2",&jetpt2,"jetpt2/F");
-   zeetree->Branch("jeteta2",&jeteta2,"jeteta2/F");
-   zeetree->Branch("jetphi2",&jetphi2,"jetphi2/F");
-   zeetree->Branch("jetcharge2",&jetcharge2,"jetcharge2/F");
-   zeetree->Branch("jetDeltaRa2",&jetDeltaRa2,"jetDeltaRa2/F");
-   zeetree->Branch("jetDeltaRb2",&jetDeltaRb2,"jetDeltaRb2/F");
-   zeetree->Branch("jetEmFrac2",&jetEmFrac2,"jetEmFrac2/F");
-   zeetree->Branch("jetpt3",&jetpt3,"jetpt3/F");
-   zeetree->Branch("jeteta3",&jeteta3,"jeteta3/F");
-   zeetree->Branch("jetphi3",&jetphi3,"jetphi3/F");
-   zeetree->Branch("jetcharge3",&jetcharge3,"jetcharge3/F");
-   zeetree->Branch("jetDeltaRa3",&jetDeltaRa3,"jetDeltaRa3/F");
-   zeetree->Branch("jetDeltaRb3",&jetDeltaRb3,"jetDeltaRb3/F");
-   zeetree->Branch("jetEmFrac3",&jetEmFrac3,"jetEmFrac3/F");
+   zeetree->Branch("ncalojetsele",&ncalojetsele,"ncalojetsele/I");  
+   zeetree->Branch("calojetet1",&calojetet1,"calojetet1/F"); 
+   zeetree->Branch("calojetpt1",&calojetpt1,"calojetpt1/F");
+   zeetree->Branch("calojeteta1",&calojeteta1,"calojeteta1/F");
+   zeetree->Branch("calojetphi1",&calojetphi1,"calojetphi1/F");
+   zeetree->Branch("calojetcharge1",&calojetcharge1,"calojetcharge1/F");
+   zeetree->Branch("calojetDeltaRa1",&calojetDeltaRa1,"calojetDeltaRa1/F");
+   zeetree->Branch("calojetDeltaRb1",&calojetDeltaRb1,"calojetDeltaRb1/F");
+   zeetree->Branch("calojetEmFrac1",&calojetEmFrac1,"calojetEmFrac1/F");
+   zeetree->Branch("calojetet2",&calojetet2,"calojetet2/F"); 
+   zeetree->Branch("calojetpt2",&calojetpt2,"calojetpt2/F");
+   zeetree->Branch("calojeteta2",&calojeteta2,"calojeteta2/F");
+   zeetree->Branch("calojetphi2",&calojetphi2,"calojetphi2/F");
+   zeetree->Branch("calojetcharge2",&calojetcharge2,"calojetcharge2/F");
+   zeetree->Branch("calojetDeltaRa2",&calojetDeltaRa2,"calojetDeltaRa2/F");
+   zeetree->Branch("calojetDeltaRb2",&calojetDeltaRb2,"calojetDeltaRb2/F");
+   zeetree->Branch("calojetEmFrac2",&calojetEmFrac2,"calojetEmFrac2/F");
+   zeetree->Branch("calojetet3",&calojetet3,"calojetet3/F"); 
+   zeetree->Branch("calojetpt3",&calojetpt3,"calojetpt3/F");
+   zeetree->Branch("calojeteta3",&calojeteta3,"calojeteta3/F");
+   zeetree->Branch("calojetphi3",&calojetphi3,"calojetphi3/F");
+   zeetree->Branch("calojetcharge3",&calojetcharge3,"calojetcharge3/F");
+   zeetree->Branch("calojetDeltaRa3",&calojetDeltaRa3,"calojetDeltaRa3/F");
+   zeetree->Branch("calojetDeltaRb3",&calojetDeltaRb3,"calojetDeltaRb3/F");
+   zeetree->Branch("calojetEmFrac3",&calojetEmFrac3,"calojetEmFrac3/F");
+   
+   zeetree->Branch("npfjetsele",&npfjetsele,"npfjetsele/I");   
+   zeetree->Branch("pfjetet1",&pfjetet1,"pfjetet1/F"); 
+   zeetree->Branch("pfjetpt1",&pfjetpt1,"pfjetpt1/F");
+   zeetree->Branch("pfjeteta1",&pfjeteta1,"pfjeteta1/F");
+   zeetree->Branch("pfjetphi1",&pfjetphi1,"pfjetphi1/F");
+   zeetree->Branch("pfjetcharge1",&pfjetcharge1,"pfjetcharge1/F");
+   zeetree->Branch("pfjetDeltaRa1",&pfjetDeltaRa1,"pfjetDeltaRa1/F");
+   zeetree->Branch("pfjetDeltaRb1",&pfjetDeltaRb1,"pfjetDeltaRb1/F");
+   zeetree->Branch("pfjetet2",&pfjetet2,"pfjetet2/F"); 
+   zeetree->Branch("pfjetpt2",&pfjetpt2,"pfjetpt2/F");
+   zeetree->Branch("pfjeteta2",&pfjeteta2,"pfjeteta2/F");
+   zeetree->Branch("pfjetphi2",&pfjetphi2,"pfjetphi2/F");
+   zeetree->Branch("pfjetcharge2",&pfjetcharge2,"pfjetcharge2/F");
+   zeetree->Branch("pfjetDeltaRa2",&pfjetDeltaRa2,"pfjetDeltaRa2/F");
+   zeetree->Branch("pfjetDeltaRb2",&pfjetDeltaRb2,"pfjetDeltaRb2/F");
+   zeetree->Branch("pfjetet3",&pfjetet3,"pfjetet3/F"); 
+   zeetree->Branch("pfjetpt3",&pfjetpt3,"pfjetpt3/F");
+   zeetree->Branch("pfjeteta3",&pfjeteta3,"pfjeteta3/F");
+   zeetree->Branch("pfjetphi3",&pfjetphi3,"pfjetphi3/F");
+   zeetree->Branch("pfjetcharge3",&pfjetcharge3,"pfjetcharge3/F");
+   zeetree->Branch("pfjetDeltaRa3",&pfjetDeltaRa3,"pfjetDeltaRa3/F");
+   zeetree->Branch("pfjetDeltaRb3",&pfjetDeltaRb3,"pfjetDeltaRb3/F");
 
    cout << "RecoElectronNtuple: ntuple eletree created " << endl;
    
@@ -295,42 +275,11 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    
    run=-1;
    event=-1;
-   
-   valid_ElPt=-99.;
-   valid_ElPhi=-99.;
-   valid_ElEta=-99.;
-   valid_ElCharge=-99.;
-   valid_elehcaliso=-99.;
-   valid_eleecaliso=-99.;
-   valid_eletrackiso=-99.;
-   valid_elereliso=-99.;
-   valid_elechisq=-99.;
-   valid_elenhits=-1;
-   valid_eledB=-99.;
-   valid_elefbrem=-99.;
-   valid_eledeltaeta=-99.;
-   valid_eledeltaphi=-99.;
-   valid_eleHadronicOvEm=-99.;
-   valid_eleHcalOvEcal=-99.;
-   valid_eleEovP=-99.;
-   valid_elesigmaetaeta=-99.;
-   valid_elesigmaietaieta=-99.;
-   valid_elerobusttight=-1;
-   valid_elerobustloose=-1;
-   valid_eletight=-1;
-   valid_eleloose=-1;
-   
-   valid_JetMult=-1;
-   valid_JetMult_Pt10Cut=-1;
-   valid_ElMult=-1;
-   
-   valid_JetPt=-99.;
-   valid_JetPhi=-99.;
-   valid_JetEta=-99.;
-   valid_JetCharge=-99.;
-   valid_JetEmFrac=-99;
-   for(unsigned i = 0; i != 500; i++){
-   valid_JetEl_DeltaR[i]=-99;}
+   lumi=-1;
+   TrgBit=-1;
+   OneElTrgMatch=-1;
+   TRG_Photon15=-1;
+   TRG_Ele15=-1;
    
    ptzgen=-99.;
    etazgen=-99.;
@@ -368,7 +317,7 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    acc_jetgenphi3=-99.;
    acc_jetgencharge3=-99.;
 
-      loosezmass=-99.;
+      zmass=-99.;
       zmass_AllCuts=-99.;
       zpt=-99.;
       zeta=-99.;
@@ -421,29 +370,54 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
       nelesall = -1;
       neles = -1;
 
-      njetsele = -1;
-      jetpt1=-99.;
-      jeteta1=-99.;
-      jetphi1=-99.;
-      jetcharge1=-99.;
-      jetDeltaRa1=-99.;
-      jetDeltaRb1=-99.;
-      jetEmFrac1=-99.;
-      jetpt2=-99.;
-      jeteta2=-99.;
-      jetphi2=-99.;
-      jetcharge2=-99.;
-      jetDeltaRa2=-99.;
-      jetDeltaRb2=-99.;
-      jetEmFrac2=-99.;
-      jetpt3=-99.;
-      jeteta3=-99.;
-      jetphi3=-99.;
-      jetcharge3=-99.;
-      jetDeltaRa3=-99.;
-      jetDeltaRb3=-99.;
-      jetEmFrac3=-99.;
-
+      ncalojetsele = -1;
+      calojetet1=0.;
+      calojetpt1=-99.;
+      calojeteta1=-99.;
+      calojetphi1=-99.;
+      calojetcharge1=-99.;
+      calojetDeltaRa1=-99.;
+      calojetDeltaRb1=-99.;
+      calojetEmFrac1=-99.;
+      calojetet2=0.;
+      calojetpt2=-99.;
+      calojeteta2=-99.;
+      calojetphi2=-99.;
+      calojetcharge2=-99.;
+      calojetDeltaRa2=-99.;
+      calojetDeltaRb2=-99.;
+      calojetEmFrac2=-99.;
+      calojetet3=0.;
+      calojetpt3=-99.;
+      calojeteta3=-99.;
+      calojetphi3=-99.;
+      calojetcharge3=-99.;
+      calojetDeltaRa3=-99.;
+      calojetDeltaRb3=-99.;
+      calojetEmFrac3=-99.;
+      
+      npfjetsele = -1;
+      pfjetet1=0.;
+      pfjetpt1=-99.;
+      pfjeteta1=-99.;
+      pfjetphi1=-99.;
+      pfjetcharge1=-99.;
+      pfjetDeltaRa1=-99.;
+      pfjetDeltaRb1=-99.;
+      pfjetet2=0.;
+      pfjetpt2=-99.;
+      pfjeteta2=-99.;
+      pfjetphi2=-99.;
+      pfjetcharge2=-99.;
+      pfjetDeltaRa2=-99.;
+      pfjetDeltaRb2=-99.;
+      pfjetet3=0.;
+      pfjetpt3=-99.;
+      pfjeteta3=-99.;
+      pfjetphi3=-99.;
+      pfjetcharge3=-99.;
+      pfjetDeltaRa3=-99.;
+      pfjetDeltaRb3=-99.;
 
 }
 
@@ -462,6 +436,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    
    run       = iEvent.id().run();
    event     = iEvent.id().event();
+   lumi      = iEvent.luminosityBlock();
 
    // generators quantities
 
@@ -566,9 +541,11 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    fwlite::Handle<std::vector<reco::CompositeCandidate> > zrecHandle;
    zrecHandle.getByLabel(iEvent, "zeerec");
 
-   fwlite::Handle<std::vector<pat::Jet> > jetrecHandle;
-   if(_JetType=="CALO")jetrecHandle.getByLabel(iEvent, "selectedJets");
-   if(_JetType=="PF")jetrecHandle.getByLabel(iEvent, "selectedPFJets");
+   fwlite::Handle<std::vector<pat::Jet> > calojetrecHandle;
+   calojetrecHandle.getByLabel(iEvent, "selectedJets");
+   
+   fwlite::Handle<std::vector<pat::Jet> > pfjetrecHandle;
+   pfjetrecHandle.getByLabel(iEvent, "selectedPFJets");
 
    fwlite::Handle<pat::TriggerEvent> triggerHandle;
    triggerHandle.getByLabel(iEvent, "patTriggerEvent");
@@ -576,79 +553,20 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    numberOfZ=zrecHandle->size();
    nelesall=electronHandle->size();    // all electrons with loose cuts
    
-   //Validation Trees
-   
-   std::vector<const pat::Jet*> jetspt10cut;
-   for(unsigned int i = 0; i < jetrecHandle->size(); i++){     
-   if((*jetrecHandle)[i].pt())jetspt10cut.push_back(&(*jetrecHandle)[i]);}
-   
-   valid_ElMult = electronHandle->size();
-   valid_JetMult = jetrecHandle->size();
-   valid_JetMult_Pt10Cut = jetspt10cut.size();
-   
-   if(isElectronTriggered(*triggerHandle))valid_ElectronTrigger = 1;
-   
-   if(isJetTriggered(*triggerHandle))valid_JetTrigger = 1;
- 
-   validel_EventTree->Fill();
-   validjet_EventTree->Fill();
-   
-   for(unsigned i = 0; i != electronHandle->size(); i++){
-   
-   const reco::GsfTrackRef valid_eltrack_ref = (*electronHandle)[i].gsfTrack();
-   assert(valid_eltrack_ref.isNonnull());
-   const reco::GsfTrack valid_eltrack = *((*electronHandle)[i].gsfTrack());
-   
-   valid_ElPt = (*electronHandle)[i].pt();
-   valid_ElPhi = (*electronHandle)[i].phi();
-   valid_ElEta = (*electronHandle)[i].eta();
-   valid_ElCharge = (*electronHandle)[i].charge();
-   valid_elehcaliso=(*electronHandle)[i].hcalIso();
-   valid_eleecaliso=(*electronHandle)[i].ecalIso();
-   valid_eletrackiso=(*electronHandle)[i].trackIso();
-   valid_elereliso=((*electronHandle)[i].trackIso() + (*electronHandle)[i].ecalIso() + (*electronHandle)[i].hcalIso()) / (*electronHandle)[i].pt();
-   valid_elenhits=valid_eltrack.numberOfValidHits();
-   valid_elechisq=valid_eltrack.normalizedChi2();
-   valid_eledB=(*electronHandle)[i].dB();
-   valid_elefbrem=(*electronHandle)[i].fbrem();
-   valid_eledeltaeta=(*electronHandle)[i].deltaEtaSuperClusterTrackAtVtx();
-   valid_eledeltaphi=(*electronHandle)[i].deltaPhiSuperClusterTrackAtVtx();
-   valid_eleHadronicOvEm=(*electronHandle)[i].hadronicOverEm();
-   valid_eleHcalOvEcal=(*electronHandle)[i].hcalOverEcal();
-   valid_eleEovP=(*electronHandle)[i].eSuperClusterOverP();
-   valid_elesigmaetaeta=(*electronHandle)[i].sigmaEtaEta();
-   valid_elesigmaietaieta=(*electronHandle)[i].sigmaIetaIeta();
-   if((*electronHandle)[i].isElectronIDAvailable("eidRobustTight") && (*electronHandle)[i].electronID("eidRobustTight")) valid_elerobusttight=1;
-   if((*electronHandle)[i].isElectronIDAvailable("eidRobustLoose") && (*electronHandle)[i].electronID("eidRobustLoose")) valid_elerobustloose=1;
-   if((*electronHandle)[i].isElectronIDAvailable("eidTight") && (*electronHandle)[i].electronID("eidTight")) valid_eletight=1;
-   if((*electronHandle)[i].isElectronIDAvailable("eidLoose") && (*electronHandle)[i].electronID("eidLoose")) valid_eleloose=1;
-      
-   valideltree->Fill();
-   }
-   
-   for(unsigned i = 0; i != jetrecHandle->size(); i++){
-   
-   valid_JetPt = (*jetrecHandle)[i].pt();
-   valid_JetPhi = (*jetrecHandle)[i].phi();
-   valid_JetEta = (*jetrecHandle)[i].eta();
-   valid_JetCharge = (*jetrecHandle)[i].charge();
-   if(_JetType=="CALO")valid_JetEmFrac= (*jetrecHandle)[i].emEnergyFraction();
-   for(unsigned n = 0; n != electronHandle->size(); n++){valid_JetEl_DeltaR[n]=Delta_R((*electronHandle)[n], (*jetrecHandle)[i]);}
-   
-   validjettree->Fill();
-   }
-   
    // Z REC events
    
    if(zrecHandle->size()){
 
-     std::vector<const pat::Jet*> recjets = GetJets<pat::Jet>(*jetrecHandle);
-     std::vector<const pat::Jet*> isorecjets;
-     std::vector<const pat::Jet*> notisorecjets;
+     std::vector<const pat::Jet*> calorecjets = GetJets<pat::Jet>(*calojetrecHandle);
+     std::vector<const pat::Jet*> pfrecjets = GetJets<pat::Jet>(*pfjetrecHandle);
+     
+     std::vector<const pat::Jet*> caloisorecjets;
+     std::vector<const pat::Jet*> pfisorecjets;
       
-     for(unsigned int i = 0; i < recjets.size(); i++){     
-     if(IsoJet((*zrecHandle)[0],*recjets[i],"RECO"))isorecjets.push_back(recjets[i]);
-     if(!IsoJet((*zrecHandle)[0],*recjets[i],"RECO"))notisorecjets.push_back(recjets[i]);}
+     for(unsigned int i = 0; i < calorecjets.size(); i++){     
+     if(IsoJet((*zrecHandle)[0],*calorecjets[i],"RECO"))caloisorecjets.push_back(calorecjets[i]);}
+     for(unsigned int i = 0; i < pfrecjets.size(); i++){     
+     if(IsoJet((*zrecHandle)[0],*pfrecjets[i],"RECO"))pfisorecjets.push_back(pfrecjets[i]);}
    
      std::vector<const pat::Electron*> zrecdaughters = ZRECDaughters((*zrecHandle)[0]);
      const pat::Electron *recdau0 = 0;
@@ -667,6 +585,19 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
 
    // loose cuts, only acceptance cuts
    
+   if(isTriggerAvailable(*triggerHandle, "HLT_Photon15_L1R"))TRG_Photon15=1;
+   if(isTriggerAvailable(*triggerHandle, "HLT_Ele15_LW_L1R"))TRG_Ele15=1;
+   
+   if(isElTriggerAvailable(*triggerHandle)){
+   TrgBit=0;
+   if(isElectronTriggered(*triggerHandle)){
+   TrgBit=1;
+   if(RecSelected_TrgMatch(*recdau0)||RecSelected_TrgMatch(*recdau1)){
+   OneElTrgMatch=1;
+   }
+   }
+   }
+   
    if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle)){
    
       const reco::GsfTrackRef& track0 = recdau0->gsfTrack();
@@ -675,7 +606,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
 
       // fill variables for ntuple
       
-      loosezmass=(*zrecHandle)[0].mass();
+      zmass=(*zrecHandle)[0].mass();
       zpt=(*zrecHandle)[0].pt();
       zeta=(*zrecHandle)[0].eta();
       zphi=(*zrecHandle)[0].phi();
@@ -736,37 +667,68 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
       if(recdau1->isElectronIDAvailable("eidLoose") && 
 	  recdau1->electronID("eidLoose")) eleloose2=1;
      
-         njetsele=isorecjets.size();
+         ncalojetsele=caloisorecjets.size();
+         npfjetsele=pfisorecjets.size();
          
       // fill ntuples for jets
       
-      if (isorecjets.size()>0){
-        jetpt1=isorecjets[0]->pt();
-        jeteta1=isorecjets[0]->eta();
-        jetphi1=isorecjets[0]->phi();
-        jetcharge1=isorecjets[0]->jetCharge();
-        jetDeltaRa1=Delta_R(*recdau0, *isorecjets[0]);
-        jetDeltaRb1=Delta_R(*recdau1, *isorecjets[0]);
-	if(_JetType=="CALO")jetEmFrac1=isorecjets[0]->emEnergyFraction();
+      if (caloisorecjets.size()>0){
+        calojetet1=caloisorecjets[0]->et();
+        calojetpt1=caloisorecjets[0]->pt();
+        calojeteta1=caloisorecjets[0]->eta();
+        calojetphi1=caloisorecjets[0]->phi();
+        calojetcharge1=caloisorecjets[0]->jetCharge();
+        calojetDeltaRa1=Delta_R(*recdau0, *caloisorecjets[0]);
+        calojetDeltaRb1=Delta_R(*recdau1, *caloisorecjets[0]);
+	calojetEmFrac1=caloisorecjets[0]->emEnergyFraction();
       }
-      if (isorecjets.size()>1){
-        jetpt2=isorecjets[1]->pt();
-        jeteta2=isorecjets[1]->eta();
-        jetphi2=isorecjets[1]->phi();
-        jetcharge2=isorecjets[1]->jetCharge();
-        jetDeltaRa2=Delta_R(*recdau0, *isorecjets[1]);
-        jetDeltaRb2=Delta_R(*recdau1, *isorecjets[1]);
-	if(_JetType=="CALO")jetEmFrac2=isorecjets[1]->emEnergyFraction();
+      if (caloisorecjets.size()>1){
+        calojetet2=caloisorecjets[1]->et();
+        calojetpt2=caloisorecjets[1]->pt();
+        calojeteta2=caloisorecjets[1]->eta();
+        calojetphi2=caloisorecjets[1]->phi();
+        calojetcharge2=caloisorecjets[1]->jetCharge();
+        calojetDeltaRa2=Delta_R(*recdau0, *caloisorecjets[1]);
+        calojetDeltaRb2=Delta_R(*recdau1, *caloisorecjets[1]);
+	calojetEmFrac2=caloisorecjets[1]->emEnergyFraction();
       }
-      if (isorecjets.size()>2){
-        jetpt3=isorecjets[2]->pt();
-        jeteta3=isorecjets[2]->eta();
-        jetphi3=isorecjets[2]->phi();
-        jetcharge3=isorecjets[2]->jetCharge();
-        jetDeltaRa3=Delta_R(*recdau0, *isorecjets[2]);
-        jetDeltaRb3=Delta_R(*recdau1, *isorecjets[2]);
-	if(_JetType=="CALO")jetEmFrac3=isorecjets[2]->emEnergyFraction();
-
+      if (caloisorecjets.size()>2){
+        calojetet3=caloisorecjets[2]->et();
+        calojetpt3=caloisorecjets[2]->pt();
+        calojeteta3=caloisorecjets[2]->eta();
+        calojetphi3=caloisorecjets[2]->phi();
+        calojetcharge3=caloisorecjets[2]->jetCharge();
+        calojetDeltaRa3=Delta_R(*recdau0, *caloisorecjets[2]);
+        calojetDeltaRb3=Delta_R(*recdau1, *caloisorecjets[2]);
+	calojetEmFrac3=caloisorecjets[2]->emEnergyFraction();
+      }
+      
+      if (pfisorecjets.size()>0){
+        pfjetet1=pfisorecjets[0]->et();
+        pfjetpt1=pfisorecjets[0]->pt();
+        pfjeteta1=pfisorecjets[0]->eta();
+        pfjetphi1=pfisorecjets[0]->phi();
+        pfjetcharge1=pfisorecjets[0]->jetCharge();
+        pfjetDeltaRa1=Delta_R(*recdau0, *pfisorecjets[0]);
+        pfjetDeltaRb1=Delta_R(*recdau1, *pfisorecjets[0]);
+      }
+      if (pfisorecjets.size()>1){
+        pfjetet2=pfisorecjets[1]->et();
+        pfjetpt2=pfisorecjets[1]->pt();
+        pfjeteta2=pfisorecjets[1]->eta();
+        pfjetphi2=pfisorecjets[1]->phi();
+        pfjetcharge2=pfisorecjets[1]->jetCharge();
+        pfjetDeltaRa2=Delta_R(*recdau0, *pfisorecjets[1]);
+        pfjetDeltaRb2=Delta_R(*recdau1, *pfisorecjets[1]);
+      }
+      if (pfisorecjets.size()>2){
+        pfjetet3=pfisorecjets[2]->et();
+        pfjetpt3=pfisorecjets[2]->pt();
+        pfjeteta3=pfisorecjets[2]->eta();
+        pfjetphi3=pfisorecjets[2]->phi();
+        pfjetcharge3=pfisorecjets[2]->jetCharge();
+        pfjetDeltaRa3=Delta_R(*recdau0, *pfisorecjets[2]);
+        pfjetDeltaRb3=Delta_R(*recdau1, *pfisorecjets[2]);
       }
       
       } // endif loose selected Z

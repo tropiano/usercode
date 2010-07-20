@@ -24,21 +24,9 @@ public :
 
    void zero_ntuple();
 
-   // added a simple tree  EG 12.10.09
    TTree *zeetree;
-   TTree *valideltree;
-   TTree *validjettree;
-   TTree *validel_EventTree;
-   TTree *validjet_EventTree;
    
-   Float_t valid_ElPt, valid_ElPhi, valid_ElEta, valid_ElCharge, valid_elehcaliso, valid_eleecaliso, valid_eletrackiso, valid_elereliso, valid_elechisq, valid_eledB, valid_elefbrem, valid_eledeltaeta, valid_eledeltaphi, valid_eleHadronicOvEm, valid_eleHcalOvEcal, valid_eleEovP, valid_elesigmaetaeta, valid_elesigmaietaieta;
-   
-   Float_t valid_JetPt, valid_JetPhi, valid_JetEta, valid_JetCharge, valid_JetEmFrac;
-   Float_t valid_JetEl_DeltaR[500];
-   
-   Int_t valid_elenhits, valid_elerobusttight, valid_elerobustloose, valid_eleloose, valid_eletight, valid_ElMult, valid_JetMult_Pt10Cut, valid_JetMult, valid_ElectronTrigger, valid_JetTrigger;
-   
-   Int_t event, run;
+   Int_t event, run, lumi, TrgBit, OneElTrgMatch, TRG_Photon15, TRG_Ele15;
    
    Float_t ptzgen, etazgen, phizgen, zmassgen;
    Float_t elegenpt1, elegeneta1, elegenphi1;
@@ -47,11 +35,11 @@ public :
    Float_t acc_ptzgen, acc_etazgen, acc_phizgen, acc_zmassgen;
    Float_t acc_elegenpt1, acc_elegeneta1, acc_elegenphi1;
    Float_t acc_elegenpt2, acc_elegeneta2, acc_elegenphi2;
-   //
-   Float_t loosezmass, zmass_AllCuts, zpt, zeta, zphi;
-   // loosezmass>0. is a loose recostructed Z, only reconstructed mass cut
-   // zmass>0. is a good recostructed Z, all cuts except electron ID
-   Int_t numberOfZ, nelesall, neles, njetsele;
+   
+   Float_t zmass, zmass_AllCuts, zpt, zeta, zphi;
+  
+   Int_t numberOfZ, nelesall, neles, ncalojetsele, npfjetsele;
+   
    Float_t elept1,eleeta1,elephi1,elept2,eleeta2,elephi2;
    Float_t elecharge1,eledB1,elefbrem1,eledeltaeta1,eledeltaphi1,eleHovE1,
      eleHovE1other,eleEovP1,elesigmaetaeta1,elesigmaietaieta1; 
@@ -68,10 +56,14 @@ public :
    Float_t acc_jetgenpt1,acc_jetgeneta1,acc_jetgenphi1,acc_jetgencharge1;
    Float_t acc_jetgenpt2,acc_jetgeneta2,acc_jetgenphi2,acc_jetgencharge2;
    Float_t acc_jetgenpt3,acc_jetgeneta3,acc_jetgenphi3,acc_jetgencharge3;
-   Float_t jetpt1,jeteta1,jetphi1,jetcharge1,jetDeltaRa1,jetDeltaRb1,jetEmFrac1;
-   Float_t jetpt2,jeteta2,jetphi2,jetcharge2,jetDeltaRa2,jetDeltaRb2,jetEmFrac2;
-   Float_t jetpt3,jeteta3,jetphi3,jetcharge3,jetDeltaRa3,jetDeltaRb3,jetEmFrac3;
-
+   
+   Float_t calojetet1,calojetpt1,calojeteta1,calojetphi1,calojetcharge1,calojetDeltaRa1,calojetDeltaRb1,calojetEmFrac1;
+   Float_t calojetet2,calojetpt2,calojeteta2,calojetphi2,calojetcharge2,calojetDeltaRa2,calojetDeltaRb2,calojetEmFrac2;
+   Float_t calojetet3,calojetpt3,calojeteta3,calojetphi3,calojetcharge3,calojetDeltaRa3,calojetDeltaRb3,calojetEmFrac3;
+   
+   Float_t pfjetet1,pfjetpt1,pfjeteta1,pfjetphi1,pfjetcharge1,pfjetDeltaRa1,pfjetDeltaRb1;
+   Float_t pfjetet2,pfjetpt2,pfjeteta2,pfjetphi2,pfjetcharge2,pfjetDeltaRa2,pfjetDeltaRb2;
+   Float_t pfjetet3,pfjetpt3,pfjeteta3,pfjetphi3,pfjetcharge3,pfjetDeltaRa3,pfjetDeltaRb3;
 
    // counters
    

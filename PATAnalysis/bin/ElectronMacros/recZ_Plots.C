@@ -107,6 +107,15 @@ string Tab_cut = "True";
 	//tabella cut
 	int cut_decimal = 10000;
 	string Tabcut_title = "Cut level = ";
+	string Tabcut_ZMass = "Z Mass Mean = ";
+	string Tabcut_ZMass_err = "Z Mass Mean error = ";
+	string Tabcut_ZMass_um = " GeV/c²";
+	string Tabcut_ZPt = "Z Pt Mean = ";
+	string Tabcut_ZPt_err = "Z Pt Mean error = ";
+	string Tabcut_ZPt_um = " GeV/c";
+	string Tabcut_ZEta = "Z Eta Mean = ";
+	string Tabcut_ZEta_err = "Z Eta Mean error = ";
+	string Tabcut_ZEta_um = " ";
 	string Tabcut_QCD_EMEnriched_all_Int = "QCD EM Enriched (PYTHIA6) Integral = ";
 	string Tabcut_QCD_EMEnriched_all_Int_err = "QCD EM Enriched (PYTHIA6) Integral error = ";
 	string Tabcut_QCD_BCtoE_all_Int = "QCD QCD b,c-> e (PYTHIA6) Integral = ";
@@ -221,6 +230,9 @@ string asseY_name_Cartella2a_recPtZ = Form("Events/(%.0f GeV/c)", 1.0*rebin_recP
 string asseX_name_Cartella2a_recEtaZ = "Reconstructed Z #eta";
 string asseY_name_Cartella2a_recEtaZ = Form("Events/(%.1f)",0.2*rebin_recEtaZ); //bins da 0.2
 
+//tabella cut
+string Tabcut_Mean, Tabcut_Mean_err, Tabcut_Mean_um;
+
 TDirectory *Dir_1;
 Dir_1 = outplots->mkdir(cartella1.c_str());
 Dir_1->cd();
@@ -262,7 +274,10 @@ if(b==1){cartellaplot = grafico_name_Cartella2a_recMassZ;
 	 nminX = nminX_recMassZ;
 	 nmaxX = nmaxX_recMassZ;
 	 nminY = nminY_recMassZ;
-	 nmaxY = nmaxY_recMassZ;}
+	 nmaxY = nmaxY_recMassZ;
+	 Tabcut_Mean = Tabcut_ZMass;
+	 Tabcut_Mean_err = Tabcut_ZMass_err; 
+	 Tabcut_Mean_um = Tabcut_ZMass_um;}
 
 else if(b==2){cartellaplot = grafico_name_Cartella2a_recPtZ;
 	      grafico_name = grafico_name_Cartella2a_recPtZ;
@@ -272,7 +287,10 @@ else if(b==2){cartellaplot = grafico_name_Cartella2a_recPtZ;
 	      nminX = nminX_recPtZ;
 	      nmaxX = nmaxX_recPtZ;
 	      nminY = nminY_recPtZ;
-	      nmaxY = nmaxY_recPtZ;}
+	      nmaxY = nmaxY_recPtZ;
+	      Tabcut_Mean = Tabcut_ZPt;
+	      Tabcut_Mean_err = Tabcut_ZPt_err; 
+	      Tabcut_Mean_um = Tabcut_ZPt_um;}
 
 else if(b==3){cartellaplot = grafico_name_Cartella2a_recEtaZ;
 	      grafico_name = grafico_name_Cartella2a_recEtaZ;
@@ -282,7 +300,10 @@ else if(b==3){cartellaplot = grafico_name_Cartella2a_recEtaZ;
 	      nminX = nminX_recEtaZ;
 	      nmaxX = nmaxX_recEtaZ;
 	      nminY = nminY_recEtaZ;
-	      nmaxY = nmaxY_recEtaZ;}
+	      nmaxY = nmaxY_recEtaZ;
+	      Tabcut_Mean = Tabcut_ZEta;
+	      Tabcut_Mean_err = Tabcut_ZEta_err; 
+	      Tabcut_Mean_um = Tabcut_ZEta_um;}
 
 
 TDirectory *Dir_3;
@@ -517,6 +538,9 @@ Dir_4a->cd();
 	double err_QCD_EMEnriched_all_1, err_QCD_BCtoE_all_1, err_TTbar_1, err_W_1, err_Z_1, err_Data_1;
 	
 	cut<<endl<<Tabcut_title.c_str()<<c_name.c_str()<<endl;
+	cut<<endl<< Tabcut_Mean.c_str() <<((float)((int)(histoData_1->GetMean(1)*cut_decimal)))/cut_decimal<< Tabcut_Mean_um.c_str()<<endl;
+	cut<< Tabcut_Mean_err.c_str() <<((float)((int)(histoData_1->GetMeanError()*cut_decimal)))/cut_decimal<<Tabcut_Mean_um.c_str()<<endl;
+	cut<<endl<<Tabcut_riga.c_str()<<endl;
 	cut<<endl<<Tabcut_QCD_EMEnriched_all_Int.c_str()<<((float)((int)(histoQCD_EMEnriched_all_1->IntegralAndError(0,-1,err_QCD_EMEnriched_all_1,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_QCD_EMEnriched_all_Int_err.c_str()<<((float)((int)(err_QCD_EMEnriched_all_1*cut_decimal)))/cut_decimal<<endl<<endl;
 	cut<<Tabcut_QCD_BCtoE_all_Int.c_str()<<((float)((int)(histoQCD_BCtoE_all_1->IntegralAndError(0,-1,err_QCD_BCtoE_all_1,"")*cut_decimal)))/cut_decimal<<endl;
@@ -603,6 +627,9 @@ Dir_4a->cd();
 	double err_QCD_EMEnriched_all_12, err_QCD_BCtoE_all_12, err_TTbar_12, err_W_12, err_Z_12, err_Data_12;
 	
 	cut<<endl<<Tabcut_title.c_str()<<c_name.c_str()<<endl;
+	cut<<endl<< Tabcut_Mean.c_str() <<((float)((int)(histoData_12->GetMean(1)*cut_decimal)))/cut_decimal<< Tabcut_Mean_um.c_str()<<endl;
+	cut<< Tabcut_Mean_err.c_str() <<((float)((int)(histoData_12->GetMeanError()*cut_decimal)))/cut_decimal<<Tabcut_Mean_um.c_str()<<endl;
+	cut<<endl<<Tabcut_riga.c_str()<<endl;
 	cut<<endl<<Tabcut_QCD_EMEnriched_all_Int.c_str()<<((float)((int)(histoQCD_EMEnriched_all_12->IntegralAndError(0,-1,err_QCD_EMEnriched_all_12,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_QCD_EMEnriched_all_Int_err.c_str()<<((float)((int)(err_QCD_EMEnriched_all_12*cut_decimal)))/cut_decimal<<endl<<endl;
 	cut<<Tabcut_QCD_BCtoE_all_Int.c_str()<<((float)((int)(histoQCD_BCtoE_all_12->IntegralAndError(0,-1,err_QCD_BCtoE_all_12,"")*cut_decimal)))/cut_decimal<<endl;
@@ -691,6 +718,9 @@ Dir_4a->cd();
 	double err_QCD_EMEnriched_all_123, err_QCD_BCtoE_all_123, err_TTbar_123, err_W_123, err_Z_123, err_Data_123;
 	
 	cut<<endl<<Tabcut_title.c_str()<<c_name.c_str()<<endl;
+	cut<<endl<< Tabcut_Mean.c_str() <<((float)((int)(histoData_123->GetMean(1)*cut_decimal)))/cut_decimal<< Tabcut_Mean_um.c_str()<<endl;
+	cut<< Tabcut_Mean_err.c_str() <<((float)((int)(histoData_123->GetMeanError()*cut_decimal)))/cut_decimal<<Tabcut_Mean_um.c_str()<<endl;
+	cut<<endl<<Tabcut_riga.c_str()<<endl;
 	cut<<endl<<Tabcut_QCD_EMEnriched_all_Int.c_str()<<((float)((int)(histoQCD_EMEnriched_all_123->IntegralAndError(0,-1,err_QCD_EMEnriched_all_123,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_QCD_EMEnriched_all_Int_err.c_str()<<((float)((int)(err_QCD_EMEnriched_all_123*cut_decimal)))/cut_decimal<<endl<<endl;
 	cut<<Tabcut_QCD_BCtoE_all_Int.c_str()<<((float)((int)(histoQCD_BCtoE_all_123->IntegralAndError(0,-1,err_QCD_BCtoE_all_123,"")*cut_decimal)))/cut_decimal<<endl;
@@ -780,6 +810,9 @@ Dir_4a->cd();
 	double err_QCD_EMEnriched_all_1234, err_QCD_BCtoE_all_1234, err_TTbar_1234, err_W_1234, err_Z_1234, err_Data_1234;
 	
 	cut<<endl<<Tabcut_title.c_str()<<c_name.c_str()<<endl;
+	cut<<endl<< Tabcut_Mean.c_str() <<((float)((int)(histoData_1234->GetMean(1)*cut_decimal)))/cut_decimal<< Tabcut_Mean_um.c_str()<<endl;
+	cut<< Tabcut_Mean_err.c_str() <<((float)((int)(histoData_1234->GetMeanError()*cut_decimal)))/cut_decimal<<Tabcut_Mean_um.c_str()<<endl;
+	cut<<endl<<Tabcut_riga.c_str()<<endl;
 	cut<<endl<<Tabcut_QCD_EMEnriched_all_Int.c_str()<<((float)((int)(histoQCD_EMEnriched_all_1234->IntegralAndError(0,-1,err_QCD_EMEnriched_all_1234,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_QCD_EMEnriched_all_Int_err.c_str()<<((float)((int)(err_QCD_EMEnriched_all_1234*cut_decimal)))/cut_decimal<<endl<<endl;
 	cut<<Tabcut_QCD_BCtoE_all_Int.c_str()<<((float)((int)(histoQCD_BCtoE_all_1234->IntegralAndError(0,-1,err_QCD_BCtoE_all_1234,"")*cut_decimal)))/cut_decimal<<endl;
@@ -870,6 +903,9 @@ Dir_4a->cd();
 	double err_QCD_EMEnriched_all_12345, err_QCD_BCtoE_all_12345, err_TTbar_12345, err_W_12345, err_Z_12345, err_Data_12345;
 	
 	cut<<endl<<Tabcut_title.c_str()<<c_name.c_str()<<endl;
+	cut<<endl<< Tabcut_Mean.c_str() <<((float)((int)(histoData_12345->GetMean(1)*cut_decimal)))/cut_decimal<< Tabcut_Mean_um.c_str()<<endl;
+	cut<< Tabcut_Mean_err.c_str() <<((float)((int)(histoData_12345->GetMeanError()*cut_decimal)))/cut_decimal<<Tabcut_Mean_um.c_str()<<endl;
+	cut<<endl<<Tabcut_riga.c_str()<<endl;
 	cut<<endl<<Tabcut_QCD_EMEnriched_all_Int.c_str()<<((float)((int)(histoQCD_EMEnriched_all_12345->IntegralAndError(0,-1,err_QCD_EMEnriched_all_12345,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_QCD_EMEnriched_all_Int_err.c_str()<<((float)((int)(err_QCD_EMEnriched_all_12345*cut_decimal)))/cut_decimal<<endl<<endl;
 	cut<<Tabcut_QCD_BCtoE_all_Int.c_str()<<((float)((int)(histoQCD_BCtoE_all_12345->IntegralAndError(0,-1,err_QCD_BCtoE_all_12345,"")*cut_decimal)))/cut_decimal<<endl;
@@ -960,6 +996,9 @@ Dir_4a->cd();
 	double err_QCD_EMEnriched_all_123456, err_QCD_BCtoE_all_123456, err_TTbar_123456, err_W_123456, err_Z_123456, err_Data_123456;
 	
 	cut<<endl<<Tabcut_title.c_str()<<c_name.c_str()<<endl;
+	cut<<endl<< Tabcut_Mean.c_str() <<((float)((int)(histoData_123456->GetMean(1)*cut_decimal)))/cut_decimal<< Tabcut_Mean_um.c_str()<<endl;
+	cut<< Tabcut_Mean_err.c_str() <<((float)((int)(histoData_123456->GetMeanError()*cut_decimal)))/cut_decimal<<Tabcut_Mean_um.c_str()<<endl;
+	cut<<endl<<Tabcut_riga.c_str()<<endl;
 	cut<<endl<<Tabcut_QCD_EMEnriched_all_Int.c_str()<<((float)((int)(histoQCD_EMEnriched_all_123456->IntegralAndError(0,-1,err_QCD_EMEnriched_all_123456,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_QCD_EMEnriched_all_Int_err.c_str()<<((float)((int)(err_QCD_EMEnriched_all_123456*cut_decimal)))/cut_decimal<<endl<<endl;
 	cut<<Tabcut_QCD_BCtoE_all_Int.c_str()<<((float)((int)(histoQCD_BCtoE_all_123456->IntegralAndError(0,-1,err_QCD_BCtoE_all_123456,"")*cut_decimal)))/cut_decimal<<endl;

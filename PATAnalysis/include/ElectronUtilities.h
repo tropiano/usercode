@@ -33,7 +33,7 @@ using namespace TMath;
 ////////////////////////////////// Selection Cuts ////////////////////////////////////////////////
 
 //Data-Spring10 TRIGGER
-static string ElectronTrigger = "HLT_Photon15_L1R";
+static string ElectronTrigger = "HLT_Ele15_LW_L1R";
 static string JetTrigger = "HLT_Jet30U";
 
 //Summer09 triggers
@@ -41,8 +41,8 @@ static string JetTrigger = "HLT_Jet30U";
 //static string JetTrigger = "HLT_Jet30";
 
 //Common cuts
-static double etaelcut = 2.4;
-static double eta_el_excl_up = 1.56;               //Excluded Eta region
+static double etaelcut = 2.5;
+static double eta_el_excl_up = 1.566;               //Excluded Eta region
 static double eta_el_excl_down = 1.4442;           //Excluded Eta region
 static double minnhit = 11.;
 static double maxchi2 = 10.;
@@ -60,8 +60,8 @@ static string eID_VPJ = "eidRobustLoose";
 
 // VPJ Tag cuts
 static double VPJ_TAG_ptelcut = 25.;    //Gev/c
-static double VPJ_TAG_etaelcut = 2.4;
-static double VPJ_TAG_eta_el_excl_up = 1.56;               //Excluded Eta region
+static double VPJ_TAG_etaelcut = 2.5;
+static double VPJ_TAG_eta_el_excl_up = 1.566;               //Excluded Eta region
 static double VPJ_TAG_eta_el_excl_down = 1.4442;           //Excluded Eta region
 static double VPJ_TAG_minnhit = 15.;
 static double VPJ_TAG_maxchi2 = 3.;
@@ -73,7 +73,7 @@ static string VPJ_TagEiD = "eidRobustLoose"; //if "" no EiD cut applied
 static double ptelcut0 = 20.;    //Gev/c
 static double ptelcut1 = 10.;
 static double zmassmin_vbtf = 60.;   //Gev/c^2
-static double zmassmax_vbtf = 110.;  //Gev/c^2
+static double zmassmax_vbtf = 120.;  //Gev/c^2
 
 //New cuts VBTF: tuned on Spring10. CombRelIso used. WP = 70/80 for dau0, 95 for dau1
 //// Dau0 - WP80 (80%)// EB
@@ -92,8 +92,8 @@ static double Dau0_CombIso_EE = 0.03;static double Dau0_sihih_EE = 0.03;static
 
 // VBTF0 Tag cuts (for soft electron probe)
 static double VBTF0_TAG_ptelcut = 20.;    //Gev/c
-static double VBTF0_TAG_etaelcut = 2.4;
-static double VBTF0_TAG_eta_el_excl_up = 1.56;               //Excluded Eta region
+static double VBTF0_TAG_etaelcut = 2.5;
+static double VBTF0_TAG_eta_el_excl_up = 1.566;               //Excluded Eta region
 static double VBTF0_TAG_eta_el_excl_down = 1.4442;           //Excluded Eta region
 static double VBTF0_TAG_minnhit = 0.;
 static double VBTF0_TAG_maxchi2 = 9999.;
@@ -103,8 +103,8 @@ static string VBTF0_TagEiD = ""; //if "" no EiD cut applied
 
 // VBTF1 Tag cuts (for hard electron probe)
 static double VBTF1_TAG_ptelcut = 10.;    //Gev/c
-static double VBTF1_TAG_etaelcut = 2.4;
-static double VBTF1_TAG_eta_el_excl_up = 1.56;               //Excluded Eta region
+static double VBTF1_TAG_etaelcut = 2.5;
+static double VBTF1_TAG_eta_el_excl_up = 1.566;               //Excluded Eta region
 static double VBTF1_TAG_eta_el_excl_down = 1.4442;           //Excluded Eta region
 static double VBTF1_TAG_minnhit = 0.;
 static double VBTF1_TAG_maxchi2 = 9999.;
@@ -115,6 +115,22 @@ static string VBTF1_TagEiD = ""; //if "" no EiD cut applied
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Trigger
+
+inline bool isTriggerAvailable(const pat::TriggerEvent& triggers, std::string triggername){
+  const pat::TriggerPath* path = triggers.path(triggername);
+  if(!path){
+  return false;
+  }else{
+  return true;}
+}
+
+inline bool isElTriggerAvailable(const pat::TriggerEvent& triggers){
+  const pat::TriggerPath* path = triggers.path(ElectronTrigger.c_str());
+  if(!path){
+  return false;
+  }else{
+  return true;}
+}
 
 inline bool isTriggered(const pat::TriggerEvent& triggers, std::string triggername){
   const pat::TriggerPath* path = triggers.path(triggername);
@@ -277,6 +293,18 @@ inline bool GenSelectedInAcceptance(const reco::CompositeCandidate ZGEN, string 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // REC SELECTION
+
+inline bool RecSelected_TrgMatch(const pat::Electron& Electron){
+
+const TriggerObjectStandAloneCollection MatchElectron = Electron.triggerObjectMatches();
+    
+if(MatchElectron.size()){
+return true;
+}else{
+return false;
+}
+
+}
   
 inline bool RecSelected(string Flag, const reco::CompositeCandidate ZREC, const pat::TriggerEvent& triggers){
   
@@ -314,7 +342,7 @@ inline bool RecSelected(string Flag, const reco::CompositeCandidate ZREC, const 
             (fabs(dau1->eta())<eta_el_excl_down || fabs(dau1->eta())>eta_el_excl_up);
          }
   else if(Flag=="_Trg"){
-  return isElectronTriggered(triggers);
+  return isElectronTriggered(triggers)&&(RecSelected_TrgMatch(*dau0)||RecSelected_TrgMatch(*dau1));
          }
   else if(Flag=="_Qual"){
   return track0->numberOfValidHits() > minnhit && track1->numberOfValidHits() > minnhit &&
@@ -384,18 +412,6 @@ inline bool RecSelected(string Flag, const reco::CompositeCandidate ZREC, const 
   
   }
   
-}
-
-inline bool RecSelected_TrgMatch(const pat::Electron& Electron){
-
-const TriggerObjectStandAloneCollection MatchElectron = Electron.triggerObjectMatches();
-    
-if(MatchElectron.size()){
-return true;
-}else{
-return false;
-}
-
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
