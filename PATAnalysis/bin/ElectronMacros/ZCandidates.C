@@ -32,12 +32,11 @@ void Tokenize(const string& str,
 
 void ZCandidates(){
 
-        TFile *data = TFile::Open("Data_17Jul.root");
-        string output = "ZCandReport.txt";
+        TFile *data = TFile::Open("Data_Zee_17Jul_all_PF30_Eta2e5_WP80_95_VBTF.root");
+        string output = "ZCandReport_17Jul.txt";
         
         ofstream outlist;
         outlist.open(output.c_str());
-        outlist<<endl;
         
         TTree *tree = (TTree*) data->Get("RecoElectronNtuple/ZeeTree");
         
@@ -46,66 +45,71 @@ void ZCandidates(){
         tree->SetScanField(0);    
         ((TTreePlayer*)(tree->GetPlayer()))->SetScanRedirect(true);
         ((TTreePlayer*)(tree->GetPlayer()))->SetScanFileName(t.c_str());
+ 
+        tree->Scan("run:lumi:event:zmass:elept1:eleeta1:elephi1:elefbrem1:elept2:eleeta2:elephi2:elefbrem2","zmass_AllCuts>0");
         
-        tree->Scan("run:lumi:event:zmass:ncalojetsele:calojetet1:calojetet2:calojetet3:npfjetsele:pfjetet1:pfjetet2:pfjetet3","zmass_AllCuts>0");
-     
+        outlist<<endl<<"Z candidates with electron properties"<<endl<<endl;
+        
         ifstream out1(t.c_str());       
         string s1;       
-        map<int,string> ordout1;
+        multimap<int,string> ordout1;
         int linecounter1 = 0;
         while(getline(out1,s1)){
         vector<string> *tokens = new vector<string>();
         if(linecounter1==0){
-        ordout1[1]=s1;
+        ordout1.insert(pair<int,string>(1,s1));
         }else{
         Tokenize(s1, tokens);
         vector<string>::iterator iter;
         int colcounter1 = 0;
         for(iter = tokens->begin(); iter!=tokens->end(); iter++){
-        if(colcounter1==3)ordout1[atoi(iter->c_str())]=s1;
+        if(colcounter1==3)ordout1.insert(pair<int,string>(atoi(iter->c_str()),s1));
         colcounter1++;}
         }
         linecounter1++;
         delete tokens;
         }
   
-        map<int,string>::iterator mapiter1;
+        multimap<int,string>::iterator mapiter1;
         for(mapiter1 = ordout1.begin(); mapiter1 != ordout1.end(); mapiter1++){
         outlist<<mapiter1->second<<endl;}
-        outlist<<endl<<endl;
-        
-        remove(t.c_str());
+        outlist<<endl;
    
-        tree->Scan("run:lumi:event:zmass:elept1:eleeta1:elephi1:elefbrem1:elept2:eleeta2:elephi2:elefbrem2","zmass_AllCuts>0");
+        tree->Scan("run:lumi:event:zmass:ncalojetsele:calojetet1:calojetet2:calojetet3:npfjetsele:pfjetet1:pfjetet2:pfjetet3","zmass_AllCuts>0");
+        
+        outlist<<endl<<"Z candidates with jet properties"<<endl<<endl;
         
         ifstream out2(t.c_str());       
         string s2;  
-        map<int,string> ordout2;
+        multimap<int,string> ordout2;
         int linecounter2 = 0;
+        int zcount = 0;
         while(getline(out2,s2)){
         vector<string> *tokens = new vector<string>();
         if(linecounter2==0){
-        ordout2[1]=s2;
+        ordout2.insert(pair<int,string>(1,s2));
         }else{
         Tokenize(s2, tokens);
         vector<string>::iterator iter;
         int colcounter2 = 0;
         for(iter = tokens->begin(); iter!=tokens->end(); iter++){
-        if(colcounter2==3)ordout2[atoi(iter->c_str())]=s2;
+        if(colcounter2==3){
+        ordout2.insert(pair<int,string>(atoi(iter->c_str()),s2));
+        zcount++;}
         colcounter2++;}
         }
         linecounter2++;
         delete tokens;
         }
   
-        map<int,string>::iterator mapiter2;
+        multimap<int,string>::iterator mapiter2;
         for(mapiter2 = ordout2.begin(); mapiter2 != ordout2.end(); mapiter2++){
         outlist<<mapiter2->second<<endl;}
-        outlist<<endl<<endl;
+        outlist<<endl;
+        
+        outlist<<"Number of Z candidates = "<<zcount-1<<endl<<endl;
        
         remove(t.c_str());
      
         outlist.close();
 }
-
-
