@@ -31,7 +31,7 @@ using namespace edm;
 
 RecoElectronNtuple::RecoElectronNtuple(): 
  
-_sample("mc"), _selections("VBTF"), _ptjetmin(30.), _etajetmax(3.), _isocut(0.1), _weight(1.), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _Acc(1), _Trg(2), _Qual(3), _Imp(4), _Iso(5), _EiD(6), _Norm(false)
+_sample("mc"), _selections("VBTF"), _NtupleFill("zcand"), _ptjetmin(30.), _etajetmax(3.), _isocut(0.1), _weight(1.), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _Acc(1), _Trg(2), _Qual(3), _Imp(4), _Iso(5), _EiD(6), _Norm(false)
 
 { }
 
@@ -46,6 +46,7 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    _targetLumi= iConfig.getParameter<double>("targetLumi");
    _xsec      = iConfig.getParameter<double>("CrossSection");
    _Norm      = iConfig.getParameter<bool>("Norm");
+   _NtupleFill      = iConfig.getParameter<std::string>("NtupleFill");
    _EventsPerFile    = iConfig.getParameter<int32_t>("EventsPerFile");
    _EventNumber    = iConfig.getParameter<int32_t>("EventNumber");
    _ProcEvents    = iConfig.getParameter<int32_t>("ProcEvents");
@@ -743,8 +744,11 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    }  // endif strict selected Z
    
    }
-      
-   zeetree->Fill();   // fill outside any loop
+   
+   if(_NtupleFill=="zcand"){
+   if(zmass_AllCuts>0.) zeetree->Fill();
+   }else if(_NtupleFill=="all"){
+   zeetree->Fill();}
      
 }
 

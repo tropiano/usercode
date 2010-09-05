@@ -83,9 +83,11 @@ IsoJetCounter_1(0), IsoJetCounter_12(0), IsoJetCounter_123(0), IsoJetCounter_123
 
 HEnergy_IsoJet_ElType(0), EMEnergy_IsoJet_ElType(0), Jet_EMEnergy(0), Jet_HEnergy(0), MinDeltaR_ZDau(0), AllJetCharge(0), IsoJetCharge(0), NotIsoJetCharge(0), DeltaR_IsoJet(0), DeltaR_NotIsoJet(0), DeltaR_IsoJet_ElType(0),
 
-ChargeMisID_Pt_Acc(0), ChargeMisID_Eta_Acc(0), ChargeMisID_Hit_Acc(0), ChargeMisID_fBrem_Acc(0), ChargeMisID_IP_Acc(0), 
-CorrectCharge_Pt_Acc(0), CorrectCharge_Eta_Acc(0), CorrectCharge_Hit_Acc(0), CorrectCharge_fBrem_Acc(0), CorrectCharge_IP_Acc(0),
-AllEl_Pt_Acc(0), AllEl_Eta_Acc(0), AllEl_Hit_Acc(0), AllEl_fBrem_Acc(0), AllEl_IP_Acc(0),
+ChargeMisID_Pt_Acc(0), ChargeMisID_Eta_Acc(0), ChargeMisID_Hit_Acc(0), ChargeMisID_fBrem_Acc(0), ChargeMisID_IP_Acc(0), ChargeMisID_RecoExclJet_Acc(0), ChargeMisID_RecoInclJet_Acc(0),
+
+CorrectCharge_Pt_Acc(0), CorrectCharge_Eta_Acc(0), CorrectCharge_Hit_Acc(0), CorrectCharge_fBrem_Acc(0), CorrectCharge_IP_Acc(0), CorrectCharge_RecoExclJet_Acc(0), CorrectCharge_RecoInclJet_Acc(0),
+
+AllEl_Pt_Acc(0), AllEl_Eta_Acc(0), AllEl_Hit_Acc(0), AllEl_fBrem_Acc(0), AllEl_IP_Acc(0), AllEl_RecoExclJet_Acc(0), AllEl_RecoInclJet_Acc(0),
 
 PixelHit_OC(0), PixelHit_SC(0), FirstPixelBarrelHit_OC(0), FirstPixelBarrelHit_SC(0),
 
@@ -743,7 +745,11 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    ChargeMisID_fBrem_Acc = new TH1D("ChargeMisID_fBrem_Acc", "ChargeMisID - fBrem", 100, 0, 2);
    _histoVector.push_back(ChargeMisID_fBrem_Acc);
    ChargeMisID_IP_Acc = new TH1D("ChargeMisID_IP_Acc", "ChargeMisID - IP", 100, 0, 0.1);
-   _histoVector.push_back(ChargeMisID_IP_Acc);   
+   _histoVector.push_back(ChargeMisID_IP_Acc);
+   ChargeMisID_RecoExclJet_Acc = new TH1D("ChargeMisID_RecoExclJet_Acc", "ChargeMisID - Reco Jet exclusive multiplicity", 10, -0.5, 9.5);
+   _histoVector.push_back(ChargeMisID_RecoExclJet_Acc);
+   ChargeMisID_RecoInclJet_Acc = new TH1D("ChargeMisID_RecoInclJet_Acc", "ChargeMisID - Reco Jet inclusive multiplicity", 10, -0.5, 9.5);
+   _histoVector.push_back(ChargeMisID_RecoInclJet_Acc); 
    
    CorrectCharge_Pt_Acc = new TH1D("CorrectCharge_Pt_Acc", "CorrectCharge - gen electron p_{T}", 200, 0, 200);
    _histoVector.push_back(CorrectCharge_Pt_Acc);
@@ -755,6 +761,10 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _histoVector.push_back(CorrectCharge_fBrem_Acc);
    CorrectCharge_IP_Acc = new TH1D("CorrectCharge_IP_Acc", "CorrectCharge - IP", 100, 0, 0.1);
    _histoVector.push_back(CorrectCharge_IP_Acc);
+   CorrectCharge_RecoExclJet_Acc = new TH1D("CorrectCharge_RecoExclJet_Acc", "CorrectCharge - Reco Jet exclusive multiplicity", 10, -0.5, 9.5);
+   _histoVector.push_back(CorrectCharge_RecoExclJet_Acc);
+   CorrectCharge_RecoInclJet_Acc = new TH1D("CorrectCharge_RecoInclJet_Acc", "CorrectCharge - Reco Jet inclusive multiplicity", 10, -0.5, 9.5);
+   _histoVector.push_back(CorrectCharge_RecoInclJet_Acc);
 
    AllEl_Pt_Acc = new TH1D("AllEl_Pt_Acc", "AllEl - gen electron p_{T}", 200, 0, 200);
    _histoVector.push_back(AllEl_Pt_Acc);
@@ -766,6 +776,10 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _histoVector.push_back(AllEl_fBrem_Acc);
    AllEl_IP_Acc = new TH1D("AllEl_IP_Acc", "AllEl - IP", 100, 0, 0.1);
    _histoVector.push_back(AllEl_IP_Acc);
+   AllEl_RecoExclJet_Acc = new TH1D("AllEl_RecoExclJet_Acc", "AllEl - Reco Jet exclusive multiplicity", 10, -0.5, 9.5);
+   _histoVector.push_back(AllEl_RecoExclJet_Acc);
+   AllEl_RecoInclJet_Acc = new TH1D("AllEl_RecoInclJet_Acc", "AllEl - Reco Jet inclusive multiplicity", 10, -0.5, 9.5);
+   _histoVector.push_back(AllEl_RecoInclJet_Acc);
    
    PixelHit_OC = new TH1D("PixelHit_OC", "Number of Pixel Hit - ZOC", 10,0,10);
    _histoVector.push_back(PixelHit_OC);
@@ -1096,6 +1110,8 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
    CorrectCharge_Hit_Acc->Fill(selectedelectrons[i].gsfTrack()->numberOfValidHits());
    CorrectCharge_fBrem_Acc->Fill(selectedelectrons[i].fbrem());
    CorrectCharge_IP_Acc->Fill(selectedelectrons[i].dB());
+   CorrectCharge_RecoExclJet_Acc->Fill(isorecjets.size());
+   for(unsigned int n = 0; n < isorecjets.size()+1; n++)CorrectCharge_RecoInclJet_Acc->AddBinContent(n+1,1);
    
    HitVsEta_CorrCharge->Fill(genCorrElectron->eta(),selectedelectrons[i].gsfTrack()->numberOfValidHits());
    
@@ -1115,6 +1131,8 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
    AllEl_Hit_Acc->Fill(selectedelectrons[i].gsfTrack()->numberOfValidHits());
    AllEl_fBrem_Acc->Fill(selectedelectrons[i].fbrem());
    AllEl_IP_Acc->Fill(selectedelectrons[i].dB());
+   AllEl_RecoExclJet_Acc->Fill(isorecjets.size());
+   for(unsigned int n = 0; n < isorecjets.size()+1; n++)AllEl_RecoInclJet_Acc->AddBinContent(n+1,1);
    
    HitVsEta_AllEl->Fill(genCorrElectron->eta(),selectedelectrons[i].gsfTrack()->numberOfValidHits());
    
@@ -1147,6 +1165,8 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
    ChargeMisID_Hit_Acc->Fill(selectedelectrons[i].gsfTrack()->numberOfValidHits());
    ChargeMisID_fBrem_Acc->Fill(selectedelectrons[i].fbrem());
    ChargeMisID_IP_Acc->Fill(selectedelectrons[i].dB());
+   ChargeMisID_RecoExclJet_Acc->Fill(isorecjets.size());
+   for(unsigned int n = 0; n < isorecjets.size()+1; n++)ChargeMisID_RecoInclJet_Acc->AddBinContent(n+1,1);
    
    HitVsEta_MisIDCharge->Fill(genMisElectron->eta(),selectedelectrons[i].gsfTrack()->numberOfValidHits());
    
@@ -1166,6 +1186,8 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
    AllEl_Hit_Acc->Fill(selectedelectrons[i].gsfTrack()->numberOfValidHits());
    AllEl_fBrem_Acc->Fill(selectedelectrons[i].fbrem());
    AllEl_IP_Acc->Fill(selectedelectrons[i].dB());
+   AllEl_RecoExclJet_Acc->Fill(isorecjets.size());
+   for(unsigned int n = 0; n < isorecjets.size()+1; n++)AllEl_RecoInclJet_Acc->AddBinContent(n+1,1);
    
    HitVsEta_AllEl->Fill(genMisElectron->eta(),selectedelectrons[i].gsfTrack()->numberOfValidHits());
    
@@ -1612,8 +1634,13 @@ void RecoElectron::finalize(){
    Report<<"etajetmax = "<<etajetmax<<endl;
    Report<<"isocut = "<<vpj_isocut<<endl;
    Report<<"isojetcut = "<<isojetcut<<endl;
-   Report<<"ElectronTrigger = "<<ElectronTrigger.c_str()<<endl;
-   Report<<"JetTrigger = "<<JetTrigger.c_str()<<endl;
+   
+   static vector<std::string> TrgVector = elTrigger();
+   static vector<std::string>::iterator TrgVectorIter;
+   for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
+   Report<<"ElectronTrigger = "<<TrgVectorIter->c_str()<<endl;}
+   
+   Report<<endl<<"JetTrigger = "<<JetTrigger.c_str()<<endl;
    Report<<"VPJ_TAG_ptelcut = "<<VPJ_TAG_ptelcut<<endl;
    Report<<"VPJ_TAG_etaelcut = "<<VPJ_TAG_etaelcut<<endl;
    Report<<"VPJ_TAG_eta_el_excl_up = "<<VPJ_TAG_eta_el_excl_up<<endl;
@@ -1639,8 +1666,13 @@ void RecoElectron::finalize(){
    Report<<"ptjetmin = "<<ptjetmin<<endl;
    Report<<"etajetmax = "<<etajetmax<<endl<<endl;
    Report<<"isojetcut = "<<isojetcut<<endl<<endl;
-   Report<<"ElectronTrigger = "<<ElectronTrigger.c_str()<<endl;
-   Report<<"JetTrigger = "<<JetTrigger.c_str()<<endl<<endl;
+   
+   static vector<std::string> TrgVector = elTrigger();
+   static vector<std::string>::iterator TrgVectorIter;
+   for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
+   Report<<"ElectronTrigger = "<<TrgVectorIter->c_str()<<endl;}
+   
+   Report<<endl<<"JetTrigger = "<<JetTrigger.c_str()<<endl<<endl;
    Report<<"Dau0_CombIso_EB = "<<Dau0_CombIso_EB<<endl;   Report<<"Dau0_sihih_EB = "<<Dau0_sihih_EB<<endl;   Report<<"Dau0_Dphi_vtx_EB = "<<Dau0_Dphi_vtx_EB<<endl;   Report<<"Dau0_Deta_vtx_EB = "<<Dau0_Deta_vtx_EB<<endl;   Report<<"Dau0_HovE_EB = "<<Dau0_HovE_EB<<endl;
    Report<<"Dau0_CombIso_EE = "<<Dau0_CombIso_EE<<endl;   Report<<"Dau0_sihih_EE = "<<Dau0_sihih_EE<<endl;   Report<<"Dau0_Dphi_vtx_EE = "<<Dau0_Dphi_vtx_EE<<endl;   Report<<"Dau0_Deta_vtx_EE = "<<Dau0_Deta_vtx_EE<<endl;   Report<<"Dau0_HovE_EE = "<<Dau0_HovE_EE<<endl<<endl;
    Report<<"Dau1_CombIso_EB = "<<Dau1_CombIso_EB<<endl;   Report<<"Dau1_sihih_EB = "<<Dau1_sihih_EB<<endl;   Report<<"Dau1_Dphi_vtx_EB = "<<Dau1_Dphi_vtx_EB<<endl;   Report<<"Dau1_Deta_vtx_EB = "<<Dau1_Deta_vtx_EB<<endl;   Report<<"Dau1_HovE_EB = "<<Dau1_HovE_EB<<endl;

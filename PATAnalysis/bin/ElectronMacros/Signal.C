@@ -122,14 +122,14 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
    TH1D* AccDenom_genMassZ = (TH1D*) signal_file->Get("EfficiencyElectron/AccDenom_genMassZ");
    TH1D* AccDenom_genPtZ = (TH1D*) signal_file->Get("EfficiencyElectron/AccDenom_genPtZ");
    TH1D* AccDenom_genEtaZ = (TH1D*) signal_file->Get("EfficiencyElectron/AccDenom_genEtaZ");
-   TH1D* AccDenom_GenIsoJetNumber = (TH1D*) signal_file->Get("EfficiencyElectron/AccDenom_GenIsoJetNumber");
+   TH1D* AccDenom_GenExclJetNumber = (TH1D*) signal_file->Get("EfficiencyElectron/AccDenom_GenExclJetNumber");
    TH1D* AccDenom_RecoInclJetNumber = (TH1D*) signal_file->Get("EfficiencyElectron/AccDenom_RecoInclJetNumber");
    TH1D* AccDenom_RecoExclJetNumber = (TH1D*) signal_file->Get("EfficiencyElectron/AccDenom_RecoExclJetNumber");
 	
    TH1D* EffDenom_genMassZ = (TH1D*) signal_file->Get("EfficiencyElectron/EffDenom_genMassZ");
    TH1D* EffDenom_genPtZ = (TH1D*) signal_file->Get("EfficiencyElectron/EffDenom_genPtZ");
    TH1D* EffDenom_genEtaZ = (TH1D*) signal_file->Get("EfficiencyElectron/EffDenom_genEtaZ");
-   TH1D* EffDenom_GenIsoJetNumber = (TH1D*) signal_file->Get("EfficiencyElectron/EffDenom_GenIsoJetNumber");
+   TH1D* EffDenom_GenExclJetNumber = (TH1D*) signal_file->Get("EfficiencyElectron/EffDenom_GenExclJetNumber");
    TH1D* EffDenom_RecoInclJetNumber = (TH1D*) signal_file->Get("EfficiencyElectron/EffDenom_RecoInclJetNumber");
    TH1D* EffDenom_RecoExclJetNumber = (TH1D*) signal_file->Get("EfficiencyElectron/EffDenom_RecoExclJetNumber");
 	
@@ -182,19 +182,19 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	genEtaZEff_name+=_RecoCutFlags[6].c_str();
 	TH1D* genEtaZ_123456 = (TH1D*) signal_file->Get(genEtaZEff_name.c_str());
 	
-	string genIsoJetEff_name = "EfficiencyElectron/GenIsoJetEff";
-	genIsoJetEff_name+=_RecoCutFlags[1].c_str();
-        TH1D* GenIsoJetNumber_1 = (TH1D*) signal_file->Get(genIsoJetEff_name.c_str());
-	genIsoJetEff_name+=_RecoCutFlags[2].c_str();
-        TH1D* GenIsoJetNumber_12 = (TH1D*) signal_file->Get(genIsoJetEff_name.c_str());
-	genIsoJetEff_name+=_RecoCutFlags[3].c_str();
-	TH1D* GenIsoJetNumber_123 = (TH1D*) signal_file->Get(genIsoJetEff_name.c_str());
-	genIsoJetEff_name+=_RecoCutFlags[4].c_str();
-	TH1D* GenIsoJetNumber_1234 = (TH1D*) signal_file->Get(genIsoJetEff_name.c_str());
-	genIsoJetEff_name+=_RecoCutFlags[5].c_str();
-	TH1D* GenIsoJetNumber_12345 = (TH1D*) signal_file->Get(genIsoJetEff_name.c_str());
-	genIsoJetEff_name+=_RecoCutFlags[6].c_str();
-	TH1D* GenIsoJetNumber_123456 = (TH1D*) signal_file->Get(genIsoJetEff_name.c_str());
+	string GenExclJetEff_name = "EfficiencyElectron/GenExclJetEff";
+	GenExclJetEff_name+=_RecoCutFlags[1].c_str();
+        TH1D* GenExclJetNumber_1 = (TH1D*) signal_file->Get(GenExclJetEff_name.c_str());
+	GenExclJetEff_name+=_RecoCutFlags[2].c_str();
+        TH1D* GenExclJetNumber_12 = (TH1D*) signal_file->Get(GenExclJetEff_name.c_str());
+	GenExclJetEff_name+=_RecoCutFlags[3].c_str();
+	TH1D* GenExclJetNumber_123 = (TH1D*) signal_file->Get(GenExclJetEff_name.c_str());
+	GenExclJetEff_name+=_RecoCutFlags[4].c_str();
+	TH1D* GenExclJetNumber_1234 = (TH1D*) signal_file->Get(GenExclJetEff_name.c_str());
+	GenExclJetEff_name+=_RecoCutFlags[5].c_str();
+	TH1D* GenExclJetNumber_12345 = (TH1D*) signal_file->Get(GenExclJetEff_name.c_str());
+	GenExclJetEff_name+=_RecoCutFlags[6].c_str();
+	TH1D* GenExclJetNumber_123456 = (TH1D*) signal_file->Get(GenExclJetEff_name.c_str());
 	
 	string RecoInclJetEff_name = "EfficiencyElectron/RecoInclJetEff";
 	RecoInclJetEff_name+=_RecoCutFlags[1].c_str();
@@ -236,7 +236,7 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	Acc_VsZPt.SetNameTitle("Acc_ZPt", "Acceptance vs gen Z Pt");
 	TGraphAsymmErrors Acc_VsZEta(EffDenom_genEtaZ, AccDenom_genEtaZ);
 	Acc_VsZEta.SetNameTitle("Acc_ZEta", "Acceptance vs gen Z Eta");
-	TGraphAsymmErrors Acc_VsJetN(EffDenom_GenIsoJetNumber, AccDenom_GenIsoJetNumber);
+	TGraphAsymmErrors Acc_VsJetN(EffDenom_GenExclJetNumber, AccDenom_GenExclJetNumber);
 	Acc_VsJetN.SetNameTitle("Acc_VsGenExclJetN", "Acceptance vs Gen Exclusive Iso Jet Number");
 	TGraphAsymmErrors Acc_VsRecoInclJetN(EffDenom_RecoInclJetNumber, AccDenom_RecoInclJetNumber);
 	Acc_VsRecoInclJetN.SetNameTitle("Acc_VsRecoInclJetN", "Acceptance vs Reco Inclusive Iso Jet Number");
@@ -368,22 +368,22 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	
 	string EffVsGenExclJetN_name = "EffVsGenExclJetN";
 	EffVsGenExclJetN_name+=_RecoCutFlags[1].c_str();
-	TGraphAsymmErrors Eff_GenExclJet_1(GenIsoJetNumber_1, EffDenom_GenIsoJetNumber);
+	TGraphAsymmErrors Eff_GenExclJet_1(GenExclJetNumber_1, EffDenom_GenExclJetNumber);
 	Eff_GenExclJet_1.SetNameTitle(EffVsGenExclJetN_name.c_str(), _RecoCutFlags[1].c_str());
 	EffVsGenExclJetN_name+=_RecoCutFlags[2].c_str();
-	TGraphAsymmErrors Eff_GenExclJet_12(GenIsoJetNumber_12, EffDenom_GenIsoJetNumber);
+	TGraphAsymmErrors Eff_GenExclJet_12(GenExclJetNumber_12, EffDenom_GenExclJetNumber);
 	Eff_GenExclJet_12.SetNameTitle(EffVsGenExclJetN_name.c_str(), _RecoCutFlags[2].c_str());
 	EffVsGenExclJetN_name+=_RecoCutFlags[3].c_str();
-	TGraphAsymmErrors Eff_GenExclJet_123(GenIsoJetNumber_123, EffDenom_GenIsoJetNumber);
+	TGraphAsymmErrors Eff_GenExclJet_123(GenExclJetNumber_123, EffDenom_GenExclJetNumber);
 	Eff_GenExclJet_123.SetNameTitle(EffVsGenExclJetN_name.c_str(), _RecoCutFlags[3].c_str());
 	EffVsGenExclJetN_name+=_RecoCutFlags[4].c_str();
-	TGraphAsymmErrors Eff_GenExclJet_1234(GenIsoJetNumber_1234, EffDenom_GenIsoJetNumber);
+	TGraphAsymmErrors Eff_GenExclJet_1234(GenExclJetNumber_1234, EffDenom_GenExclJetNumber);
 	Eff_GenExclJet_1234.SetNameTitle(EffVsGenExclJetN_name.c_str(), _RecoCutFlags[4].c_str());
 	EffVsGenExclJetN_name+=_RecoCutFlags[5].c_str();
-	TGraphAsymmErrors Eff_GenExclJet_12345(GenIsoJetNumber_12345, EffDenom_GenIsoJetNumber);
+	TGraphAsymmErrors Eff_GenExclJet_12345(GenExclJetNumber_12345, EffDenom_GenExclJetNumber);
 	Eff_GenExclJet_12345.SetNameTitle(EffVsGenExclJetN_name.c_str(), _RecoCutFlags[5].c_str());
 	EffVsGenExclJetN_name+=_RecoCutFlags[6].c_str();
-	TGraphAsymmErrors Eff_GenExclJet_123456(GenIsoJetNumber_123456, EffDenom_GenIsoJetNumber);
+	TGraphAsymmErrors Eff_GenExclJet_123456(GenExclJetNumber_123456, EffDenom_GenExclJetNumber);
 	Eff_GenExclJet_123456.SetNameTitle(EffVsGenExclJetN_name.c_str(), _RecoCutFlags[6].c_str());
 	
 	Eff_GenExclJet_1.Write();
@@ -991,12 +991,12 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         
         R_GenExclJet_Eff->cd();
             
-        TGraphAsymmErrors RelEff_GenExclJet_1(GenIsoJetNumber_1, EffDenom_GenIsoJetNumber);
-        TGraphAsymmErrors RelEff_GenExclJet_12(GenIsoJetNumber_12, GenIsoJetNumber_1);
-        TGraphAsymmErrors RelEff_GenExclJet_123(GenIsoJetNumber_123, GenIsoJetNumber_12);
-        TGraphAsymmErrors RelEff_GenExclJet_1234(GenIsoJetNumber_1234, GenIsoJetNumber_123);
-        TGraphAsymmErrors RelEff_GenExclJet_12345(GenIsoJetNumber_12345, GenIsoJetNumber_1234);
-        TGraphAsymmErrors RelEff_GenExclJet_123456(GenIsoJetNumber_123456, GenIsoJetNumber_12345);
+        TGraphAsymmErrors RelEff_GenExclJet_1(GenExclJetNumber_1, EffDenom_GenExclJetNumber);
+        TGraphAsymmErrors RelEff_GenExclJet_12(GenExclJetNumber_12, GenExclJetNumber_1);
+        TGraphAsymmErrors RelEff_GenExclJet_123(GenExclJetNumber_123, GenExclJetNumber_12);
+        TGraphAsymmErrors RelEff_GenExclJet_1234(GenExclJetNumber_1234, GenExclJetNumber_123);
+        TGraphAsymmErrors RelEff_GenExclJet_12345(GenExclJetNumber_12345, GenExclJetNumber_1234);
+        TGraphAsymmErrors RelEff_GenExclJet_123456(GenExclJetNumber_123456, GenExclJetNumber_12345);
         
         TGraphAsymmErrors RelEff_RecoInclJet_1(RecoInclJetNumber_1, EffDenom_RecoInclJetNumber);
         TGraphAsymmErrors RelEff_RecoInclJet_12(RecoInclJetNumber_12, RecoInclJetNumber_1);
@@ -1790,13 +1790,17 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	TH1D* AllEl_Hit_Acc = (TH1D*) signal_file->Get("RecoElectron/ChargeMisID/AllEl_Hit_Acc");
 	TH1D* AllEl_fBrem_Acc = (TH1D*) signal_file->Get("RecoElectron/ChargeMisID/AllEl_fBrem_Acc");
 	TH1D* AllEl_IP_Acc = (TH1D*) signal_file->Get("RecoElectron/ChargeMisID/AllEl_IP_Acc");
+	TH1D* AllEl_RecoExclJet_Acc = (TH1D*) signal_file->Get("RecoElectron/ChargeMisID/AllEl_RecoExclJet_Acc");
+	TH1D* AllEl_RecoInclJet_Acc = (TH1D*) signal_file->Get("RecoElectron/ChargeMisID/AllEl_RecoInclJet_Acc");
 	TH1D* ChargeMisID_Pt_Acc = (TH1D*) signal_file->Get("RecoElectron/ChargeMisID/ChargeMisID_Pt_Acc");
 	TH1D* ChargeMisID_Eta_Acc = (TH1D*) signal_file->Get("RecoElectron/ChargeMisID/ChargeMisID_Eta_Acc");
 	TH1D* ChargeMisID_Hit_Acc = (TH1D*) signal_file->Get("RecoElectron/ChargeMisID/ChargeMisID_Hit_Acc");
 	TH1D* ChargeMisID_fBrem_Acc = (TH1D*) signal_file->Get("RecoElectron/ChargeMisID/ChargeMisID_fBrem_Acc");
 	TH1D* ChargeMisID_IP_Acc = (TH1D*) signal_file->Get("RecoElectron/ChargeMisID/ChargeMisID_IP_Acc");
+	TH1D* ChargeMisID_RecoExclJet_Acc = (TH1D*) signal_file->Get("RecoElectron/ChargeMisID/ChargeMisID_RecoExclJet_Acc");
+	TH1D* ChargeMisID_RecoInclJet_Acc = (TH1D*) signal_file->Get("RecoElectron/ChargeMisID/ChargeMisID_RecoInclJet_Acc");
 	
-	
+		
 	ChargeMisID_Eta_Acc->Divide(AllEl_Eta_Acc);
 	ChargeMisID_Eta_Acc->GetXaxis()->SetTitle("gen Eta");
 	ChargeMisID_Eta_Acc->SetName("ChargeMisID_Eta");
@@ -1816,7 +1820,15 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	ChargeMisID_fBrem_Acc->Divide(AllEl_fBrem_Acc);
 	ChargeMisID_fBrem_Acc->GetXaxis()->SetTitle("fBrem");
 	ChargeMisID_fBrem_Acc->SetName("ChargeMisID_fBrem");
-	ChargeMisID_fBrem_Acc->Write();	
+	ChargeMisID_fBrem_Acc->Write();
+	ChargeMisID_RecoExclJet_Acc->Divide(AllEl_RecoExclJet_Acc);
+	ChargeMisID_RecoExclJet_Acc->GetXaxis()->SetTitle("RecoExclJet");
+	ChargeMisID_RecoExclJet_Acc->SetName("ChargeMisID_RecoExclJet");
+	ChargeMisID_RecoExclJet_Acc->Write();
+	ChargeMisID_RecoInclJet_Acc->Divide(AllEl_RecoInclJet_Acc);
+	ChargeMisID_RecoInclJet_Acc->GetXaxis()->SetTitle("RecoInclJet");
+	ChargeMisID_RecoInclJet_Acc->SetName("ChargeMisID_RecoInclJet");
+	ChargeMisID_RecoInclJet_Acc->Write();	
 	
 	effincl.close();	
 

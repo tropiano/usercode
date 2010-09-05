@@ -38,17 +38,19 @@ genMassZEff_1234(0), genPtZEff_1234(0), genEtaZEff_1234(0),
 genMassZEff_12345(0), genPtZEff_12345(0), genEtaZEff_12345(0),
 genMassZEff_123456(0), genPtZEff_123456(0), genEtaZEff_123456(0),
 
-GenIsoJetEff_1(0), GenIsoJetEff_12(0), GenIsoJetEff_123(0), GenIsoJetEff_1234(0), GenIsoJetEff_12345(0), GenIsoJetEff_123456(0),
+GenInclJetEff_1(0), GenInclJetEff_12(0), GenInclJetEff_123(0), GenInclJetEff_1234(0), GenInclJetEff_12345(0), GenInclJetEff_123456(0),
+GenExclJetEff_1(0), GenExclJetEff_12(0), GenExclJetEff_123(0), GenExclJetEff_1234(0), GenExclJetEff_12345(0), GenExclJetEff_123456(0),
+
 RecoInclJetEff_1(0), RecoInclJetEff_12(0), RecoInclJetEff_123(0), RecoInclJetEff_1234(0), RecoInclJetEff_12345(0), RecoInclJetEff_123456(0),
 RecoExclJetEff_1(0), RecoExclJetEff_12(0), RecoExclJetEff_123(0), RecoExclJetEff_1234(0), RecoExclJetEff_12345(0), RecoExclJetEff_123456(0),
 
 genLeadElEtaEff_1(0), genLeadElEtaEff_12(0), genLeadElEtaEff_123(0), genLeadElEtaEff_1234(0), genLeadElEtaEff_12345(0), genLeadElEtaEff_123456(0),
 genLeadElPtEff_1(0), genLeadElPtEff_12(0), genLeadElPtEff_123(0), genLeadElPtEff_1234(0), genLeadElPtEff_12345(0), genLeadElPtEff_123456(0),
 
-AccDenom_genPtZ(0), AccDenom_genMassZ(0), AccDenom_genEtaZ(0), AccDenom_genLeadElEta(0), AccDenom_genLeadElPt(0), AccDenom_GenIsoJetNumber(0), AccDenom_RecoInclJetNumber(0), AccDenom_RecoExclJetNumber(0),
-EffDenom_genPtZ(0), EffDenom_genMassZ(0), EffDenom_genEtaZ(0), EffDenom_genLeadElEta(0), EffDenom_genLeadElPt(0), EffDenom_GenIsoJetNumber(0), EffDenom_RecoInclJetNumber(0), EffDenom_RecoExclJetNumber(0),
+AccDenom_genPtZ(0), AccDenom_genMassZ(0), AccDenom_genEtaZ(0), AccDenom_genLeadElEta(0), AccDenom_genLeadElPt(0), AccDenom_GenExclJetNumber(0), AccDenom_RecoInclJetNumber(0), AccDenom_RecoExclJetNumber(0),
+EffDenom_genPtZ(0), EffDenom_genMassZ(0), EffDenom_genEtaZ(0), EffDenom_genLeadElEta(0), EffDenom_genLeadElPt(0), EffDenom_GenExclJetNumber(0), EffDenom_RecoInclJetNumber(0), EffDenom_RecoExclJetNumber(0),
 
-_sample("mc"), _selections("VBTF"), _JetType("CALO"), _dir(0), _file(0), _Acc(1), _Trg(2), _Qual(3), _Imp(4), _Iso(5), _EiD(6), _histoVector(), _nbin(10), _xmin(-0.5), _xmax(9.5), _Norm(false), _norm(1.), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1)
+_sample("mc"), _selections("VBTF"), _JetType("CALO"), _dir(0), _file(0), _Acc(1), _Trg(2), _Qual(3), _Imp(4), _Iso(5), _EiD(6), _histoVector(), _nbin(10), _xmin(-0.5), _xmax(9.5), _Norm(false), _norm(1.), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _tp_mult("incl")
 
 { }
 
@@ -66,6 +68,7 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
     _targetLumi= iConfig.getParameter<double>("targetLumi");
     _xsec      = iConfig.getParameter<double>("CrossSection");
     _JetType = iConfig.getParameter<std::string>("JetType");
+    _tp_mult = iConfig.getParameter<std::string>("TPMult");
     
     //Selections
    _Acc = iConfig.getParameter<int32_t>("Acc");
@@ -107,8 +110,8 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _histoVector.push_back(AccDenom_genLeadElEta);
    AccDenom_genLeadElPt = new TH1D("AccDenom_genLeadElPt", "Generated Leading electron Pt, No acceptance cut applied", 200, 0, 200);
    _histoVector.push_back(AccDenom_genLeadElPt);
-   AccDenom_GenIsoJetNumber = new TH1D("AccDenom_GenIsoJetNumber", "Number of Gen Iso Jet, No acceptance cut applied", 10, 0, 10);
-   _histoVector.push_back(AccDenom_GenIsoJetNumber);
+   AccDenom_GenExclJetNumber = new TH1D("AccDenom_GenExclJetNumber", "Number of Gen Iso Jet, No acceptance cut applied", 10, 0, 10);
+   _histoVector.push_back(AccDenom_GenExclJetNumber);
    AccDenom_RecoInclJetNumber = new TH1D("AccDenom_RecoInclJetNumber", "Number of Inclusive Reco Jet, No acceptance cut applied", 10, 0, 10);
    _histoVector.push_back(AccDenom_RecoInclJetNumber);
    AccDenom_RecoExclJetNumber = new TH1D("AccDenom_RecoExclJetNumber", "Number of Exclusive Reco Jet, No acceptance cut applied", 10, 0, 10);
@@ -125,8 +128,8 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _histoVector.push_back(EffDenom_genLeadElEta);
    EffDenom_genLeadElPt = new TH1D("EffDenom_genLeadElPt", "Generated Leading electron Pt, in acceptance", 200, 0, 200);
    _histoVector.push_back(EffDenom_genLeadElPt);
-   EffDenom_GenIsoJetNumber = new TH1D("EffDenom_GenIsoJetNumber", "Number of Gen Iso Jet, in acceptance", 10, 0, 10);
-   _histoVector.push_back(EffDenom_GenIsoJetNumber);
+   EffDenom_GenExclJetNumber = new TH1D("EffDenom_GenExclJetNumber", "Number of Gen Iso Jet, in acceptance", 10, 0, 10);
+   _histoVector.push_back(EffDenom_GenExclJetNumber);
    EffDenom_RecoInclJetNumber = new TH1D("EffDenom_RecoInclJetNumber", "Number of Inclusive Reco Iso Jet, in acceptance", 10, 0, 10);
    _histoVector.push_back(EffDenom_RecoInclJetNumber);
    EffDenom_RecoExclJetNumber = new TH1D("EffDenom_RecoExclJetNumber", "Number of Exclusive Reco Iso Jet, in acceptance", 10, 0, 10);
@@ -237,25 +240,46 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _histoVector.push_back(genEtaZEff_123456);
    
    //Eff vs Gen Excl Jet number
-   string GenIsoJetEff_name = "GenIsoJetEff";
-   GenIsoJetEff_name+=_RecoCutFlags[1].c_str();
-   GenIsoJetEff_1 = new TH1D(GenIsoJetEff_name.c_str(), "Number of Gen Iso Jet", 10, -0.5, 9.5);
-   _histoVector.push_back(GenIsoJetEff_1);
-   GenIsoJetEff_name+=_RecoCutFlags[2].c_str();
-   GenIsoJetEff_12 = new TH1D(GenIsoJetEff_name.c_str(), "Number of Gen Iso Jet", 10, -0.5, 9.5);
-   _histoVector.push_back(GenIsoJetEff_12);
-   GenIsoJetEff_name+=_RecoCutFlags[3].c_str();
-   GenIsoJetEff_123 = new TH1D(GenIsoJetEff_name.c_str(), "Number of Gen Iso Jet", 10, -0.5, 9.5);
-   _histoVector.push_back(GenIsoJetEff_123);
-   GenIsoJetEff_name+=_RecoCutFlags[4].c_str();
-   GenIsoJetEff_1234 = new TH1D(GenIsoJetEff_name.c_str(), "Number of Gen Iso Jet", 10, -0.5, 9.5);
-   _histoVector.push_back(GenIsoJetEff_1234);
-   GenIsoJetEff_name+=_RecoCutFlags[5].c_str();
-   GenIsoJetEff_12345 = new TH1D(GenIsoJetEff_name.c_str(), "Number of Gen Iso Jet", 10, -0.5, 9.5);
-   _histoVector.push_back(GenIsoJetEff_12345);
-   GenIsoJetEff_name+=_RecoCutFlags[6].c_str();
-   GenIsoJetEff_123456 = new TH1D(GenIsoJetEff_name.c_str(), "Number of Gen Iso Jet", 10, -0.5, 9.5);
-   _histoVector.push_back(GenIsoJetEff_123456);
+   string GenExclJetEff_name = "GenExclJetEff";
+   GenExclJetEff_name+=_RecoCutFlags[1].c_str();
+   GenExclJetEff_1 = new TH1D(GenExclJetEff_name.c_str(), "Number of Exclusive Gen Iso Jet", 10, -0.5, 9.5);
+   _histoVector.push_back(GenExclJetEff_1);
+   GenExclJetEff_name+=_RecoCutFlags[2].c_str();
+   GenExclJetEff_12 = new TH1D(GenExclJetEff_name.c_str(), "Number of Exclusive Gen Iso Jet", 10, -0.5, 9.5);
+   _histoVector.push_back(GenExclJetEff_12);
+   GenExclJetEff_name+=_RecoCutFlags[3].c_str();
+   GenExclJetEff_123 = new TH1D(GenExclJetEff_name.c_str(), "Number of Exclusive Gen Iso Jet", 10, -0.5, 9.5);
+   _histoVector.push_back(GenExclJetEff_123);
+   GenExclJetEff_name+=_RecoCutFlags[4].c_str();
+   GenExclJetEff_1234 = new TH1D(GenExclJetEff_name.c_str(), "Number of Exclusive Gen Iso Jet", 10, -0.5, 9.5);
+   _histoVector.push_back(GenExclJetEff_1234);
+   GenExclJetEff_name+=_RecoCutFlags[5].c_str();
+   GenExclJetEff_12345 = new TH1D(GenExclJetEff_name.c_str(), "Number of Exclusive Gen Iso Jet", 10, -0.5, 9.5);
+   _histoVector.push_back(GenExclJetEff_12345);
+   GenExclJetEff_name+=_RecoCutFlags[6].c_str();
+   GenExclJetEff_123456 = new TH1D(GenExclJetEff_name.c_str(), "Number of Exclusive Gen Iso Jet", 10, -0.5, 9.5);
+   _histoVector.push_back(GenExclJetEff_123456);
+   
+   //Eff vs Gen Incl Jet number
+   string GenInclJetEff_name = "GenInclJetEff";
+   GenInclJetEff_name+=_RecoCutFlags[1].c_str();
+   GenInclJetEff_1 = new TH1D(GenInclJetEff_name.c_str(), "Number of Inclusive Gen Iso Jet", 10, -0.5, 9.5);
+   _histoVector.push_back(GenInclJetEff_1);
+   GenInclJetEff_name+=_RecoCutFlags[2].c_str();
+   GenInclJetEff_12 = new TH1D(GenInclJetEff_name.c_str(), "Number of Inclusive Gen Iso Jet", 10, -0.5, 9.5);
+   _histoVector.push_back(GenInclJetEff_12);
+   GenInclJetEff_name+=_RecoCutFlags[3].c_str();
+   GenInclJetEff_123 = new TH1D(GenInclJetEff_name.c_str(), "Number of Inclusive Gen Iso Jet", 10, -0.5, 9.5);
+   _histoVector.push_back(GenInclJetEff_123);
+   GenInclJetEff_name+=_RecoCutFlags[4].c_str();
+   GenInclJetEff_1234 = new TH1D(GenInclJetEff_name.c_str(), "Number of Inclusive Gen Iso Jet", 10, -0.5, 9.5);
+   _histoVector.push_back(GenInclJetEff_1234);
+   GenInclJetEff_name+=_RecoCutFlags[5].c_str();
+   GenInclJetEff_12345 = new TH1D(GenInclJetEff_name.c_str(), "Number of Inclusive Gen Iso Jet", 10, -0.5, 9.5);
+   _histoVector.push_back(GenInclJetEff_12345);
+   GenInclJetEff_name+=_RecoCutFlags[6].c_str();
+   GenInclJetEff_123456 = new TH1D(GenInclJetEff_name.c_str(), "Number of Inclusive Gen Iso Jet", 10, -0.5, 9.5);
+   _histoVector.push_back(GenInclJetEff_123456);
    
    //Eff vs Reco Incl (Iso) Jet number
    string RecoInclJetEff_name = "RecoInclJetEff";
@@ -748,7 +772,7 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
      AccDenom_genMassZ->Fill((*zgenHandle)[0].mass());
      AccDenom_genLeadElEta->Fill(genleadeleta);
      AccDenom_genLeadElPt->Fill(genleadelpt);
-     AccDenom_GenIsoJetNumber->Fill(isogenjets.size());     
+     AccDenom_GenExclJetNumber->Fill(isogenjets.size());     
      for(unsigned int i = 0; i < geniso_recjets.size()+1; i++)AccDenom_RecoInclJetNumber->AddBinContent(i+1,1);
      AccDenom_RecoExclJetNumber->Fill(geniso_recjets.size());
      
@@ -762,7 +786,7 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
      EffDenom_genMassZ->Fill((*zgenHandle)[0].mass());
      EffDenom_genLeadElEta->Fill(genleadeleta);
      EffDenom_genLeadElPt->Fill(genleadelpt);
-     EffDenom_GenIsoJetNumber->Fill(isogenjets.size());    
+     EffDenom_GenExclJetNumber->Fill(isogenjets.size());    
      for(unsigned int i = 0; i < geniso_recjets.size()+1; i++)EffDenom_RecoInclJetNumber->AddBinContent(i+1,1);
      EffDenom_RecoExclJetNumber->Fill(geniso_recjets.size());
       
@@ -783,7 +807,8 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
      genLeadElPtEff_1->Fill(genleadelpt);
      
      //Eff vs Gen Jet variables
-     GenIsoJetEff_1->Fill(isogenjets.size());
+     for(unsigned int i = 0; i < isogenjets.size()+1; i++)GenInclJetEff_1->AddBinContent(i+1,1);
+     GenExclJetEff_1->Fill(isogenjets.size());
      
      //Eff vs Reco Jet variables
      for(unsigned int i = 0; i < geniso_recjets.size()+1; i++)RecoInclJetEff_1->AddBinContent(i+1,1);
@@ -803,8 +828,9 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
      genLeadElEtaEff_12->Fill(genleadeleta);
      genLeadElPtEff_12->Fill(genleadelpt);
      
-     //Eff vs Jet variables
-     GenIsoJetEff_12->Fill(isogenjets.size());
+     //Eff vs Gen Jet variables
+     for(unsigned int i = 0; i < isogenjets.size()+1; i++)GenInclJetEff_12->AddBinContent(i+1,1);
+     GenExclJetEff_12->Fill(isogenjets.size());
      
      //Eff vs Reco Jet variables
      for(unsigned int i = 0; i < geniso_recjets.size()+1; i++)RecoInclJetEff_12->AddBinContent(i+1,1);
@@ -824,8 +850,9 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
      genLeadElEtaEff_123->Fill(genleadeleta);
      genLeadElPtEff_123->Fill(genleadelpt);
      
-     //Eff vs Jet variables
-     GenIsoJetEff_123->Fill(isogenjets.size());
+     //Eff vs Gen Jet variables
+     for(unsigned int i = 0; i < isogenjets.size()+1; i++)GenInclJetEff_123->AddBinContent(i+1,1);
+     GenExclJetEff_123->Fill(isogenjets.size());
      
      //Eff vs Reco Jet variables
      for(unsigned int i = 0; i < geniso_recjets.size()+1; i++)RecoInclJetEff_123->AddBinContent(i+1,1);
@@ -845,8 +872,9 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
      genLeadElEtaEff_1234->Fill(genleadeleta);
      genLeadElPtEff_1234->Fill(genleadelpt);
      
-     //Eff vs Jet variables
-     GenIsoJetEff_1234->Fill(isogenjets.size());
+     //Eff vs Gen Jet variables
+     for(unsigned int i = 0; i < isogenjets.size()+1; i++)GenInclJetEff_1234->AddBinContent(i+1,1);
+     GenExclJetEff_1234->Fill(isogenjets.size());
      
      //Eff vs Reco Jet variables
      for(unsigned int i = 0; i < geniso_recjets.size()+1; i++)RecoInclJetEff_1234->AddBinContent(i+1,1);
@@ -866,8 +894,9 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
       genLeadElEtaEff_12345->Fill(genleadeleta);
       genLeadElPtEff_12345->Fill(genleadelpt);
       
-      //Eff vs Jet variables
-      GenIsoJetEff_12345->Fill(isogenjets.size());
+      //Eff vs Gen Jet variables
+      for(unsigned int i = 0; i < isogenjets.size()+1; i++)GenInclJetEff_12345->AddBinContent(i+1,1);
+      GenExclJetEff_12345->Fill(isogenjets.size());
       
       //Eff vs Reco Jet variables
       for(unsigned int i = 0; i < geniso_recjets.size()+1; i++)RecoInclJetEff_12345->AddBinContent(i+1,1);
@@ -887,8 +916,9 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
       genLeadElEtaEff_123456->Fill(genleadeleta);
       genLeadElPtEff_123456->Fill(genleadelpt);
       
-      //Eff vs Jet variables
-      GenIsoJetEff_123456->Fill(isogenjets.size());
+      //Eff vs Gen Jet variables
+      for(unsigned int i = 0; i < isogenjets.size()+1; i++)GenInclJetEff_123456->AddBinContent(i+1,1);
+      GenExclJetEff_123456->Fill(isogenjets.size());
       
       //Eff vs Reco Jet variables
       for(unsigned int i = 0; i < geniso_recjets.size()+1; i++)RecoInclJetEff_123456->AddBinContent(i+1,1);
@@ -910,28 +940,54 @@ double lumi = _entries/_xsec;
    if(_Norm && lumi!=0){
    _norm = _targetLumi/lumi;
    }
+   
+   if(_tp_mult=="excl"){
+   if(_selections=="VPJ"){
+   _TagProbe_Electron_12->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
+   _TagProbe_Electron_123->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
+   _TagProbe_Electron_1234->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
+   _TagProbe_Electron_12345->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
+   _TagProbe_Electron_123456->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
+   }
+   if(_selections=="VBTF"){
+   _TagProbe_Electron0_12->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
+   _TagProbe_Electron0_123->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
+   _TagProbe_Electron0_1234->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
+   _TagProbe_Electron0_12345->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
+   _TagProbe_Electron0_123456->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
 
-if(_selections=="VPJ"){
-_TagProbe_Electron_12->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
-_TagProbe_Electron_123->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
-_TagProbe_Electron_1234->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
-_TagProbe_Electron_12345->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
-_TagProbe_Electron_123456->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
-}
+   _TagProbe_Electron1_12->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
+   _TagProbe_Electron1_123->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
+   _TagProbe_Electron1_1234->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
+   _TagProbe_Electron1_12345->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
+   _TagProbe_Electron1_123456->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
+   }
+   }
+   else if(_tp_mult=="incl"){
+   for(unsigned int i = 0; i < reciso_recjets.size()+1; i++){
+   if(_selections=="VPJ"){
+   _TagProbe_Electron_12->fill((*zrecHandle)[0], i, _norm);
+   _TagProbe_Electron_123->fill((*zrecHandle)[0], i, _norm);
+   _TagProbe_Electron_1234->fill((*zrecHandle)[0], i, _norm);
+   _TagProbe_Electron_12345->fill((*zrecHandle)[0], i, _norm);
+   _TagProbe_Electron_123456->fill((*zrecHandle)[0], i, _norm);
+   }
+   if(_selections=="VBTF"){
+   _TagProbe_Electron0_12->fill((*zrecHandle)[0], i, _norm);
+   _TagProbe_Electron0_123->fill((*zrecHandle)[0], i, _norm);
+   _TagProbe_Electron0_1234->fill((*zrecHandle)[0], i, _norm);
+   _TagProbe_Electron0_12345->fill((*zrecHandle)[0], i, _norm);
+   _TagProbe_Electron0_123456->fill((*zrecHandle)[0], i, _norm);
 
-if(_selections=="VBTF"){
-_TagProbe_Electron0_12->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
-_TagProbe_Electron0_123->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
-_TagProbe_Electron0_1234->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
-_TagProbe_Electron0_12345->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
-_TagProbe_Electron0_123456->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
-
-_TagProbe_Electron1_12->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
-_TagProbe_Electron1_123->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
-_TagProbe_Electron1_1234->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
-_TagProbe_Electron1_12345->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
-_TagProbe_Electron1_123456->fill((*zrecHandle)[0], reciso_recjets.size(), _norm);
-}
+   _TagProbe_Electron1_12->fill((*zrecHandle)[0], i, _norm);
+   _TagProbe_Electron1_123->fill((*zrecHandle)[0], i, _norm);
+   _TagProbe_Electron1_1234->fill((*zrecHandle)[0], i, _norm);
+   _TagProbe_Electron1_12345->fill((*zrecHandle)[0], i, _norm);
+   _TagProbe_Electron1_123456->fill((*zrecHandle)[0], i, _norm);
+   }
+   
+   }
+   }
 
 }
 }

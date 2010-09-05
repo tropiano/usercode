@@ -78,7 +78,11 @@ public :
    
    TH1D *HEnergy_IsoJet_ElType, *EMEnergy_IsoJet_ElType, *Jet_EMEnergy, *Jet_HEnergy, *MinDeltaR_ZDau, *AllJetCharge, *IsoJetCharge, *NotIsoJetCharge, *DeltaR_IsoJet, *DeltaR_NotIsoJet, *DeltaR_IsoJet_ElType;
    
-   TH1D *ChargeMisID_Pt_Acc, *ChargeMisID_Eta_Acc, *ChargeMisID_Hit_Acc, *ChargeMisID_fBrem_Acc, *ChargeMisID_IP_Acc, *CorrectCharge_Pt_Acc, *CorrectCharge_Eta_Acc, *CorrectCharge_Hit_Acc, *CorrectCharge_fBrem_Acc, *CorrectCharge_IP_Acc, *AllEl_Pt_Acc, *AllEl_Eta_Acc, *AllEl_Hit_Acc, *AllEl_fBrem_Acc, *AllEl_IP_Acc;
+   TH1D *ChargeMisID_Pt_Acc, *ChargeMisID_Eta_Acc, *ChargeMisID_Hit_Acc, *ChargeMisID_fBrem_Acc, *ChargeMisID_IP_Acc, *ChargeMisID_RecoExclJet_Acc, *ChargeMisID_RecoInclJet_Acc;
+   
+   TH1D *CorrectCharge_Pt_Acc, *CorrectCharge_Eta_Acc, *CorrectCharge_Hit_Acc, *CorrectCharge_fBrem_Acc, *CorrectCharge_IP_Acc, *CorrectCharge_RecoExclJet_Acc, *CorrectCharge_RecoInclJet_Acc;
+   
+   TH1D *AllEl_Pt_Acc, *AllEl_Eta_Acc, *AllEl_Hit_Acc, *AllEl_fBrem_Acc, *AllEl_IP_Acc, *AllEl_RecoExclJet_Acc, *AllEl_RecoInclJet_Acc;
    
    TH1D *PixelHit_OC, *PixelHit_SC, *FirstPixelBarrelHit_OC, *FirstPixelBarrelHit_SC;
    

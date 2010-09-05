@@ -33,7 +33,8 @@ public :
    *genMassZEff_12345, *genPtZEff_12345, *genEtaZEff_12345,
    *genMassZEff_123456, *genPtZEff_123456, *genEtaZEff_123456;
    
-   TH1D *GenIsoJetEff_1, *GenIsoJetEff_12, *GenIsoJetEff_123, *GenIsoJetEff_1234, *GenIsoJetEff_12345, *GenIsoJetEff_123456;
+   TH1D *GenInclJetEff_1, *GenInclJetEff_12, *GenInclJetEff_123, *GenInclJetEff_1234, *GenInclJetEff_12345, *GenInclJetEff_123456;
+   TH1D *GenExclJetEff_1, *GenExclJetEff_12, *GenExclJetEff_123, *GenExclJetEff_1234, *GenExclJetEff_12345, *GenExclJetEff_123456;
    
    TH1D *RecoInclJetEff_1, *RecoInclJetEff_12, *RecoInclJetEff_123, *RecoInclJetEff_1234, *RecoInclJetEff_12345, *RecoInclJetEff_123456;
    TH1D *RecoExclJetEff_1, *RecoExclJetEff_12, *RecoExclJetEff_123, *RecoExclJetEff_1234, *RecoExclJetEff_12345, *RecoExclJetEff_123456;
@@ -41,7 +42,7 @@ public :
    TH1D *genLeadElEtaEff_1, *genLeadElEtaEff_12, *genLeadElEtaEff_123, *genLeadElEtaEff_1234, *genLeadElEtaEff_12345, *genLeadElEtaEff_123456, 
    *genLeadElPtEff_1, *genLeadElPtEff_12, *genLeadElPtEff_123, *genLeadElPtEff_1234, *genLeadElPtEff_12345, *genLeadElPtEff_123456;
    
-   TH1D *AccDenom_genPtZ, *AccDenom_genMassZ, *AccDenom_genEtaZ, *AccDenom_genLeadElEta,     *AccDenom_genLeadElPt, *AccDenom_GenIsoJetNumber, *AccDenom_RecoInclJetNumber, *AccDenom_RecoExclJetNumber, *EffDenom_genPtZ, *EffDenom_genMassZ, *EffDenom_genEtaZ, *EffDenom_genLeadElEta, *EffDenom_genLeadElPt, *EffDenom_GenIsoJetNumber, *EffDenom_RecoInclJetNumber, *EffDenom_RecoExclJetNumber;
+   TH1D *AccDenom_genPtZ, *AccDenom_genMassZ, *AccDenom_genEtaZ, *AccDenom_genLeadElEta,     *AccDenom_genLeadElPt, *AccDenom_GenExclJetNumber, *AccDenom_RecoInclJetNumber, *AccDenom_RecoExclJetNumber, *EffDenom_genPtZ, *EffDenom_genMassZ, *EffDenom_genEtaZ, *EffDenom_genLeadElEta, *EffDenom_genLeadElPt, *EffDenom_GenExclJetNumber, *EffDenom_RecoInclJetNumber, *EffDenom_RecoExclJetNumber;
       
 private:
 
@@ -94,6 +95,8 @@ private:
   double _targetLumi;
   
   double _xsec;
+  
+  std::string _tp_mult;
 
 };
 #endif

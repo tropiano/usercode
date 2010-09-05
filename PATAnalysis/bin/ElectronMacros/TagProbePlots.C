@@ -25,19 +25,22 @@
 
 using namespace std;
 
-//sample == "mc" -> MonteCarlo , sample == "data" -> Data
+//multiplicity: "excl" = exclusive multiplicity; "incl" = inclusive multiplicity
 //Selections: "VPJ" = V+jets selections (old); "VBTF" = Vector Boson Task Force (new)
 
-void TPPlots(string sample, string selections){
+void TPPlots(string multiplicity, string selections){
 
         gROOT->SetStyle("Plain");
-
-        TFile *signal_file = TFile::Open("TagProbe_Signal_train_TagIso005_VPJ.root");
         
+        //MonteCarlo Signal file used to evaluate the Rel. MC Eff. and the TP Eff. w/o background
+        TFile *signal_MC_file = TFile::Open("TagProbe_Signal_train_TagIso005_VPJ.root");
+        
+        //TP files (outputs of TagAndProbeAnalyzer) whit the mass fits
         TFile *tp_123 = TFile::Open("TPAnalyzer_Total_50pb_TagIso005_VPJ_Imp.root");
         TFile *tp_1234 = TFile::Open("TPAnalyzer_Total_50pb_TagIso005_VPJ_Iso.root");
         TFile *tp_12345 = TFile::Open("TPAnalyzer_Total_50pb_TagIso005_VPJ_EiD.root");
         
+        //outputof TPPlots macro
         TFile* outplots = new TFile("TPStudy_TagIso005_VPJ.root", "RECREATE");
         
         double xmin, xmax;
@@ -70,7 +73,7 @@ void TPPlots(string sample, string selections){
        _RecoCutFlags[_Qual] = "_Qual";
        _RecoCutFlags[_Imp] =  "_Imp";
     
-        if(!signal_file){
+        if(!signal_MC_file){
 	cout<<"Error! Input files doesn't exist!"<<endl;
 	return;
 	}
@@ -97,93 +100,95 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 
    //Denominators
 	
-   TH1D* EffDenom_GenIsoJetNumber = (TH1D*) signal_file->Get("EfficiencyElectron/EffDenom_GenIsoJetNumber");
+   TH1D* RelEffDenom_MC(0);
+   
+   if(multiplicity=="excl")RelEffDenom_MC = (TH1D*) signal_MC_file->Get("EfficiencyElectron/EffDenom_RecoExclJetNumber");
+   if(multiplicity=="incl")RelEffDenom_MC = (TH1D*) signal_MC_file->Get("EfficiencyElectron/EffDenom_RecoInclJetNumber");
+
+	string MCJetEff_name;
+	if(multiplicity=="excl")MCJetEff_name = "EfficiencyElectron/RecoExclJetEff";
+	if(multiplicity=="incl")MCJetEff_name = "EfficiencyElectron/RecoInclJetEff";
 	
-	
-	string genIsoJetEff_name = "EfficiencyElectron/GenIsoJetEff";
-	genIsoJetEff_name+=_RecoCutFlags[1].c_str();
-        TH1D* GenIsoJetNumber_1 = (TH1D*) signal_file->Get(genIsoJetEff_name.c_str());
-	genIsoJetEff_name+=_RecoCutFlags[2].c_str();
-        TH1D* GenIsoJetNumber_12 = (TH1D*) signal_file->Get(genIsoJetEff_name.c_str());
-	genIsoJetEff_name+=_RecoCutFlags[3].c_str();
-	TH1D* GenIsoJetNumber_123 = (TH1D*) signal_file->Get(genIsoJetEff_name.c_str());
-	genIsoJetEff_name+=_RecoCutFlags[4].c_str();
-	TH1D* GenIsoJetNumber_1234 = (TH1D*) signal_file->Get(genIsoJetEff_name.c_str());
-	genIsoJetEff_name+=_RecoCutFlags[5].c_str();
-	TH1D* GenIsoJetNumber_12345 = (TH1D*) signal_file->Get(genIsoJetEff_name.c_str());
-	genIsoJetEff_name+=_RecoCutFlags[6].c_str();
-	TH1D* GenIsoJetNumber_123456 = (TH1D*) signal_file->Get(genIsoJetEff_name.c_str());
+	MCJetEff_name+=_RecoCutFlags[1].c_str();
+        TH1D* MCJetNumber_1 = (TH1D*) signal_MC_file->Get(MCJetEff_name.c_str());
+	MCJetEff_name+=_RecoCutFlags[2].c_str();
+        TH1D* MCJetNumber_12 = (TH1D*) signal_MC_file->Get(MCJetEff_name.c_str());
+	MCJetEff_name+=_RecoCutFlags[3].c_str();
+	TH1D* MCJetNumber_123 = (TH1D*) signal_MC_file->Get(MCJetEff_name.c_str());
+	MCJetEff_name+=_RecoCutFlags[4].c_str();
+	TH1D* MCJetNumber_1234 = (TH1D*) signal_MC_file->Get(MCJetEff_name.c_str());
+	MCJetEff_name+=_RecoCutFlags[5].c_str();
+	TH1D* MCJetNumber_12345 = (TH1D*) signal_MC_file->Get(MCJetEff_name.c_str());
+	MCJetEff_name+=_RecoCutFlags[6].c_str();
+	TH1D* MCJetNumber_123456 = (TH1D*) signal_MC_file->Get(MCJetEff_name.c_str());
 
         //Relative Efficiency from MC
         
         R_Jet_Eff->cd();
             
-        TGraphAsymmErrors Eff_Rel_1(GenIsoJetNumber_1, EffDenom_GenIsoJetNumber);
-        TGraphAsymmErrors Eff_Rel_12(GenIsoJetNumber_12, GenIsoJetNumber_1);
-        TGraphAsymmErrors Eff_Rel_123(GenIsoJetNumber_123, GenIsoJetNumber_12);
-        TGraphAsymmErrors Eff_Rel_1234(GenIsoJetNumber_1234, GenIsoJetNumber_123);
-        TGraphAsymmErrors Eff_Rel_12345(GenIsoJetNumber_12345, GenIsoJetNumber_1234);
-        TGraphAsymmErrors Eff_Rel_123456(GenIsoJetNumber_123456, GenIsoJetNumber_12345);
+        TGraphAsymmErrors Eff_MC_Rel1(MCJetNumber_1, RelEffDenom_MC);
+        TGraphAsymmErrors Eff_MC_Rel12(MCJetNumber_12, MCJetNumber_1);
+        TGraphAsymmErrors Eff_MC_Rel123(MCJetNumber_123, MCJetNumber_12);
+        TGraphAsymmErrors Eff_MC_Rel1234(MCJetNumber_1234, MCJetNumber_123);
+        TGraphAsymmErrors Eff_MC_Rel12345(MCJetNumber_12345, MCJetNumber_1234);
+        TGraphAsymmErrors Eff_MC_Rel123456(MCJetNumber_123456, MCJetNumber_12345);
         
-        if(sample=="mc"){
+        string Eff_MC_Relname="RelativeEff_MC";
+        Eff_MC_Relname+=_RecoCutFlags[1].c_str();
+        Eff_MC_Rel1.SetNameTitle(Eff_MC_Relname.c_str(), Eff_MC_Relname.c_str());
+        Eff_MC_Relname+=_RecoCutFlags[2].c_str();  
+        Eff_MC_Rel12.SetNameTitle(Eff_MC_Relname.c_str(), Eff_MC_Relname.c_str());
+        Eff_MC_Relname+=_RecoCutFlags[3].c_str();  
+        Eff_MC_Rel123.SetNameTitle(Eff_MC_Relname.c_str(), Eff_MC_Relname.c_str());
+        Eff_MC_Relname+=_RecoCutFlags[4].c_str();  
+        Eff_MC_Rel1234.SetNameTitle(Eff_MC_Relname.c_str(), Eff_MC_Relname.c_str());
+        Eff_MC_Relname+=_RecoCutFlags[5].c_str();  
+        Eff_MC_Rel12345.SetNameTitle(Eff_MC_Relname.c_str(), Eff_MC_Relname.c_str());
+        Eff_MC_Relname+=_RecoCutFlags[6].c_str();  
+        Eff_MC_Rel123456.SetNameTitle(Eff_MC_Relname.c_str(), Eff_MC_Relname.c_str());
         
-        string Eff_Rel_name="RelativeEff_MC";
-        Eff_Rel_name+=_RecoCutFlags[1].c_str();
-        Eff_Rel_1.SetNameTitle(Eff_Rel_name.c_str(), Eff_Rel_name.c_str());
-        Eff_Rel_name+=_RecoCutFlags[2].c_str();  
-        Eff_Rel_12.SetNameTitle(Eff_Rel_name.c_str(), Eff_Rel_name.c_str());
-        Eff_Rel_name+=_RecoCutFlags[3].c_str();  
-        Eff_Rel_123.SetNameTitle(Eff_Rel_name.c_str(), Eff_Rel_name.c_str());
-        Eff_Rel_name+=_RecoCutFlags[4].c_str();  
-        Eff_Rel_1234.SetNameTitle(Eff_Rel_name.c_str(), Eff_Rel_name.c_str());
-        Eff_Rel_name+=_RecoCutFlags[5].c_str();  
-        Eff_Rel_12345.SetNameTitle(Eff_Rel_name.c_str(), Eff_Rel_name.c_str());
-        Eff_Rel_name+=_RecoCutFlags[6].c_str();  
-        Eff_Rel_123456.SetNameTitle(Eff_Rel_name.c_str(), Eff_Rel_name.c_str());
-        
-        Eff_Rel_1.Write();
-        Eff_Rel_12.Write();
-        Eff_Rel_123.Write();
-        Eff_Rel_1234.Write();
-        Eff_Rel_123456.Write();
+        Eff_MC_Rel1.Write();
+        Eff_MC_Rel12.Write();
+        Eff_MC_Rel123.Write();
+        Eff_MC_Rel1234.Write();
+        Eff_MC_Rel123456.Write();
         
 	TCanvas *REffJet = new TCanvas;
-	Eff_Rel_1.GetYaxis()->SetRangeUser(0.3,1);
-	Eff_Rel_1.GetXaxis()->SetTitle("gen Jet number");
-	Eff_Rel_1.SetMarkerStyle(20);
-	Eff_Rel_1.Draw("AP");
+	Eff_MC_Rel1.GetYaxis()->SetRangeUser(0.3,1);
+	Eff_MC_Rel1.GetXaxis()->SetTitle("gen Jet number");
+	Eff_MC_Rel1.SetMarkerStyle(20);
+	Eff_MC_Rel1.Draw("AP");
 	if(_RecoCutFlags[2] != "_1"){
-	Eff_Rel_12.SetLineColor(2);
-	Eff_Rel_12.SetMarkerStyle(21);
-	Eff_Rel_12.SetMarkerColor(2);
-	Eff_Rel_12.Draw("PSAME");}
+	Eff_MC_Rel12.SetLineColor(2);
+	Eff_MC_Rel12.SetMarkerStyle(21);
+	Eff_MC_Rel12.SetMarkerColor(2);
+	Eff_MC_Rel12.Draw("PSAME");}
 	if(_RecoCutFlags[3] != "_1"){
-	Eff_Rel_123.SetLineColor(3);
-	Eff_Rel_123.SetMarkerStyle(22);
-	Eff_Rel_123.SetMarkerColor(3);
-        Eff_Rel_123.Draw("PSAME");}
+	Eff_MC_Rel123.SetLineColor(3);
+	Eff_MC_Rel123.SetMarkerStyle(22);
+	Eff_MC_Rel123.SetMarkerColor(3);
+        Eff_MC_Rel123.Draw("PSAME");}
 	if(_RecoCutFlags[4] != "_1"){
-	Eff_Rel_1234.SetLineColor(4);
-	Eff_Rel_1234.SetMarkerStyle(23);
-	Eff_Rel_1234.SetMarkerColor(4);
-	Eff_Rel_1234.Draw("PSAME");}
+	Eff_MC_Rel1234.SetLineColor(4);
+	Eff_MC_Rel1234.SetMarkerStyle(23);
+	Eff_MC_Rel1234.SetMarkerColor(4);
+	Eff_MC_Rel1234.Draw("PSAME");}
 	if(_RecoCutFlags[5] != "_1"){
-        Eff_Rel_12345.SetLineColor(5);
-	Eff_Rel_12345.SetMarkerStyle(24);
-	Eff_Rel_12345.SetMarkerColor(5);
-	Eff_Rel_12345.Draw("PSAME");}
+        Eff_MC_Rel12345.SetLineColor(5);
+	Eff_MC_Rel12345.SetMarkerStyle(24);
+	Eff_MC_Rel12345.SetMarkerColor(5);
+	Eff_MC_Rel12345.Draw("PSAME");}
 	if(_RecoCutFlags[6] != "_1"){
-        Eff_Rel_123456.SetLineColor(6);
-	Eff_Rel_123456.SetMarkerStyle(25);
-	Eff_Rel_123456.SetMarkerColor(6);
-	Eff_Rel_123456.Draw("PSAME");}
+        Eff_MC_Rel123456.SetLineColor(6);
+	Eff_MC_Rel123456.SetMarkerStyle(25);
+	Eff_MC_Rel123456.SetMarkerColor(6);
+	Eff_MC_Rel123456.Draw("PSAME");}
 	TLegend *LegREffJ = REffJet->BuildLegend(0.5,0.67,0.88,0.88,"Legenda");
 	LegREffJ->Draw();
-	Eff_Rel_1.SetTitle("Cut Relative Efficiency vs Gen Jet Number");
+	Eff_MC_Rel1.SetTitle("Cut Relative Efficiency vs Gen Jet Number");
 	REffJet->Write("Cut_RelativeEfficiency_VsGenJet.root");
 	REffJet->Close();
 	
-	}
         
 ////////////////////////////////////////////////////////////////////////////////////	
 	
@@ -204,40 +209,40 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         string num_TP = TPDir+TPHisto+"_SingleCandTag&Probe_numerator";
         string den_TP = TPDir+TPHisto+"_SingleCandTag&Probe_denominator";
         
-        TH1D* TP_numerator_12 = (TH1D*) signal_file->Get(num_TP.c_str());
-        TH1D* TP_denominator_12 = (TH1D*) signal_file->Get(den_TP.c_str());
+        TH1D* TP_numerator_12 = (TH1D*) signal_MC_file->Get(num_TP.c_str());
+        TH1D* TP_denominator_12 = (TH1D*) signal_MC_file->Get(den_TP.c_str());
         
         TPDir+=_RecoCutFlags[3].c_str();    
         TPHisto+=_RecoCutFlags[3].c_str(); 
         num_TP = TPDir+TPHisto+"_SingleCandTag&Probe_numerator";
         den_TP = TPDir+TPHisto+"_SingleCandTag&Probe_denominator";
         
-        TH1D* TP_numerator_123 = (TH1D*) signal_file->Get(num_TP.c_str());
-        TH1D* TP_denominator_123 = (TH1D*) signal_file->Get(den_TP.c_str());
+        TH1D* TP_numerator_123 = (TH1D*) signal_MC_file->Get(num_TP.c_str());
+        TH1D* TP_denominator_123 = (TH1D*) signal_MC_file->Get(den_TP.c_str());
         
         TPDir+=_RecoCutFlags[4].c_str();    
         TPHisto+=_RecoCutFlags[4].c_str(); 
         num_TP = TPDir+TPHisto+"_SingleCandTag&Probe_numerator";
         den_TP = TPDir+TPHisto+"_SingleCandTag&Probe_denominator";
        
-        TH1D* TP_numerator_1234 = (TH1D*) signal_file->Get(num_TP.c_str());
-        TH1D* TP_denominator_1234 = (TH1D*) signal_file->Get(den_TP.c_str());
+        TH1D* TP_numerator_1234 = (TH1D*) signal_MC_file->Get(num_TP.c_str());
+        TH1D* TP_denominator_1234 = (TH1D*) signal_MC_file->Get(den_TP.c_str());
         
         TPDir+=_RecoCutFlags[5].c_str();    
         TPHisto+=_RecoCutFlags[5].c_str(); 
         num_TP = TPDir+TPHisto+"_SingleCandTag&Probe_numerator";
         den_TP = TPDir+TPHisto+"_SingleCandTag&Probe_denominator";
         
-        TH1D* TP_numerator_12345 = (TH1D*) signal_file->Get(num_TP.c_str());
-        TH1D* TP_denominator_12345 = (TH1D*) signal_file->Get(den_TP.c_str());
+        TH1D* TP_numerator_12345 = (TH1D*) signal_MC_file->Get(num_TP.c_str());
+        TH1D* TP_denominator_12345 = (TH1D*) signal_MC_file->Get(den_TP.c_str());
         
         TPDir+=_RecoCutFlags[6].c_str();    
         TPHisto+=_RecoCutFlags[6].c_str(); 
         num_TP = TPDir+TPHisto+"_SingleCandTag&Probe_numerator";
         den_TP = TPDir+TPHisto+"_SingleCandTag&Probe_denominator";
         
-        TH1D* TP_numerator_123456 = (TH1D*) signal_file->Get(num_TP.c_str());
-        TH1D* TP_denominator_123456 = (TH1D*) signal_file->Get(den_TP.c_str());
+        TH1D* TP_numerator_123456 = (TH1D*) signal_MC_file->Get(num_TP.c_str());
+        TH1D* TP_denominator_123456 = (TH1D*) signal_MC_file->Get(den_TP.c_str());
         
         TGraphAsymmErrors Eff_TP_Single_12(TP_numerator_12, TP_denominator_12);       
         TGraphAsymmErrors Eff_TP_Single_123(TP_numerator_123, TP_denominator_123);      
@@ -274,40 +279,40 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         string num_TP1 = TPDir1+TPHisto+"_SingleCandTag&Probe_numerator";
         string den_TP1 = TPDir1+TPHisto+"_SingleCandTag&Probe_denominator";
         
-        TH1D* TP_numerator1_12 = (TH1D*) signal_file->Get(num_TP1.c_str());
-        TH1D* TP_denominator1_12 = (TH1D*) signal_file->Get(den_TP1.c_str());
+        TH1D* TP_numerator1_12 = (TH1D*) signal_MC_file->Get(num_TP1.c_str());
+        TH1D* TP_denominator1_12 = (TH1D*) signal_MC_file->Get(den_TP1.c_str());
         
         TPDir1+=_RecoCutFlags[3].c_str();    
         TPHisto+=_RecoCutFlags[3].c_str(); 
         num_TP1 = TPDir1+TPHisto+"_SingleCandTag&Probe_numerator";
         den_TP1 = TPDir1+TPHisto+"_SingleCandTag&Probe_denominator";
         
-        TH1D* TP_numerator1_123 = (TH1D*) signal_file->Get(num_TP1.c_str());
-        TH1D* TP_denominator1_123 = (TH1D*) signal_file->Get(den_TP1.c_str());
+        TH1D* TP_numerator1_123 = (TH1D*) signal_MC_file->Get(num_TP1.c_str());
+        TH1D* TP_denominator1_123 = (TH1D*) signal_MC_file->Get(den_TP1.c_str());
         
         TPDir1+=_RecoCutFlags[4].c_str();    
         TPHisto+=_RecoCutFlags[4].c_str(); 
         num_TP1 = TPDir1+TPHisto+"_SingleCandTag&Probe_numerator";
         den_TP1 = TPDir1+TPHisto+"_SingleCandTag&Probe_denominator";
        
-        TH1D* TP_numerator1_1234 = (TH1D*) signal_file->Get(num_TP1.c_str());
-        TH1D* TP_denominator1_1234 = (TH1D*) signal_file->Get(den_TP1.c_str());
+        TH1D* TP_numerator1_1234 = (TH1D*) signal_MC_file->Get(num_TP1.c_str());
+        TH1D* TP_denominator1_1234 = (TH1D*) signal_MC_file->Get(den_TP1.c_str());
         
         TPDir1+=_RecoCutFlags[5].c_str();    
         TPHisto+=_RecoCutFlags[5].c_str(); 
         num_TP1 = TPDir1+TPHisto+"_SingleCandTag&Probe_numerator";
         den_TP1 = TPDir1+TPHisto+"_SingleCandTag&Probe_denominator";
         
-        TH1D* TP_numerator1_12345 = (TH1D*) signal_file->Get(num_TP1.c_str());
-        TH1D* TP_denominator1_12345 = (TH1D*) signal_file->Get(den_TP1.c_str());
+        TH1D* TP_numerator1_12345 = (TH1D*) signal_MC_file->Get(num_TP1.c_str());
+        TH1D* TP_denominator1_12345 = (TH1D*) signal_MC_file->Get(den_TP1.c_str());
         
         TPDir1+=_RecoCutFlags[6].c_str();    
         TPHisto+=_RecoCutFlags[6].c_str(); 
         num_TP1 = TPDir1+TPHisto+"_SingleCandTag&Probe_numerator";
         den_TP1 = TPDir1+TPHisto+"_SingleCandTag&Probe_denominator";
         
-        TH1D* TP_numerator1_123456 = (TH1D*) signal_file->Get(num_TP1.c_str());
-        TH1D* TP_denominator1_123456 = (TH1D*) signal_file->Get(den_TP1.c_str());
+        TH1D* TP_numerator1_123456 = (TH1D*) signal_MC_file->Get(num_TP1.c_str());
+        TH1D* TP_denominator1_123456 = (TH1D*) signal_MC_file->Get(den_TP1.c_str());
         
         Eff_TP_Single1_12.BayesDivide(TP_numerator1_12, TP_denominator1_12);       
         Eff_TP_Single1_123.BayesDivide(TP_numerator1_123, TP_denominator1_123);      
@@ -478,13 +483,12 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	Eff_TP_Double_12.Draw("AP");
 	Eff_TP_Double_12.SetTitle("Cut eff: MC (black), TP w/o back (red), TP w back (blue)");
 	Eff_TP_Double_12.GetXaxis()->SetRangeUser(xmin,xmax);
-	Eff_TP_Double_12.GetYaxis()->SetRangeUser(0.3,1.05);
-        if(sample=="mc"){     
-        Eff_Rel_12.SetLineColor(1);
-        Eff_Rel_12.SetLineWidth(2);
-	Eff_Rel_12.SetMarkerStyle(20);
-	Eff_Rel_12.SetMarkerColor(1);
-	Eff_Rel_12.Draw("PSAME");}	
+	Eff_TP_Double_12.GetYaxis()->SetRangeUser(0.3,1.05); 
+        Eff_MC_Rel12.SetLineColor(1);
+        Eff_MC_Rel12.SetLineWidth(2);
+	Eff_MC_Rel12.SetMarkerStyle(20);
+	Eff_MC_Rel12.SetMarkerColor(1);
+	Eff_MC_Rel12.Draw("PSAME");	
 	string EffTP_12_name = "TPEff";
 	EffTP_12_name+=_RecoCutFlags[1].c_str();
         EffTP_12_name+=_RecoCutFlags[2].c_str();
@@ -509,12 +513,11 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	tp_eff_123->SetMarkerStyle(23);
 	tp_eff_123->SetMarkerColor(4);
 	tp_eff_123->DrawClone("PSAME");	
-        if(sample=="mc"){ 
-        Eff_Rel_123.SetLineColor(1);
-        Eff_Rel_123.SetLineWidth(2);
-	Eff_Rel_123.SetMarkerStyle(20);
-	Eff_Rel_123.SetMarkerColor(1);
-	Eff_Rel_123.Draw("PSAME");}	
+        Eff_MC_Rel123.SetLineColor(1);
+        Eff_MC_Rel123.SetLineWidth(2);
+	Eff_MC_Rel123.SetMarkerStyle(20);
+	Eff_MC_Rel123.SetMarkerColor(1);
+	Eff_MC_Rel123.Draw("PSAME");
 	string EffTP_123_name = "TPEff";
 	EffTP_123_name+=_RecoCutFlags[1].c_str();
         EffTP_123_name+=_RecoCutFlags[2].c_str();
@@ -539,13 +542,12 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	tp_eff_1234->DrawClone("PSAME");	
 	Eff_TP_Double_1234.SetTitle("Cut eff: MC (black), TP w/o back (red), TP w back (blue)");
 	Eff_TP_Double_1234.GetXaxis()->SetRangeUser(xmin,xmax);
-	Eff_TP_Double_1234.GetYaxis()->SetRangeUser(0.3,1.05);
-        if(sample=="mc"){     
-        Eff_Rel_1234.SetLineColor(1);
-        Eff_Rel_1234.SetLineWidth(2);
-	Eff_Rel_1234.SetMarkerStyle(20);
-	Eff_Rel_1234.SetMarkerColor(1);
-	Eff_Rel_1234.Draw("PSAME");}
+	Eff_TP_Double_1234.GetYaxis()->SetRangeUser(0.3,1.05);    
+        Eff_MC_Rel1234.SetLineColor(1);
+        Eff_MC_Rel1234.SetLineWidth(2);
+	Eff_MC_Rel1234.SetMarkerStyle(20);
+	Eff_MC_Rel1234.SetMarkerColor(1);
+	Eff_MC_Rel1234.Draw("PSAME");
 	string EffTP_1234_name = "TPEff";
 	EffTP_1234_name+=_RecoCutFlags[1].c_str();
         EffTP_1234_name+=_RecoCutFlags[2].c_str();
@@ -571,13 +573,12 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	tp_eff_12345->DrawClone("PSAME");	
 	Eff_TP_Double_12345.SetTitle("Cut eff: MC (black), TP w/o back (red), TP w back (blue)");
 	Eff_TP_Double_12345.GetXaxis()->SetRangeUser(xmin,xmax);
-	Eff_TP_Double_12345.GetYaxis()->SetRangeUser(0.3,1.05);
-        if(sample=="mc"){       
-        Eff_Rel_12345.SetLineColor(1);
-        Eff_Rel_12345.SetLineWidth(2);
-	Eff_Rel_12345.SetMarkerStyle(20);
-	Eff_Rel_12345.SetMarkerColor(1);
-	Eff_Rel_12345.Draw("PSAME");}
+	Eff_TP_Double_12345.GetYaxis()->SetRangeUser(0.3,1.05);      
+        Eff_MC_Rel12345.SetLineColor(1);
+        Eff_MC_Rel12345.SetLineWidth(2);
+	Eff_MC_Rel12345.SetMarkerStyle(20);
+	Eff_MC_Rel12345.SetMarkerColor(1);
+	Eff_MC_Rel12345.Draw("PSAME");
 	string EffTP_12345_name = "TPEff";
 	EffTP_12345_name+=_RecoCutFlags[1].c_str();
         EffTP_12345_name+=_RecoCutFlags[2].c_str();
@@ -600,12 +601,11 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	Eff_TP_Double_123456.SetTitle("Cut eff: MC (black), TP w/o back (red), TP w back (blue)");
 	Eff_TP_Double_123456.GetXaxis()->SetRangeUser(xmin,xmax);
 	Eff_TP_Double_123456.GetYaxis()->SetRangeUser(0.3,1.05);
-        if(sample=="mc"){
-        Eff_Rel_123456.SetLineColor(1);
-        Eff_Rel_123456.SetLineWidth(2);
-	Eff_Rel_123456.SetMarkerStyle(20);
-	Eff_Rel_123456.SetMarkerColor(1);
-	Eff_Rel_123456.Draw("PSAME");}	
+        Eff_MC_Rel123456.SetLineColor(1);
+        Eff_MC_Rel123456.SetLineWidth(2);
+	Eff_MC_Rel123456.SetMarkerStyle(20);
+	Eff_MC_Rel123456.SetMarkerColor(1);
+	Eff_MC_Rel123456.Draw("PSAME");	
 	string EffTP_123456_name = "TPEff";
 	EffTP_123456_name+=_RecoCutFlags[1].c_str();
         EffTP_123456_name+=_RecoCutFlags[2].c_str();
@@ -620,8 +620,6 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 /////////////////////////////////////////////////////////////////////////////////////////
 
 // Tag&Probe residuals
-
-        if(sample=="mc"){
 
         TVectorD res1vx_123(n_123);
         TVectorD res1vy_123(n_123);
@@ -638,21 +636,21 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         
         for ( int i = 0; i < n_123; ++i ){
         double x0 = 0., y0 = 0., x1 = 0., y1 = 0., x2 = 0., y2 = 0.;
-        Eff_Rel_123.GetPoint(i, x0, y0);
+        Eff_MC_Rel123.GetPoint(i, x0, y0);
         Eff_TP_Double_123.GetPoint(i, x1, y1);
         tp_eff_123->GetPoint(i, x2, y2);
         res1vx_123(i)   = i;
-        res1vexl_123(i) = Eff_Rel_123.GetErrorXlow(i);
-        res1vexh_123(i) = Eff_Rel_123.GetErrorXhigh(i);
+        res1vexl_123(i) = Eff_MC_Rel123.GetErrorXlow(i);
+        res1vexh_123(i) = Eff_MC_Rel123.GetErrorXhigh(i);
         res1vy_123(i)   = y1-y0;
-        res1veyl_123(i) = TMath::Sqrt(pow(Eff_Rel_123.GetErrorYlow(i),2)+pow(Eff_TP_Double_123.GetErrorYlow(i),2));
-        res1veyh_123(i) = TMath::Sqrt(pow(Eff_Rel_123.GetErrorYhigh(i),2)+pow(Eff_TP_Double_123.GetErrorYhigh(i),2));
+        res1veyl_123(i) = TMath::Sqrt(pow(Eff_MC_Rel123.GetErrorYlow(i),2)+pow(Eff_TP_Double_123.GetErrorYlow(i),2));
+        res1veyh_123(i) = TMath::Sqrt(pow(Eff_MC_Rel123.GetErrorYhigh(i),2)+pow(Eff_TP_Double_123.GetErrorYhigh(i),2));
         res2vx_123(i)   = i;
-        res2vexl_123(i) = Eff_Rel_123.GetErrorXlow(i);
-        res2vexh_123(i) = Eff_Rel_123.GetErrorXhigh(i);
+        res2vexl_123(i) = Eff_MC_Rel123.GetErrorXlow(i);
+        res2vexh_123(i) = Eff_MC_Rel123.GetErrorXhigh(i);
         res2vy_123(i)   = y2-y0;
-        res2veyl_123(i) = TMath::Sqrt(pow(Eff_Rel_123.GetErrorYlow(i),2)+pow(tp_eff_123->GetErrorYlow(i),2));
-        res2veyh_123(i) = TMath::Sqrt(pow(Eff_Rel_123.GetErrorYhigh(i),2)+pow(tp_eff_123->GetErrorYhigh(i),2));
+        res2veyl_123(i) = TMath::Sqrt(pow(Eff_MC_Rel123.GetErrorYlow(i),2)+pow(tp_eff_123->GetErrorYlow(i),2));
+        res2veyh_123(i) = TMath::Sqrt(pow(Eff_MC_Rel123.GetErrorYhigh(i),2)+pow(tp_eff_123->GetErrorYhigh(i),2));
         }
               
         TP_123->cd();
@@ -691,21 +689,21 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         
         for ( int i = 0; i < n_1234; ++i ){
         double x0 = 0., y0 = 0., x1 = 0., y1 = 0., x2 = 0., y2 = 0.;
-        Eff_Rel_1234.GetPoint(i, x0, y0);
+        Eff_MC_Rel1234.GetPoint(i, x0, y0);
         Eff_TP_Double_1234.GetPoint(i, x1, y1);
         tp_eff_1234->GetPoint(i, x2, y2);
         res1vx_1234(i)   = i;
-        res1vexl_1234(i) = Eff_Rel_1234.GetErrorXlow(i);
-        res1vexh_1234(i) = Eff_Rel_1234.GetErrorXhigh(i);
+        res1vexl_1234(i) = Eff_MC_Rel1234.GetErrorXlow(i);
+        res1vexh_1234(i) = Eff_MC_Rel1234.GetErrorXhigh(i);
         res1vy_1234(i)   = y1-y0;
-        res1veyl_1234(i) = TMath::Sqrt(pow(Eff_Rel_1234.GetErrorYlow(i),2)+pow(Eff_TP_Double_1234.GetErrorYlow(i),2));
-        res1veyh_1234(i) = TMath::Sqrt(pow(Eff_Rel_1234.GetErrorYhigh(i),2)+pow(Eff_TP_Double_1234.GetErrorYhigh(i),2));
+        res1veyl_1234(i) = TMath::Sqrt(pow(Eff_MC_Rel1234.GetErrorYlow(i),2)+pow(Eff_TP_Double_1234.GetErrorYlow(i),2));
+        res1veyh_1234(i) = TMath::Sqrt(pow(Eff_MC_Rel1234.GetErrorYhigh(i),2)+pow(Eff_TP_Double_1234.GetErrorYhigh(i),2));
         res2vx_1234(i)   = i;
-        res2vexl_1234(i) = Eff_Rel_1234.GetErrorXlow(i);
-        res2vexh_1234(i) = Eff_Rel_1234.GetErrorXhigh(i);
+        res2vexl_1234(i) = Eff_MC_Rel1234.GetErrorXlow(i);
+        res2vexh_1234(i) = Eff_MC_Rel1234.GetErrorXhigh(i);
         res2vy_1234(i)   = y2-y0;
-        res2veyl_1234(i) = TMath::Sqrt(pow(Eff_Rel_1234.GetErrorYlow(i),2)+pow(tp_eff_1234->GetErrorYlow(i),2));
-        res2veyh_1234(i) = TMath::Sqrt(pow(Eff_Rel_1234.GetErrorYhigh(i),2)+pow(tp_eff_1234->GetErrorYhigh(i),2));
+        res2veyl_1234(i) = TMath::Sqrt(pow(Eff_MC_Rel1234.GetErrorYlow(i),2)+pow(tp_eff_1234->GetErrorYlow(i),2));
+        res2veyh_1234(i) = TMath::Sqrt(pow(Eff_MC_Rel1234.GetErrorYhigh(i),2)+pow(tp_eff_1234->GetErrorYhigh(i),2));
         }
               
         TP_1234->cd();
@@ -744,21 +742,21 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
        
         for ( int i = 0; i < n_12345; ++i ){
         double x0 = 0., y0 = 0., x1 = 0., y1 = 0., x2 = 0., y2 = 0.;
-        Eff_Rel_12345.GetPoint(i, x0, y0);
+        Eff_MC_Rel12345.GetPoint(i, x0, y0);
         Eff_TP_Double_12345.GetPoint(i, x1, y1);
         tp_eff_12345->GetPoint(i, x2, y2);
         res1vx_12345(i)   = i;
-        res1vexl_12345(i) = Eff_Rel_12345.GetErrorXlow(i);
-        res1vexh_12345(i) = Eff_Rel_12345.GetErrorXhigh(i);
+        res1vexl_12345(i) = Eff_MC_Rel12345.GetErrorXlow(i);
+        res1vexh_12345(i) = Eff_MC_Rel12345.GetErrorXhigh(i);
         res1vy_12345(i)   = y1-y0;
-        res1veyl_12345(i) = TMath::Sqrt(pow(Eff_Rel_12345.GetErrorYlow(i),2)+pow(Eff_TP_Double_12345.GetErrorYlow(i),2));
-        res1veyh_12345(i) = TMath::Sqrt(pow(Eff_Rel_12345.GetErrorYhigh(i),2)+pow(Eff_TP_Double_12345.GetErrorYhigh(i),2));
+        res1veyl_12345(i) = TMath::Sqrt(pow(Eff_MC_Rel12345.GetErrorYlow(i),2)+pow(Eff_TP_Double_12345.GetErrorYlow(i),2));
+        res1veyh_12345(i) = TMath::Sqrt(pow(Eff_MC_Rel12345.GetErrorYhigh(i),2)+pow(Eff_TP_Double_12345.GetErrorYhigh(i),2));
         res2vx_12345(i)   = i;
-        res2vexl_12345(i) = Eff_Rel_12345.GetErrorXlow(i);
-        res2vexh_12345(i) = Eff_Rel_12345.GetErrorXhigh(i);
+        res2vexl_12345(i) = Eff_MC_Rel12345.GetErrorXlow(i);
+        res2vexh_12345(i) = Eff_MC_Rel12345.GetErrorXhigh(i);
         res2vy_12345(i)   = y2-y0;
-        res2veyl_12345(i) = TMath::Sqrt(pow(Eff_Rel_12345.GetErrorYlow(i),2)+pow(tp_eff_12345->GetErrorYlow(i),2));
-        res2veyh_12345(i) = TMath::Sqrt(pow(Eff_Rel_12345.GetErrorYhigh(i),2)+pow(tp_eff_12345->GetErrorYhigh(i),2));
+        res2veyl_12345(i) = TMath::Sqrt(pow(Eff_MC_Rel12345.GetErrorYlow(i),2)+pow(tp_eff_12345->GetErrorYlow(i),2));
+        res2veyh_12345(i) = TMath::Sqrt(pow(Eff_MC_Rel12345.GetErrorYhigh(i),2)+pow(tp_eff_12345->GetErrorYhigh(i),2));
         }
               
         TP_12345->cd();
@@ -782,7 +780,6 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	ResTP_12345->Write("ResTP_EiD.root");
 	ResTP_12345->Close();
 	
-	}
 	
   outplots->Write();
   outplots->Close();

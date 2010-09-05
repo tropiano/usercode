@@ -38,22 +38,25 @@ int main() {
 
   //Job
   
-  int PreDefName = 1;
+  int PreDefName = 0;
   
-  string sourceList = "Zpj_Madgraph_train.txt";
-  string outNameSuf="_TEST";
+  string sourceList = "Data.txt";
+  string outNameSuf="_test";
   name(PreDefName);
   string outputName = SampleName;
   outputName+=outNameSuf;
   
   //Sample: mc = MonteCarlo , data = Data
-  string sample = "mc";
+  string sample = "data";
   
   //Selections: "VPJ" = V+jets selections (old); "VBTF" = Vector Boson Task Force (new)
   string selections = "VBTF";
   
   //Jet Type - "CALO": CaloJets, "PF": PFJets
   string JetType = "PF";
+  
+  //Jet multiplicity for Tag&Probe
+  string TPMult = "incl";
   
   //Normalization
   string Norm = "True";
@@ -78,7 +81,10 @@ int main() {
   int ProcEvents = -1;
   
   //Gen Particle Matching
-  string GenParticleMatch = "False";
+  string GenParticleMatch = "True";
+  
+  //Ntuple - "zcand" = saves only z candidates; "all" = saves all the events
+  string NtupleFill = "zcand";
   
   //Modules
   bool GEN = true;
@@ -107,7 +113,7 @@ int main() {
   GenParticleMatch = "False";
   GEN = false;}
 
-  makeCfg(sample, selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Qual, Imp, Iso, EiD, path.c_str(), sourceList.c_str(), outputName.c_str(), Norm.c_str(), Sumw2.c_str(), EventsPerFile, EventNumber, ProcEvents, xsec*EventFilter, targetLumi, GenParticleMatch.c_str());
+  makeCfg(sample, selections, JetType, TPMult, GEN, RECO, EFF, NTUPLE, Acc, Trg, Qual, Imp, Iso, EiD, path.c_str(), sourceList.c_str(), outputName.c_str(), Norm.c_str(), Sumw2.c_str(), EventsPerFile, EventNumber, ProcEvents, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
 
   gEnv->SetValue("Proof.Sandbox", "/data/sfrosali/.proof");
 

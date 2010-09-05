@@ -33,7 +33,13 @@ using namespace TMath;
 ////////////////////////////////// Selection Cuts ////////////////////////////////////////////////
 
 //Data-Spring10 TRIGGER
-static string ElectronTrigger = "HLT_Ele15_LW_L1R";
+static vector<std::string> elTrigger() {
+static vector<std::string> TrgVector;
+TrgVector.push_back("HLT_Photon15_cleaned");
+TrgVector.push_back("HLT_Ele15_SW_L1R");
+return TrgVector;
+}
+
 static string JetTrigger = "HLT_Jet30U";
 
 //Summer09 triggers
@@ -125,11 +131,14 @@ inline bool isTriggerAvailable(const pat::TriggerEvent& triggers, std::string tr
 }
 
 inline bool isElTriggerAvailable(const pat::TriggerEvent& triggers){
-  const pat::TriggerPath* path = triggers.path(ElectronTrigger.c_str());
-  if(!path){
-  return false;
-  }else{
-  return true;}
+  bool Triggered = false;
+  static vector<std::string> TrgVector = elTrigger();
+  static vector<std::string>::iterator TrgVectorIter;
+  for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
+  const pat::TriggerPath* path = triggers.path(TrgVectorIter->c_str());
+  if(path)Triggered = true;
+  }
+  return Triggered;
 }
 
 inline bool isTriggered(const pat::TriggerEvent& triggers, std::string triggername){
@@ -142,7 +151,12 @@ inline bool isTriggered(const pat::TriggerEvent& triggers, std::string triggerna
 }
 
 inline bool isElectronTriggered(const pat::TriggerEvent& triggers){
-  return isTriggered(triggers, ElectronTrigger.c_str());
+  bool Triggered = false;
+  static vector<std::string> TrgVector = elTrigger();
+  static vector<std::string>::iterator TrgVectorIter;
+  for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
+  if(isTriggered(triggers, TrgVectorIter->c_str()))Triggered = true;}
+  return Triggered;
 }
 
 inline bool isJetTriggered(const pat::TriggerEvent& triggers){

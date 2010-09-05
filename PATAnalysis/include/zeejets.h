@@ -172,7 +172,7 @@ TDSet* getDS(const char* filename){
   return out; 
 }
 
-void makeCfg(string sample, string selections, string JetType, bool GEN, bool RECO, bool EFF, bool NTUPLE, int Acc, int Trg, int Qual, int Imp, int Iso, int EiD, const char* path, const char* sourceList, const char *outFile, const char* Norm, const char* Sumw2, int EventsPerFile, int EventNumber, int ProcEvents, double xsec, double targetLumi, const char* GenParticleMatch){
+void makeCfg(string sample, string selections, string JetType, string TPMult, bool GEN, bool RECO, bool EFF, bool NTUPLE, int Acc, int Trg, int Qual, int Imp, int Iso, int EiD, const char* path, const char* sourceList, const char *outFile, const char* Norm, const char* Sumw2, int EventsPerFile, int EventNumber, int ProcEvents, double xsec, double targetLumi, const char* GenParticleMatch, string NtupleFill){
 
 //cfg
 string cfgPath = path;
@@ -250,6 +250,7 @@ cfg<<"Name        = cms.string(\"EfficiencyElectron\"),"<<std::endl;
 cfg<<"sourceFileList = cms.string(\""<<Source.c_str()<<"\"),"<<std::endl;
 cfg<<"Selections = cms.string(\""<<selections.c_str()<<"\"),"<<std::endl;
 cfg<<"JetType = cms.string(\""<<JetType.c_str()<<"\"),"<<std::endl;
+cfg<<"TPMult = cms.string(\""<<TPMult.c_str()<<"\"),"<<std::endl;
 cfg<<"Sample = cms.string(\""<<sample.c_str()<<"\"),"<<std::endl;
 cfg<<"CrossSection = cms.double("<<xsec<<"),"<<std::endl;
 cfg<<"targetLumi  = cms.double("<<targetLumi<<"),"<<std::endl;
@@ -283,6 +284,7 @@ cfg<<"EiD = cms.int32("<<EiD<<"),"<<std::endl;
 cfg<<"CrossSection = cms.double("<<xsec<<"),"<<std::endl;
 cfg<<"targetLumi  = cms.double("<<targetLumi<<"),"<<std::endl;
 cfg<<"Norm        = cms.bool("<<Norm<<"),"<<std::endl;
+cfg<<"NtupleFill        = cms.string(\""<<NtupleFill<<"\"),"<<std::endl;
 cfg<<"EventsPerFile  = cms.int32("<<EventsPerFile<<"),"<<std::endl;
 cfg<<"EventNumber  = cms.int32("<<EventNumber<<"),"<<std::endl;
 cfg<<"ProcEvents  = cms.int32("<<ProcEvents<<")"<<std::endl;

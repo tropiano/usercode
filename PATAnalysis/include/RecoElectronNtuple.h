@@ -74,7 +74,7 @@ public :
 
 private:
 
-  std::string _sample, _selections, _JetType;
+  std::string _sample, _selections, _NtupleFill;
 
   double _ptjetmin;
 

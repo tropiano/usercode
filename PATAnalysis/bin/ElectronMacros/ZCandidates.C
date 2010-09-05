@@ -46,7 +46,7 @@ void ZCandidates(){
         ((TTreePlayer*)(tree->GetPlayer()))->SetScanRedirect(true);
         ((TTreePlayer*)(tree->GetPlayer()))->SetScanFileName(t.c_str());
  
-        tree->Scan("run:lumi:event:zmass:elept1:eleeta1:elephi1:elefbrem1:elept2:eleeta2:elephi2:elefbrem2","zmass_AllCuts>0");
+        tree->Scan("run:lumi:event:zmass:zpt:elept1:eleeta1:elephi1:elefbrem1:elept2:eleeta2:elephi2:elefbrem2","zmass_AllCuts>0");
         
         outlist<<endl<<"Z candidates with electron properties"<<endl<<endl;
         
@@ -75,7 +75,7 @@ void ZCandidates(){
         outlist<<mapiter1->second<<endl;}
         outlist<<endl;
    
-        tree->Scan("run:lumi:event:zmass:ncalojetsele:calojetet1:calojetet2:calojetet3:npfjetsele:pfjetet1:pfjetet2:pfjetet3","zmass_AllCuts>0");
+        tree->Scan("run:lumi:event:zmass:zpt:ncalojetsele:calojetet1:calojetet2:calojetet3:npfjetsele:pfjetet1:pfjetet2:pfjetet3","zmass_AllCuts>0");
         
         outlist<<endl<<"Z candidates with jet properties"<<endl<<endl;
         
