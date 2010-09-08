@@ -615,18 +615,18 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    
    HoverE_PreEiD = new TH1D("HoverE_PreEiD", "Electron Hcal Over Ecal", 100, 0, 0.1);
    _histoVector.push_back(HoverE_PreEiD);
-   DeltaEtaIn_PreEiD = new TH1D("DeltaEtaIn_PreEiD", "Electron Delta Eta In", 100, -0.5, 0.05);
+   DeltaEtaIn_PreEiD = new TH1D("DeltaEtaIn_PreEiD", "Electron Delta Eta In", 100, -0.1, 0.1);
    _histoVector.push_back(DeltaEtaIn_PreEiD);
-   DeltaPhiIn_PreEiD = new TH1D("DeltaPhiIn_PreEiD", "Electron Delta Phi In", 100, -0.5, 0.5);
+   DeltaPhiIn_PreEiD = new TH1D("DeltaPhiIn_PreEiD", "Electron Delta Phi In", 100, -0.4, 0.4);
    _histoVector.push_back(DeltaPhiIn_PreEiD);
    SigmaIEtaIEta_PreEiD= new TH1D("SigmaIEtaIEta_PreEiD", "Electron SigmaIEtaIEta", 100, 0, 0.1);
    _histoVector.push_back(SigmaIEtaIEta_PreEiD);
    
    HoverE_EiD = new TH1D("HoverE_EiD", "Electron Hcal Over Ecal", 100, 0, 0.1);
    _histoVector.push_back(HoverE_EiD);
-   DeltaEtaIn_EiD = new TH1D("DeltaEtaIn_EiD", "Electron Delta Eta In", 100, -0.5, 0.05);
+   DeltaEtaIn_EiD = new TH1D("DeltaEtaIn_EiD", "Electron Delta Eta In", 100, -0.1, 0.1);
    _histoVector.push_back(DeltaEtaIn_EiD);
-   DeltaPhiIn_EiD = new TH1D("DeltaPhiIn_EiD", "Electron Delta Phi In", 100, -0.5, 0.5);
+   DeltaPhiIn_EiD = new TH1D("DeltaPhiIn_EiD", "Electron Delta Phi In", 100, -0.4, 0.4);
    _histoVector.push_back(DeltaPhiIn_EiD);
    SigmaIEtaIEta_EiD= new TH1D("SigmaIEtaIEta_EiD", "Electron SigmaIEtaIEta", 100, 0, 0.1);
    _histoVector.push_back(SigmaIEtaIEta_EiD);
@@ -1458,11 +1458,19 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
       recEl2EtaVsExclMulti[isorecjets.size()]->Fill(dau1->eta(), weight);
    
    }
+   
+   string IsoFlag, EiDFlag;
+   if(_selections=="VPJ"){
+   IsoFlag="_IsoVPJ";
+   EiDFlag="_EiDVPJ";}
+   if(_selections=="VBTF"){
+   IsoFlag="_IsoVBTF";
+   EiDFlag="_EiDVBTF";}
  
    for(int fcount = 1; fcount<7; fcount++){
    
    if(fcount != 5){
-   if(_RecoCutFlags[fcount+1] == "_Iso"){   
+   if(_RecoCutFlags[fcount+1] == IsoFlag.c_str()){   
    bool PreIso = false;
    for(int n = 1; n < fcount+1; n++){
    if(RecSelected(_RecoCutFlags[n].c_str(), (*zrecHandle)[0], *triggerHandle)){
@@ -1488,7 +1496,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      }
      
    if(fcount != 5){
-   if(_RecoCutFlags[fcount+1] == "_EiD"){   
+   if(_RecoCutFlags[fcount+1] == EiDFlag.c_str()){   
    bool PreEiD = false;
    for(int n = 1; n < fcount+1; n++){
    if(RecSelected(_RecoCutFlags[n].c_str(), (*zrecHandle)[0], *triggerHandle)){
