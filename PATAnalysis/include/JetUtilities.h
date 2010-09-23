@@ -13,7 +13,7 @@ inline bool isJetMatched(const reco::Candidate& cand) {
     std::cout << "NOT A PAT JET IN isJetMatcjed" << std::endl;
     return false;
   }
-  return jet->triggerObjectMatchesByPath("HLT_Jet15U").size() > 0 ;
+  return jet->triggerObjectMatchesByPath("HLT_Jet30U").size() > 0 ;
   //return jet->pt()>30.;
 }
 

@@ -10,6 +10,7 @@
 #include "TList.h"
 //#include "TProofOutputFile.h"
 #include "TFile.h"
+#include "TTree.h"
 #include "MyPatAnalysis.h"
 
 
@@ -53,7 +54,9 @@ public :
    std::vector<TH1D*> recMu1EtaVsExclMulti;
 
    std::vector<TH1D*> recMu2PtVsExclMulti;
-   std::vector<TH1D*> recMu2EtaVsExclMulti;    
+   std::vector<TH1D*> recMu2EtaVsExclMulti;   
+
+   TTree* _summaryPass;
  
 private:
   double _ptjetmin;
@@ -72,6 +75,20 @@ private:
 
   std::vector<TH1D*> _histoVector;
 
+  //tree variables
+  unsigned int _runnumber;
+  unsigned int _lumisection;
+  unsigned int _eventnumber;
+  double _mass;
+  double _pt;
+  double _pt0;
+  double _pt1;
+  double _isorel0;
+  double _isorel1;
+  double _isotk0;
+  double _isotk1;
+  unsigned int _njets;
+  double _ptjetsum;
 
 };
 #endif

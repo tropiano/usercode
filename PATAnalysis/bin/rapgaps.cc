@@ -35,20 +35,21 @@ int main(){
   TProof * p = TProof::Open("");
   //p->SetParallel(4);
   
+  std::string pwd(gSystem->Getenv("PWD"));
 
   gSystem->Load("libFWCoreFWLite");
   AutoLibraryLoader::enable();
   gSystem->Load("libFirenzePATAnalysis");
 
-  p->Exec( ".x /data/lenzip/RapGap/CMSSW_3_5_6/src/Firenze/PATAnalysis/bin/remote.C" );
+  p->Exec( ".x /data01/lenzip/Zjets/localCMSSW/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/remote.C" );
 
   TProofLog *pl = TProof::Mgr("")->GetSessionLogs();
-  pl->Save("*","/raid/lenzip/CMSSW/test/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/Log.txt");
+  pl->Save("*",(pwd+"/Log.txt").c_str());
 
 
 
-  TDSet* dsdata = getDS("test.txt");//"tracks_data.txt") ;
-  TNamed* configdata = new TNamed("ConfigFile", "/data/lenzip/RapGap/CMSSW_3_5_6/src/Firenze/PATAnalysis/bin/config_Dec09_data.py");
+  TDSet* dsdata = getDS("data.txt");//"tracks_data.txt") ;
+  TNamed* configdata = new TNamed("ConfigFile", (pwd+"/config_data.py").c_str());
   p->AddInput(configdata);
   p->Process(dsdata, "FWLiteTSelector");
   p->ClearInput();

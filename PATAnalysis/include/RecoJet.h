@@ -50,6 +50,8 @@ private:
 
   double _ptcut, _etamax;
 
+  std::string _jetSource;
+
   myanalysis::JetPlots _jetplots;
 
   TH1F *_sumEt, *_metPx, *_metPy, *_met, *_nJet;

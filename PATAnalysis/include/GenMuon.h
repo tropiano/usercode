@@ -32,7 +32,7 @@ public :
 
    //Histograms
    TH1D *genPtZ, *genEtaZ, *genMulti, *genMassZ, *genLeadMuPt, *genSecMuPt, *genLeadMuEta, *genSecMuEta,
-        *genLeadJetPt, *genLeadJetEta, *genDeltayJfwdJbwd;
+        *genLeadJetPt, *genLeadJetEta, *genDeltayJfwdJbwd, *genRapZ;
         //*genDjr0, *genDjr1, *genDjr2;
 
    std::vector<TH1D*> genJetPtVsInclMulti;

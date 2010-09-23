@@ -34,6 +34,7 @@ void RecoJet::begin(TFile* out, const edm::ParameterSet& iConfig){
 
    _ptcut  = iConfig.getParameter<double>("MinPt");
    _etamax = iConfig.getParameter<double>("MaxEta");
+   _jetSource = iConfig.getParameter<std::string>("JetSource");
 
    //_file = proofFile->OpenFile("RECREATE");
    cout << "RecoJet file name : " << _file->GetName() << endl;
@@ -71,29 +72,36 @@ void  RecoJet::process(const fwlite::Event& iEvent)
    _file->cd();
 
    fwlite::Handle<std::vector<pat::Jet> > jetHandle;
-   jetHandle.getByLabel(iEvent, "selectedJets");
-
-   //fwlite::Handle<std::vector<pat::MET> > metHandle;
-   //metHandle.getByLabel(iEvent, "layer1METs");
-
-   fwlite::Handle<std::vector<reco::Vertex> > vertexHandle;
-   vertexHandle.getByLabel(iEvent, "offlinePrimaryVertices");
-
-   fwlite::Handle<std::vector<reco::Track> > trackHandle;
-   trackHandle.getByLabel(iEvent, "generalTracks");
+   jetHandle.getByLabel(iEvent, _jetSource.c_str());
 
    std::vector<pat::Jet>::const_iterator ijet;
    std::vector<pat::Jet>::const_iterator jetbeg = jetHandle->begin();
    std::vector<pat::Jet>::const_iterator jetend = jetHandle->end();
    int countJet = 0;
    for (ijet = jetbeg; ijet != jetend; ++ijet){
-     if (ijet->pt() > _ptcut && fabs(ijet->eta()) < _etamax  && 
-         ijet->emEnergyFraction() > 0.01 && 
-         ijet->jetID().fHPD < 0.98 &&
-         ijet->jetID().n90Hits > 1) {
-        _jetplots.fill(*ijet);
-        countJet++;
-     }
+     if ( (fabs(ijet->rapidity()) < _etamax) && (ijet->pt() > _ptcut) ){
+      if (ijet->isCaloJet()){
+        if (ijet->pt() > _ptcut && fabs(ijet->eta()) < _etamax  &&
+            ijet->emEnergyFraction() > 0.01 &&
+            ijet->jetID().fHPD < 0.98 &&
+            ijet->jetID().n90Hits > 1) {
+            _jetplots.fill(*ijet);
+            countJet++;
+        }
+      } else if (ijet->isPFJet()) {
+        //tight PFJetId
+        if ((ijet->chargedHadronEnergyFraction() > 0.  || fabs(ijet->eta()>2.4)) &&
+            ijet->neutralHadronEnergyFraction() < 0.9 &&
+            (ijet->chargedMultiplicity()         > 0.  || fabs(ijet->eta()>2.4)) &&
+            ijet->chargedEmEnergyFraction()     < 1.  &&
+            ijet->neutralEmEnergyFraction()     < 0.9   ){
+            _jetplots.fill(*ijet);
+            countJet++;
+        }
+      } else {
+        throw cms::Exception("RapGapPlots") << " not a Calo or PF jet " << std::endl;
+      }
+     } 
    }
    _nJet->Fill(countJet);
 
@@ -149,9 +157,9 @@ namespace myanalysis{
     if (!_initialized) throw cms::Exception("JetPlots") << "uninitialized histo ";
     _pt->Fill(jet.pt());
     _eta->Fill(jet.eta());
-    _nTrk->Fill(jet.associatedTracks().size());
+    //_nTrk->Fill(jet.associatedTracks().size());
     _phi->Fill(jet.phi());
-    _emf->Fill(jet.emEnergyFraction());
+    //_emf->Fill(jet.emEnergyFraction());
   }
  
 }

@@ -54,15 +54,14 @@ int main(){
   p->AddInput(configdata);
   p->Process(dataDS, "FWLiteTSelector");
   delete dataDS;
-  
 /*
   TDSet* signalDS = getDS("/data01/lenzip/Zjets/localCMSSW/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/signal.txt");
   TNamed* configsignal = new TNamed("ConfigFile", (pwd+"/config_signal.py").c_str());
   p->AddInput(configsignal);
   p->Process(signalDS, "FWLiteTSelector");
   delete signalDS;
-*/  
-/*
+  
+
   TDSet* signalMadDS = getDS("/data01/lenzip/Zjets/localCMSSW/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/signal_Madgraph.txt");
   TNamed* configMad = new TNamed("ConfigFile", (pwd+"/config_signal_Madgraph.py").c_str());
   p->AddInput(configMad);
@@ -133,7 +132,7 @@ int main(){
   mueffana2.analyze();
   out1.Close();
   out2.Close();
-/*
+
   //madgraph
   TFile inMadgraph("signalMadgraph.root");
   TFile out1Madgraph("signal_Eff_vsRecoMadgraph.root", "RECREATE");
@@ -144,7 +143,7 @@ int main(){
   mueffana2Madgraph.analyze("z_yieldVsGenMadgraph_noscale.tex");
   out1Madgraph.Close();
   out2Madgraph.Close();
-*/
+
 /*  
   //tune DW
   TFile inDW("signalDW.root");
@@ -189,35 +188,35 @@ int main(){
 */  
 
   EfficiencyAnalyzerMuon zyield_ana(&in, 0, 0, "EfficiencyMuonVSRecoMulti");
-  zyield_ana.analyze("z_yield.tex", 0.07765);
+  zyield_ana.analyze("z_yield.tex", 0.198 );
 
-/*
+
   EfficiencyAnalyzerMuon zyield_anaMad(&inMadgraph, 0, 0, "EfficiencyMuonVSRecoMulti");
-  zyield_anaMad.analyze("z_yieldMad.tex", 0.07765);
-*/
+  zyield_anaMad.analyze("z_yieldMad.tex", 0.198);
+
 
   TFile inW("w.root");
   EfficiencyAnalyzerMuon wyield_ana(&inW, 0, 0, "EfficiencyMuonVSRecoMulti");
-  wyield_ana.analyze("w_yield.tex", 0.07765);  
+  wyield_ana.analyze("w_yield.tex", 0.198);  
   wyield_ana.analyze("w_yield_noscale.tex", 2087693/(10312.*0.742));
 
   TFile inQCD("qcd.root");
   EfficiencyAnalyzerMuon qcdyield_ana(&inQCD, 0, 0, "EfficiencyMuonVSRecoMulti");
-  qcdyield_ana.analyze("qcd_yield.tex", 0.07765);
+  qcdyield_ana.analyze("qcd_yield.tex", 0.198);
   qcdyield_ana.analyze("qcd_yield_noscale.tex", 5120334/(296900000.*2.684e-4));
 
   TFile inTTbar("ttbar.root");
   EfficiencyAnalyzerMuon ttbaryield_ana(&inTTbar, 0, 0, "EfficiencyMuonVSRecoMulti");
-  ttbaryield_ana.analyze("ttbar_yield.tex", 0.07765);
+  ttbaryield_ana.analyze("ttbar_yield.tex", 0.198);
   ttbaryield_ana.analyze("ttbar_yield_noscale.tex", 632010/95.);
 
   TFile intau("ztautau.root");
   EfficiencyAnalyzerMuon tauyield_ana(&intau, 0, 0, "EfficiencyMuonVSRecoMulti");
-  tauyield_ana.analyze("ztautau_yield.tex", 0.07765);
+  tauyield_ana.analyze("ztautau_yield.tex", 0.198);
   tauyield_ana.analyze("ztautau_yield_noscale.tex", 1369709/1667.);
 
-  //TFile in("zmumu.root");
-  //EfficiencyAnalyzerMuon yield_ana(&in, 0, 0, "EfficiencyMuonVSRecoMulti");
-  //yield_ana.analyze("yield.tex");
+  TFile indata("zmumu.root");
+  EfficiencyAnalyzerMuon yield_ana(&indata, 0, 0, "EfficiencyMuonVSRecoMulti");
+  yield_ana.analyze("yield.tex");
 
 }

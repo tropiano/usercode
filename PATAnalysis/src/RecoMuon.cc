@@ -33,7 +33,7 @@ RecoMuon::RecoMuon():
 recPtZ(0), recEtaZ(0), recMulti(0), recMassZ(0), recTrackIsoLead(0), recEcalIsoLead(0), recHcalIsoLead(0), recRelIsoLead(0),
 recTrackIsoSec(0), recEcalIsoSec(0), recHcalIsoSec(0), recRelIsoSec(0),
 recLeadMuPt(0), recSecMuPt(0), recLeadMuEta(0), recSecMuEta(0),
-recLeadJetPt(0), recLeadJetEta(0), 
+recLeadJetPt(0), recLeadJetEta(0), _summaryPass(0), 
 _ptjetmin(30.), _etajetmax(3.), _isocut(0.15), _norm(1.),
 _file(0), _dir(0), _histoVector()
 //_bayesUnfold("bayesUnfoldedMulti", "Bayes unfolded Jet Multiplicity")
@@ -92,6 +92,21 @@ void RecoMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
    _histoVector.push_back(recLeadJetPt);
    recLeadJetEta = new TH1D("recLeadJetEta", "Reconstructed Leading Jet #eta", 100, -5, 5); 
    _histoVector.push_back(recLeadJetEta);
+   _summaryPass = new TTree("summaryPass", "summaryPass");
+   _summaryPass->Branch("_runnumber", &_runnumber, "_runnumber/I");
+   _summaryPass->Branch("_lumisection", &_lumisection, "_lumisection/I");
+   _summaryPass->Branch("_eventnumber", &_eventnumber, "_eventnumber/I");
+   _summaryPass->Branch("_mass", &_mass, "_mass/D");
+   _summaryPass->Branch("_pt", &_pt, "_pt/D");
+   _summaryPass->Branch("_pt0", &_pt0, "_pt0/D");
+   _summaryPass->Branch("_pt1", &_pt1, "_pt1/D");
+   _summaryPass->Branch("_isorel0", &_isorel0, "_isorel0/D");
+   _summaryPass->Branch("_isorel1", &_isorel1, "_isorel1/D");
+   _summaryPass->Branch("_isotk0", &_isotk0, "_isotk0/D");
+   _summaryPass->Branch("_isotk1", &_isotk1, "_isotk1/D");
+   _summaryPass->Branch("_njets", &_njets, "_njets/I");
+   _summaryPass->Branch("_ptjetsum", &_ptjetsum, "_ptjetsum/D");
+
    std::vector<TH1D*>::const_iterator ibeg = _histoVector.begin();
    std::vector<TH1D*>::const_iterator iend = _histoVector.end();
    //use the errors as they were from real data 
@@ -167,6 +182,20 @@ void  RecoMuon::process(const fwlite::Event& iEvent)
    if (RecSelectedMuonWithTrigger(*zHandle, *triggerHandle, _isocut, dau0, dau1)){
    //if (RecSelectedMuon(*zHandle, _isocut, dau0, dau1)){
       //cout << "PASSED!" << endl;
+      _runnumber  = iEvent.id().run();
+      _eventnumber = iEvent.id().event();
+      _lumisection = iEvent.id().luminosityBlock();
+      _pt = (*zHandle)[0].pt();
+      _mass = (*zHandle)[0].mass();
+      const reco::MuonIsolation& iso03_0 = muonsfromZ[0]->isolationR03();
+      const reco::MuonIsolation& iso03_1 = muonsfromZ[1]->isolationR03();
+      _pt0 = (*zHandle)[0].daughter(0)->pt();
+      _pt1 = (*zHandle)[0].daughter(1)->pt();
+      _isorel0 = (iso03_0.hadEt + iso03_0.emEt + iso03_0.sumPt)/(*zHandle)[0].daughter(0)->pt();
+      _isorel1 = (iso03_1.hadEt + iso03_1.emEt + iso03_1.sumPt)/(*zHandle)[0].daughter(1)->pt();
+      _isotk0 = iso03_0.sumPt;  
+      _isotk1 = iso03_1.sumPt;  
+
       recPtZ->Fill((*zHandle)[0].pt(), _norm);
       recEtaZ->Fill((*zHandle)[0].eta(), _norm);
       recMassZ->Fill((*zHandle)[0].mass(), _norm);
@@ -204,6 +233,15 @@ void  RecoMuon::process(const fwlite::Event& iEvent)
           recJetEtaVsInclMulti[i+1]->Fill(recjets[i]->eta(), _norm);
         }
       }
+      _njets=recjets.size();
+      reco::Candidate::LorentzVector jetpsum(0., 0., 0., 0.);
+
+        
+      for (unsigned int i = 0; i < recjets.size(); ++i){
+        jetpsum += recjets[i]->p4();
+      }  
+      
+      _ptjetsum = jetpsum.pt();
 
       //fill inclusive histograms
       for (unsigned int i = 0; i < recjets.size()+1; ++i){
@@ -211,6 +249,7 @@ void  RecoMuon::process(const fwlite::Event& iEvent)
         recZEtaVsInclMulti[i]->Fill((*zHandle)[0].eta(), _norm);
       }
 
+      _summaryPass->Fill();
       //fill exclusive histograms
       recZPtVsExclMulti[recjets.size()]->Fill((*zHandle)[0].pt(), _norm);
       recZEtaVsExclMulti[recjets.size()]->Fill((*zHandle)[0].eta(), _norm);

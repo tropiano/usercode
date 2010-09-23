@@ -6,9 +6,9 @@ from Firenze.PATAnalysis.config_signal import *
 
 process.outputFile.name = cms.string("signalMadgraph.root")
 process.zmumueff.TrainUnfolding = cms.bool(False)
-process.zmumugen.ScaleFactor=cms.double(969.*3/1084921) #inclusive cross section from https://twiki.cern.ch/twiki/bin/view/CMS/StandardModelCrossSections
-process.zmumurec.ScaleFactor=cms.double(969.*3/1084921)
-process.zmumueff.ScaleFactor=cms.double(969.*3/1084921)
+process.zmumugen.ScaleFactor=cms.double(969.*3/984921) #inclusive cross section from https://twiki.cern.ch/twiki/bin/view/CMS/StandardModelCrossSections
+process.zmumurec.ScaleFactor=cms.double(969.*3/984921)
+process.zmumueff.ScaleFactor=cms.double(969.*3/984921)
 
 process.zmumurec.JetSource     = cms.string("selectedPFJets")
 process.zmumurec.MaxEtaJet   = cms.double(2.5)

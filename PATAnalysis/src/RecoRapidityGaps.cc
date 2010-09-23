@@ -54,13 +54,11 @@ void RecoRapidityGaps::begin(TFile* out, const edm::ParameterSet& iConfig){
   std::vector<bool (*)(const reco::Candidate&)> passprobe_cuts;
   passprobe_cuts.push_back(isJetMatched);
 
-  _tpfiller2jet = new TagAndProbeFiller(_dir, string("JetTriggerTP_2jets"), 10, 0., 5., tag_cuts, probe_cuts, passprobe_cuts);
-  _tpfiller3jet = new TagAndProbeFiller(_dir, string("JetTriggerTP_3jets"), 10, 0., 5., tag_cuts, probe_cuts, passprobe_cuts);
+  //_tpfiller2jet = new TagAndProbeFiller(_dir, string("JetTriggerTP_2jets"), 10, 0., 5., tag_cuts, probe_cuts, passprobe_cuts);
+  //_tpfiller3jet = new TagAndProbeFiller(_dir, string("JetTriggerTP_3jets"), 10, 0., 5., tag_cuts, probe_cuts, passprobe_cuts);
 
   cout << "RecoRapidityGaps Worker built." << endl;  
 
-  _activity = new TH1F("activity", "activity", 10, 0., 5.);
-  _jet15andactivity = new TH1F("jet15andactivity", "jet15andactivity", 10, 0., 5.);
 }
 
 RecoRapidityGaps::~RecoRapidityGaps(){
@@ -73,8 +71,7 @@ void  RecoRapidityGaps::process(const fwlite::Event& iEvent)
   _file->cd();
 
   //std::cout << "Inizio " << std::endl;       
-  bool isaccept15 = accept(iEvent, "HLT_Jet15U");
-  bool isaccept6 = accept(iEvent, "HLT_Activity_PixelClusters");//"HLT_L1Jet10U");
+  bool isaccept = accept(iEvent, "HLT_Jet30U");
 
   _plots.cacheJets(iEvent);
 
@@ -90,28 +87,21 @@ void  RecoRapidityGaps::process(const fwlite::Event& iEvent)
       break;
     }
   }  
-  //if (!_isMC) 
-  //  if (!isaccept15 || !isMatched) return;
 
-  if (isaccept15 && isMatched) _plots.fill();
+  if (isaccept && isMatched) _plots.fill();
 
 
   //to use our t&p code make a composite candicate out of the two jets
   if (jets.size()<2) return;
   double deltay = fabs(jets.front().rapidity()-jets.back().rapidity());
-  if (isaccept6) _activity->Fill(deltay);
 
   if (jets.size() == 2){
     reco::CompositeCandidate cc;
     cc.addDaughter(jets.front(), "FWD_jet");
     cc.addDaughter(jets.back(), "BWD_jet");
-    if (isaccept6) {
-      if (isaccept15 && isMatched) _jet15andactivity->Fill(deltay); 
-      _tpfiller2jet->fill(cc, deltay);
-    }  
     if (_isMC){
       _2jden->Fill(deltay);
-      if (isaccept15 && isMatched) _2jnum->Fill(deltay);
+      if (isaccept && isMatched) _2jnum->Fill(deltay);
     }
   } else {
     for (unsigned int ii = 0; ii < jets.size()-1; ++ii){
@@ -119,20 +109,19 @@ void  RecoRapidityGaps::process(const fwlite::Event& iEvent)
         reco::CompositeCandidate cc;
         cc.addDaughter(jets[ii], "FWD_jet");
         cc.addDaughter(jets[jj], "BWD_jet");
-        if (isaccept6) _tpfiller3jet->fill(cc, deltay);
       }
     }
     if (_isMC){
       _3jden->Fill(deltay);
-      if (isaccept15 && isMatched) _3jnum->Fill(deltay);
+      if (isaccept && isMatched) _3jnum->Fill(deltay);
     }
   }
   //std::cout << "Fine " << std::endl;      
 }
 
 void RecoRapidityGaps::finalize(){
-  _tpfiller2jet->finalize();
-  _tpfiller3jet->finalize();
+  //_tpfiller2jet->finalize();
+  //_tpfiller3jet->finalize();
   _file->Write();
 }
 

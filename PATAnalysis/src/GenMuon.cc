@@ -27,7 +27,7 @@ using namespace edm;
 
 GenMuon::GenMuon(/*TFile* proofFile, const TList* fInput*/):  
 genPtZ(0), genEtaZ(0), genMulti(0), genMassZ(0), genLeadMuPt(0), genSecMuPt(0), genLeadMuEta(0), genSecMuEta(0),
-genLeadJetPt(0), genLeadJetEta(0), genDeltayJfwdJbwd(0),
+genLeadJetPt(0), genLeadJetEta(0), genDeltayJfwdJbwd(0), genRapZ(0),
 //genDjr0(0), genDjr1(0), genDjr2(0),
 _ptjetmin(30.), _etajetmax(3.), _norm(1.),
 _file(0), _dir(0), _histovector()
@@ -97,6 +97,8 @@ void GenMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
    _histovector.push_back(genLeadJetEta);
    genDeltayJfwdJbwd = new TH1D("genDeltayJfwdJbwd", "Generated #Deltay fw jet - bwd jet", 100, 0, 10);
    _histovector.push_back(genDeltayJfwdJbwd);
+   genRapZ = new TH1D("genRapZ", "Generated Z rapidity", 200, -10, 10);
+   _histovector.push_back(genRapZ);
    std::vector<TH1D*>::const_iterator ibeg = _histovector.begin();
    std::vector<TH1D*>::const_iterator iend = _histovector.end();
    for (std::vector<TH1D*>::const_iterator i = ibeg; i != iend; ++i){
@@ -144,6 +146,7 @@ void  GenMuon::process(const fwlite::Event& iEvent)
    if (GenSelectedMuon(*zHandle)){
       genPtZ->Fill((*zHandle)[0].pt(), weight);
       genEtaZ->Fill((*zHandle)[0].eta(), weight);
+      genRapZ->Fill((*zHandle)[0].rapidity(), weight);
       genMassZ->Fill((*zHandle)[0].mass(), weight);
       double leadmupt, leadmueta, secondmupt, secondmueta;
       double pt0  = (*zHandle)[0].daughter(0)->pt(); 
