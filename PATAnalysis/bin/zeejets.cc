@@ -59,7 +59,7 @@ int main() {
   string TPMult = "incl";
   
   //Normalization
-  string Norm = "True";
+  string Norm = "False";
   string Sumw2= "True";
   double targetLumi = 50.; //pb-1
   
@@ -81,7 +81,7 @@ int main() {
   int ProcEvents = -1;
   
   //Gen Particle Matching
-  string GenParticleMatch = "True";
+  string GenParticleMatch = "False";
   
   //Ntuple - "zcand" = saves only z candidates; "all" = saves all the events
   string NtupleFill = "zcand";

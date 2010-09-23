@@ -97,11 +97,11 @@ string Tab_cut = "True";
 	double nmaxY_recEtaZ = 300.0;
 	
 	//Legenda
-	string Leg_QCD_EMEnriched_all = "QCD EM Enriched (PYTHIA6)";
-	string Leg_QCD_BCtoE_all = "QCD b,c #rightarrow e (PYTHIA6)";
-	string Leg_TTbar = "t #bar{t}+jets (MADGRAPH)";
-	string Leg_W = "W+jets (MADGRAPH)";
-	string Leg_Z = "Z+jets (MADGRAPH)";
+	string Leg_QCD_EMEnriched_all = "QCD EM Enriched";
+	string Leg_QCD_BCtoE_all = "QCD b,c #rightarrow e";
+	string Leg_TTbar = "t #bar{t}+jets";
+	string Leg_W = "W+jets";
+	string Leg_Z = "Z+jets";
 	string Leg_Data	= "Data";
 
 	//tabella cut

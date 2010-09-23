@@ -189,30 +189,54 @@ for(int a=1; a<3; a++){
 		 Title = Title_inclusive;
          
 		for(int n=1; n<10; n++){
+                
+                double err_Signal_MAD_recJetN_1, err_Signal_PYT_recJetN_1, err_data_recJetN_1;        
+		Signal_MAD_recJetN_1->SetBinContent(n, Signal_MAD_recJetN_1->IntegralAndError(n, 10, err_Signal_MAD_recJetN_1));
+		Signal_MAD_recJetN_1->SetBinError(n, err_Signal_MAD_recJetN_1);
+        	Signal_PYT_recJetN_1->SetBinContent(n, Signal_PYT_recJetN_1->IntegralAndError(n, 10, err_Signal_PYT_recJetN_1));
+        	Signal_PYT_recJetN_1->SetBinError(n, err_Signal_PYT_recJetN_1);
+		data_recJetN_1->SetBinContent(n, data_recJetN_1->IntegralAndError(n, 10, err_data_recJetN_1));
+		data_recJetN_1->SetBinError(n, err_data_recJetN_1);
 
-		Signal_MAD_recJetN_1->SetBinContent(n, Signal_MAD_recJetN_1->Integral(n, 10));
-        	Signal_PYT_recJetN_1->SetBinContent(n, Signal_PYT_recJetN_1->Integral(n, 10));
-		data_recJetN_1->SetBinContent(n, data_recJetN_1->Integral(n, 10));
+		double err_Signal_MAD_recJetN_12, err_Signal_PYT_recJetN_12, err_data_recJetN_12;        
+		Signal_MAD_recJetN_12->SetBinContent(n, Signal_MAD_recJetN_12->IntegralAndError(n, 10, err_Signal_MAD_recJetN_12));
+		Signal_MAD_recJetN_12->SetBinError(n, err_Signal_MAD_recJetN_12);
+        	Signal_PYT_recJetN_12->SetBinContent(n, Signal_PYT_recJetN_12->IntegralAndError(n, 10, err_Signal_PYT_recJetN_12));
+        	Signal_PYT_recJetN_12->SetBinError(n, err_Signal_PYT_recJetN_12);
+		data_recJetN_12->SetBinContent(n, data_recJetN_12->IntegralAndError(n, 10, err_data_recJetN_12));
+		data_recJetN_12->SetBinError(n, err_data_recJetN_12);
 
-		Signal_MAD_recJetN_12->SetBinContent(n, Signal_MAD_recJetN_12->Integral(n, 10));
-        	Signal_PYT_recJetN_12->SetBinContent(n, Signal_PYT_recJetN_12->Integral(n, 10));
-		data_recJetN_12->SetBinContent(n, data_recJetN_12->Integral(n, 10));
+		double err_Signal_MAD_recJetN_123, err_Signal_PYT_recJetN_123, err_data_recJetN_123;        
+		Signal_MAD_recJetN_123->SetBinContent(n, Signal_MAD_recJetN_123->IntegralAndError(n, 10, err_Signal_MAD_recJetN_123));
+		Signal_MAD_recJetN_123->SetBinError(n, err_Signal_MAD_recJetN_123);
+        	Signal_PYT_recJetN_123->SetBinContent(n, Signal_PYT_recJetN_123->IntegralAndError(n, 10, err_Signal_PYT_recJetN_123));
+        	Signal_PYT_recJetN_123->SetBinError(n, err_Signal_PYT_recJetN_123);
+		data_recJetN_123->SetBinContent(n, data_recJetN_123->IntegralAndError(n, 10, err_data_recJetN_123));
+		data_recJetN_123->SetBinError(n, err_data_recJetN_123);
 
-		Signal_MAD_recJetN_123->SetBinContent(n, Signal_MAD_recJetN_123->Integral(n, 10));
-        	Signal_PYT_recJetN_123->SetBinContent(n, Signal_PYT_recJetN_123->Integral(n, 10));
-		data_recJetN_123->SetBinContent(n, data_recJetN_123->Integral(n, 10));
-
-		Signal_MAD_recJetN_1234->SetBinContent(n, Signal_MAD_recJetN_1234->Integral(n, 10));
-        	Signal_PYT_recJetN_1234->SetBinContent(n, Signal_PYT_recJetN_1234->Integral(n, 10));
-		data_recJetN_1234->SetBinContent(n, data_recJetN_1234->Integral(n, 10));
+		double err_Signal_MAD_recJetN_1234, err_Signal_PYT_recJetN_1234, err_data_recJetN_1234;        
+		Signal_MAD_recJetN_1234->SetBinContent(n, Signal_MAD_recJetN_1234->IntegralAndError(n, 10, err_Signal_MAD_recJetN_1234));
+		Signal_MAD_recJetN_1234->SetBinError(n, err_Signal_MAD_recJetN_1234);
+        	Signal_PYT_recJetN_1234->SetBinContent(n, Signal_PYT_recJetN_1234->IntegralAndError(n, 10, err_Signal_PYT_recJetN_1234));
+        	Signal_PYT_recJetN_1234->SetBinError(n, err_Signal_PYT_recJetN_1234);
+		data_recJetN_1234->SetBinContent(n, data_recJetN_1234->IntegralAndError(n, 10, err_data_recJetN_1234));
+		data_recJetN_1234->SetBinError(n, err_data_recJetN_1234);
 	
-		Signal_MAD_recJetN_12345->SetBinContent(n, Signal_MAD_recJetN_12345->Integral(n, 10));
-        	Signal_PYT_recJetN_12345->SetBinContent(n, Signal_PYT_recJetN_12345->Integral(n, 10));
-		data_recJetN_12345->SetBinContent(n, data_recJetN_12345->Integral(n, 10));
+		double err_Signal_MAD_recJetN_12345, err_Signal_PYT_recJetN_12345, err_data_recJetN_12345;        
+		Signal_MAD_recJetN_12345->SetBinContent(n, Signal_MAD_recJetN_12345->IntegralAndError(n, 10, err_Signal_MAD_recJetN_12345));
+		Signal_MAD_recJetN_12345->SetBinError(n, err_Signal_MAD_recJetN_12345);
+        	Signal_PYT_recJetN_12345->SetBinContent(n, Signal_PYT_recJetN_12345->IntegralAndError(n, 10, err_Signal_PYT_recJetN_12345));
+        	Signal_PYT_recJetN_12345->SetBinError(n, err_Signal_PYT_recJetN_12345);
+		data_recJetN_12345->SetBinContent(n, data_recJetN_12345->IntegralAndError(n, 10, err_data_recJetN_12345));
+		data_recJetN_12345->SetBinError(n, err_data_recJetN_12345);
 
-		Signal_MAD_recJetN_123456->SetBinContent(n, Signal_MAD_recJetN_123456->Integral(n, 10));
-        	Signal_PYT_recJetN_123456->SetBinContent(n, Signal_PYT_recJetN_123456->Integral(n, 10));
-		data_recJetN_123456->SetBinContent(n, data_recJetN_123456->Integral(n, 10));
+		double err_Signal_MAD_recJetN_123456, err_Signal_PYT_recJetN_123456, err_data_recJetN_123456;        
+		Signal_MAD_recJetN_123456->SetBinContent(n, Signal_MAD_recJetN_123456->IntegralAndError(n, 10, err_Signal_MAD_recJetN_123456));
+		Signal_MAD_recJetN_123456->SetBinError(n, err_Signal_MAD_recJetN_123456);
+        	Signal_PYT_recJetN_123456->SetBinContent(n, Signal_PYT_recJetN_123456->IntegralAndError(n, 10, err_Signal_PYT_recJetN_123456));
+        	Signal_PYT_recJetN_123456->SetBinError(n, err_Signal_PYT_recJetN_123456);
+		data_recJetN_123456->SetBinContent(n, data_recJetN_123456->IntegralAndError(n, 10, err_data_recJetN_123456));
+		data_recJetN_123456->SetBinError(n, err_data_recJetN_123456);
 
 		}
 	}

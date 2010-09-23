@@ -35,8 +35,8 @@ using namespace TMath;
 //Data-Spring10 TRIGGER
 static vector<std::string> elTrigger() {
 static vector<std::string> TrgVector;
-TrgVector.push_back("HLT_Photon15_cleaned");
-TrgVector.push_back("HLT_Ele15_SW_L1R");
+TrgVector.push_back("HLT_Photon15_Cleaned_L1R");
+TrgVector.push_back("HLT_Ele15_SW_EleId_L1R");
 return TrgVector;
 }
 

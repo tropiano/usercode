@@ -6,6 +6,7 @@
 #include "TFileMerger.h"
 #include "TSystem.h"
 #include "TROOT.h"
+#include "FWCore/Utilities/interface/Exception.h"
 #include "Firenze/PATAnalysis/include/EfficiencyAnalyzerElectron.h"
 
 using namespace std;
@@ -13,20 +14,20 @@ using namespace std;
 int main() {
 
   //Input files
-  string training_sign = "TagProbeSample_VPJ/TagProbe_Signal_train_VPJ.root";
-  string training_back = "TagProbeSample_VPJ/TagProbe_Background_train_Norm50_VPJ.root";
-  string total = "TagProbeSample_VPJ/TagProbe_Total_50pb_VPJ.root";
+  string training_sign = "TPFiles/ZJets_Madgraph_Spring10_Signal_train.root";
+  string training_back = "TPFiles/Background_All_train.root";
+  string total = "TPFiles/Data_Aug18_25_NoTrg.root";
   
   //Output files
-  string output_train_sign =  "TPAnalyzer_VPJ/TPAnalyzer_Signal_train_VPJ_EiD.root";
-  string output_train_back =  "TPAnalyzer_VPJ/TPAnalyzer_Background_train_VPJ_EiD.root";
-  string output_total =  "TPAnalyzer_VPJ/TPAnalyzer_Total_50pb_VPJ_EiD.root";
+  string output_train_sign =  "TPAnalyzer/TPAnalyzer_Signal_train_VBTF_Imp.root";
+  string output_train_back =  "TPAnalyzer/TPAnalyzer_Background_train_VBTF_Imp.root";
+  string output_total =  "TPAnalyzer/TPAnalyzer_Data_VBTF_Imp.root";
 
   //Selections used
-  string selections = "VPJ";
+  string selections = "VBTF";
   
   //Cut to evaluate
-  string cut = "EiD";
+  string cut = "_Imp";
   
   //Analyzer steps
   bool tr_sig = true;
@@ -39,6 +40,33 @@ int main() {
   //IF directories are different from default ones
   string nodef_dir = "";
   string nodef_secdir = "";
+  
+  //Selections
+  
+  int _Acc  = 1;
+  int _Trg  = 2;
+  int _Qual = 0;
+  int _Imp  = 3;
+  int _Iso  = 4;
+  int _EiD  = 5;
+	
+  string _RecoCutFlags[7];
+	
+  for(int i=0; i<7; i++){
+  _RecoCutFlags[i] = "_1";}
+   
+  if(selections=="VPJ"){
+  _RecoCutFlags[_Acc] =  "_AccVPJ";
+  _RecoCutFlags[_Iso] =  "_IsoVPJ";
+  _RecoCutFlags[_EiD] =  "_EiDVPJ";}
+  if(selections=="VBTF"){
+  _RecoCutFlags[_Acc] =  "_AccVBTF";
+  _RecoCutFlags[_Iso] =  "_IsoVBTF";
+  _RecoCutFlags[_EiD] =  "_EiDVBTF";}
+     
+  _RecoCutFlags[_Trg] =  "_Trg";
+  _RecoCutFlags[_Qual] = "_Qual";
+  _RecoCutFlags[_Imp] =  "_Imp";
   
   TFile* train_sign = 0;
   TFile* train_back = 0;
@@ -58,27 +86,25 @@ int main() {
   if(output_total!=""&&total_an)total_out = new TFile(output_total.c_str(), "RECREATE");
   if(output_total!=""&&!total_an)total_out = new TFile(output_total.c_str());
   
-  string dir = "";
-  string sec_el_dir = "";
-  
-  if(selections=="VPJ"){
-  if(cut=="Imp")dir = "EfficiencyElectron/Tag&Probe_Acc_Trg_Imp";
-  if(cut=="Iso")dir = "EfficiencyElectron/Tag&Probe_Acc_Trg_Imp_Iso";
-  if(cut=="EiD")dir = "EfficiencyElectron/Tag&Probe_Acc_Trg_Imp_Iso_EiD";
-  }
-  
+  string dir = "EfficiencyElectron/";
+  string sec_el_dir = "EfficiencyElectron/";
+	
+  if(selections=="VPJ")dir+="Tag&Probe";
   if(selections=="VBTF"){
-  if(cut=="Imp"){
-  dir = "EfficiencyElectron/Tag&Probe0_AccVBTF_Trg_Imp";
-  sec_el_dir = "EfficiencyElectron/Tag&Probe1_AccVBTF_Trg_Imp";}
-  if(cut=="Iso"){
-  dir = "EfficiencyElectron/Tag&Probe0_AccVBTF_Trg_Imp_IsoVBTF";
-  sec_el_dir = "EfficiencyElectron/Tag&Probe1_AccVBTF_Trg_Imp_IsoVBTF";}
-  if(cut=="EiD"){
-  dir = "EfficiencyElectron/Tag&Probe0_AccVBTF_Trg_Imp_IsoVBTF_EiDVBTF";
-  sec_el_dir = "EfficiencyElectron/Tag&Probe1_AccVBTF_Trg_Imp_IsoVBTF_EiDVBTF";}
+  dir+="Tag&Probe0";
+  sec_el_dir+="Tag&Probe1";}
+	
+  int ncut = 1;	
+  while(cut!=_RecoCutFlags[ncut]){
+  dir+=_RecoCutFlags[ncut].c_str();
+  sec_el_dir+=_RecoCutFlags[ncut].c_str();
+  ncut++;
+  if(ncut>6)throw cms::Exception("PATAnalysis:zeetpana_CutNotFound") << "ERROR! Cut selected not found!";
   }
-  
+	
+  dir+=_RecoCutFlags[ncut].c_str();
+  sec_el_dir+=_RecoCutFlags[ncut].c_str();
+	
   if(nodef_dir!="")dir=nodef_dir;
   if(nodef_secdir!="")sec_el_dir=nodef_secdir;
   

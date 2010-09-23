@@ -28,12 +28,13 @@ using namespace std;
 
 //Selections: "VPJ" = V+jets selections (old); "VBTF" = Vector Boson Task Force (new)
 
-void recJet_Plots(string selections){
+void recJet_Plots1(string selections){
 
 
 string Analysis_Note = "False";
 if (Analysis_Note == "False") gROOT->SetStyle("Plain");
 gStyle->SetOptStat(0);
+gStyle->SetOptTitle(0);
 
 string log_scale = "True";
 
@@ -41,66 +42,73 @@ string Tab_cut = "True";
 string Tab_jetm = "True";                
 
         //Background MC
-        TFile* QCD_EMEnriched_all_TF = TFile::Open("QCD_EMEnriched_all_Skimmed_Calo30_Eta2e5_WP80_95_VBTF.root");
-        TFile* QCD_BCtoE_all_TF = TFile::Open("QCD_BCtoE_all_Calo30_Eta2e5_WP80_95_VBTF.root");
-        TFile* TTbar_TF = TFile::Open("TTbar_plus_jets_Madgraph_Calo30_Eta2e5_WP80_95_VBTF.root");
-        TFile* W_TF = TFile::Open("W_plus_jets_Madgraph_Calo30_Eta2e5_WP80_95_VBTF.root");
+        TFile* QCD_EMEnriched_all_TF = TFile::Open("QCD_EMEnriched_Pythia_all_Spring10_Skimmed_Calo30_Eta3_WP80_95_VBTF.root");
+        TFile* QCD_BCtoE_all_TF = TFile::Open("QCD_BCtoE_Pythia_all_Spring10_Calo30_Eta3_WP80_95_VBTF.root");
+        TFile* TTbar_TF = TFile::Open("TTbarJets_Madgraph_Spring10_Calo30_Eta3_WP80_95_VBTF.root");
+        TFile* W_TF = TFile::Open("WJets_Madgraph_Spring10_Calo30_Eta3_WP80_95_VBTF.root");
         
 	//Signal MC
-        TFile *Z_TF = TFile::Open("Z_plus_jets_Madgraph_Calo30_Eta2e5_WP80_95_VBTF.root");
+        TFile *Z_TF = TFile::Open("ZJets_Madgraph_Spring10_Calo30_Eta3_WP80_95_VBTF.root");
 
         //Data
-        TFile *Data_TF = TFile::Open("Zee_06Jul_all_Calo30_Eta2e5_WP80_95_VBTF.root");
+        TFile *Data_TF = TFile::Open("Data_Zee_17Jul_all_Calo30_Eta3_WP80_95_VBTF.root");
         
         //Output
-        string out = "recJet_Plots_Calo30_Eta2e5_WP80_95_VBTF_56e23invnb";        
+        string out = "recJet_Plots1_Calo30_Eta3_WP80_95_VBTF_193e39invnb";        
         string output = out;
         output+=".root";
         TFile* outplots = new TFile(output.c_str(), "RECREATE");
 	      
         //Normalization factor
         double iniLumi = 50.; //pb-1
-        double targetLumi = 0.05623; //pb-1
+        double targetLumi = 0.19339; //pb-1
         double scale = 1.;
         if(iniLumi!=0)scale = targetLumi/iniLumi;
 	
 	//colors	
-	int col_QCD_EMEnriched_all= 2;
-	int col_QCD_BCtoE_all= 3;
-	int col_TTbar= 4;
-	int col_W= 6;
-	int col_Z = 14;
-	int col_Data = 1;
+	int col_Z = 798;
+	int col_QCD_EMEnriched_all= 856;
+	int col_QCD_BCtoE_all= 607;
+	int col_TTbar= 634;
+	int col_W= 807;
+	int col_Data= 1;
 
 	//FillStyle	
-	int style = 3002;
+	int style = 1001;
 
 	//SetRangeUser
 	//Jets
 	double nminX = 0.0; 
 	double nmaxX = 6.0;
 	double nminY = 0.001; 
-	double nmaxY = 400.0;
+	double nmaxY = 700.0;
 	
 	//Legenda
-	string Leg_QCD_EMEnriched_all = "QCD EM Enriched (PYTHIA6)";
-	string Leg_QCD_BCtoE_all = "QCD b,c #rightarrow e (PYTHIA6)";
-	string Leg_TTbar = "t #bar{t}+jets (MADGRAPH)";
-	string Leg_W = "W+jets (MADGRAPH)";
-	string Leg_Z = "Z+jets (MADGRAPH)";
+	string Leg_QCD_EMEnriched_all = "QCD EM Enriched";
+	string Leg_QCD_BCtoE_all = "QCD b,c #rightarrow e";
+	string Leg_TTbar = "t #bar{t}+jets";
+	string Leg_W = "W+jets";
+	string Leg_Z = "Z+jets";
 	string Leg_Data	= "Data";
 
 	//tabella jetm
-	int decimal = 1000;
+	int decimal = 10000;
 	string Tab_title = "Number of jets			0	1	2	3	4	5";
 	string Tab_QCD_EMEnriched_all = "QCD EM Enriched (PYTHIA6)	";
+	string Tab_QCD_EMEnriched_all_err = "QCD EM Enriched (PYTHIA6) Error	";
 	string Tab_QCD_BCtoE_all = "QCD b,c->e (PYTHIA6)		";
+	string Tab_QCD_BCtoE_all_err = "QCD b,c->e (PYTHIA6) Error	";
 	string Tab_TTbar = "TTbar+jets (MADGRAPH)		";
+	string Tab_TTbar_err = "TTbar+jets (MADGRAPH) Error	";
 	string Tab_W = "W+jets (MADGRAPH)		";
+	string Tab_W_err = "W+jets (MADGRAPH) Error		";
 	string Tab_Z = "Z+jets (MADGRAPH)		";
+	string Tab_Z_err = "Z+jets (MADGRAPH) Error		";
 	string Tab_riga = "-----------------------------------------------------------------------------";
 	string Tab_total = "Total				";
+	string Tab_total_err = "Total Error			";
 	string Tab_Data = "DATA				";
+	string Tab_Data_err = "DATA Error			";
 	string Tab_end = "#############################################################################";
 		
 	//tabella cut
@@ -210,8 +218,8 @@ string cartellaplot = "IsoJetCounter";
 //grafici
 string grafico_name = "IsoJetCounter";
 
-string asseX_name = "Number of jets";
-string asseY_name = "Events"; 
+string asseX_name = "Numero di jets";
+string asseY_name = "Eventi"; 
 
 TDirectory *Dir_1;
 Dir_1 = outplots->mkdir(cartella1.c_str());
@@ -388,47 +396,95 @@ for(int a=1; a<3; a++){
          
 		for(int n=1; n<10; n++){
 
-		histoQCD_EMEnriched_all_1->SetBinContent(n, histoQCD_EMEnriched_all_1->Integral(n, 10));
-        	histoQCD_BCtoE_all_1->SetBinContent(n, histoQCD_BCtoE_all_1->Integral(n, 10));
-		histoTTbar_1->SetBinContent(n, histoTTbar_1->Integral(n, 10));
-		histoW_1->SetBinContent(n, histoW_1->Integral(n, 10));
-		histoZ_1->SetBinContent(n, histoZ_1->Integral(n, 10));
-		histoData_1->SetBinContent(n, histoData_1->Integral(n, 10));
+		double err_QCD_EMEnriched_all_1_incl, err_QCD_BCtoE_all_1_incl, err_TTbar_1_incl, err_W_1_incl, err_Z_1_incl, err_Data_1_incl;
 
-		histoQCD_EMEnriched_all_12->SetBinContent(n, histoQCD_EMEnriched_all_12->Integral(n, 10));
-        	histoQCD_BCtoE_all_12->SetBinContent(n, histoQCD_BCtoE_all_12->Integral(n, 10));
-		histoTTbar_12->SetBinContent(n, histoTTbar_12->Integral(n, 10));
-		histoW_12->SetBinContent(n, histoW_12->Integral(n, 10));
-		histoZ_12->SetBinContent(n, histoZ_12->Integral(n, 10));
-		histoData_12->SetBinContent(n, histoData_12->Integral(n, 10));
+		histoQCD_EMEnriched_all_1->SetBinContent(n, histoQCD_EMEnriched_all_1->IntegralAndError(n, 10, err_QCD_EMEnriched_all_1_incl));
+                histoQCD_EMEnriched_all_1->SetBinError(n, err_QCD_EMEnriched_all_1_incl);
+        	histoQCD_BCtoE_all_1->SetBinContent(n, histoQCD_BCtoE_all_1->IntegralAndError(n, 10, err_QCD_BCtoE_all_1_incl));
+                histoQCD_BCtoE_all_1->SetBinError(n, err_QCD_BCtoE_all_1_incl);
+		histoTTbar_1->SetBinContent(n, histoTTbar_1->IntegralAndError(n, 10, err_TTbar_1_incl));
+		histoTTbar_1->SetBinError(n, err_TTbar_1_incl);
+                histoW_1->SetBinContent(n, histoW_1->IntegralAndError(n, 10, err_W_1_incl));
+		histoW_1->SetBinError(n, err_W_1_incl);
+                histoZ_1->SetBinContent(n, histoZ_1->IntegralAndError(n, 10, err_Z_1_incl));
+		histoZ_1->SetBinError(n, err_Z_1_incl);
+                histoData_1->SetBinContent(n, histoData_1->IntegralAndError(n, 10, err_Data_1_incl));
+                histoData_1->SetBinError(n, err_Data_1_incl);
 
-		histoQCD_EMEnriched_all_123->SetBinContent(n, histoQCD_EMEnriched_all_123->Integral(n, 10));
-        	histoQCD_BCtoE_all_123->SetBinContent(n, histoQCD_BCtoE_all_123->Integral(n, 10));
-		histoTTbar_123->SetBinContent(n, histoTTbar_123->Integral(n, 10));
-		histoW_123->SetBinContent(n, histoW_123->Integral(n, 10));
-		histoZ_123->SetBinContent(n, histoZ_123->Integral(n, 10));
-		histoData_123->SetBinContent(n, histoData_123->Integral(n, 10));
+		double err_QCD_EMEnriched_all_12_incl, err_QCD_BCtoE_all_12_incl, err_TTbar_12_incl, err_W_12_incl, err_Z_12_incl, err_Data_12_incl;
 
-		histoQCD_EMEnriched_all_1234->SetBinContent(n, histoQCD_EMEnriched_all_1234->Integral(n, 10));
-        	histoQCD_BCtoE_all_1234->SetBinContent(n, histoQCD_BCtoE_all_1234->Integral(n, 10));
-		histoTTbar_1234->SetBinContent(n, histoTTbar_1234->Integral(n, 10));
-		histoW_1234->SetBinContent(n, histoW_1234->Integral(n, 10));
-		histoZ_1234->SetBinContent(n, histoZ_1234->Integral(n, 10));
-		histoData_1234->SetBinContent(n, histoData_1234->Integral(n, 10));	
+		histoQCD_EMEnriched_all_12->SetBinContent(n, histoQCD_EMEnriched_all_12->IntegralAndError(n, 10, err_QCD_EMEnriched_all_12_incl));
+                histoQCD_EMEnriched_all_12->SetBinError(n, err_QCD_EMEnriched_all_12_incl);
+        	histoQCD_BCtoE_all_12->SetBinContent(n, histoQCD_BCtoE_all_12->IntegralAndError(n, 10, err_QCD_BCtoE_all_12_incl));
+                histoQCD_BCtoE_all_12->SetBinError(n, err_QCD_BCtoE_all_12_incl);
+		histoTTbar_12->SetBinContent(n, histoTTbar_12->IntegralAndError(n, 10, err_TTbar_12_incl));
+		histoTTbar_12->SetBinError(n, err_TTbar_12_incl);
+                histoW_12->SetBinContent(n, histoW_12->IntegralAndError(n, 10, err_W_12_incl));
+		histoW_12->SetBinError(n, err_W_12_incl);
+                histoZ_12->SetBinContent(n, histoZ_12->IntegralAndError(n, 10, err_Z_12_incl));
+		histoZ_12->SetBinError(n, err_Z_12_incl);
+                histoData_12->SetBinContent(n, histoData_12->IntegralAndError(n, 10, err_Data_12_incl));
+                histoData_12->SetBinError(n, err_Data_12_incl);
 
-		histoQCD_EMEnriched_all_12345->SetBinContent(n, histoQCD_EMEnriched_all_12345->Integral(n, 10));
-        	histoQCD_BCtoE_all_12345->SetBinContent(n, histoQCD_BCtoE_all_12345->Integral(n, 10));
-		histoTTbar_12345->SetBinContent(n, histoTTbar_12345->Integral(n, 10));
-		histoW_12345->SetBinContent(n, histoW_12345->Integral(n, 10));
-		histoZ_12345->SetBinContent(n, histoZ_12345->Integral(n, 10));
-		histoData_12345->SetBinContent(n, histoData_12345->Integral(n, 10));
+		double err_QCD_EMEnriched_all_123_incl, err_QCD_BCtoE_all_123_incl, err_TTbar_123_incl, err_W_123_incl, err_Z_123_incl, err_Data_123_incl;
 
-		histoQCD_EMEnriched_all_123456->SetBinContent(n, histoQCD_EMEnriched_all_123456->Integral(n, 10));
-        	histoQCD_BCtoE_all_123456->SetBinContent(n, histoQCD_BCtoE_all_123456->Integral(n, 10));
-		histoTTbar_123456->SetBinContent(n, histoTTbar_123456->Integral(n, 10));
-		histoW_123456->SetBinContent(n, histoW_123456->Integral(n, 10));
-		histoZ_123456->SetBinContent(n, histoZ_123456->Integral(n, 10));
-		histoData_123456->SetBinContent(n, histoData_123456->Integral(n, 10));
+		histoQCD_EMEnriched_all_123->SetBinContent(n, histoQCD_EMEnriched_all_123->IntegralAndError(n, 10, err_QCD_EMEnriched_all_123_incl));
+                histoQCD_EMEnriched_all_123->SetBinError(n, err_QCD_EMEnriched_all_123_incl);
+        	histoQCD_BCtoE_all_123->SetBinContent(n, histoQCD_BCtoE_all_123->IntegralAndError(n, 10, err_QCD_BCtoE_all_123_incl));
+                histoQCD_BCtoE_all_123->SetBinError(n, err_QCD_BCtoE_all_123_incl);
+		histoTTbar_123->SetBinContent(n, histoTTbar_123->IntegralAndError(n, 10, err_TTbar_123_incl));
+		histoTTbar_123->SetBinError(n, err_TTbar_123_incl);
+                histoW_123->SetBinContent(n, histoW_123->IntegralAndError(n, 10, err_W_123_incl));
+		histoW_123->SetBinError(n, err_W_123_incl);
+                histoZ_123->SetBinContent(n, histoZ_123->IntegralAndError(n, 10, err_Z_123_incl));
+		histoZ_123->SetBinError(n, err_Z_123_incl);
+                histoData_123->SetBinContent(n, histoData_123->IntegralAndError(n, 10, err_Data_123_incl));
+                histoData_123->SetBinError(n, err_Data_123_incl);
+
+		double err_QCD_EMEnriched_all_1234_incl, err_QCD_BCtoE_all_1234_incl, err_TTbar_1234_incl, err_W_1234_incl, err_Z_1234_incl, err_Data_1234_incl;
+
+		histoQCD_EMEnriched_all_1234->SetBinContent(n, histoQCD_EMEnriched_all_1234->IntegralAndError(n, 10, err_QCD_EMEnriched_all_1234_incl));
+                histoQCD_EMEnriched_all_1234->SetBinError(n, err_QCD_EMEnriched_all_1234_incl);
+        	histoQCD_BCtoE_all_1234->SetBinContent(n, histoQCD_BCtoE_all_1234->IntegralAndError(n, 10, err_QCD_BCtoE_all_1234_incl));
+                histoQCD_BCtoE_all_1234->SetBinError(n, err_QCD_BCtoE_all_1234_incl);
+		histoTTbar_1234->SetBinContent(n, histoTTbar_1234->IntegralAndError(n, 10, err_TTbar_1234_incl));
+		histoTTbar_1234->SetBinError(n, err_TTbar_1234_incl);
+                histoW_1234->SetBinContent(n, histoW_1234->IntegralAndError(n, 10, err_W_1234_incl));
+		histoW_1234->SetBinError(n, err_W_1234_incl);
+                histoZ_1234->SetBinContent(n, histoZ_1234->IntegralAndError(n, 10, err_Z_1234_incl));
+		histoZ_1234->SetBinError(n, err_Z_1234_incl);
+                histoData_1234->SetBinContent(n, histoData_1234->IntegralAndError(n, 10, err_Data_1234_incl));
+                histoData_1234->SetBinError(n, err_Data_1234_incl);	
+
+double err_QCD_EMEnriched_all_12345_incl, err_QCD_BCtoE_all_12345_incl, err_TTbar_12345_incl, err_W_12345_incl, err_Z_12345_incl, err_Data_12345_incl;
+
+		histoQCD_EMEnriched_all_12345->SetBinContent(n, histoQCD_EMEnriched_all_12345->IntegralAndError(n, 10, err_QCD_EMEnriched_all_12345_incl));
+                histoQCD_EMEnriched_all_12345->SetBinError(n, err_QCD_EMEnriched_all_12345_incl);
+        	histoQCD_BCtoE_all_12345->SetBinContent(n, histoQCD_BCtoE_all_12345->IntegralAndError(n, 10, err_QCD_BCtoE_all_12345_incl));
+                histoQCD_BCtoE_all_12345->SetBinError(n, err_QCD_BCtoE_all_12345_incl);
+		histoTTbar_12345->SetBinContent(n, histoTTbar_12345->IntegralAndError(n, 10, err_TTbar_12345_incl));
+		histoTTbar_12345->SetBinError(n, err_TTbar_12345_incl);
+                histoW_12345->SetBinContent(n, histoW_12345->IntegralAndError(n, 10, err_W_12345_incl));
+		histoW_12345->SetBinError(n, err_W_12345_incl);
+                histoZ_12345->SetBinContent(n, histoZ_12345->IntegralAndError(n, 10, err_Z_12345_incl));
+		histoZ_12345->SetBinError(n, err_Z_12345_incl);
+                histoData_12345->SetBinContent(n, histoData_12345->IntegralAndError(n, 10, err_Data_12345_incl));
+                histoData_12345->SetBinError(n, err_Data_12345_incl);
+
+double err_QCD_EMEnriched_all_123456_incl, err_QCD_BCtoE_all_123456_incl, err_TTbar_123456_incl, err_W_123456_incl, err_Z_123456_incl, err_Data_123456_incl;
+
+		histoQCD_EMEnriched_all_123456->SetBinContent(n, histoQCD_EMEnriched_all_123456->IntegralAndError(n, 10, err_QCD_EMEnriched_all_123456_incl));
+                histoQCD_EMEnriched_all_123456->SetBinError(n, err_QCD_EMEnriched_all_123456_incl);
+        	histoQCD_BCtoE_all_123456->SetBinContent(n, histoQCD_BCtoE_all_123456->IntegralAndError(n, 10, err_QCD_BCtoE_all_123456_incl));
+                histoQCD_BCtoE_all_123456->SetBinError(n, err_QCD_BCtoE_all_123456_incl);
+		histoTTbar_123456->SetBinContent(n, histoTTbar_123456->IntegralAndError(n, 10, err_TTbar_123456_incl));
+		histoTTbar_123456->SetBinError(n, err_TTbar_123456_incl);
+                histoW_123456->SetBinContent(n, histoW_123456->IntegralAndError(n, 10, err_W_123456_incl));
+		histoW_123456->SetBinError(n, err_W_123456_incl);
+                histoZ_123456->SetBinContent(n, histoZ_123456->IntegralAndError(n, 10, err_Z_123456_incl));
+		histoZ_123456->SetBinError(n, err_Z_123456_incl);
+                histoData_123456->SetBinContent(n, histoData_123456->IntegralAndError(n, 10, err_Data_123456_incl));
+                histoData_123456->SetBinError(n, err_Data_123456_incl);
 
 		}
 	}
@@ -954,27 +1010,56 @@ Dir_5a->cd();
 	
 	c_12345->Write(c_name.c_str());
 	c_12345->Close();
-	
+
 	if(Tab_jetm == "True"){
 	jetm<<endl<<"Selection = "<< c_name.c_str() <<endl;
 	jetm<<endl<<Tab_title.c_str()<<endl;
 	jetm<<endl<<Tab_QCD_EMEnriched_all.c_str();
-	for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoQCD_EMEnriched_all_12345->GetBinContent(i)*decimal)))/decimal<<"	";
-	jetm<<endl<<Tab_QCD_BCtoE_all.c_str();
-	for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoQCD_BCtoE_all_12345->GetBinContent(i)*decimal)))/decimal<<"	";
-	jetm<<endl<<Tab_TTbar.c_str();
-	for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoTTbar_12345->GetBinContent(i)*decimal)))/decimal<<"	";
-	jetm<<endl<<Tab_W.c_str();
-	for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoW_12345->GetBinContent(i)*decimal)))/decimal<<"	";
-	jetm<<endl<<Tab_Z.c_str();
-	for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoZ_12345->GetBinContent(i)*decimal)))/decimal<<"	";
+	for(int i = 1; i < 7; i++)
+jetm<<((float)((int)(histoQCD_EMEnriched_all_12345->GetBinContent(i)*decimal)))/decimal<<"	";
+	jetm<<endl<<Tab_QCD_EMEnriched_all_err.c_str();        
+	for(int i = 1; i < 7; i++)
+jetm<<((float)((int)(histoQCD_EMEnriched_all_12345->GetBinError(i)*decimal)))/decimal<<"	";
+	jetm<<endl<<endl<<Tab_QCD_BCtoE_all.c_str();
+	for(int i = 1; i < 7; i++)
+jetm<<((float)((int)(histoQCD_BCtoE_all_12345->GetBinContent(i)*decimal)))/decimal<<"	";
+	jetm<<endl<<Tab_QCD_BCtoE_all_err.c_str();
+	for(int i = 1; i < 7; i++)
+jetm<<((float)((int)(histoQCD_BCtoE_all_12345->GetBinError(i)*decimal)))/decimal<<"	";
+	jetm<<endl<<endl<<Tab_TTbar.c_str();
+	for(int i = 1; i < 7; i++)
+jetm<<((float)((int)(histoTTbar_12345->GetBinContent(i)*decimal)))/decimal<<"	";
+	jetm<<endl<<Tab_TTbar_err.c_str();
+	for(int i = 1; i < 7; i++)
+jetm<<((float)((int)(histoTTbar_12345->GetBinError(i)*decimal)))/decimal<<"	";
+	jetm<<endl<<endl<<Tab_W.c_str();
+	for(int i = 1; i < 7; i++)
+jetm<<((float)((int)(histoW_12345->GetBinContent(i)*decimal)))/decimal<<"	";
+	jetm<<endl<<Tab_W_err.c_str();
+	for(int i = 1; i < 7; i++)
+jetm<<((float)((int)(histoW_12345->GetBinError(i)*decimal)))/decimal<<"	";
+	jetm<<endl<<endl<<Tab_Z.c_str();
+	for(int i = 1; i < 7; i++)
+jetm<<((float)((int)(histoZ_12345->GetBinContent(i)*decimal)))/decimal<<"	";
+	jetm<<endl<<Tab_Z_err.c_str();
+	for(int i = 1; i < 7; i++)
+jetm<<((float)((int)(histoZ_12345->GetBinError(i)*decimal)))/decimal<<"	";
 	jetm<<endl<<Tab_riga.c_str();
 	jetm<<endl<<Tab_total.c_str();
-	for(int i = 1; i < 7; i++)jetm<<((float)((int)((histoQCD_EMEnriched_all_12345->GetBinContent(i) + histoQCD_BCtoE_all_12345->GetBinContent(i) + histoTTbar_12345->GetBinContent(i) + histoW_12345->GetBinContent(i) + histoZ_12345->GetBinContent(i))*decimal)))/decimal<<"	";
-	jetm<<endl<<Tab_Data.c_str();
-	for(int i = 1; i < 7; i++)jetm<<histoData_12345->GetBinContent(i)<<"	";
+	for(int i = 1; i < 7; i++)
+jetm<<((float)((int)((histoQCD_EMEnriched_all_12345->GetBinContent(i) + histoQCD_BCtoE_all_12345->GetBinContent(i) + histoTTbar_12345->GetBinContent(i) + histoW_12345->GetBinContent(i) + histoZ_12345->GetBinContent(i))*decimal)))/decimal<<"	";
+	jetm<<endl<<Tab_total_err.c_str();
+	for(int i = 1; i < 7; i++)
+jetm<<((float)((int)(sqrt((pow((histoQCD_EMEnriched_all_12345->GetBinError(i)),2) + pow(histoQCD_BCtoE_all_12345->GetBinError(i),2) + pow(histoTTbar_12345->GetBinError(i),2) + pow(histoW_12345->GetBinError(i),2) + pow(histoZ_12345->GetBinError(i),2)))*decimal)))/decimal<<"	";
+	jetm<<endl<<endl<<Tab_Data.c_str();
+	for(int i = 1; i < 7; i++)
+jetm<<histoData_12345->GetBinContent(i)<<"	";
+	jetm<<endl<<Tab_Data_err.c_str();
+	for(int i = 1; i < 7; i++)
+jetm<<histoData_12345->GetBinError(i)<<"	";
 	jetm<<endl<<endl<<Tab_end.c_str()<<endl;
-	}
+	
+        }
 
 	if(Tab_cut == "True"){
 	if(a==1){
