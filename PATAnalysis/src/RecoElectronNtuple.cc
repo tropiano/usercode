@@ -511,26 +511,26 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
 	 
       acc_gennjetsele=isogenjets.size();
 
-      if(genjets.size()>0){
-       acc_jetgenpt1=genjets[0]->pt();
-       acc_jetgeneta1=genjets[0]->eta();
-       acc_jetgenphi1=genjets[0]->phi();
-       acc_jetgencharge1=genjets[0]->charge();
+      if(isogenjets.size()>0){
+       acc_jetgenpt1=isogenjets[0]->pt();
+       acc_jetgeneta1=isogenjets[0]->eta();
+       acc_jetgenphi1=isogenjets[0]->phi();
+       acc_jetgencharge1=isogenjets[0]->charge();
       }
-      if(genjets.size()>1){
-       acc_jetgenpt2=genjets[1]->pt();
-       acc_jetgeneta2=genjets[1]->eta();
-       acc_jetgenphi2=genjets[1]->phi();
-       acc_jetgencharge2=genjets[1]->charge();
+      if(isogenjets.size()>1){
+       acc_jetgenpt2=isogenjets[1]->pt();
+       acc_jetgeneta2=isogenjets[1]->eta();
+       acc_jetgenphi2=isogenjets[1]->phi();
+       acc_jetgencharge2=isogenjets[1]->charge();
       }
-      if(genjets.size()>2){
-       acc_jetgenpt3=genjets[2]->pt();
-       acc_jetgeneta3=genjets[2]->eta();
-       acc_jetgenphi3=genjets[2]->phi();
-       acc_jetgencharge3=genjets[2]->charge();
+      if(isogenjets.size()>2){
+       acc_jetgenpt3=isogenjets[2]->pt();
+       acc_jetgeneta3=isogenjets[2]->eta();
+       acc_jetgenphi3=isogenjets[2]->phi();
+       acc_jetgencharge3=isogenjets[2]->charge();
       }
 
-   } // end selected in acceptance
+   } // end GEN Z selected in acceptance
 
 }
 
