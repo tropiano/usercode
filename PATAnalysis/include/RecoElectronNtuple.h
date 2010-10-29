@@ -64,6 +64,10 @@ public :
    Float_t pfjetet1,pfjetpt1,pfjeteta1,pfjetphi1,pfjetcharge1,pfjetDeltaRa1,pfjetDeltaRb1;
    Float_t pfjetet2,pfjetpt2,pfjeteta2,pfjetphi2,pfjetcharge2,pfjetDeltaRa2,pfjetDeltaRb2;
    Float_t pfjetet3,pfjetpt3,pfjeteta3,pfjetphi3,pfjetcharge3,pfjetDeltaRa3,pfjetDeltaRb3;
+   
+   Float_t DeltaR_GenJetCaloJet, DeltaR_GenJetPFJet;
+   
+   Float_t CorrLeadElPt_AllCuts, CorrSecElPt_AllCuts, CorrZMass_AllCuts, CorrZPt_AllCuts;
 
    // counters
    

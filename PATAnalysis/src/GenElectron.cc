@@ -59,7 +59,7 @@ void GenElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _EventNumber    = iConfig.getParameter<int32_t>("EventNumber");
    _ProcEvents    = iConfig.getParameter<int32_t>("ProcEvents");
 
-    cout << "GenElectron file name : " << _file->GetName() << endl;
+   cout << "GenElectron file name : " << _file->GetName() << endl;
    _file->cd();
    _dir = _file->mkdir(dirname.c_str(), dirname.c_str());
    _dir->cd();
@@ -109,8 +109,7 @@ void GenElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    GenIsoJetCounter = new TH1D("GenIsoJetCounter", "Number of Generated Iso Jet per event", 10, 0, 10);
    _histovector.push_back(GenIsoJetCounter);
    GenJetCounter = new TH1D("GenJetCounter", "Number of Generated Jet per event", 10, 0, 10);
-   _histovector.push_back(GenJetCounter);
-   
+   _histovector.push_back(GenJetCounter);  
    GenJetCounter_Acc = new TH1D("GenJetCounter_Acc", "Number of Generated Jet per event in Acc", 10, 0, 10);
    _histovector.push_back(GenJetCounter_Acc);
    GenIsoJetCounter_Acc = new TH1D("GenIsoJetCounter_Acc", "Number of Generated Iso Jet per event in Acc", 10, 0, 10);
@@ -128,7 +127,7 @@ void GenElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    
   int fileCounter = 0;
    
-   TChain *ch = new TChain("Events");
+  TChain *ch = new TChain("Events");
   ifstream infile;
   infile.open(sourceFileList.c_str());
   string datafile;
@@ -150,7 +149,7 @@ void GenElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
   
   delete ch;
 
-   cout << "GenElectron Worker configured." << endl;   
+  cout << "GenElectron Worker configured." << endl;   
 }
 
 GenElectron::~GenElectron(){
@@ -197,7 +196,7 @@ void  GenElectron::process(const fwlite::Event& iEvent)
    if(IsoJet((*zgenHandle)[0],*genjets[i], "GEN"))isogenjets.push_back(genjets[i]);}
      
    //Events with a selected GEN Zee - NO Acceptance cuts applied
-   if (GenSelected((*zgenHandle)[0], _selections)&&zdaughters.size()!=0){
+   if(GenSelected((*zgenHandle)[0], _selections)&&zdaughters.size()!=0){
    
       genPtZ->Fill((*zgenHandle)[0].pt(), weight);
       genEtaZ->Fill((*zgenHandle)[0].eta(), weight);

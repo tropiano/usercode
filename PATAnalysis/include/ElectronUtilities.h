@@ -32,19 +32,20 @@ using namespace TMath;
 
 ////////////////////////////////// Selection Cuts ////////////////////////////////////////////////
 
-//Data-Spring10 TRIGGER
+//Electron TRIGGER
 static vector<std::string> elTrigger() {
 static vector<std::string> TrgVector;
-TrgVector.push_back("HLT_Photon15_Cleaned_L1R");
+TrgVector.push_back("HLT_Ele15_LW_L1R");
 TrgVector.push_back("HLT_Ele15_SW_EleId_L1R");
 return TrgVector;
 }
 
+//Jet TRIGGER
 static string JetTrigger = "HLT_Jet30U";
 
-//Summer09 triggers
-//static string ElectronTrigger = "HLT_Ele10_LW_L1R";
-//static string JetTrigger = "HLT_Jet30";
+//Electron energy corrections
+static double ElEnergyCorr_B = 1.0115;
+static double ElEnergyCorr_E = 1.0292;
 
 //Common cuts
 static double etaelcut = 2.5;
@@ -53,7 +54,7 @@ static double eta_el_excl_down = 1.4442;           //Excluded Eta region
 static double minnhit = 11.;
 static double maxchi2 = 10.;
 static double dxycut = 0.02;     //cm
-static double ptjetmin = 30.;   //Gev/c
+static double ptjetmin = 15.;   //Gev/c
 static double etajetmax = 2.5;
 static double isojetcut = 0.5; //Isolation jet - Z electron
 

@@ -1,0 +1,4 @@
+/data/sfrosali/PATtuple/MC/Spring10/QCD_EMEnriched_Pt30to80_Skimmed/QCD_EMEnriched_Pt30to80_Spring10_Skimmed_1.root
+/data/sfrosali/PATtuple/MC/Spring10/QCD_EMEnriched_Pt30to80_Skimmed/QCD_EMEnriched_Pt30to80_Spring10_Skimmed_2.root
+/data/sfrosali/PATtuple/MC/Spring10/QCD_EMEnriched_Pt30to80_Skimmed/QCD_EMEnriched_Pt30to80_Spring10_Skimmed_3.root
+/data/sfrosali/PATtuple/MC/Spring10/QCD_EMEnriched_Pt30to80_Skimmed/QCD_EMEnriched_Pt30to80_Spring10_Skimmed_4.root

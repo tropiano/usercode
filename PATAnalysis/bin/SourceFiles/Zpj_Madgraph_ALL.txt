@@ -1,3 +1,6 @@
+/data/sandro/PATtuple/MC/Spring10/7TeV_35X/Zee/ZJets_Madgraph_Spring10_7TeV_akt5_356/ZJets_Madgraph_Spring10_7TeV_ak5_356_10_2.root
+/data/sandro/PATtuple/MC/Spring10/7TeV_35X/Zee/ZJets_Madgraph_Spring10_7TeV_akt5_356/ZJets_Madgraph_Spring10_7TeV_ak5_356_11_2.root
+/data/sandro/PATtuple/MC/Spring10/7TeV_35X/Zee/ZJets_Madgraph_Spring10_7TeV_akt5_356/ZJets_Madgraph_Spring10_7TeV_ak5_356_12_3.root
 /data/sandro/PATtuple/MC/Spring10/7TeV_35X/Zee/ZJets_Madgraph_Spring10_7TeV_akt5_356/ZJets_Madgraph_Spring10_7TeV_ak5_356_13_2.root
 /data/sandro/PATtuple/MC/Spring10/7TeV_35X/Zee/ZJets_Madgraph_Spring10_7TeV_akt5_356/ZJets_Madgraph_Spring10_7TeV_ak5_356_14_2.root
 /data/sandro/PATtuple/MC/Spring10/7TeV_35X/Zee/ZJets_Madgraph_Spring10_7TeV_akt5_356/ZJets_Madgraph_Spring10_7TeV_ak5_356_15_2.root

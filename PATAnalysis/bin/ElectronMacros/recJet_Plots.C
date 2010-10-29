@@ -22,13 +22,12 @@
 #include "TLegendEntry.h"
 #include "TGraphAsymmErrors.h"
 #include "TMath.h"
-#include "tdrstyle.C"
 
 using namespace std;
 
 //Selections: "VPJ" = V+jets selections (old); "VBTF" = Vector Boson Task Force (new)
 
-void recJet_Plots1(string selections){
+void recJet_Plots(string selections){
 
 
 string Analysis_Note = "False";
@@ -42,35 +41,35 @@ string Tab_cut = "True";
 string Tab_jetm = "True";                
 
         //Background MC
-        TFile* QCD_EMEnriched_all_TF = TFile::Open("QCD_EMEnriched_Pythia_all_Spring10_Skimmed_Calo30_Eta3_WP80_95_VBTF.root");
-        TFile* QCD_BCtoE_all_TF = TFile::Open("QCD_BCtoE_Pythia_all_Spring10_Calo30_Eta3_WP80_95_VBTF.root");
-        TFile* TTbar_TF = TFile::Open("TTbarJets_Madgraph_Spring10_Calo30_Eta3_WP80_95_VBTF.root");
-        TFile* W_TF = TFile::Open("WJets_Madgraph_Spring10_Calo30_Eta3_WP80_95_VBTF.root");
+        TFile* QCD_EMEnriched_all_TF = TFile::Open("../Simulazioni/PF30Jets/QCD_EMEnriched_Pythia_ALL_Spring10_PF30Eta2e5_Norm50_ALL.root");
+        TFile* QCD_BCtoE_all_TF = TFile::Open("../Simulazioni/PF30Jets/QCD_BCtoE_Pythia_ALL_Spring10_PF30Eta2e5_Norm50_ALL.root");
+        TFile* TTbar_TF = TFile::Open("../Simulazioni/PF30Jets/TTbarJets_Madgraph_Spring10_PF30Eta2e5_Norm50_ALL.root");
+        TFile* W_TF = TFile::Open("../Simulazioni/PF30Jets/WJets_Madgraph_Spring10_PF30Eta2e5_Norm50_ALL.root");
         
 	//Signal MC
-        TFile *Z_TF = TFile::Open("ZJets_Madgraph_Spring10_Calo30_Eta3_WP80_95_VBTF.root");
+        TFile *Z_TF = TFile::Open("../Simulazioni/PF30Jets/ZJets_Madgraph_Spring10_PF30Eta2e5_Norm50_ALL.root");
 
         //Data
-        TFile *Data_TF = TFile::Open("Data_Zee_17Jul_all_Calo30_Eta3_WP80_95_VBTF.root");
+        TFile *Data_TF = TFile::Open("../Dati/PF30Jets/Data_Sep8_Photon15_Cleaned_Ele15_SW_EleID_ALL.root");
         
         //Output
-        string out = "recJet_Plots1_Calo30_Eta3_WP80_95_VBTF_193e39invnb";        
+        string out = "../Plots/PF30Jets/recJets_Plots_PF30_Sep8";        
         string output = out;
         output+=".root";
         TFile* outplots = new TFile(output.c_str(), "RECREATE");
 	      
         //Normalization factor
         double iniLumi = 50.; //pb-1
-        double targetLumi = 0.19339; //pb-1
+        double targetLumi = 2.343; //pb-1
         double scale = 1.;
         if(iniLumi!=0)scale = targetLumi/iniLumi;
 	
 	//colors	
-	int col_Z = 798;
-	int col_QCD_EMEnriched_all= 856;
-	int col_QCD_BCtoE_all= 607;
-	int col_TTbar= 634;
-	int col_W= 807;
+	int col_Z = 800;
+	int col_QCD_EMEnriched_all= 616+3;
+	int col_QCD_BCtoE_all= 800+7;
+	int col_TTbar= 632;
+	int col_W= 800+3;
 	int col_Data= 1;
 
 	//FillStyle	
@@ -192,14 +191,14 @@ string Tab_jetm = "True";
 
 
 	ofstream cut;
-	string outcut="CutsReport_";
-	outcut+=out;
+	string outcut = out;
+	outcut+="_CutsReport";
 	outcut+=".txt";
 	cut.open(outcut.c_str());
 	
 	ofstream jetm;
-	string outjet="JetMultiReport_";
-	outjet+=out;
+	string outjet = out;
+	outjet+="_JetMultiReport";
 	outjet+=".txt";
 	jetm.open(outjet.c_str());
 	

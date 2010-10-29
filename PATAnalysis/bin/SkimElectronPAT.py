@@ -8,7 +8,7 @@ process.load("FWCore.MessageLogger.MessageLogger_cfi")
 
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1000)
 
-process.load("Firenze.PATAnalysis.list_QCDPt20to30_2_cfi")
+process.load("Firenze.PATAnalysis.list_ZeeCollisionsSep11_3_cfi")
 
 #process.source = cms.Source("PoolSource",
 #    fileNames = cms.untracked.vstring(
@@ -51,7 +51,7 @@ from PhysicsTools.PatAlgos.patEventContent_cff import patTriggerEventContent
 from PhysicsTools.PatAlgos.patEventContent_cff import patEventContent
 
 process.out = cms.OutputModule("PoolOutputModule",
-fileName = cms.untracked.string('file:/data/sfrosali/PATtuple/MC/Spring10/QCD_EMEnriched_Pt20to30_Skimmed/QCD_EMEnriched_Pt20to30_Spring10_Skimmed_2.root'),
+fileName = cms.untracked.string('file:/data/sfrosali/PATtuple/DATA/SkimGalloSep11/ZeeCollisionsSep11_3.root'),
 # save only events passing the full path
 SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('skimming') ),
 # save PAT Layer 1 output; you need a '*' to

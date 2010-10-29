@@ -1,8 +1,10 @@
 #!/bin/bash
 
-LIST=Summer09_test.txt
-TMPLIST=tmp_list.txt
-DIR=/data/sfrosali/PATtuple/MC/ZeeSummer09_7TeV_akt5_335_wGenP/
+FLAG_POOLSOURCE=0;
+
+LIST=ZeeCollisionsSep11_2.txt
+TMPLIST=tmp.txt
+DIR=/data/egallo/ZeeCollisions10/Sep11/
 
 ls -l $DIR | grep root > $TMPLIST
 
@@ -14,6 +16,10 @@ if [ $COUNT -eq 0 ] ; then
 echo $DIR$i > $LIST
 COUNT=1
 else
+if [ $FLAG_POOLSOURCE -eq 0 ] ; then
 echo $DIR$i >> $LIST
+else
+echo "'file:"$DIR$i"'," >> $LIST
+fi
 fi
 done;

@@ -22,7 +22,6 @@
 #include "TLegendEntry.h"
 #include "TGraphAsymmErrors.h"
 #include "TMath.h"
-#include "tdrstyle.C"
 
 using namespace std;
 
@@ -40,26 +39,26 @@ string Tab_cut = "True";
         
                 
         //Background MC
-        TFile* QCD_EMEnriched_all_TF = TFile::Open("QCD_EMEnriched_all_Skimmed_Calo30_Eta2e5_WP80_95_VBTF.root");
-        TFile* QCD_BCtoE_all_TF = TFile::Open("QCD_BCtoE_all_Calo30_Eta2e5_WP80_95_VBTF.root");
-        TFile* TTbar_TF = TFile::Open("TTbar_plus_jets_Madgraph_Calo30_Eta2e5_WP80_95_VBTF.root");
-        TFile* W_TF = TFile::Open("W_plus_jets_Madgraph_Calo30_Eta2e5_WP80_95_VBTF.root");
+        TFile* QCD_EMEnriched_all_TF = TFile::Open("../Simulazioni/CALO30Jets/QCD_EMEnriched_CALO30Eta3_ALL.root");
+        TFile* QCD_BCtoE_all_TF = TFile::Open("../Simulazioni/CALO30Jets/QCD_BCtoE_CALO30Eta3_ALL.root");
+        TFile* TTbar_TF = TFile::Open("../Simulazioni/CALO30Jets/TTbarJets_Madgraph_Spring10_CALO30Eta3.root");
+        TFile* W_TF = TFile::Open("../Simulazioni/CALO30Jets/WJets_Madgraph_Spring10_CALO30Eta3.root");
         
 	//Signal MC
-        TFile *Z_TF = TFile::Open("Z_plus_jets_Madgraph_Calo30_Eta2e5_WP80_95_VBTF.root");
+        TFile *Z_TF = TFile::Open("../Simulazioni/CALO30Jets/ZJets_Madgraph_Spring10_CALO30Eta3_Norm50_ALL.root");
 
         //Data
-        TFile *Data_TF = TFile::Open("Zee_06Jul_all_Calo30_Eta2e5_WP80_95_VBTF.root");
+        TFile *Data_TF = TFile::Open("../Dati/CALO30Jets/Data_Sep11_CALO30Eta3.root");
         
         //Output
-        string out = "recZElectrons_Plots_Calo30_Eta2e5_WP80_95_VBTF_56e23invnb";        
+        string out = "../Plots/CALO30Jets/recZElectrons_Plots_CALO30Eta3_Sep11";        
         string output = out;
         output+=".root";
         TFile* outplots = new TFile(output.c_str(), "RECREATE");
 	      
         //Normalization factor
         double iniLumi = 50.; //pb-1
-        double targetLumi = 0.05623; //pb-1
+        double targetLumi = 2.90274; //pb-1
         double scale = 1.;
         if(iniLumi!=0)scale = targetLumi/iniLumi;
 
@@ -76,19 +75,19 @@ string Tab_cut = "True";
 	int rebin_recSecElfBrem = 2;
 
 	//colors	
-	int col_Z = 14;
-	int col_QCD_EMEnriched_all= 2;
-	int col_QCD_BCtoE_all= 3;
-	int col_TTbar= 4;
-	int col_W= 6;
+	int col_Z = 800;
+	int col_QCD_EMEnriched_all= 616+3;
+	int col_QCD_BCtoE_all= 800+7;
+	int col_TTbar= 632;
+	int col_W= 800+3;
 	int col_Data= 1;
 
 	//FillStyle	
-	int style = 3002;
+	int style = 1001;
 
 	//SetRangeUser
 	//LeadElPt
-	double nminX_recLeadElPt= 0.0; 
+	double nminX_recLeadElPt = 0.0; 
 	double nmaxX_recLeadElPt = 200.0;
 	double nminY_recLeadElPt = 0.001; 
 	double nmaxY_recLeadElPt = 300.0;
@@ -218,8 +217,8 @@ string Tab_cut = "True";
 
 
 	ofstream cut;
-	string outcut="CutsReport_";
-	outcut+=out;
+	string outcut = out;
+	outcut+="_CutsReport";
 	outcut+=".txt";
 	cut.open(outcut.c_str());
 	

@@ -1,0 +1,1 @@
+/data/sfrosali/PATtuple/MC/Spring10/QCD_EMEnriched_Pt80to170_Skimmed/QCD_EMEnriched_Pt80to170_Spring10_Skimmed.root

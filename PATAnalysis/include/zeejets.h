@@ -224,6 +224,7 @@ cfg<<"type        = cms.string(\"RecoElectron\"),"<<std::endl;
 cfg<<"Name        = cms.string(\"RecoElectron\"),"<<std::endl;
 cfg<<"sourceFileList = cms.string(\""<<Source.c_str()<<"\"),"<<std::endl;
 cfg<<"Selections = cms.string(\""<<selections.c_str()<<"\"),"<<std::endl;
+cfg<<"Sample = cms.string(\""<<sample.c_str()<<"\"),"<<std::endl;
 cfg<<"JetType = cms.string(\""<<JetType.c_str()<<"\"),"<<std::endl;
 cfg<<"ReportName        = cms.string(\""<<RepName.c_str()<<"\"),"<<std::endl;
 cfg<<"Acc = cms.int32("<<Acc<<"),"<<std::endl;

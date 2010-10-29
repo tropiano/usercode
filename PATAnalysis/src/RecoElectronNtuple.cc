@@ -24,6 +24,7 @@
 #include "DataFormats/FWLite/interface/ChainEvent.h"
 #include "DataFormats/GsfTrackReco/interface/GsfTrack.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
+#include "TLorentzVector.h"
 
 using namespace std;
 using namespace edm;
@@ -135,6 +136,10 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    zeetree->Branch("neles",&neles,"neles/I");
    zeetree->Branch("zmass",&zmass,"zmass/F");
    zeetree->Branch("zmass_AllCuts",&zmass_AllCuts,"zmass_AllCuts/F");
+   zeetree->Branch("CorrZMass_AllCuts",&CorrZMass_AllCuts,"CorrZMass_AllCuts/F");
+   zeetree->Branch("CorrZPt_AllCuts",&CorrZPt_AllCuts,"CorrZPt_AllCuts/F");
+   zeetree->Branch("CorrLeadElPt_AllCuts",&CorrLeadElPt_AllCuts,"CorrLeadElPt_AllCuts/F");
+   zeetree->Branch("CorrSecElPt_AllCuts",&CorrSecElPt_AllCuts,"CorrSecElPt_AllCuts/F");
    zeetree->Branch("zpt",&zpt,"zpt/F");
    zeetree->Branch("zeta",&zeta,"zeta/F");
    zeetree->Branch("zphi",&zphi,"zphi/F");
@@ -209,6 +214,7 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    zeetree->Branch("calojetDeltaRa3",&calojetDeltaRa3,"calojetDeltaRa3/F");
    zeetree->Branch("calojetDeltaRb3",&calojetDeltaRb3,"calojetDeltaRb3/F");
    zeetree->Branch("calojetEmFrac3",&calojetEmFrac3,"calojetEmFrac3/F");
+   zeetree->Branch("DeltaR_GenJetCaloJet",&DeltaR_GenJetCaloJet,"DeltaR_GenJetCaloJet/F");
    
    zeetree->Branch("npfjetsele",&npfjetsele,"npfjetsele/I");   
    zeetree->Branch("pfjetet1",&pfjetet1,"pfjetet1/F"); 
@@ -232,6 +238,7 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    zeetree->Branch("pfjetcharge3",&pfjetcharge3,"pfjetcharge3/F");
    zeetree->Branch("pfjetDeltaRa3",&pfjetDeltaRa3,"pfjetDeltaRa3/F");
    zeetree->Branch("pfjetDeltaRb3",&pfjetDeltaRb3,"pfjetDeltaRb3/F");
+   zeetree->Branch("DeltaR_GenJetPFJet",&DeltaR_GenJetPFJet,"DeltaR_GenJetPFJet/F");
 
    cout << "RecoElectronNtuple: ntuple eletree created " << endl;
    
@@ -320,6 +327,10 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
 
       zmass=-99.;
       zmass_AllCuts=-99.;
+      CorrLeadElPt_AllCuts=-99.;
+      CorrSecElPt_AllCuts=-99.; 
+      CorrZMass_AllCuts=-99.;
+      CorrZPt_AllCuts=-99.;
       zpt=-99.;
       zeta=-99.;
       zphi=-99.;
@@ -396,6 +407,8 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
       calojetDeltaRa3=-99.;
       calojetDeltaRb3=-99.;
       calojetEmFrac3=-99.;
+      DeltaR_GenJetCaloJet=-99;
+      DeltaR_GenJetPFJet=-99;
       
       npfjetsele = -1;
       pfjetet1=0.;
@@ -447,6 +460,8 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    fwlite::Handle<std::vector<reco::GenJet> > jetgenHandle;
    jetgenHandle.getByLabel(iEvent, "selectedGenJets");
    
+   std::vector<const reco::GenJet*> isogenjets;
+   
    if(_sample=="mc" && zgenHandle->size()!=0){
    
    if(zgenHandle->size()>1)throw cms::Exception("PATAnalysis:RecoElectronNtuple_MoreThanOneGENZ") << "ERROR! More than one GEN Z found!";
@@ -462,7 +477,6 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
      }
    
    std::vector<const reco::GenJet*> genjets = GetJets<reco::GenJet>(*jetgenHandle);   
-   std::vector<const reco::GenJet*> isogenjets;
    
    for(unsigned int i = 0; i < genjets.size(); i++){
    if(IsoJet((*zgenHandle)[0],*genjets[i],"GEN"))isogenjets.push_back(genjets[i]);}
@@ -682,6 +696,23 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
         calojetDeltaRa1=Delta_R(*recdau0, *caloisorecjets[0]);
         calojetDeltaRb1=Delta_R(*recdau1, *caloisorecjets[0]);
 	calojetEmFrac1=caloisorecjets[0]->emEnergyFraction();
+	
+	//DeltaR leading Gen jet - leading CALO jet
+	if(acc_jetgenphi1>-10 && calojetphi1>-10){
+	double DeltaPhi_CALO = 0;
+	if((TMath::Abs(acc_jetgenphi1 - calojetphi1) < TMath::Pi()) && (TMath::Abs(acc_jetgenphi1 - calojetphi1) > -(TMath::Pi()))){
+	DeltaPhi_CALO = acc_jetgenphi1 - calojetphi1;
+	}	
+	else if((acc_jetgenphi1 - calojetphi1) > TMath::Pi() ){
+	DeltaPhi_CALO = (2*TMath::Pi()) - (acc_jetgenphi1 - calojetphi1);
+	}	
+        else if((acc_jetgenphi1 - calojetphi1) < -(TMath::Pi())){
+        DeltaPhi_CALO = (2*TMath::Pi()) + (acc_jetgenphi1 - calojetphi1);
+	}
+        double DeltaEta_CALO = acc_jetgeneta1 - calojeteta1;
+	DeltaR_GenJetCaloJet = sqrt(pow(DeltaPhi_CALO,2) + pow(DeltaEta_CALO,2));
+	}
+
       }
       if (caloisorecjets.size()>1){
         calojetet2=caloisorecjets[1]->et();
@@ -712,6 +743,22 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
         pfjetcharge1=pfisorecjets[0]->jetCharge();
         pfjetDeltaRa1=Delta_R(*recdau0, *pfisorecjets[0]);
         pfjetDeltaRb1=Delta_R(*recdau1, *pfisorecjets[0]);
+	
+	//DeltaR leading Gen jet - leading PF jet
+	if(acc_jetgenphi1>-10 && pfjetphi1>-10){
+	double DeltaPhi_PF = 0;
+	if((TMath::Abs(acc_jetgenphi1 - pfjetphi1) < TMath::Pi()) && (TMath::Abs(acc_jetgenphi1 - pfjetphi1) > -(TMath::Pi()))){
+	DeltaPhi_PF = acc_jetgenphi1 - pfjetphi1;
+	}	
+	else if((acc_jetgenphi1 - pfjetphi1) > TMath::Pi() ){
+	DeltaPhi_PF = (2*TMath::Pi()) - (acc_jetgenphi1 - pfjetphi1);
+	}	
+        else if((acc_jetgenphi1 - pfjetphi1) < -(TMath::Pi())){
+        DeltaPhi_PF = (2*TMath::Pi()) + (acc_jetgenphi1 - pfjetphi1);
+	}
+        double DeltaEta_PF = acc_jetgeneta1 - pfjeteta1;
+	DeltaR_GenJetPFJet = sqrt(pow(DeltaPhi_PF,2) + pow(DeltaEta_PF,2));
+	}
       }
       if (pfisorecjets.size()>1){
         pfjetet2=pfisorecjets[1]->et();
@@ -740,6 +787,30 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[6].c_str(), (*zrecHandle)[0], *triggerHandle)){
   
       zmass_AllCuts=(*zrecHandle)[0].mass();
+      
+      //Electron energy corrections
+      if(_sample=="data"){
+      
+      CorrLeadElPt_AllCuts = recdau0->pt();
+      CorrSecElPt_AllCuts  = recdau1->pt();
+      
+      if(recdau0->eta()<eta_el_excl_down)CorrLeadElPt_AllCuts*=ElEnergyCorr_B;  
+      if(recdau1->eta()<eta_el_excl_down)CorrSecElPt_AllCuts*=ElEnergyCorr_B;
+      if(recdau0->eta()>eta_el_excl_up)CorrLeadElPt_AllCuts*=ElEnergyCorr_E;
+      if(recdau1->eta()>eta_el_excl_up)CorrSecElPt_AllCuts*=ElEnergyCorr_E;
+      
+      TLorentzVector p4e1, p4e2;
+      
+      //For our electrons Pt = Et
+      p4e1.SetPtEtaPhiM(CorrLeadElPt_AllCuts, recdau0->eta(), recdau0->phi(),0.0005);
+      p4e2.SetPtEtaPhiM(CorrSecElPt_AllCuts, recdau1->eta(), recdau1->phi(),0.0005);
+ 
+      TLorentzVector Zp4 = p4e1+p4e2;
+     
+      CorrZMass_AllCuts = Zp4.M();
+      CorrZPt_AllCuts   = Zp4.Pt();
+   
+      }
       
    }  // endif strict selected Z
    
