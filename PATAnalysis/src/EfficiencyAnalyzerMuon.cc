@@ -173,10 +173,9 @@ void EfficiencyAnalyzerMuon::analyze(std::string summaryfile, double scale){
 
     stream.close();
   }
-/*.
-  TagAndProbeAnalyzer tpana(_dir, _output, "TM_MuT_OC_M_QC_DXY_Iso");
-  tpana.analyze(2);
-*/ 
+  TagAndProbeAnalyzer tpana(_dir, _output, 0, "Offline");
+  tpana.analyze(3);
+ 
 }
 
 TGraphAsymmErrors EfficiencyAnalyzerMuon::inclusiveEfficiency(TH1* num, TH1* den, const char* name, const char* title) const{

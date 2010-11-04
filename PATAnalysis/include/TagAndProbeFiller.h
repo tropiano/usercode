@@ -25,11 +25,12 @@ public :
                 const std::vector<bool (*)(const reco::Candidate&)>& tag_cuts,
                 const std::vector<bool (*)(const reco::Candidate&)>& probe_cuts,
                 const std::vector<bool (*)(const reco::Candidate&)>& passprobe_cuts,
-                std::string tpflag="");
+                std::string tpflag="",
+                bool onecombinationonly=false);
 
     ~TagAndProbeFiller();
 
-    void fill(const reco::Candidate& Z, double x, double w = 1.);
+    void fill(const reco::Candidate& Z, double x, double w = 1., double pT1=0., double pT2=0., double pT3=0. );
 
     void finalize() const;
 
@@ -60,6 +61,7 @@ private:
   double _mass;
   double _bin;
   double _probe, /*_passprobe,*/ _weight;
+  double _pt1, _pt2, _pt3;
   //char _passprobe[8];
   int _passprobe;
   std::vector<bool (*)(const reco::Candidate&)> _tag_cuts;
@@ -67,6 +69,7 @@ private:
   std::vector<bool (*)(const reco::Candidate&)> _passprobe_cuts;
   
   std::string _tpflag;
+  bool _onecombination;
 
 };
 

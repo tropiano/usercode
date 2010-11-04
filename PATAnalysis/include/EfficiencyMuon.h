@@ -96,7 +96,8 @@ private:
    TagAndProbe* _tp_TM_MuT_OC_M_QC;
    TagAndProbe* _tp_TM_MuT_OC_M_QC_DXY;
 */   
-   TagAndProbeFiller* _tp_TM_MuT_OC_M_QC_DXY_Iso;
+   TagAndProbeFiller* _tp_offline;
+   TagAndProbeFiller* _tp_online;
    std::string getCutName(cuts i) const;
 
 };

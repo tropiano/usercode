@@ -135,7 +135,13 @@ void EfficiencyMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
   dir->cd("-");
 
   std::vector<bool (*)(const reco::Candidate&)> tag_cuts;
-  tag_cuts.push_back(singleMu_Tag);
+  tag_cuts.push_back(singleMu_PtEta); //TEST!!
+  /*
+  tag_cuts.push_back(singleMu_PtEta);
+  tag_cuts.push_back(singleMu_QualityCuts);
+  tag_cuts.push_back(singleMu_DXY);
+  tag_cuts.push_back(singleMu_Isolation);
+  */
   //tag_cuts.push_back(singleMu_isNegative); //TEST 
 
   std::vector<bool (*)(const reco::Candidate&)> probe_cuts;
@@ -159,16 +165,28 @@ void EfficiencyMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
 */  
   probe_cuts.clear();
   passprobe_cuts.clear();
-  probe_cuts.push_back(singleMu_QualityCuts);
-  probe_cuts.push_back(singleMu_DXY);
+  probe_cuts.push_back(singleMu_PtEta);
+  passprobe_cuts.push_back(singleMu_PtEta);
   passprobe_cuts.push_back(singleMu_QualityCuts);
   passprobe_cuts.push_back(singleMu_DXY);
   passprobe_cuts.push_back(singleMu_Isolation);
-  _tp_TM_MuT_OC_M_QC_DXY_Iso = new TagAndProbeFiller(dir, string("TM_MuT_OC_M_QC_DXY_Iso"), _nbin, _xmin, _xmax, tag_cuts, probe_cuts, passprobe_cuts);
+  _tp_offline = new TagAndProbeFiller(dir, string("Offline"), _nbin, _xmin, _xmax, tag_cuts, probe_cuts, passprobe_cuts, "", true);
+
+  tag_cuts.clear();
+  probe_cuts.clear();
+  passprobe_cuts.clear();
+  tag_cuts.push_back(singleMu_PtEta);
+  tag_cuts.push_back(isTriggerMatched);
+  probe_cuts.push_back(singleMu_PtEta);
+  passprobe_cuts.push_back(singleMu_PtEta);
+  passprobe_cuts.push_back(isTriggerMatched);
+  _tp_online = new TagAndProbeFiller (dir, string("Online"), _nbin, _xmin, _xmax, tag_cuts, probe_cuts, passprobe_cuts, "", true); 
   
 }
 
 EfficiencyMuon::~EfficiencyMuon(){
+  delete _tp_offline;
+  delete _tp_online;
 }
 
 
@@ -239,7 +257,11 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
    std::vector<pat::Jet> cleanedJets;
    //CleanJets(*jetHandle, muonsfromZ, cleanedJets, 0.5);
    CleanJets(*jetHandle, allHardMuons, cleanedJets, 0.5);
-   std::vector<const pat::Jet*> jets = GetJets<pat::Jet>(cleanedJets, _ptjetmin, _etajetmax); 
+   std::vector<const pat::Jet*> jets = GetJets<pat::Jet>(cleanedJets, _ptjetmin, _etajetmax);
+   double leadpT, secondpT,thirdpT;
+   leadpT = jets.size() > 0 ? jets[0]->pt() : 0;
+   secondpT = jets.size() > 1 ? jets[1]->pt() : 0;
+   thirdpT  = jets.size() > 2 ? jets[2]->pt() : 0;
 
    double recosize = jets.size();
    double gensize  = 0;
@@ -354,24 +376,23 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
       TM_MuJetTriggeredVsMuPt->Fill(allmuons.front()->pt(), w);
       TM_MuJetTriggeredVsMuEta->Fill(allmuons.front()->eta(), w);
    }   
-/*
+
    //tag and probe 
    if (recselectedTM_MuT_OC_Mass) {
-      //FIXME!!!!!!!!!!! we need to select the Z candidate
-      if (zHandle->size() == 1){
-        //_tp_TM_MuT_OC_M_QC->fill(_zmuons, _zs, x, w);
-        //_tp_TM_MuT_OC_M_QC_DXY->fill(_zmuons, _zs, x, w);
-        _tp_TM_MuT_OC_M_QC_DXY_Iso->fill((*zHandle)[0], recosize, w);
+      if (zHandle->size() > 0){
+        _tp_offline->fill((*zHandle)[0], recosize, w, leadpT, secondpT, thirdpT);
+        _tp_online->fill((*zHandle)[0], recosize, w);
       }  
    } 
-*/
+
    //_initiated= false;
 
 }
 
 void EfficiencyMuon::finalize()
 {
-  _tp_TM_MuT_OC_M_QC_DXY_Iso->finalize();
+  _tp_offline->finalize();
+  _tp_online->finalize();
   std::cout << "response nbins measured " << _jetmultiResponse->GetNbinsMeasured() << std::endl;
   std::cout << "response nbins truth " << _jetmultiResponse->GetNbinsTruth() << std::endl;
   if (_trainUnfolding) _jetmultiResponse->Write();

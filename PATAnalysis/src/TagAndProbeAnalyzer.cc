@@ -21,6 +21,7 @@
 #include "TMath.h"
 
 using namespace std;
+using namespace RooFit;
 
 TagAndProbeAnalyzer::TagAndProbeAnalyzer(TDirectory* input, TFile* output, TDirectory* sec_input, std::string name, bool performfits, TFile* training_signal, TFile* training_background):
 _initialized(false),
@@ -65,7 +66,8 @@ _passprobe_cat("passprobe", "passprobe")
   _argset = new RooArgSet(_mass, _bin, _probe, _passprobe_cat, _weight );
  
   _output->cd();
-  _rootree = new RooDataSet("roodataset", "roodataset", tree, *_argset, "", "weight");
+  _rootree = new RooDataSet("roodataset", "roodataset", tree, *_argset, "");//, "weight");
+  //_rootree = new RooDataSet("roodataset", "roodataset", RooArgSet(_mass, _bin, _probe, _passprobe_cat, _weight));//, Import(*tree), WeightVar("weight"));
   if(_sec_input)_rootree1 = new RooDataSet("roodataset", "roodataset", tree1, *_argset, "", "weight");
   
 }
@@ -108,31 +110,31 @@ void TagAndProbeAnalyzer::analyze(unsigned int nbins, std::string option )
       //_mass.setMin(80.); //TRY smaller range
       //_mass.setMax(100.); //TRY smaller range
     
-        std::pair<RooFitResult*, RooRealVar*>  tp_fit, tp_fit1;
-        
-        cout<<endl<<"### Fitting bin n. "<<i<<endl<<endl;
-        
-        tp_fit  = fit(tagprobe, name_tp.str().c_str(), option);
-        if(_sec_input)tp_fit1  = fit(tagprobe1, name_tp1.str().c_str(), option);
-        
-        if(tp_fit.first && tp_fit.first->status() == 0 ){
-          cout << "Using backgound correctedvalues for " << _name << " in bin " << i << endl;  
-          singleEfficiency.SetPoint(i, i, tp_fit.second->getVal());
-          double errlow = 0.;
-          double errhigh = 0.;
-          if (tp_fit.second->hasAsymError()){
-            errhigh = TMath::Abs(tp_fit.second->getAsymErrorHi());
-            errlow  = TMath::Abs(tp_fit.second->getAsymErrorLo());
-          } else {
-            errlow  = TMath::Abs(tp_fit.second->getError());
-            errhigh = TMath::Abs(tp_fit.second->getError());
-          }
-          singleEfficiency.SetPointEYhigh(i, errhigh);
-          singleEfficiency.SetPointEYlow(i, errlow);
-          }
-         
-         if(_sec_input){ 
-         if(tp_fit1.first && tp_fit1.first->status() == 0 ){
+      std::pair<RooFitResult*, RooRealVar*>  tp_fit, tp_fit1;
+      
+      cout<<endl<<"### Fitting bin n. "<<i<<endl<<endl;
+      
+      tp_fit  = fit(tagprobe, name_tp.str().c_str(), option);
+      if(_sec_input)tp_fit1  = fit(tagprobe1, name_tp1.str().c_str(), option);
+      
+      if(tp_fit.first && tp_fit.first->status() == 0 ){
+        cout << "Using backgound correctedvalues for " << _name << " in bin " << i << endl;  
+        singleEfficiency.SetPoint(i, i, tp_fit.second->getVal());
+        double errlow = 0.;
+        double errhigh = 0.;
+        if (tp_fit.second->hasAsymError()){
+          errhigh = TMath::Abs(tp_fit.second->getAsymErrorHi());
+          errlow  = TMath::Abs(tp_fit.second->getAsymErrorLo());
+        } else {
+          errlow  = TMath::Abs(tp_fit.second->getError());
+          errhigh = TMath::Abs(tp_fit.second->getError());
+        }
+        singleEfficiency.SetPointEYhigh(i, errhigh);
+        singleEfficiency.SetPointEYlow(i, errlow);
+       }
+       
+       if(_sec_input){ 
+        if(tp_fit1.first && tp_fit1.first->status() == 0 ){
           cout << "Using backgound correctedvalues for " << _name << " in bin " << i << endl;  
           singleEfficiency1.SetPoint(i, i, tp_fit1.second->getVal());
           double errlow1 = 0.;
@@ -146,33 +148,35 @@ void TagAndProbeAnalyzer::analyze(unsigned int nbins, std::string option )
           }
           singleEfficiency1.SetPointEYhigh(i, errhigh1);
           singleEfficiency1.SetPointEYlow(i, errlow1);
-          }
-          }
+        }
+        
                
-          if (tp_fit.first) delete tp_fit.first;
+        if (tp_fit.first) delete tp_fit.first;
           if (tp_fit.second) delete tp_fit.second;
           if(_sec_input){
-          if (tp_fit1.first) delete tp_fit1.first;
-          if (tp_fit1.second) delete tp_fit1.second;
+            if (tp_fit1.first) delete tp_fit1.first;
+            if (tp_fit1.second) delete tp_fit1.second;
           }
-   }
+       }
 
    //double efficiency
-   if(!_sec_input){
-   TGraphAsymmErrors doubleEfficiency = createDoubleEfficiency(singleEfficiency);
-   singleEfficiency.SetNameTitle("SingleTag&ProbeEff","SingleTag&ProbeEff");
-   singleEfficiency.Write();
-   doubleEfficiency.Write();}
-   if(_sec_input){
-   TGraphAsymmErrors doubleEfficiency = createAsymmCutEfficiency(singleEfficiency, singleEfficiency1);
-   singleEfficiency.SetNameTitle("SingleTag&ProbeEff_0","SingleTag&ProbeEff_0");
-   singleEfficiency1.SetNameTitle("SingleTag&ProbeEff_1","SingleTag&ProbeEff_1");
-   singleEfficiency.Write();
-   singleEfficiency1.Write();
-   doubleEfficiency.Write();}
+       if(!_sec_input){
+         TGraphAsymmErrors doubleEfficiency = createDoubleEfficiency(singleEfficiency);
+         singleEfficiency.SetNameTitle("SingleTag&ProbeEff","SingleTag&ProbeEff");
+         singleEfficiency.Write();
+         doubleEfficiency.Write();
+       }
+       if(_sec_input){
+         TGraphAsymmErrors doubleEfficiency = createAsymmCutEfficiency(singleEfficiency, singleEfficiency1);
+         singleEfficiency.SetNameTitle("SingleTag&ProbeEff_0","SingleTag&ProbeEff_0");
+         singleEfficiency1.SetNameTitle("SingleTag&ProbeEff_1","SingleTag&ProbeEff_1");
+         singleEfficiency.Write();
+         singleEfficiency1.Write();
+         doubleEfficiency.Write();
+       }
   
+  }
 }
-
 
 std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data, const char* name, std::string option) {
 
@@ -366,8 +370,10 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
   RooRealVar b_pass("b_pass", "background yield pass", 50, 0, 1000);
   RooRealVar b_fail("b_fail", "background yield fail", 50, 0, 1000);
 
-  RooFormulaVar s_pass("s_pass","s*efficiency", RooArgList(s, efficiency) );
-  RooFormulaVar s_fail("s_fail","s*(1.0 - efficiency)", RooArgList(s, efficiency) );
+  //RooFormulaVar s_fail("s_fail","s*(1.0 - efficiency)", RooArgList(s, efficiency) );
+  RooFormulaVar s_fail("s_fail","s*efficiency*(1.0 - efficiency)", RooArgList(s, efficiency) );
+  //RooFormulaVar s_pass("s_pass","s*efficiency", RooArgList(s, efficiency) );
+  RooFormulaVar s_pass("s_pass","s*efficiency*efficiency", RooArgList(s, efficiency) );
   //RooFormulaVar s_pass("s_pass","s*efficiency", RooArgList(efficiency) );
   //RooFormulaVar s_fail("s_fail","s*(1.0 - efficiency)", RooArgList(efficiency) ); 
 
@@ -414,7 +420,7 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
 
  // RooFitResult* fitresult = total_fit.fitTo(*data, RooFit::Save(true), RooFit::Strategy(2), RooFit::NumCPU(8), RooFit::Extended(kTRUE), RooFit::SumW2Error(true));
   
-  RooFitResult* fitresult = total_fit.fitTo(*data, RooFit::Minos(RooArgSet(efficiency)), RooFit::Save(true), RooFit::Strategy(1), RooFit::NumCPU(8), RooFit::Extended(kTRUE), RooFit::SumW2Error(true));
+  RooFitResult* fitresult = total_fit.fitTo(*((RooDataSet*) data), RooFit::Minos(RooArgSet(efficiency)), RooFit::Save(true),  RooFit::PrintLevel(3), RooFit::Strategy(1), RooFit::NumCPU(8), RooFit::Optimize(false), RooFit::Extended(kTRUE), RooFit::SumW2Error(true));
     
   fitresult->SetName(nllname.str().c_str());
 

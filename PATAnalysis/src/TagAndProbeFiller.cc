@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <ctime>
 
 using namespace std;
 
@@ -12,7 +13,8 @@ TagAndProbeFiller::TagAndProbeFiller(TDirectory* output, std::string name, int n
                          const std::vector<bool (*)(const reco::Candidate&)>& tag_cuts,
                          const std::vector<bool (*)(const reco::Candidate&)>& probe_cuts,
                          const std::vector<bool (*)(const reco::Candidate&)>& passprobe_cuts,
-                         string tpflag): 
+                         string tpflag,
+                         bool onecombinationonly): 
 _output(output),
 _name(name),
 
@@ -24,8 +26,8 @@ _passprobe(0),
 _tag_cuts(tag_cuts),
 _probe_cuts(probe_cuts),
 _passprobe_cuts(passprobe_cuts),
-_tpflag(tpflag)
-
+_tpflag(tpflag),
+_onecombination(onecombinationonly)
 {
   _output->cd();
   _numerator = new TH1D((name+"SingleCandTag&Probe_numerator").c_str(), (name+"SingleCandTag&Probe_numerator").c_str(), nbins, xmin, xmax);
@@ -38,12 +40,18 @@ _tpflag(tpflag)
     name2 << name << "TagPassProbeMassBin" << i;
     _v_mass_tagpassprobe.push_back(new TH1D(name2.str().c_str(), name2.str().c_str(), 30, 60., 120.));
   }
-  _rootree = new TTree("dataset", "dataset");
+  string dsname("dataset");
+  dsname+=name;
+  _rootree = new TTree(dsname.c_str(), dsname.c_str());
   _rootree->Branch("mass", &_mass, "mass/D");
   _rootree->Branch("bin",  &_bin, "bin/D");
   _rootree->Branch("probe", &_probe, "probe/D");
   _rootree->Branch("passprobe", &_passprobe, "passprobe/I");
   _rootree->Branch("weight", &_weight, "weight/D");
+  _rootree->Branch("pt1", &_pt1, "pt1/D");
+  _rootree->Branch("pt2", &_pt2, "pt2/D");
+  _rootree->Branch("pt3", &_pt3, "pt3/D");
+  srand(time(0));
 }
 
 TagAndProbeFiller::~TagAndProbeFiller(){
@@ -51,31 +59,44 @@ TagAndProbeFiller::~TagAndProbeFiller(){
   delete _denominator;
 }
 
-void TagAndProbeFiller::fill(const reco::Candidate& Z, double x, double w){
+void TagAndProbeFiller::fill(const reco::Candidate& Z, double x, double w, double pt1, double pt2, double pt3){
   
   _mass = 0.;
   _probe = 0.;
   _passprobe = 0;
+  _pt1 = pt1;
+  _pt2 = pt2;
+  _pt3 = pt3;
   
   if((*Z.daughter(0)).pt()<(*Z.daughter(1)).pt()){
   throw cms::Exception("PATAnalysis:PtEl") << "################ ERROR! Pt0 < Pt1";
   }
- 
-  //tag cand 1, probe cand 2
-  if(_tpflag=="" || _tpflag=="soft"){
-  if (tag(*(Z.daughter(0)))) probe(*(Z.daughter(1)), Z.mass(), x, w);
-  }
 
-  //reset
-  _mass = 0.;
-  _probe = 0.;
-  _passprobe = 0;
+  if (_onecombination){
+    double random = rand() / double(RAND_MAX);
+    //cout << "random " << random << endl;
+    if (random > 0.5){
+      //tag cand 1, probe cand 2
+      if (tag(*(Z.daughter(0)))) probe(*(Z.daughter(1)), Z.mass(), x, w);
+    } else {
+      if (tag(*(Z.daughter(1)))) probe(*(Z.daughter(0)), Z.mass(), x, w);
+    }  
+  } else {
+    //tag cand 1, probe cand 2
+    if(_tpflag=="" || _tpflag=="soft"){
+      if (tag(*(Z.daughter(0)))) probe(*(Z.daughter(1)), Z.mass(), x, w);
+    }
+
+    //reset
+    _mass = 0.;
+    _probe = 0.;
+    _passprobe = 0;
  
-  //tag cand 2 probe cand 1
-  if(_tpflag=="" || _tpflag=="hard"){ 
-  if (tag(*(Z.daughter(1)))) probe(*(Z.daughter(0)), Z.mass(), x, w);
+    //tag cand 2 probe cand 1
+    if(_tpflag=="" || _tpflag=="hard"){ 
+      if (tag(*(Z.daughter(1)))) probe(*(Z.daughter(0)), Z.mass(), x, w);
+    }
   }
-  
 }
 
 bool TagAndProbeFiller::tag(const reco::Candidate& cand){
