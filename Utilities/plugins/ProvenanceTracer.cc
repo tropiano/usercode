@@ -14,7 +14,7 @@
 //
 // Original Author:  Piergiulio Lenzi,,,
 //         Created:  Mon Jan 26 16:02:23 CET 2009
-// $Id: ProvenanceTracer.cc,v 1.2 2009/01/27 08:08:59 lenzip Exp $
+// $Id: ProvenanceTracer.cc,v 1.3 2009/03/05 17:58:02 lenzip Exp $
 //
 //
 
@@ -28,7 +28,7 @@
 
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
-#include "FWCore/ParameterSet/interface/InputTag.h"
+#include "FWCore/Utilities/interface/InputTag.h"
 #include "FWCore/Framework/interface/GenericHandle.h"
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"

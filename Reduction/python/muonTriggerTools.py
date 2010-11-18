@@ -38,7 +38,7 @@ class MuonTriggerTools(ConfigToolBase):
                                                 filterIdsEnum  = cms.vstring( 'TriggerL1Mu' ),#'TriggerMuon', 'TriggerL1Mu' ), 
                                                 filterIds      = cms.vint32( 0 ),
                                                 filterLabels   = cms.vstring( '*' ),
-                                                pathNames      = cms.vstring( 'HLT_Mu9', 'HLT_L2Mu11', 'HLT_L1Mu20' ),
+                                                pathNames      = cms.vstring( 'HLT_Mu9', 'HLT_Mu11', 'HLT_L1Mu20' ),
                                                 collectionTags = cms.vstring( '*' ),
                                                 maxDeltaR = cms.double( 0.2 ),
                                                 resolveAmbiguities    = cms.bool( True ),

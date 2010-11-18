@@ -1,39 +1,44 @@
 import FWCore.ParameterSet.Config as cms
 
+#add user data
+from PhysicsTools.PatAlgos.producersLayer1.muonProducer_cfi import patMuons
+patMuons.userData.userFunctions = cms.vstring('? globalTrack.isNonnull ? globalTrack.hitPattern.numberOfValidPixelHits() : -1',
+                                              '? globalTrack.isNonnull ? globalTrack.hitPattern.numberOfValidMuonHits() : -1',
+                                              '? globalTrack.isNonnull ? globalTrack.hitPattern.numberOfValidHits() : -1',
+                                              '? globalTrack.isNonnull ? globalTrack.hitPattern.numberOfValidTrackerHits() : -1',
+                                              'numberOfMatches()',
+                                              '? globalTrack.isNonnull ? globalTrack.normalizedChi2() : -1')
+patMuons.userData.userFunctionLabels = cms.vstring('numberOfValidPixelHits',
+                                                   'numberOfValidMuonHits',
+                                                   'numberOfValidHits',
+                                                   'numberOfValidTrackerHits',
+                                                   'numberOfMatches',
+                                                   'normChi2')
+
 ##select muons according to these criteria
-import PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi
-selectedMuons = PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi.selectedPatMuons.clone()
+from PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi import selectedPatMuons
+selectedMuons = selectedPatMuons.clone()
 selectedMuons.src = cms.InputTag("patMuons")
-#selectedMuons.cut = cms.string("pt > 20. & abs(eta) < 2.4 & isGood('GlobalMuonPromptTight') & innerTrack().found()>=11 & abs(globalTrack().d0())<0.2 & (trackIso()+caloIso()+ecalIso())/pt<0.1")
-selectedMuons.cut = cms.string("pt > 10. & abs(eta) < 3. & isGlobalMuon()")
+selectedMuons.cut = cms.string("pt > 15. & abs(eta) < 3. ")
 
 
 #Z candidate combiner
-zmumurec = cms.EDFilter('CandViewShallowCloneCombiner',
-#zmumurec = cms.EDFilter('CandViewCombiner',
+zmumurec = cms.EDProducer('CandViewCombiner',
   decay = cms.string('selectedMuons@+ selectedMuons@-'),
   cut   = cms.string('50 < mass < 130'),
   name  = cms.string('Zmumu'),
   roles = cms.vstring('mu1', 'mu2')
 )
 
-zmumurecSameChargePlus = cms.EDFilter('CandViewShallowCloneCombiner',
-#zmumurecSameChargePlus = cms.EDFilter('CandViewCombiner',
+zmumurecSameCharge = cms.EDProducer('CandViewCombiner',
+#both ++ and -- in the same colelction
   decay = cms.string('selectedMuons@+ selectedMuons@+'),
   cut   = cms.string('50 < mass < 130'),
-  name  = cms.string('Zmumu_samechargeplus'),
+  name  = cms.string('Zmumu_samecharge'),
   roles = cms.vstring('mu1', 'mu2')
 )
 
-zmumurecSameChargeMinus = cms.EDFilter('CandViewShallowCloneCombiner',
-#zmumurecSameChargeMinus = cms.EDFilter('CandViewCombiner',
-  decay = cms.string('selectedMuons@- selectedMuons@-'),
-  cut   = cms.string('50 < mass < 130'),
-  name  = cms.string('Zmumu_samechargeminus'),
-  roles = cms.vstring('mu1', 'mu2')
-)
-
-zmumurecSequence = cms.Sequence(selectedMuons*(zmumurec + zmumurecSameChargePlus + zmumurecSameChargeMinus))
+zmumurecSequence = cms.Sequence(selectedMuons*(zmumurec + zmumurecSameCharge))
 
 zmumurecEventContent = [
   'keep *_selectedMuons_*_*',
