@@ -25,14 +25,6 @@ from PhysicsTools.PatAlgos.tools.coreTools import *
 removeMCMatching(process, ['All'])
 #add JPT and PF jet colelctions
 from PhysicsTools.PatAlgos.tools.jetTools import *
-#switchJetCollection(process, cms.InputTag('ak5PFJets'),
-#                 doJTA=False,
-#                 doBTagging=False,
-#                 jetCorrLabel=('AK5', 'PF'), 
-#                 doType1MET=False, 
-#                 genJetCollection=cms.InputTag(''), 
-#                 doJetID = True, 
-#                 jetIdLabel   = "ak5")
 switchJetCollection(process,cms.InputTag('ak5PFJets'),
                  doJTA        = True,
                  doBTagging   = True,
@@ -59,10 +51,24 @@ process.L1Fastjet.algorithm = cms.string('AK5Calo') #DUMMY
 process.L1Fastjet.era = 'Spring10' #DUMMY
 process.L1Fastjet.level = cms.string('L2Relative') #DUMMY
 process.L1Fastjet.useCondDB = cms.untracked.bool(False)
-process.ak5PFL1L2L3Residual = process.ak5PFL2L3Residual.clone()
-process.ak5PFL1L2L3Residual.correctors.insert(0,'L1Fastjet')
-process.ak5PFJetsL1L2L3Residual=process.ak5PFJetsL1L2L3.clone(correctors = ['ak5PFL1L2L3Residual'])
-process.offsetCorrection = cms.Sequence(process.ak5PFJets * process.kt6PFJets * process.ak5PFJetsL1L2L3Residual)  
+#process.ak5PFL1L2L3Residual = process.ak5PFL2L3Residual.clone()
+#process.ak5PFL1L2L3Residual.correctors.insert(0,'L1Fastjet')
+#process.ak5PFJetsL1L2L3Residual=process.ak5PFJetsL1L2L3.clone(correctors = ['ak5PFL1L2L3Residual'])
+process.offsetCorrection = cms.Sequence(process.ak5PFJets * process.kt6PFJets * process.ak5PFJetsL1) 
+addJetCollection(process,cms.InputTag('ak5PFJetsL1'),
+                 'AK5', 'PFL1corrected',
+                 doJTA        = True,
+                 doBTagging   = False,
+                 jetCorrLabel = ('AK5PF', cms.vstring(['L2Relative', 'L3Absolute', 'L2L3Residual'])),
+                 doType1MET   = True,
+                 doL1Cleaning = True,                 
+                 doL1Counters = False,
+                 genJetCollection=cms.InputTag("ak5GenJets"),
+                 doJetID      = True,
+                 jetIdLabel   = "ak5"
+)
+process.selectedJetsL1Corrected = process.selectedJets.clone(src = cms.InputTag("patJetsAK5PFL1corrected"))
+process.recjetsSequence += process.selectedJetsL1Corrected
 ###############################################################
 
 #add the trigger matching
@@ -120,7 +126,7 @@ process.out.outputCommands=cms.untracked.vstring('drop *')
 process.out.outputCommands.extend(zmumurecEventContent)
 process.out.outputCommands.extend(jetrecEventContent)
 #process.out.outputCommands.extend(patTriggerEventContent)
-process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*', 'keep *_pat*METs*_*_*', 'keep *_patTriggerEvent_*_*', 'keep patTriggerPaths_patTrigger_*_*', 'keep *_ak5PFJets*L2L3*_*_*'])
+process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*', 'keep *_pat*METs*_*_*', 'keep *_patTriggerEvent_*_*', 'keep patTriggerPaths_patTrigger_*_*'])
 
 process.out.dropMetaData = cms.untracked.string('DROPPED')
 process.out.SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') )

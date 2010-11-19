@@ -28,6 +28,6 @@ recjetsSequence = cms.Sequence( selectedJets )#+ selectedJPTJets)
 
 
 jetrecEventContent = [
-  'keep patJets_selectedJets_*_*',
+  'keep patJets_selectedJets*_*_*',
   #'keep *_selectedJPTJets_*_*'
 ]  
