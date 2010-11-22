@@ -3,7 +3,7 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 #process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1000)
 
 process.source.fileNames = [
-'file:mctest.root']
+'file:/tmp/lenzip/mcpileuptest.root']
 process.maxEvents.input = -1              ## (e.g. -1 to run on all events)
 #process.source.firstRun = cms.untracked.uint32(122314)
 #process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange('123592:2-123592:14', '') 

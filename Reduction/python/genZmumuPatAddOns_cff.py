@@ -1,14 +1,14 @@
 import FWCore.ParameterSet.Config as cms
 
 ##select gen muons from Z clustering the possible QED final state photon
-genMuMinusStatus3 = cms.EDFilter('Status3MotherCombiner',
+genMuMinusStatus3 = cms.EDProducer('Status3MotherCombiner',
   src = cms.InputTag('genParticles'),
   motherId = cms.int32(13),
   requestedStaus3Daughters = cms.vint32(),
   motherCharge = cms.int32(-1)
 )
 
-genMuPlusStatus3 = cms.EDFilter('Status3MotherCombiner',
+genMuPlusStatus3 = cms.EDProducer('Status3MotherCombiner',
   src = cms.InputTag('genParticles'),
   motherId = cms.int32(-13),
   requestedStaus3Daughters = cms.vint32(),
@@ -27,7 +27,7 @@ genMuPlusStatus3Selector = cms.EDFilter('CandViewSelector',
 
 ##Z mumu with QED FS photons
 #zmumugenfull = cms.EDFilter('CandViewShallowCloneCombiner',
-zmumugenfull = cms.EDFilter('CandViewCombiner',
+zmumugenfull = cms.EDProducer('CandViewCombiner',
    decay = cms.string('genMuPlusStatus3Selector@+ genMuMinusStatus3Selector@-'),
    cut   = cms.string('20 < mass < 10000'),
    name  = cms.string('ZmumuGenFull'),
@@ -46,7 +46,7 @@ genMuPlusSelector = cms.EDFilter('CandViewSelector',
 )
 ## Z mumu wothout QED FS photons
 #zmumugen = cms.EDFilter('CandViewShallowCloneCombiner',
-zmumugen = cms.EDFilter('CandViewCombiner',
+zmumugen = cms.EDProducer('CandViewCombiner',
    decay = cms.string('genMuPlusSelector@+ genMuMinusSelector@-'),
    cut   = cms.string('20 < mass < 10000'),
    name  = cms.string('ZmumuGen'),
