@@ -28,7 +28,7 @@ from PhysicsTools.PatAlgos.tools.jetTools import *
 switchJetCollection(process,cms.InputTag('ak5PFJets'),
                  doJTA=True,
                  doBTagging=True,
-                 jetCorrLabel=('AK5PF', cms.vstring(['L2Relative', 'L3Absolute', 'L2L3Residual'])),
+                 jetCorrLabel=('AK5PF', cms.vstring(['L2Relative', 'L3Absolute'])),
                  doType1MET=True,
 		 genJetCollection=cms.InputTag("ak5GenJets"),
 		 doJetID      = True
@@ -67,7 +67,7 @@ process.offsetCorrection = cms.Sequence(process.ak5PFJets * process.kt6PFJets * 
 addJetCollection(process,cms.InputTag('ak5PFJetsL1'),'AK5', 'PFL1corrected',
                  doJTA        = True,
                  doBTagging   = False,
-                 jetCorrLabel = ('AK5PF', cms.vstring(['L2Relative', 'L3Absolute', 'L2L3Residual'])),
+                 jetCorrLabel = ('AK5PF', cms.vstring(['L2Relative', 'L3Absolute'])),
                  doType1MET   = True,
                  doL1Cleaning = True,
                  doL1Counters = False,
