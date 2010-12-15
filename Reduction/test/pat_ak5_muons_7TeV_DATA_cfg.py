@@ -72,13 +72,27 @@ process.recjetsSequence += process.selectedJetsL1Corrected
 ###############################################################
 
 #add the trigger matching
+process.muonTriggerMatchHLTMuons = cms.EDProducer( "PATTriggerMatcherDRLessByR",
+     src     = cms.InputTag( "patMuons" ),
+     matched = cms.InputTag( "patTrigger" ),
+     andOr          = cms.bool( False ),
+     filterIdsEnum  = cms.vstring( 'TriggerMuon' ),
+     filterIds      = cms.vint32( 0 ),
+     filterLabels   = cms.vstring( '*' ),
+     pathNames      = cms.vstring( 'HLT_Mu9', 'HLT_Mu9_v1', 'HLT_Mu11', 'HLT_Mu11_v1', 'HLT_Mu13', 'HLT_Mu13_v1', 'HLT_Mu15', 'HLT_Mu15_v1' ),
+     collectionTags = cms.vstring( '*' ),
+     maxDPtRel = cms.double( 0.5 ),
+     maxDeltaR = cms.double( 0.5 ),
+     resolveAmbiguities    = cms.bool( True ),
+     resolveByMatchQuality = cms.bool( True )
+)
 from PhysicsTools.PatAlgos.tools.trigTools import *
 switchOnTrigger(process)
 switchOnTriggerMatchEmbedding( process )
-process.cleanPatMuonsTriggerMatch.matches=cms.VInputTag('cleanMuonTriggerMatchHLTMu9')
-process.cleanMuonTriggerMatchHLTMu9.src = cms.InputTag("patMuons")
+process.patTriggerEvent.patTriggerMatches = [ "muonTriggerMatchHLTMuons" ]
+process.cleanPatMuonsTriggerMatch.matches=cms.VInputTag('muonTriggerMatchHLTMuons')
 process.cleanPatMuonsTriggerMatch.src = cms.InputTag("patMuons")
-process.patTriggerSequence=cms.Sequence(process.patTrigger+process.cleanMuonTriggerMatchHLTMu9+process.cleanPatMuonsTriggerMatch)
+process.patTriggerSequence=cms.Sequence(process.patTrigger+process.muonTriggerMatchHLTMuons+process.cleanPatMuonsTriggerMatch)
 process.selectedMuons.src=cms.InputTag('cleanPatMuonsTriggerMatch')
 #################
 #################
