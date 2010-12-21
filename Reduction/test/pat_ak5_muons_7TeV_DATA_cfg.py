@@ -16,6 +16,7 @@ process.GlobalTag.globaltag = cms.string('GR_R_38X_V15::All')
 process.load("Firenze.Reduction.recZmumuPatAddOns_cff")
 process.load("Firenze.Reduction.recJetPatAddOns_cff")
 process.load("PhysicsTools.RecoAlgos.goodTracks_cfi")
+process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 process.goodTracks.cut = cut = cms.string('pt > 8')
 #################
 
@@ -83,7 +84,9 @@ process.muonTriggerMatchHLTMuons = cms.EDProducer(
 , filterIdsEnum  = cms.vstring( 'TriggerMuon' )
 , filterIds      = cms.vint32( 0 )
 , filterLabels   = cms.vstring( '*' )
-, pathNames      = cms.vstring( 'HLT_Mu9', 'HLT_Mu9_v1', 'HLT_Mu11', 'HLT_Mu11_v1', 'HLT_Mu13', 'HLT_Mu13_v1', 'HLT_Mu15', 'HLT_Mu15_v1' )
+, pathNames      = cms.vstring( 'HLT_Mu9','HLT_Mu11','HLT_Mu13','HLT_Mu15','HLT_Mu17','HLT_Mu19','HLT_Mu21','HLT_Mu25',\
+                                'HLT_Mu13_v1','HLT_Mu15_v1','HLT_Mu17_v1','HLT_Mu19_v1','HLT_Mu21_v1','HLT_Mu25_v1',\
+                                'HLT_L1Mu7','HLT_L1Mu7_1','HLT_L2Mu7','HLT_L2Mu7_v1' )
 , collectionTags = cms.vstring( '*' )
 , maxDPtRel   = cms.double( 0.5 ) # no effect here
 , maxDeltaR   = cms.double( 0.5 )
@@ -141,7 +144,7 @@ process.recosequence = cms.Sequence(#process.recPFjetsSequence*
                                     process.zmumurecSequence*
                                     process.recjetsSequence)
 
-process.pattuples = cms.Sequence(process.offsetCorrection*process.recosequence*process.skimPatMuons)
+process.pattuples = cms.Sequence(process.goodTracks+process.offsetCorrection*process.recosequence*process.skimPatMuons)
 
 process.p = cms.Path(process.pattuples)
 #process.p = cms.Path(process.pattuples)
