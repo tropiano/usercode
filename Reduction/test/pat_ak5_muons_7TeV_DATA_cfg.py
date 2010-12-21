@@ -3,10 +3,11 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 #process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1000)
 
 process.source.fileNames = [
-'file:runBtest.root']
+'file:/tmp/lenzip/mctestpileup.root']
 process.maxEvents.input = -1              ## (e.g. -1 to run on all events)
 #process.source.firstRun = cms.untracked.uint32(122314)
 #process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange('123592:2-123592:14', '') 
+process.GlobalTag.globaltag = cms.string('GR_R_38X_V15::All')
 
 
 #################
@@ -14,6 +15,8 @@ process.maxEvents.input = -1              ## (e.g. -1 to run on all events)
 #################
 process.load("Firenze.Reduction.recZmumuPatAddOns_cff")
 process.load("Firenze.Reduction.recJetPatAddOns_cff")
+process.load("PhysicsTools.RecoAlgos.goodTracks_cfi")
+process.goodTracks.cut = cut = cms.string('pt > 8')
 #################
 
 
@@ -72,28 +75,39 @@ process.recjetsSequence += process.selectedJetsL1Corrected
 ###############################################################
 
 #add the trigger matching
-process.muonTriggerMatchHLTMuons = cms.EDProducer( "PATTriggerMatcherDRLessByR",
-     src     = cms.InputTag( "patMuons" ),
-     matched = cms.InputTag( "patTrigger" ),
-     andOr          = cms.bool( False ),
-     filterIdsEnum  = cms.vstring( 'TriggerMuon' ),
-     filterIds      = cms.vint32( 0 ),
-     filterLabels   = cms.vstring( '*' ),
-     pathNames      = cms.vstring( 'HLT_Mu9', 'HLT_Mu9_v1', 'HLT_Mu11', 'HLT_Mu11_v1', 'HLT_Mu13', 'HLT_Mu13_v1', 'HLT_Mu15', 'HLT_Mu15_v1' ),
-     collectionTags = cms.vstring( '*' ),
-     maxDPtRel = cms.double( 0.5 ),
-     maxDeltaR = cms.double( 0.5 ),
-     resolveAmbiguities    = cms.bool( True ),
-     resolveByMatchQuality = cms.bool( True )
+process.muonTriggerMatchHLTMuons = cms.EDProducer(
+  "PATTriggerMatcherDRLessByR"
+, src     = cms.InputTag( 'cleanPatMuons' )
+, matched = cms.InputTag( 'patTrigger' )
+, andOr          = cms.bool( False )
+, filterIdsEnum  = cms.vstring( 'TriggerMuon' )
+, filterIds      = cms.vint32( 0 )
+, filterLabels   = cms.vstring( '*' )
+, pathNames      = cms.vstring( 'HLT_Mu9', 'HLT_Mu9_v1', 'HLT_Mu11', 'HLT_Mu11_v1', 'HLT_Mu13', 'HLT_Mu13_v1', 'HLT_Mu15', 'HLT_Mu15_v1' )
+, collectionTags = cms.vstring( '*' )
+, maxDPtRel   = cms.double( 0.5 ) # no effect here
+, maxDeltaR   = cms.double( 0.5 )
+, maxDeltaEta = cms.double( 0.2 ) # no effect here
+, resolveAmbiguities    = cms.bool( True )
+, resolveByMatchQuality = cms.bool( True )
 )
+
+from PhysicsTools.PatAlgos.tools.coreTools import removeCleaning
+removeCleaning( process )
+
 from PhysicsTools.PatAlgos.tools.trigTools import *
-switchOnTrigger(process)
-switchOnTriggerMatchEmbedding( process )
-process.patTriggerEvent.patTriggerMatches = [ "muonTriggerMatchHLTMuons" ]
-process.cleanPatMuonsTriggerMatch.matches=cms.VInputTag('muonTriggerMatchHLTMuons')
-process.cleanPatMuonsTriggerMatch.src = cms.InputTag("patMuons")
-process.patTriggerSequence=cms.Sequence(process.patTrigger+process.muonTriggerMatchHLTMuons+process.cleanPatMuonsTriggerMatch)
-process.selectedMuons.src=cms.InputTag('cleanPatMuonsTriggerMatch')
+switchOnTrigger( process ) # This is optional and can be omitted.
+#switchOnTriggerMatching( process, triggerMatchers = [ 'muonTriggerMatchHLTMuons' ] )
+switchOnTriggerMatchEmbedding( process , triggerMatchers = [ 'muonTriggerMatchHLTMuons' ])
+# Switch to selected PAT objects in the trigger matching
+removeCleaningFromTriggerMatching( process )
+process.muonTriggerMatchHLTMuons.src     = cms.InputTag( 'patMuons' )
+process.selectedPatMuonsTriggerMatch.src = cms.InputTag( 'patMuons' )
+process.selectedPatMuonsTriggerMatch.matches=cms.VInputTag('muonTriggerMatchHLTMuons')
+process.patTriggerSequence=cms.Sequence(process.patTrigger+process.muonTriggerMatchHLTMuons+process.selectedPatMuonsTriggerMatch)
+
+process.selectedMuons.src=cms.InputTag('selectedPatMuonsTriggerMatch')
+
 #################
 #################
 
@@ -110,11 +124,17 @@ process.patMuons.embedPickyMuon = cms.bool(False)
 #Sequences and Paths
 #################
 #request at least two muons
-from PhysicsTools.PatAlgos.selectionLayer1.muonCountFilter_cfi import countPatMuons
-process.skimPatMuons = countPatMuons.clone()
-process.skimPatMuons.minNumber = cms.uint32(2)
-process.skimPatMuons.filter = cms.bool(True)
-process.skimPatMuons.src = 'selectedMuons'
+#from PhysicsTools.PatAlgos.selectionLayer1.muonCountFilter_cfi import countPatMuons
+#process.skimPatMuons = countPatMuons.clone()
+#process.skimPatMuons.minNumber = cms.uint32(2)
+#process.skimPatMuons.filter = cms.bool(True)
+#process.skimPatMuons.src = 'selectedMuons'
+process.skimPatMuons=cms.EDFilter("CandViewCountFilter",
+  src = cms.InputTag("zmumurec"),
+  minNumber = cms.uint32(1),
+  filter = cms.bool(True)
+)
+
 
 process.recosequence = cms.Sequence(#process.recPFjetsSequence*
                                     process.patDefaultSequence*
@@ -140,7 +160,7 @@ process.out.outputCommands=cms.untracked.vstring('drop *')
 process.out.outputCommands.extend(zmumurecEventContent)
 process.out.outputCommands.extend(jetrecEventContent)
 #process.out.outputCommands.extend(patTriggerEventContent)
-process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*', 'keep *_pat*METs*_*_*', 'keep *_patTriggerEvent_*_*', 'keep patTriggerPaths_patTrigger_*_*'])
+process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*', 'keep *_pat*METs*_*_*', 'keep *_patTriggerEvent_*_*', 'keep patTriggerPaths_patTrigger_*_*', 'keep *_goodTracks_*_*'])
 
 process.out.dropMetaData = cms.untracked.string('DROPPED')
 process.out.SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') )
