@@ -7,7 +7,7 @@ process.source.fileNames = [
 process.maxEvents.input = -1              ## (e.g. -1 to run on all events)
 #process.source.firstRun = cms.untracked.uint32(122314)
 #process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange('123592:2-123592:14', '') 
-
+process.GlobalTag.globaltag = cms.string('START38_V14::All')
 
 #################
 #my modules
@@ -16,6 +16,9 @@ process.load("Firenze.Reduction.genZmumuPatAddOns_cff")
 process.load("Firenze.Reduction.genJetPatAddOns_cff")
 process.load("Firenze.Reduction.recZmumuPatAddOns_cff")
 process.load("Firenze.Reduction.recJetPatAddOns_cff")
+process.load("PhysicsTools.RecoAlgos.goodTracks_cfi")
+process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
+process.goodTracks.cut = cut = cms.string('pt > 8')
 #################
 
 
@@ -80,15 +83,41 @@ process.recjetsSequence += process.selectedJetsL1Corrected
 ###############################################################
 
 
-#trigger matching
+#add the trigger matching
+process.muonTriggerMatchHLTMuons = cms.EDProducer(
+  "PATTriggerMatcherDRLessByR"
+, src     = cms.InputTag( 'cleanPatMuons' )
+, matched = cms.InputTag( 'patTrigger' )
+, andOr          = cms.bool( False )
+, filterIdsEnum  = cms.vstring( 'TriggerMuon' )
+, filterIds      = cms.vint32( 0 )
+, filterLabels   = cms.vstring( '*' )
+, pathNames      = cms.vstring( 'HLT_Mu9','HLT_Mu11','HLT_Mu13','HLT_Mu15','HLT_Mu17','HLT_Mu19','HLT_Mu21','HLT_Mu25',\
+                                'HLT_Mu13_v1','HLT_Mu15_v1','HLT_Mu17_v1','HLT_Mu19_v1','HLT_Mu21_v1','HLT_Mu25_v1',\
+                                'HLT_L1Mu7','HLT_L1Mu7_1','HLT_L2Mu7','HLT_L2Mu7_v1' )
+, collectionTags = cms.vstring( '*' )
+, maxDPtRel   = cms.double( 0.5 ) # no effect here
+, maxDeltaR   = cms.double( 0.5 )
+, maxDeltaEta = cms.double( 0.2 ) # no effect here
+, resolveAmbiguities    = cms.bool( True )
+, resolveByMatchQuality = cms.bool( True )
+)
+
+from PhysicsTools.PatAlgos.tools.coreTools import removeCleaning
+removeCleaning( process )
+
 from PhysicsTools.PatAlgos.tools.trigTools import *
-switchOnTrigger(process)
-switchOnTriggerMatchEmbedding( process )
-process.cleanPatMuonsTriggerMatch.matches=cms.VInputTag('cleanMuonTriggerMatchHLTMu9')
-process.cleanMuonTriggerMatchHLTMu9.src = cms.InputTag("patMuons")
-process.cleanPatMuonsTriggerMatch.src = cms.InputTag("patMuons")
-process.patTriggerSequence=cms.Sequence(process.patTrigger+process.cleanMuonTriggerMatchHLTMu9+process.cleanPatMuonsTriggerMatch)
-process.selectedMuons.src=cms.InputTag('cleanPatMuonsTriggerMatch')
+switchOnTrigger( process ) # This is optional and can be omitted.
+#switchOnTriggerMatching( process, triggerMatchers = [ 'muonTriggerMatchHLTMuons' ] )
+switchOnTriggerMatchEmbedding( process , triggerMatchers = [ 'muonTriggerMatchHLTMuons' ])
+# Switch to selected PAT objects in the trigger matching
+removeCleaningFromTriggerMatching( process )
+process.muonTriggerMatchHLTMuons.src     = cms.InputTag( 'patMuons' )
+process.selectedPatMuonsTriggerMatch.src = cms.InputTag( 'patMuons' )
+process.selectedPatMuonsTriggerMatch.matches=cms.VInputTag('muonTriggerMatchHLTMuons')
+process.patTriggerSequence=cms.Sequence(process.patTrigger+process.muonTriggerMatchHLTMuons+process.selectedPatMuonsTriggerMatch)
+
+process.selectedMuons.src=cms.InputTag('selectedPatMuonsTriggerMatch')
 
 #################
 #################
@@ -113,11 +142,17 @@ process.patTriggerEvent.processName = "REDIGI38XPU"
 #Sequences and Paths
 #################
 #process.skim = cms.Sequence()
-from PhysicsTools.PatAlgos.selectionLayer1.muonCountFilter_cfi import countPatMuons
-process.skimPatMuons = countPatMuons.clone()
-process.skimPatMuons.minNumber = cms.uint32(2)
-process.skimPatMuons.filter = cms.bool(True)
-process.skimPatMuons.src = 'selectedMuons'
+#from PhysicsTools.PatAlgos.selectionLayer1.muonCountFilter_cfi import countPatMuons
+#process.skimPatMuons = countPatMuons.clone()
+#process.skimPatMuons.minNumber = cms.uint32(2)
+#process.skimPatMuons.filter = cms.bool(True)
+#process.skimPatMuons.src = 'selectedMuons'
+process.skimPatMuons=cms.EDFilter("CandViewCountFilter",
+  src = cms.InputTag("zmumurec"),
+  minNumber = cms.uint32(1),
+  filter = cms.bool(True)
+)
+
 
 process.recosequence = cms.Sequence(#process.recPFjetsSequence*
 				    process.offsetCorrection*
@@ -129,7 +164,7 @@ process.recosequence = cms.Sequence(#process.recPFjetsSequence*
 
 process.gensequence = cms.Sequence(process.genjetsSequence*process.zmumugenSequence)                                    
 
-process.pattuples = cms.Sequence(process.gensequence + process.recosequence)
+process.pattuples = cms.Sequence(process.goodTracks + process.gensequence + process.recosequence)
 
 #process.p = cms.Path(process.pattuples*process.skimPatMuons)
 process.p = cms.Path(process.pattuples)
@@ -150,7 +185,7 @@ process.out.outputCommands.extend(jetgenEventContent)
 process.out.outputCommands.extend(zmumurecEventContent)
 process.out.outputCommands.extend(jetrecEventContent)
 #process.out.outputCommands.extend(patTriggerEventContent)
-process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*', 'keep *_pat*METs*_*_*', 'keep *_patTriggerEvent_*_*', 'keep patTriggerPaths_patTrigger_*_*'])
+process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*', 'keep *_pat*METs*_*_*', 'keep *_patTriggerEvent_*_*', 'keep patTriggerPaths_patTrigger_*_*', 'keep *_goodTracks_*_*'])
 
 process.out.dropMetaData = cms.untracked.string('DROPPED')
 process.out.SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') )
