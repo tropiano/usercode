@@ -73,14 +73,18 @@ void TagAndProbeFiller::fill(const reco::Candidate& Z, double x, double w, doubl
   }
 
   if (_onecombination){
+    /*
     double random = rand() / double(RAND_MAX);
-    //cout << "random " << random << endl;
     if (random > 0.5){
       //tag cand 1, probe cand 2
       if (tag(*(Z.daughter(0)))) probe(*(Z.daughter(1)), Z.mass(), x, w);
     } else {
       if (tag(*(Z.daughter(1)))) probe(*(Z.daughter(0)), Z.mass(), x, w);
-    }  
+    } 
+    */
+    //i muoni sono ordinati in pt e io voglio usare il subleading come tag nel caso usi una sel asimmetrica
+    //perche' e' sul leading che voglio distinguere i casi passa/non passa selezione offline
+    if (tag(*(Z.daughter(1)))) probe(*(Z.daughter(0)), Z.mass(), x, w); 
   } else {
     //tag cand 1, probe cand 2
     if(_tpflag=="" || _tpflag=="soft"){

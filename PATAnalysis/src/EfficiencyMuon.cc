@@ -57,6 +57,8 @@ void EfficiencyMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
   _vectorHistos.push_back(TM_MuT_OppositeCharge);
   TM_MuT_OC_Mass                = new TH1D("TM_MuT_OC_Mass", "TM_MuT_OC_Mass", _nbin, _xmin, _xmax);
   _vectorHistos.push_back(TM_MuT_OC_Mass);
+  TM_OC_Mass                = new TH1D("TM_OC_Mass", "TM_OC_Mass", _nbin, _xmin, _xmax);
+  _vectorHistos.push_back(TM_OC_Mass); 
   TM_MuT_OC_M_QualityCuts       = new TH1D("TM_MuT_OC_M_QualityCuts", "TM_MuT_OC_M_QualityCuts", _nbin, _xmin, _xmax);
   _vectorHistos.push_back(TM_MuT_OC_M_QualityCuts);
   TM_MuT_OC_M_QC_DXY            = new TH1D("TM_MuT_OC_M_QC_DXY", "TM_MuT_OC_M_QC_DXY", _nbin, _xmin, _xmax);
@@ -77,6 +79,8 @@ void EfficiencyMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
   _vectorHistos.push_back(TM_MuT_OppositeChargeVsMuPt);
   TM_MuT_OC_MassVsMuPt                = new TH1D("TM_MuT_OC_MassVsMuPt", "TM_MuT_OC_MassVsMuPt", 500, 0., 500.);
   _vectorHistos.push_back(TM_MuT_OC_MassVsMuPt);
+  TM_OC_MassVsMuPt                = new TH1D("TM_OC_MassVsMuPt", "TM_OC_MassVsMuPt", 500, 0., 500.);
+  _vectorHistos.push_back(TM_OC_MassVsMuPt);
   TM_MuT_OC_M_QualityCutsVsMuPt       = new TH1D("TM_MuT_OC_M_QualityCutsVsMuPt", "TM_MuT_OC_M_QualityCutsVsMuPt", 500, 0., 500.);
   _vectorHistos.push_back(TM_MuT_OC_M_QualityCutsVsMuPt);
   TM_MuT_OC_M_QC_DXYVsMuPt            = new TH1D("TM_MuT_OC_M_QC_DXYVsMuPt", "TM_MuT_OC_M_QC_DXYVsMuPt", 500, 0., 500.);
@@ -96,6 +100,8 @@ void EfficiencyMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
   _vectorHistos.push_back(TM_MuT_OppositeChargeVsMuEta);
   TM_MuT_OC_MassVsMuEta                = new TH1D("TM_MuT_OC_MassVsMuEta", "TM_MuT_OC_MassVsMuEta", 300, -3, 3);
   _vectorHistos.push_back(TM_MuT_OC_MassVsMuEta);
+  TM_OC_MassVsMuEta                = new TH1D("TM_OC_MassVsMuEta", "TM_OC_MassVsMuEta", 300, -3, 3);
+  _vectorHistos.push_back(TM_OC_MassVsMuEta);
   TM_MuT_OC_M_QualityCutsVsMuEta       = new TH1D("TM_MuT_OC_M_QualityCutsVsMuEta", "TM_MuT_OC_M_QualityCutsVsMuEta", 300, -3, 3);
   _vectorHistos.push_back(TM_MuT_OC_M_QualityCutsVsMuEta);
   TM_MuT_OC_M_QC_DXYVsMuEta            = new TH1D("TM_MuT_OC_M_QC_DXYVsMuEta", "TM_MuT_OC_M_QC_DXYVsMuEta", 300, -3, 3);
@@ -109,6 +115,8 @@ void EfficiencyMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
 
   TM_MuT_OC_MassVsMass                = new TH1D("TM_MuT_OC_MassVsMass", "TM_MuT_OC_MassVsMass", 100, 50., 150.);
   _vectorHistos.push_back(TM_MuT_OC_MassVsMass);
+  TM_OC_MassVsMass                = new TH1D("TM_OC_MassVsMass", "TM_OC_MassVsMass", 100, 50., 150.);
+  _vectorHistos.push_back(TM_OC_MassVsMass);
   TM_MuT_OC_M_QualityCutsVsMass       = new TH1D("TM_MuT_OC_M_QualityCutsVsMass", "TM_MuT_OC_M_QualityCutsVsMass", 100, 50., 150.);
   _vectorHistos.push_back(TM_MuT_OC_M_QualityCutsVsMass);
   TM_MuT_OC_M_QC_DXYVsMass            = new TH1D("TM_MuT_OC_M_QC_DXYVsMass", "TM_MuT_OC_M_QC_DXYVsMass", 100, 50., 150.);
@@ -135,7 +143,7 @@ void EfficiencyMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
   dir->cd("-");
 
   std::vector<bool (*)(const reco::Candidate&)> tag_cuts;
-  tag_cuts.push_back(singleMu_PtEta); //TEST!!
+  tag_cuts.push_back(secondMu_PtEta);  //perche' con tagli asimmetrici voglio testare il leading muon e vedere se passa la sel offline 
   /*
   tag_cuts.push_back(singleMu_PtEta);
   tag_cuts.push_back(singleMu_QualityCuts);
@@ -165,8 +173,8 @@ void EfficiencyMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
 */  
   probe_cuts.clear();
   passprobe_cuts.clear();
-  probe_cuts.push_back(singleMu_PtEta);
-  passprobe_cuts.push_back(singleMu_PtEta);
+  probe_cuts.push_back(leadingMu_PtEta);
+  passprobe_cuts.push_back(leadingMu_PtEta);
   passprobe_cuts.push_back(singleMu_QualityCuts);
   passprobe_cuts.push_back(singleMu_DXY);
   passprobe_cuts.push_back(singleMu_Isolation);
@@ -175,12 +183,13 @@ void EfficiencyMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
   tag_cuts.clear();
   probe_cuts.clear();
   passprobe_cuts.clear();
-  tag_cuts.push_back(singleMu_PtEta);
-  tag_cuts.push_back(isTriggerMatched);
-  probe_cuts.push_back(singleMu_PtEta);
-  passprobe_cuts.push_back(singleMu_PtEta);
+  tag_cuts.push_back(leadingMu_PtEta);
+  tag_cuts.push_back(isTriggerMatched); 
+  //we want to check the efficiency for the leading mu cuts
+  probe_cuts.push_back(leadingMu_PtEta);
+  passprobe_cuts.push_back(leadingMu_PtEta);
   passprobe_cuts.push_back(isTriggerMatched);
-  _tp_online = new TagAndProbeFiller (dir, string("Online"), _nbin, _xmin, _xmax, tag_cuts, probe_cuts, passprobe_cuts, "", true); 
+  _tp_online = new TagAndProbeFiller (dir, string("Online"), _nbin, _xmin, _xmax, tag_cuts, probe_cuts, passprobe_cuts, "", false); 
   
 }
 
@@ -251,7 +260,8 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
      if ((*muonHandle)[j].pt()>10.) allHardMuons.push_back(&(*muonHandle)[j]);
    }
 
-   bool recselected = RecSelectedMuonWithTrigger(*zHandle, *triggerHandle, _isocut);
+   //bool recselected = RecSelectedMuonWithTrigger(*zHandle, *triggerHandle, _isocut); //TEMP FOR OFFSET STUDY
+   bool recselected = RecSelectedMuon(*zHandle, _isocut);
 
    //if this is a good Z event remove Z candidates from jet collection
    std::vector<pat::Jet> cleanedJets;
@@ -308,16 +318,17 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
    }
 
   
-   bool isMuTriggered  = isMuonTriggered(*triggerHandle, allmuons);
-   bool isJTriggered = isJetTriggered(*triggerHandle);
+   bool isMuTriggered  = isMuonTriggered(*triggerHandle, allmuons); 
+   bool isJTriggered = true; //isJetTriggered(*triggerHandle);
 
    bool recselectedTwoMuons = RecSelected_GlobalMuons(allmuons,2).first;
    bool recselectedTM_MuTriggered = recselectedTwoMuons && isMuTriggered;
    //bool recselectedTM_MuT_OppositeCharge = RecSelected_OppositeCharge(allmuons).first && recselectedTM_MuTriggered;
    bool recselectedTM_MuT_Charge = _oppositeCharge ? RecSelected_Charge(allmuons, -1).first && recselectedTM_MuTriggered : 
                                                      RecSelected_Charge(allmuons,  1).first && recselectedTM_MuTriggered;
-   bool recselectedTM_MuT_OC_Mass = zHandle->size()>0 && RecSelected_MuonMass(*zHandle) && RecSelected_GlobalMuons(muonsfromZ, 2).first && isMuonTriggered(*triggerHandle, muonsfromZ); //&& RecSelected_OppositeCharge(muonsfromZ).first; these should already have the desired charge assignment
-   bool recselectedTM_MuT_OC_M_QualityCuts = RecSelected_QualityCuts(muonsfromZ, 2).first && recselectedTM_MuT_OC_Mass;
+   bool recselectedTM_MuT_OC_Mass = zHandle->size()>0 && RecSelected_MuonMass(*zHandle) && RecSelected_GlobalMuons(muonsfromZ, 2).first && isMuonTriggered(*triggerHandle, muonsfromZ);
+   bool recselectedTM_OC_Mass = zHandle->size()>0 && RecSelected_MuonMass(*zHandle) && RecSelected_GlobalMuons(muonsfromZ, 2).first;
+   bool recselectedTM_MuT_OC_M_QualityCuts = RecSelected_QualityCuts(muonsfromZ, 1).first && recselectedTM_MuT_OC_Mass;
    bool recselectedTM_MuT_OC_M_QC_DXY = RecSelected_DXY(muonsfromZ, 2).first && recselectedTM_MuT_OC_M_QualityCuts;
    bool recselectedTM_MuT_OC_M_QC_DXY_Iso = (muonsfromZ.size() > 0) ? singleMu_Isolation(*muonsfromZ.front()) && recselectedTM_MuT_OC_M_QC_DXY : false;
                                             //RecSelected_Isolation(muonsfromZ, _isocut, 1).first && recselectedTM_MuT_OC_M_QC_DXY;
@@ -345,7 +356,13 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
       TM_MuT_OC_MassVsMuPt->Fill(muonsfromZ.front()->pt(), w);
       TM_MuT_OC_MassVsMuEta->Fill(muonsfromZ.front()->eta(), w);
       TM_MuT_OC_MassVsMass->Fill((*zHandle)[0].mass(), w);
-   }   
+   }  
+   if (recselectedTM_OC_Mass){ 
+      TM_OC_Mass->Fill(size, w);
+      TM_OC_MassVsMuPt->Fill(muonsfromZ.front()->pt(), w);
+      TM_OC_MassVsMuEta->Fill(muonsfromZ.front()->eta(), w);
+      TM_OC_MassVsMass->Fill((*zHandle)[0].mass(), w); 
+   }
    if (recselectedTM_MuT_OC_M_QualityCuts) {
       TM_MuT_OC_M_QualityCuts->Fill(size, w);
       TM_MuT_OC_M_QualityCutsVsMuPt->Fill(muonsfromZ.front()->pt(), w);  

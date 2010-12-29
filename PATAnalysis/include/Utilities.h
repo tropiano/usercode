@@ -20,9 +20,9 @@
 #include "TVectorD.h"
 
 static double ptmucut_leading = 20.;
-static double ptmucut_second = 20.;
+static double ptmucut_second = 10.;
 static double etamucut_leading = 2.1;
-static double etamucut_second = 2.1;
+static double etamucut_second = 2.4;
 static double zmassmin = 60.;
 static double zmassmax = 120.;
 static double zmassgenmin = 50.;
@@ -49,15 +49,15 @@ inline bool singleMu_Tag(const reco::Candidate& cand){
 }
 
 inline bool singleMu_PtEta(const reco::Candidate& muon){
-  return muon.pt() > ptmucut_leading && fabs(muon.eta()) < etamucut_leading;
+  return muon.isGlobalMuon() && muon.pt() > ptmucut_leading && fabs(muon.eta()) < etamucut_leading;
 }
 
-inline bool leadingMu_PtEta(const pat::Muon& muon){
-  return muon.pt() > ptmucut_leading && fabs(muon.eta()) < etamucut_leading;
+inline bool leadingMu_PtEta(const reco::Candidate& muon){
+  return muon.isGlobalMuon() && muon.pt() > ptmucut_leading && fabs(muon.eta()) < etamucut_leading;
 }
 
-inline bool secondMu_PtEta(const pat::Muon& muon){
-  return muon.pt() > ptmucut_second && fabs(muon.eta()) < etamucut_second;
+inline bool secondMu_PtEta(const reco::Candidate& muon){
+  return muon.isGlobalMuon() && muon.pt() > ptmucut_second && fabs(muon.eta()) < etamucut_second;
 }
 
 inline bool singleMu_QualityCuts(const reco::Candidate& cand){
@@ -73,15 +73,13 @@ inline bool singleMu_QualityCuts(const reco::Candidate& cand){
   
   //reco::TrackRef gm = muon->globalTrack() ; 
 
-
-
   //is this the same as before? or this is total track hits
   return muon->isGlobalMuon() && muon->isTrackerMuon() &&
-         //muon->globalTrack()->hitPattern().numberOfValidPixelHits() > 0 &&
-         //muon->globalTrack()->hitPattern().numberOfValidMuonHits() > 0 && muon->track()->hitPattern().numberOfValidTrackerHits() > minnhit &&
-         muon->numberOfValidHits()>minnhit &&
-         //muon->numberOfMatches() > 1 &&               
-         muon->normChi2() < maxchi2;
+         muon->userFloat("numberOfValidPixelHits")>0 &&
+         muon->userFloat("numberOfValidMuonHits")>0 &&
+         muon->userFloat("numberOfValidTrackerHits")>minnhit &&
+         muon->userFloat("numberOfMatches") > 1 &&               
+         muon->userFloat("normChi2") < maxchi2;
 }
 
 inline bool singleMu_DXY(const reco::Candidate& cand){
@@ -210,29 +208,57 @@ inline bool isTriggerMatched(const reco::Candidate& cand){
         muon = dynamic_cast<const pat::Muon*>(scc->masterClone().get());
     }
   }
-  const pat::TriggerObjectStandAloneCollection trigMatches = muon->triggerObjectMatchesByPath("HLT_Mu9");
-  return trigMatches.size();
+  //const pat::TriggerObjectStandAloneCollection trigMatches = muon->triggerObjectMatchesByPath("HLT_Mu15");
+  //return trigMatches.size();
+  const pat::TriggerObjectStandAloneCollection trigMatches15v1 = muon->triggerObjectMatchesByPath("HLT_Mu15_v1", true);
+  const pat::TriggerObjectStandAloneCollection trigMatches13v1 = muon->triggerObjectMatchesByPath("HLT_Mu13_v1", true);
+  const pat::TriggerObjectStandAloneCollection trigMatches15   = muon->triggerObjectMatchesByPath("HLT_Mu15", true);
+  const pat::TriggerObjectStandAloneCollection trigMatches13   = muon->triggerObjectMatchesByPath("HLT_Mu13", true);
+  const pat::TriggerObjectStandAloneCollection trigMatches11   = muon->triggerObjectMatchesByPath("HLT_Mu11",true);
+  const pat::TriggerObjectStandAloneCollection trigMatches9    = muon->triggerObjectMatchesByPath("HLT_Mu9", true);
+  //const pat::TriggerObjectStandAloneCollection trigMatches9    = muon->triggerObjectMatchesByFilter("hltSingleMu9L3Filtered9");
+  bool ismatched = trigMatches9.size()>0 || trigMatches15v1.size()>0 || trigMatches13v1.size()>0 || trigMatches15.size()>0 || trigMatches13.size()>0 ||trigMatches11.size()>0 || trigMatches9.size()>0;
+  
+  /*if (trigMatches9.size()>0){
+    
+    std::cout << "number of matches: " << trigMatches9.size() << std::endl;
+    for (unsigned jj = 0; jj < trigMatches9.size(); ++jj){
+      std::cout << "Match " << jj << ":"<< std::endl;
+      std::vector< std::string > pathNames = trigMatches9[jj].pathNames();
+      std::vector< std::string > filterLabels = trigMatches9[jj].filterLabels();
+      std::cout << "pathNames: " << std::endl;  
+      for (unsigned kk = 0; kk < pathNames.size(); ++kk){
+        std::cout << pathNames[kk] << std::endl;
+      }
+      std::cout << "filterLabels: " << std::endl;
+      for (unsigned kk = 0; kk < filterLabels.size(); ++kk){
+        std::cout << filterLabels[kk] << std::endl;
+      }
+    }
+    
+    if (reco::deltaR(muon->p4(),trigMatches9[0].p4()) > 0.2) return false;
+  }*/
+  
+  return ismatched;
 }
 
 inline bool isMuonTriggered(const pat::TriggerEvent& triggers, const std::vector<const pat::Muon*>& MuREC){
-  bool hasFired = isTriggered(triggers, "HLT_Mu9");
+  bool hasFired = isTriggered(triggers, "HLT_Mu9") || isTriggered(triggers, "HLT_Mu11") || isTriggered(triggers, "HLT_Mu13_v1") || isTriggered(triggers, "HLT_Mu15_v1");
   if (MuREC.empty()) return false;
   //now we check that one of teh muons is matched to that trigger
-  std::vector<const pat::Muon*>::const_iterator imu;
-  for (imu = MuREC.begin(); imu != MuREC.end(); ++imu){
-    const pat::TriggerObjectStandAloneCollection trigMatches = (*imu)->triggerObjectMatchesByPath("HLT_Mu9");
-    if (trigMatches.size() && hasFired) return true;
-  }
-  /*std::cout << "trigMatches.size() " << trigMatches.size() << std::endl;
-  for (unsigned j = 0; j < trigMatches.size(); ++j ){
-    std::cout << "Matched paths for collection : " << trigMatches[j].collection() << std::endl;
-    std::vector< std::string > pathNames = trigMatches[j].pathNames();
-    for (unsigned k = 0; k < pathNames.size(); ++k){
-      std::cout << pathNames[k] << std::endl;
-    }
-  } 
-  */
-  //return hasFired && trigMatches.size();
+  //std::vector<const pat::Muon*>::const_iterator imu;
+  //for (imu = MuREC.begin(); imu != MuREC.end(); ++imu){
+  //check that the leading muon is matched
+  //const pat::TriggerObjectStandAloneCollection trigMatches15v1 = MuREC[0]->triggerObjectMatchesByPath("HLT_Mu15_v1", true);
+  //const pat::TriggerObjectStandAloneCollection trigMatches13v1 = MuREC[0]->triggerObjectMatchesByPath("HLT_Mu13_v1", true);
+  //const pat::TriggerObjectStandAloneCollection trigMatches15   = MuREC[0]->triggerObjectMatchesByPath("HLT_Mu15", true);
+  //const pat::TriggerObjectStandAloneCollection trigMatches13   = MuREC[0]->triggerObjectMatchesByPath("HLT_Mu13", true);
+  //const pat::TriggerObjectStandAloneCollection trigMatches11   = MuREC[0]->triggerObjectMatchesByPath("HLT_Mu11", true);
+  //const pat::TriggerObjectStandAloneCollection trigMatches9    = MuREC[0]->triggerObjectMatchesByPath("HLT_Mu9", true);
+  //const pat::TriggerObjectStandAloneCollection trigMatches9    = MuREC[0]->triggerObjectMatchesByFilter("hltSingleMu9L3Filtered9");
+  //bool ismatched = trigMatches15v1.size()>0 || trigMatches13v1.size()>0 || trigMatches15.size()>0 || trigMatches13.size()>0 ||trigMatches11.size()>0 || trigMatches9.size()>0;
+  bool ismatched=isTriggerMatched(*MuREC[0]);
+  if (ismatched && hasFired) return true;
   return false;
 }
 
@@ -365,9 +391,9 @@ inline bool RecSelectedMuon(const std::vector<reco::CompositeCandidate>& ZREC, d
   
   return ZREC.size() > 0 && ZREC[0].mass() > zmassmin && ZREC[0].mass() < zmassmax &&
          leadingMu_PtEta(*leading) && secondMu_PtEta(*second) &&
-         singleMu_QualityCuts(*leading) && singleMu_QualityCuts(*second) &&
+         singleMu_QualityCuts(*leading) /*&& singleMu_QualityCuts(*second)*/ &&
          singleMu_DXY(*leading) && singleMu_DXY(*second) && 
-         singleMu_Isolation(*leading) && singleMu_Isolation(*second);               
+         singleMu_Isolation(*leading) /*&& singleMu_Isolation(*second)*/;               
 }
 
 inline bool RecSelectedMuonWithTrigger(const std::vector<reco::CompositeCandidate>& ZREC, const pat::TriggerEvent& triggers, double isocut, 
@@ -429,7 +455,7 @@ inline bool RecSelectedNoIso(const std::vector<reco::CompositeCandidate>& ZREC, 
  
   return ZREC.size() > 0 && ZREC[0].mass() > zmassmin && ZREC[0].mass() < zmassmax &&
          leadingMu_PtEta(*leading) && secondMu_PtEta(*second) &&
-         singleMu_QualityCuts(*leading) && singleMu_QualityCuts(*second) &&
+         singleMu_QualityCuts(*leading) /*&& singleMu_QualityCuts(*second)*/ &&
          singleMu_DXY(*leading) && singleMu_DXY(*second);
  
 }

@@ -5,15 +5,15 @@ from Firenze.PATAnalysis.config_background import *
 #process.load(config_background)
 
 process.outputFile.name = cms.string("qcd.root")
-process.zmumurec.ScaleFactor=cms.double(296900000.*2.684e-4/5120334)
-process.zmumueff.ScaleFactor=cms.double(296900000.*2.684e-4/5120334)
+process.zmumurec.ScaleFactor=cms.double(296600000.*0.0002855/24520391)
+process.zmumueff.ScaleFactor=cms.double(296900000.*0.0002855/24520391)
 process.zmumueff.TrainUnfolding = cms.bool(False)
 
-process.zmumurec.JetSource     = cms.string("selectedPFJets")
-process.zmumurec.MaxEtaJet   = cms.double(2.5)
+process.zmumurec.JetSource     = cms.string("selectedJets")
+process.zmumurec.MaxEtaJet   = cms.double(2.4)
 
-process.zmumueff.JetSource     = cms.string("selectedPFJets")
-process.zmumueff.MaxEtaJet   = cms.double(2.5)
+process.zmumueff.JetSource     = cms.string("selectedJets")
+process.zmumueff.MaxEtaJet   = cms.double(2.4)
 
 process.zmumurec.MinPtJet = 15.
 process.zmumueff.MinPtJet = 15.

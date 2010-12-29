@@ -142,7 +142,7 @@ void  RecoMuon::process(const fwlite::Event& iEvent)
    fwlite::Handle<std::vector<pat::Jet> > jetHandle;
    jetHandle.getByLabel(iEvent, _jetSrc.c_str());
 
-   fwlite::Handle<pat::TriggerEvent> triggerHandle;
+   fwlite::Handle<pat::TriggerEvent> triggerHandle; 
    triggerHandle.getByLabel(iEvent, "patTriggerEvent");
 
    
@@ -179,8 +179,8 @@ void  RecoMuon::process(const fwlite::Event& iEvent)
   }
   std::sort(muonsfromZ.begin(), muonsfromZ.end(), sortByPt<pat::Muon>); 
 
-   if (RecSelectedMuonWithTrigger(*zHandle, *triggerHandle, _isocut, dau0, dau1)){
-   //if (RecSelectedMuon(*zHandle, _isocut, dau0, dau1)){
+  if (RecSelectedMuonWithTrigger(*zHandle, *triggerHandle, _isocut, dau0, dau1)){
+   //if (RecSelectedMuon(*zHandle, _isocut, dau0, dau1)){ //TEMP FOR OFFSET STUDY
       //cout << "PASSED!" << endl;
       _runnumber  = iEvent.id().run();
       _eventnumber = iEvent.id().event();
