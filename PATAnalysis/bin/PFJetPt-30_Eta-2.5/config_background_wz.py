@@ -4,9 +4,9 @@ from Firenze.PATAnalysis.config_background import *
 
 #process.load(config_background)
 
-process.outputFile.name = cms.string("qcd.root")
-process.zmumurec.ScaleFactor=cms.double(296600000.*0.0002855/24520391)
-process.zmumueff.ScaleFactor=cms.double(296900000.*0.0002855/24520391)
+process.outputFile.name = cms.string("wz.root")
+process.zmumurec.ScaleFactor=cms.double(10.4/1935664) #inclusive cross section from MCFM
+process.zmumueff.ScaleFactor=cms.double(10.4/1935664)
 process.zmumueff.TrainUnfolding = cms.bool(False)
 
 process.zmumurec.JetSource     = cms.string("selectedJets")

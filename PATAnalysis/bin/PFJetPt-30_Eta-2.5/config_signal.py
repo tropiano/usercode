@@ -25,3 +25,9 @@ process.zmumueffVsGen.JetSource     = cms.string("selectedPFJets")
 process.zmumueffVsGen.MaxEtaJet   = cms.double(2.5)
 
 process.zmumueffVsRec.RequireGenInAcceptance=cms.bool(True)
+
+process.zmumugen.MinPtJet = 30.
+process.zmumurec.MinPtJet = 30.
+process.zmumueff.MinPtJet = 30.
+process.zmumueffVsRec.MinPtJet = 30.
+process.zmumueffVsGen.MinPtJet = 30.
