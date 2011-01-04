@@ -75,7 +75,7 @@ int main(){
   p->Process(signalMadnoPUDS, "FWLiteTSelector");
   delete signalMadnoPUDS; 
 */
-/*
+
   TDSet* signalMadDS = getDS("/raid/lenzip/Zjets/CMSSW_3_8_7/src/Firenze/PATAnalysis/bin/signal_Madgraph.txt");
   TNamed* configMad = new TNamed("ConfigFile", (pwd+"/config_signal_Madgraph.py").c_str());
   p->AddInput(configMad);
@@ -131,7 +131,7 @@ int main(){
   p->AddInput(configtau);
   p->Process(tauDS, "FWLiteTSelector");
   delete tauDS;
-*/  
+  
 /*  
   TDSet* signalDWDS = getDS("/data01/lenzip/Zjets/localCMSSW/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/signal_DW.txt");
   TNamed* configDW = new TNamed("ConfigFile", (pwd+"/config_signal_DW.py").c_str());
