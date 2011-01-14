@@ -130,7 +130,7 @@ void EfficiencyMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
     (*i)->Sumw2();
   } 
 
-  _jetmultiResponse = new RooUnfoldResponse(10, -0.5, 9.5, "ResponseMatrix", "ResponseMatrix");
+  _jetmultiResponse = new RooUnfoldResponse(5, -0.5, 4.5, "ResponseMatrix", "ResponseMatrix");
 
   //debug
   /*_jetmultiResponse->IsA()->Dump();
@@ -213,7 +213,7 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
    jetHandle.getByLabel(iEvent, _jetSrc.c_str());
 
    fwlite::Handle<std::vector<reco::GenJet> > genJetHandle;
-   if (_vsGenMulti){
+   if (_vsGenMulti || _trainUnfolding){
       genJetHandle.getByLabel(iEvent, "selectedGenJets");    
    }   
 
@@ -298,9 +298,12 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
 
    ///unfolding training
    if (_trainUnfolding){
-      if (recselected)
-        _jetmultiResponse->Fill(recosize, gensize, w);
-      else _jetmultiResponse->Miss(gensize, w);  
+      if (denominatorCondition){
+        double recosizeforunfolding = recosize < 4 ? recosize : 4;
+        double gensizeforunfolding  = gensize  < 4 ? gensize  : 4;
+        _jetmultiResponse->Fill(recosizeforunfolding, gensizeforunfolding, w);
+      }  
+      //else _jetmultiResponse->Miss(gensize, w);  
    }
 
    //global efficiency 
@@ -412,7 +415,12 @@ void EfficiencyMuon::finalize()
   _tp_online->finalize();
   std::cout << "response nbins measured " << _jetmultiResponse->GetNbinsMeasured() << std::endl;
   std::cout << "response nbins truth " << _jetmultiResponse->GetNbinsTruth() << std::endl;
-  if (_trainUnfolding) _jetmultiResponse->Write();
+  if (_trainUnfolding) {
+    _jetmultiResponse->Hresponse()->Write();
+    _jetmultiResponse->Htruth()->Write();
+    _jetmultiResponse->Hmeasured()->Write();
+    //_jetmultiResponse->Write();
+  }  
   _outputfile->Write();
 }
 
