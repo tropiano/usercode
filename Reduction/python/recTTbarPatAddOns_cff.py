@@ -6,6 +6,7 @@ selectedElectrons = PhysicsTools.PatAlgos.selectionLayer1.electronSelector_cfi.s
 selectedElectrons.src = cms.InputTag("patElectrons")
 #selectedElectrons.cut = cms.string("pt > 20. & abs(eta) < 2.4 & isGood('GlobalElectronPromptTight') & innerTrack().found()>=11 & abs(globalTrack().d0())<0.2 & (trackIso()+caloIso()+ecalIso())/pt<0.1")
 selectedElectrons.cut = cms.string("pt > 10. & abs(eta) < 3.")
+
 import PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi
 selectedMuons = PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi.selectedPatMuons.clone()
 selectedMuons.src = cms.InputTag("patMuons")

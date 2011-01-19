@@ -9,7 +9,7 @@ selectedJets.cut = cms.string('pt > 20. & abs(eta) < 10. & nConstituents > 0')
 import PhysicsTools.PatAlgos.selectionLayer1.jetSelector_cfi
 selectedPFJets = PhysicsTools.PatAlgos.selectionLayer1.jetSelector_cfi.selectedPatJets.clone()
 #selectedPFJets.src = cms.InputTag('allLayer1PFJets')
-selectedPFJets.src = cms.InputTag('patPFJets')
+selectedPFJets.src = cms.InputTag('patJets')
 selectedPFJets.cut = cms.string('pt > 20. & abs(eta) < 10.')
 
 import PhysicsTools.PatAlgos.selectionLayer1.jetSelector_cfi
@@ -30,7 +30,7 @@ countPFJets = PhysicsTools.PatAlgos.selectionLayer1.jetCountFilter_cfi.countPatJ
 countPFJets.src = cms.InputTag('selectedPFJets')
 countPFJets.minNumber = cms.uint32(4)
 
-recjetsSequence = cms.Sequence((selectedPFJets + selectedJets) * countJets * countPFJets)#+ selectedJPTJets)
+recjetsSequence = cms.Sequence((selectedPFJets  * countPFJets)+ (selectedJets * countJets))
 
 
 jetrecEventContent = [
