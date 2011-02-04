@@ -7,6 +7,7 @@
 #include "RooUnfoldSvd.h"
 
 #include "TH1D.h"
+#include "TH2D.h"
 
 Unfolding::Unfolding(TFile* training, TFile* measured, TFile* output, std::string response_dirname, std::string reco_dirname): _output(output){
   _response_dir = (TDirectory*) training->Get(response_dirname.c_str());
@@ -23,18 +24,24 @@ void Unfolding::analyze(){
     std::cout << "Error in Unfolding, directory containing reco distribution not found" << std::endl;  
     return;
   }
-  RooUnfoldResponse* response = (RooUnfoldResponse*) _response_dir->Get("ResponseMatrix");
-  if (!response) {
-    std::cout << "Error in Unfolding, ResponseMatrix not found" << std::endl;
+
+TH1D* measured = (TH1D*) _response_dir->Get("measured");
+TH1D* truth = (TH1D*) _response_dir->Get("truth");
+TH2D* ResponseMatrix = (TH2D*) _response_dir->Get("ResponseMatrix");
+
+  if ((!measured)||(!truth)||(!ResponseMatrix)) {
+    std::cout << "Error in Unfolding, measured or truth or ResponseMatrix plot on training file not found" << std::endl;
     return;
   }
+
+  RooUnfoldResponse* response = new RooUnfoldResponse(measured, truth, ResponseMatrix);
   
   std::cout << "response nbins measured " << response->GetNbinsMeasured() << std::endl;
   std::cout << "response nbins truth " << response->GetNbinsTruth() << std::endl;
  
-  TH1* recoMulti = (TH1*) _reco_dir->Get("recMulti"); 
+  TH1* recoMulti = (TH1*) _reco_dir->Get("measured"); 
   if (!recoMulti){
-    std::cout << "Error in Unfolding, recMulti plot not found" << std::endl;   
+    std::cout << "Error in Unfolding, measured plot on measured file not found" << std::endl;   
     return;
   }
   recoMulti->Print();
