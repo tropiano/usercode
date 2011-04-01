@@ -25,7 +25,7 @@
 using namespace std;
 
 //sample == "mc" -> MonteCarlo , sample == "data" -> Data
-//Selections: "VPJ" = V+jets selections (old); "VBTF" = Vector Boson Task Force (new)
+//Selections: "SYM" = V+jets selections (old); "ASYM" = Vector Boson Task Force (new)
 
 void Signal(string sample, string selections){
 
@@ -41,7 +41,7 @@ void Signal(string sample, string selections){
 	
 	int _Acc  = 1;
 	int _Trg  = 2;
-	int _Qual = 0;
+	int _Conv = 0;
 	int _Imp  = 3;
 	int _Iso  = 4;
 	int _EiD  = 5;
@@ -51,17 +51,17 @@ void Signal(string sample, string selections){
 	for(int i=0; i<7; i++){
        _RecoCutFlags[i] = "_1";}
    
-       if(selections=="VPJ"){
-       _RecoCutFlags[_Acc] =  "_AccVPJ";
-       _RecoCutFlags[_Iso] =  "_IsoVPJ";
-       _RecoCutFlags[_EiD] =  "_EiDVPJ";}
-       if(selections=="VBTF"){
-       _RecoCutFlags[_Acc] =  "_AccVBTF";
-       _RecoCutFlags[_Iso] =  "_IsoVBTF";
-       _RecoCutFlags[_EiD] =  "_EiDVBTF";}
+       if(selections=="SYM"){
+       _RecoCutFlags[_Acc] =  "_AccSYM";
+       _RecoCutFlags[_Iso] =  "_IsoSYM";
+       _RecoCutFlags[_EiD] =  "_EiDSYM";}
+       if(selections=="ASYM"){
+       _RecoCutFlags[_Acc] =  "_AccASYM";
+       _RecoCutFlags[_Iso] =  "_IsoASYM";
+       _RecoCutFlags[_EiD] =  "_EiDASYM";}
      
        _RecoCutFlags[_Trg] =  "_Trg";
-       _RecoCutFlags[_Qual] = "_Qual";
+       _RecoCutFlags[_Conv] = "_ConvASYM";
        _RecoCutFlags[_Imp] =  "_Imp";
     
         if(!signal_file){
@@ -1289,7 +1289,7 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         string TPDir="EfficiencyElectron/Tag&Probe";
         string TPHisto="/Electron";
         
-        if(selections=="VBTF")TPDir="EfficiencyElectron/Tag&Probe0";
+        if(selections=="ASYM")TPDir="EfficiencyElectron/Tag&Probe0";
  
         TPDir+=_RecoCutFlags[1].c_str();   
         TPDir+=_RecoCutFlags[2].c_str();
@@ -1341,7 +1341,7 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         TGraphAsymmErrors Eff_TP_Single_123456(TP_numerator_123456, TP_denominator_123456);
         
         string Eff_TP_Single_name="SingleEff_TagProbe";
-        if(selections=="VBTF")Eff_TP_Single_name="SingleEff_TagProbe0";
+        if(selections=="ASYM")Eff_TP_Single_name="SingleEff_TagProbe0";
         Eff_TP_Single_name+=_RecoCutFlags[1].c_str();
         Eff_TP_Single_name+=_RecoCutFlags[2].c_str();
         Eff_TP_Single_12.SetNameTitle(Eff_TP_Single_name.c_str(), Eff_TP_Single_name.c_str());
@@ -1357,7 +1357,7 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         string TPDir1="EfficiencyElectron/Tag&Probe1";;
         TGraphAsymmErrors Eff_TP_Single1_12, Eff_TP_Single1_123, Eff_TP_Single1_1234, Eff_TP_Single1_12345, Eff_TP_Single1_123456;
          
-        if(selections=="VBTF"){
+        if(selections=="ASYM"){
         
         TPHisto="/Electron";
         
@@ -1436,16 +1436,16 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         for ( int i = 0; i < n_12; ++i ){
         double x = 0., y = 0., x1=0., y1=0.;
         Eff_TP_Single_12.GetPoint(i, x, y);
-        if(selections=="VBTF")Eff_TP_Single1_12.GetPoint(i, x1, y1);
+        if(selections=="ASYM")Eff_TP_Single1_12.GetPoint(i, x1, y1);
         vx_12(i)   = x;
         vexl_12(i) = Eff_TP_Single_12.GetErrorXlow(i);
         vexh_12(i) = Eff_TP_Single_12.GetErrorXhigh(i);
-        if(selections=="VPJ")vy_12(i)   = y * y;
-        if(selections=="VBTF")vy_12(i)   = y * y1;
-        if(selections=="VPJ")veyl_12(i) = 2 * y * Eff_TP_Single_12.GetErrorYlow(i);
-        if(selections=="VBTF")veyl_12(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_12.GetErrorYlow(i),2)+pow(y*Eff_TP_Single1_12.GetErrorYlow(i),2));
-        if(selections=="VPJ")veyh_12(i) = 2 * y * Eff_TP_Single_12.GetErrorYhigh(i);
-        if(selections=="VBTF")veyh_12(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_12.GetErrorYhigh(i),2)+pow(y*Eff_TP_Single1_12.GetErrorYhigh(i),2));
+        if(selections=="SYM")vy_12(i)   = y * y;
+        if(selections=="ASYM")vy_12(i)   = y * y1;
+        if(selections=="SYM")veyl_12(i) = 2 * y * Eff_TP_Single_12.GetErrorYlow(i);
+        if(selections=="ASYM")veyl_12(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_12.GetErrorYlow(i),2)+pow(y*Eff_TP_Single1_12.GetErrorYlow(i),2));
+        if(selections=="SYM")veyh_12(i) = 2 * y * Eff_TP_Single_12.GetErrorYhigh(i);
+        if(selections=="ASYM")veyh_12(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_12.GetErrorYhigh(i),2)+pow(y*Eff_TP_Single1_12.GetErrorYhigh(i),2));
         }  
         
         int n_123 = Eff_TP_Single_123.GetN();
@@ -1458,16 +1458,16 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         for ( int i = 0; i < n_123; ++i ){
         double x = 0., y = 0., x1=0., y1=0.;
         Eff_TP_Single_123.GetPoint(i, x, y);
-        if(selections=="VBTF")Eff_TP_Single1_123.GetPoint(i, x1, y1);
+        if(selections=="ASYM")Eff_TP_Single1_123.GetPoint(i, x1, y1);
         vx_123(i)   = x;
         vexl_123(i) = Eff_TP_Single_123.GetErrorXlow(i);
         vexh_123(i) = Eff_TP_Single_123.GetErrorXhigh(i);
-        if(selections=="VPJ")vy_123(i)   = y * y;
-        if(selections=="VBTF")vy_123(i)   = y * y1;
-        if(selections=="VPJ")veyl_123(i) = 2 * y * Eff_TP_Single_123.GetErrorYlow(i);
-        if(selections=="VBTF")veyl_123(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_123.GetErrorYlow(i),2)+pow(y*Eff_TP_Single1_123.GetErrorYlow(i),2));
-        if(selections=="VPJ")veyh_123(i) = 2 * y * Eff_TP_Single_123.GetErrorYhigh(i);
-        if(selections=="VBTF")veyh_123(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_123.GetErrorYhigh(i),2)+pow(y*Eff_TP_Single1_123.GetErrorYhigh(i),2));
+        if(selections=="SYM")vy_123(i)   = y * y;
+        if(selections=="ASYM")vy_123(i)   = y * y1;
+        if(selections=="SYM")veyl_123(i) = 2 * y * Eff_TP_Single_123.GetErrorYlow(i);
+        if(selections=="ASYM")veyl_123(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_123.GetErrorYlow(i),2)+pow(y*Eff_TP_Single1_123.GetErrorYlow(i),2));
+        if(selections=="SYM")veyh_123(i) = 2 * y * Eff_TP_Single_123.GetErrorYhigh(i);
+        if(selections=="ASYM")veyh_123(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_123.GetErrorYhigh(i),2)+pow(y*Eff_TP_Single1_123.GetErrorYhigh(i),2));
         }
         
         int n_1234 = Eff_TP_Single_1234.GetN();
@@ -1480,16 +1480,16 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         for ( int i = 0; i < n_1234; ++i ){
         double x = 0., y = 0., x1=0., y1=0.;
         Eff_TP_Single_1234.GetPoint(i, x, y);
-        if(selections=="VBTF")Eff_TP_Single1_1234.GetPoint(i, x1, y1);
+        if(selections=="ASYM")Eff_TP_Single1_1234.GetPoint(i, x1, y1);
         vx_1234(i)   = x;
         vexl_1234(i) = Eff_TP_Single_1234.GetErrorXlow(i);
         vexh_1234(i) = Eff_TP_Single_1234.GetErrorXhigh(i);
-        if(selections=="VPJ")vy_1234(i)   = y * y;
-        if(selections=="VBTF")vy_1234(i)   = y * y1;
-        if(selections=="VPJ")veyl_1234(i) = 2 * y * Eff_TP_Single_1234.GetErrorYlow(i);
-        if(selections=="VBTF")veyl_1234(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_1234.GetErrorYlow(i),2)+pow(y*Eff_TP_Single1_1234.GetErrorYlow(i),2));
-        if(selections=="VPJ")veyh_1234(i) = 2 * y * Eff_TP_Single_1234.GetErrorYhigh(i);
-        if(selections=="VBTF")veyh_1234(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_1234.GetErrorYhigh(i),2)+pow(y*Eff_TP_Single1_1234.GetErrorYhigh(i),2));
+        if(selections=="SYM")vy_1234(i)   = y * y;
+        if(selections=="ASYM")vy_1234(i)   = y * y1;
+        if(selections=="SYM")veyl_1234(i) = 2 * y * Eff_TP_Single_1234.GetErrorYlow(i);
+        if(selections=="ASYM")veyl_1234(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_1234.GetErrorYlow(i),2)+pow(y*Eff_TP_Single1_1234.GetErrorYlow(i),2));
+        if(selections=="SYM")veyh_1234(i) = 2 * y * Eff_TP_Single_1234.GetErrorYhigh(i);
+        if(selections=="ASYM")veyh_1234(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_1234.GetErrorYhigh(i),2)+pow(y*Eff_TP_Single1_1234.GetErrorYhigh(i),2));
         } 
         
         int n_12345 = Eff_TP_Single_12345.GetN();
@@ -1502,16 +1502,16 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         for ( int i = 0; i < n_12345; ++i ){
         double x = 0., y = 0., x1=0., y1=0.;
         Eff_TP_Single_12345.GetPoint(i, x, y);
-        if(selections=="VBTF")Eff_TP_Single1_12345.GetPoint(i, x1, y1);
+        if(selections=="ASYM")Eff_TP_Single1_12345.GetPoint(i, x1, y1);
         vx_12345(i)   = x;
         vexl_12345(i) = Eff_TP_Single_12345.GetErrorXlow(i);
         vexh_12345(i) = Eff_TP_Single_12345.GetErrorXhigh(i);
-        if(selections=="VPJ")vy_12345(i)   = y * y;
-        if(selections=="VBTF")vy_12345(i)   = y * y1;
-        if(selections=="VPJ")veyl_12345(i) = 2 * y * Eff_TP_Single_12345.GetErrorYlow(i);
-        if(selections=="VBTF")veyl_12345(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_12345.GetErrorYlow(i),2)+pow(y*Eff_TP_Single1_12345.GetErrorYlow(i),2));
-        if(selections=="VPJ")veyh_12345(i) = 2 * y * Eff_TP_Single_12345.GetErrorYhigh(i);
-        if(selections=="VBTF")veyh_12345(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_12345.GetErrorYhigh(i),2)+pow(y*Eff_TP_Single1_12345.GetErrorYhigh(i),2));
+        if(selections=="SYM")vy_12345(i)   = y * y;
+        if(selections=="ASYM")vy_12345(i)   = y * y1;
+        if(selections=="SYM")veyl_12345(i) = 2 * y * Eff_TP_Single_12345.GetErrorYlow(i);
+        if(selections=="ASYM")veyl_12345(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_12345.GetErrorYlow(i),2)+pow(y*Eff_TP_Single1_12345.GetErrorYlow(i),2));
+        if(selections=="SYM")veyh_12345(i) = 2 * y * Eff_TP_Single_12345.GetErrorYhigh(i);
+        if(selections=="ASYM")veyh_12345(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_12345.GetErrorYhigh(i),2)+pow(y*Eff_TP_Single1_12345.GetErrorYhigh(i),2));
         }
         
         int n_123456 = Eff_TP_Single_123456.GetN();
@@ -1524,16 +1524,16 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         for ( int i = 0; i < n_123456; ++i ){
         double x = 0., y = 0., x1=0., y1=0.;
         Eff_TP_Single_123456.GetPoint(i, x, y);
-        if(selections=="VBTF")Eff_TP_Single1_123456.GetPoint(i, x1, y1);
+        if(selections=="ASYM")Eff_TP_Single1_123456.GetPoint(i, x1, y1);
         vx_123456(i)   = x;
         vexl_123456(i) = Eff_TP_Single_123456.GetErrorXlow(i);
         vexh_123456(i) = Eff_TP_Single_123456.GetErrorXhigh(i);
-        if(selections=="VPJ")vy_123456(i)   = y * y;
-        if(selections=="VBTF")vy_123456(i)   = y * y1;
-        if(selections=="VPJ")veyl_123456(i) = 2 * y * Eff_TP_Single_123456.GetErrorYlow(i);
-        if(selections=="VBTF")veyl_123456(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_123456.GetErrorYlow(i),2)+pow(y*Eff_TP_Single1_123456.GetErrorYlow(i),2));
-        if(selections=="VPJ")veyh_123456(i) = 2 * y * Eff_TP_Single_123456.GetErrorYhigh(i);
-        if(selections=="VBTF")veyh_123456(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_123456.GetErrorYhigh(i),2)+pow(y*Eff_TP_Single1_123456.GetErrorYhigh(i),2));
+        if(selections=="SYM")vy_123456(i)   = y * y;
+        if(selections=="ASYM")vy_123456(i)   = y * y1;
+        if(selections=="SYM")veyl_123456(i) = 2 * y * Eff_TP_Single_123456.GetErrorYlow(i);
+        if(selections=="ASYM")veyl_123456(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_123456.GetErrorYlow(i),2)+pow(y*Eff_TP_Single1_123456.GetErrorYlow(i),2));
+        if(selections=="SYM")veyh_123456(i) = 2 * y * Eff_TP_Single_123456.GetErrorYhigh(i);
+        if(selections=="ASYM")veyh_123456(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_123456.GetErrorYhigh(i),2)+pow(y*Eff_TP_Single1_123456.GetErrorYhigh(i),2));
         } 
         
         TGraphAsymmErrors Eff_TP_Double_12(vx_12, vy_12, vexl_12, vexh_12, veyl_12, veyh_12);

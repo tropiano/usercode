@@ -83,7 +83,7 @@ HoverE_PreEiD(0), DeltaEtaIn_PreEiD(0), DeltaPhiIn_PreEiD(0), SigmaIEtaIEta_PreE
 RecoIsoJetPt_123456(0), RecoJetPt_123456(0), recLeadIsoJetPt_123456(0), recLeadIsoJetEta_123456(0), JetCounter_123456(0), 
 IsoJetCounter_1(0), IsoJetCounter_12(0), IsoJetCounter_123(0), IsoJetCounter_1234(0), IsoJetCounter_12345(0), IsoJetCounter_123456(0),
 
-HEnergy_IsoJet_ElType(0), EMEnergy_IsoJet_ElType(0), Jet_EMEnergy(0), Jet_HEnergy(0), MinDeltaR_ZDau(0), AllJetCharge(0), IsoJetCharge(0), NotIsoJetCharge(0), DeltaR_IsoJet(0), DeltaR_NotIsoJet(0), DeltaR_IsoJet_ElType(0),
+MinDeltaR_ZDau(0), AllJetCharge(0), IsoJetCharge(0), NotIsoJetCharge(0), DeltaR_IsoJet(0), DeltaR_NotIsoJet(0), DeltaR_IsoJet_ElType(0),
 
 ChargeMisID_Pt_Acc(0), ChargeMisID_Eta_Acc(0), ChargeMisID_Hit_Acc(0), ChargeMisID_fBrem_Acc(0), ChargeMisID_IP_Acc(0), ChargeMisID_RecoExclJet_Acc(0), ChargeMisID_RecoInclJet_Acc(0),
 
@@ -95,7 +95,7 @@ PixelHit_OC(0), PixelHit_SC(0), FirstPixelBarrelHit_OC(0), FirstPixelBarrelHit_S
 
 DeltaRvsCharge_JetRec(0), DeltaRvsCharge_JetRec_Iso(0), DeltaRvsCharge_JetRec_NotIso(0),
 
-_targetLumi(50.), _xsec(1.), _norm(1.), _dir(0), _charge_dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _Norm(false), _Sumw2(false), _GenParticleMatch(false), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _fileCounter(0), _Acc(1), _Trg(2), _Qual(3), _Imp(4), _Iso(5), _EiD(6), _selections("VBTF"), _JetType("CALO"), _sample("data"), _file(0), _histoVector(), _histoVector2D()
+_targetLumi(50.), _xsec(1.), _norm(1.), _dir(0), _charge_dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _Norm(false), _Sumw2(false), _GenParticleMatch(false), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _fileCounter(0), _Acc(1), _Trg(2), _Conv(3), _Imp(4), _Iso(5), _EiD(6), _selections("ASYM"), _JetType("PF"), _sample("data"), _file(0), _histoVector(), _histoVector2D()
 
 { }
 
@@ -120,7 +120,7 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    //Selections
    _Acc = iConfig.getParameter<int32_t>("Acc");
    _Trg = iConfig.getParameter<int32_t>("Trg");
-   _Qual = iConfig.getParameter<int32_t>("Qual");
+   _Conv = iConfig.getParameter<int32_t>("Conv");
    _Imp = iConfig.getParameter<int32_t>("Imp");
    _Iso = iConfig.getParameter<int32_t>("Iso");
    _EiD = iConfig.getParameter<int32_t>("EiD");
@@ -128,17 +128,17 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    for(int i=0; i<7; i++){
    _RecoCutFlags[i] = "_1";}
    
-   if(_selections=="VPJ"){
-   _RecoCutFlags[_Acc] =  "_AccVPJ";
-   _RecoCutFlags[_Iso] =  "_IsoVPJ";
-   _RecoCutFlags[_EiD] =  "_EiDVPJ";}
-   if(_selections=="VBTF"){
-   _RecoCutFlags[_Acc] =  "_AccVBTF";
-   _RecoCutFlags[_Iso] =  "_IsoVBTF";
-   _RecoCutFlags[_EiD] =  "_EiDVBTF";}
+   if(_selections=="SYM"){
+   _RecoCutFlags[_Acc] =  "_AccSYM";
+   _RecoCutFlags[_Iso] =  "_IsoSYM";
+   _RecoCutFlags[_EiD] =  "_EiDSYM";}
+   if(_selections=="ASYM"){
+   _RecoCutFlags[_Acc] =  "_AccASYM";
+   _RecoCutFlags[_Iso] =  "_IsoASYM";
+   _RecoCutFlags[_EiD] =  "_EiDASYM";}
      
    _RecoCutFlags[_Trg] =  "_Trg";
-   _RecoCutFlags[_Qual] = "_Qual";
+   _RecoCutFlags[_Conv] = "_ConvASYM"; //per il momento è solo asimmetrico
    _RecoCutFlags[_Imp] =  "_Imp";
    
    
@@ -712,14 +712,6 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _histoVector2D.push_back(DeltaRvsCharge_JetRec);
    DeltaRvsCharge_JetRec_NotIso = new TH2D("DeltaRvsCharge_JetRec_NotIso", "Delta R Reco NOT ISO Jets - Reco Z-Electrons", 400, -2, 2, 1000, 0, 6);
    _histoVector2D.push_back(DeltaRvsCharge_JetRec);
-   Jet_HEnergy = new TH1D("Jet_HEnergy", "Hadronic Jet Energy Fraction", 100, -0.5, 1.5);
-   _histoVector.push_back(Jet_HEnergy);
-   Jet_EMEnergy = new TH1D("Jet_EMEnergy", "EM Jet Energy Fraction", 100, -0.5, 1.5);
-   _histoVector.push_back(Jet_EMEnergy);
-   HEnergy_IsoJet_ElType = new TH1D("HEnergy_IsoJet_ElType", "Hadronic Energy Fraction for Iso Jets Electron Type", 100, -0.5, 1.5);
-   _histoVector.push_back(HEnergy_IsoJet_ElType);
-   EMEnergy_IsoJet_ElType = new TH1D("EMEnergy_IsoJet_ElType", "EM Energy Fraction for Iso Jets Electron Type", 100, -0.5, 1.5);
-   _histoVector.push_back(EMEnergy_IsoJet_ElType);  
    MinDeltaR_ZDau = new TH1D("MinDeltaR_ZDau", "Min Delta R Z Daughters All Jets", 100, 0, 10);
    _histoVector.push_back(MinDeltaR_ZDau);
    AllJetCharge = new TH1D("AllJetCharge", "All Jet Charge", 400, -2, 2);
@@ -819,8 +811,8 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
   
   if(_ProcEvents!=-1)_entries = _ProcEvents;
   
-  cout<<"RecoElectron analyzing nr. file = "<<_fileCounter<<endl;
-  cout<<"RecoElectron analyzing nr. event = "<<_entries<<endl;
+  cout << "RecoElectron analyzing nr. file = "<<_fileCounter<<endl;
+  cout << "RecoElectron analyzing nr. event = "<<_entries<<endl;
   
   delete ch; 
    
@@ -829,6 +821,7 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 
 RecoElectron::~RecoElectron(){
   _file->ls();
+  
 }
 
 void  RecoElectron::process(const fwlite::Event& iEvent)
@@ -848,8 +841,8 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
    zrecHandleSC.getByLabel(iEvent, "zeerecSameChargePlus");
   
    fwlite::Handle<std::vector<pat::Jet> > jetrecHandle;
-   if(_JetType=="CALO")jetrecHandle.getByLabel(iEvent, "selectedJets");
-   if(_JetType=="PF")jetrecHandle.getByLabel(iEvent, "selectedPFJets");
+   if(_JetType=="PF")jetrecHandle.getByLabel(iEvent, "selectedJets");
+   if(_JetType=="PFL1CORR")jetrecHandle.getByLabel(iEvent, "selectedJetsL1Corrected");
 
    fwlite::Handle<pat::TriggerEvent> triggerHandle;
    triggerHandle.getByLabel(iEvent, "patTriggerEvent");
@@ -869,31 +862,49 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
    }
    BestMassIndex->Fill(BestMassZNum);
    
-   
-       
    // Isolated Jets selection
    std::vector<const pat::Jet*> recjets = GetJets<pat::Jet>(*jetrecHandle);
    std::vector<const pat::Jet*> isorecjets;
    std::vector<const pat::Jet*> notisorecjets;
+   
+   std::vector<const pat::Electron*> zdaughters;
+   
+   const pat::Electron *dau0 = 0;
+   const pat::Electron *dau1 = 0;  
+   
+    if(zrecHandle->size()){
+   
+    zdaughters = ZRECDaughters((*zrecHandle)[0]);
+  
+     if(zdaughters.size()){
+     
+     dau0 = zdaughters[0];
+     dau1 = zdaughters[1];
+     
+     if(dau1->pt()>dau0->pt())throw cms::Exception("PATAnalysis:RecoElectron_WrongElectronOrder") << "ERROR! Z electrons are in wrong order!";
+    
+     }
+     
+     }
 
-   if(zrecHandle->size()){  
+   if(zdaughters.size()){  
    for(unsigned int i = 0; i < recjets.size(); i++){     
-   if(IsoJet((*zrecHandle)[0],*recjets[i],"RECO"))isorecjets.push_back(recjets[i]);
-   if(!IsoJet((*zrecHandle)[0],*recjets[i],"RECO"))notisorecjets.push_back(recjets[i]);}
+   if(IsoJet<pat::Electron>(zdaughters,*recjets[i]))isorecjets.push_back(recjets[i]);
+   if(!IsoJet<pat::Electron>(zdaughters,*recjets[i]))notisorecjets.push_back(recjets[i]);
    }
- 
+   }
    
    // Same Charge Z study
-   
-   
    
    if(zrecHandleSC->size()){
      
      std::vector<const pat::Electron*> zdaughtersSC = ZRECDaughters((*zrecHandleSC)[0]);
+     
      const pat::Electron *dau0SC = 0;
      const pat::Electron *dau1SC = 0;
      
      if(zdaughtersSC.size()){
+    
      
      dau0SC = zdaughtersSC[0];
      dau1SC = zdaughtersSC[1];
@@ -943,8 +954,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      recSecElfBremSC_12->Fill(dau1SC->fbrem());
     
      }
-     
-     
+   
      //Events with a selected Zee SC - SELECTIONS: 1+2+3
      if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandleSC)[0], *triggerHandle)){
      
@@ -1205,33 +1215,13 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
    
    }
 
-   }  
+   } 
    
-   // End of charge MisID study
-   
-   
+   // End of charge MisID study     
    
    // Z->ee events (OC) study: selections applied
- 
-
-     if(zrecHandle->size()){
-     
-     std::vector<const pat::Electron*> zdaughters = ZRECDaughters((*zrecHandle)[0]);
-     const pat::Electron *dau0 = 0;
-     const pat::Electron *dau1 = 0;
-     
-     if(zdaughters.size()){
-     
-     dau0 = zdaughters[0];
-     dau1 = zdaughters[1];
-     
-     //Pre selections events
-     
-     if(dau1->pt()>dau0->pt())throw cms::Exception("PATAnalysis:RecoElectron_WrongElectronOrder") << "ERROR! Z electrons are in wrong order!";
-    
    
-    
-     }
+   if(zrecHandle->size()){
      
      //Events with a selected Zee - SELECTIONS: 1
      if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle)){
@@ -1255,7 +1245,6 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      IsoJetCounter_1->Fill(isorecjets.size());
       
      }
-     
    
      //Events with a selected Zee - SELECTIONS: 1+2
      if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle)){
@@ -1328,43 +1317,17 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
     
     //Events with a selected Zee - SELECTIONS: 1+2+3+4+5
      if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandle)[0], *triggerHandle)){
-         
-      double CorrLeadElPt = dau0->pt();
-      double CorrSecElPt  = dau1->pt();
-      
-      double ZMass = (*zrecHandle)[0].mass();
-      double ZPt = (*zrecHandle)[0].pt();
-      
-      //Electron energy corrections
-      if(_sample=="data"){
-      if(dau0->eta()<eta_el_excl_down)CorrLeadElPt*=ElEnergyCorr_B;  
-      if(dau1->eta()<eta_el_excl_down)CorrSecElPt*=ElEnergyCorr_B;
-      if(dau0->eta()>eta_el_excl_up)CorrLeadElPt*=ElEnergyCorr_E;
-      if(dau1->eta()>eta_el_excl_up)CorrSecElPt*=ElEnergyCorr_E;
-      }
-      
-      TLorentzVector p4e1, p4e2;
-      
-      //For our electrons Pt = Et
-      p4e1.SetPtEtaPhiM(CorrLeadElPt, dau0->eta(), dau0->phi(),0.0005);
-      p4e2.SetPtEtaPhiM(CorrSecElPt, dau1->eta(), dau1->phi(),0.0005);
- 
-      TLorentzVector Zp4 = p4e1+p4e2;
-        
-      if(_sample=="data"){
-      ZMass = Zp4.M();
-      ZPt   = Zp4.Pt();}
 
       //Z variables     
-      recPtZ_12345->Fill(ZPt);
+      recPtZ_12345->Fill((*zrecHandle)[0].pt());
       recEtaZ_12345->Fill((*zrecHandle)[0].eta());
-      recMassZ_12345->Fill(ZMass);
+      recMassZ_12345->Fill((*zrecHandle)[0].mass());
 
       //Z Electrons variables      
       recLeadElEta_12345->Fill(dau0->eta());
       recSecElEta_12345->Fill(dau1->eta());
-      recLeadElPt_12345->Fill(CorrLeadElPt);
-      recSecElPt_12345->Fill(CorrSecElPt);
+      recLeadElPt_12345->Fill(dau0->pt());
+      recSecElPt_12345->Fill(dau1->pt());
       recLeadElIP_12345->Fill(dau0->dB());
       recSecElIP_12345->Fill(dau1->dB());
       recLeadElfBrem_12345->Fill(dau0->fbrem());
@@ -1413,10 +1376,8 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
       //All jets
       if (recjets.size()){      
       for (unsigned int i = 0; i < recjets.size(); ++i){     
-          if(_JetType=="CALO")Jet_HEnergy->Fill(recjets[i]->energyFractionHadronic());
-          if(_JetType=="CALO")Jet_EMEnergy->Fill(recjets[i]->emEnergyFraction());      
-          MinDeltaR_ZDau->Fill(MinDeltaRZDau((*zrecHandle)[0],*recjets[i],"RECO"));       
-          DeltaRvsCharge_JetRec->Fill(recjets[i]->jetCharge(), MinDeltaRZDau((*zrecHandle)[0],*recjets[i],"RECO"));
+          MinDeltaR_ZDau->Fill(MinDeltaRZDau<pat::Electron>(zdaughters,*recjets[i]));       
+          DeltaRvsCharge_JetRec->Fill(recjets[i]->jetCharge(), MinDeltaRZDau<pat::Electron>(zdaughters,*recjets[i]));
           AllJetCharge->Fill(recjets[i]->jetCharge());                   
       }     
       }  
@@ -1424,15 +1385,13 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
       //Isolated jets    
       if(isorecjets.size()){      
       for (unsigned int i = 0; i < isorecjets.size(); ++i){      
-        DeltaRvsCharge_JetRec_Iso->Fill(isorecjets[i]->jetCharge(), MinDeltaRZDau((*zrecHandle)[0],*isorecjets[i],"RECO"));
+        DeltaRvsCharge_JetRec_Iso->Fill(isorecjets[i]->jetCharge(), MinDeltaRZDau<pat::Electron>(zdaughters,*isorecjets[i]));
         IsoJetCharge->Fill(isorecjets[i]->jetCharge());  
-        DeltaR_IsoJet->Fill(MinDeltaRZDau((*zrecHandle)[0],*isorecjets[i],"RECO"));
+        DeltaR_IsoJet->Fill(MinDeltaRZDau<pat::Electron>(zdaughters,*isorecjets[i]));
       
         //Iso Jets electron-type
-        if(isorecjets[i]->jetCharge() < -0.98 || isorecjets[i]->jetCharge() > 0.98){        
-          if(_JetType=="CALO")HEnergy_IsoJet_ElType->Fill(isorecjets[i]->energyFractionHadronic());
-          if(_JetType=="CALO")EMEnergy_IsoJet_ElType->Fill(isorecjets[i]->emEnergyFraction());    
-          DeltaR_IsoJet_ElType->Fill(MinDeltaRZDau((*zrecHandle)[0],*isorecjets[i],"RECO"));          
+        if(isorecjets[i]->jetCharge() < -0.98 || isorecjets[i]->jetCharge() > 0.98){           
+          DeltaR_IsoJet_ElType->Fill(MinDeltaRZDau<pat::Electron>(zdaughters,*isorecjets[i]));          
           }          
           }     
      }
@@ -1441,11 +1400,10 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      if(notisorecjets.size()){     
       for (unsigned int i = 0; i < notisorecjets.size(); ++i){      
           NotIsoJetCharge->Fill(notisorecjets[i]->jetCharge());        
-          DeltaR_NotIsoJet->Fill(MinDeltaRZDau((*zrecHandle)[0],*notisorecjets[i],"RECO"));
-          DeltaRvsCharge_JetRec_NotIso->Fill(recjets[i]->jetCharge(), MinDeltaRZDau((*zrecHandle)[0],*notisorecjets[i],"RECO"));        
+          DeltaR_NotIsoJet->Fill(MinDeltaRZDau<pat::Electron>(zdaughters,*notisorecjets[i]));
+          DeltaRvsCharge_JetRec_NotIso->Fill(recjets[i]->jetCharge(), MinDeltaRZDau<pat::Electron>(zdaughters,*notisorecjets[i]));        
      }
      }
-   
      
       //Exclusive - Inclusive Histograms
       _Jetdir->cd();
@@ -1494,12 +1452,12 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
    }
    
    string IsoFlag, EiDFlag;
-   if(_selections=="VPJ"){
-   IsoFlag="_IsoVPJ";
-   EiDFlag="_EiDVPJ";}
-   if(_selections=="VBTF"){
-   IsoFlag="_IsoVBTF";
-   EiDFlag="_EiDVBTF";}
+   if(_selections=="SYM"){
+   IsoFlag="_IsoSYM";
+   EiDFlag="_EiDSYM";}
+   if(_selections=="ASYM"){
+   IsoFlag="_IsoASYM";
+   EiDFlag="_EiDASYM";}
  
    for(int fcount = 1; fcount<7; fcount++){
    
@@ -1539,7 +1497,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
    PreEiD = false;
    n = fcount+1;
    }
-   }     
+   } 
    
    if(PreEiD){     
      HoverE_PreEiD->Fill(dau0->hcalOverEcal());
@@ -1565,8 +1523,8 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
       
    }
    }
-   
-}
+
+} 
 
    }
    
@@ -1574,8 +1532,6 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
 
 
 void RecoElectron::finalize(){
-
-cout<<"### finalize"<<endl;
    
    _histoVector.insert(_histoVector.end(), recJetPtVsInclMulti.begin(), recJetPtVsInclMulti.end());
    _histoVector.insert(_histoVector.end(), recJetEtaVsInclMulti.begin(), recJetEtaVsInclMulti.end());
@@ -1653,7 +1609,7 @@ cout<<"### finalize"<<endl;
    Report<<"Normalization factor = "<<_norm<<endl;}
    if(!_Norm || lumi==0)Report<<"Sample not normalized"<<endl;
    Report<<endl<<"Selections Type used = "<<_selections.c_str()<<endl;
-   if(_selections=="VPJ")Report<<"EiD applied = "<<eID_VPJ.c_str()<<endl;
+   if(_selections=="SYM")Report<<"EiD applied = "<<eID_SYM.c_str()<<endl;
    Report<<"Selections applied:"<<endl;
    Report<<_RecoCutFlags[1].c_str()<<endl;
    Report<<_RecoCutFlags[2].c_str()<<endl;
@@ -1665,19 +1621,19 @@ cout<<"### finalize"<<endl;
    
    Report<<"Cut values applied:"<<endl<<endl;
    
-   if(_selections=="VPJ"){
+   if(_selections=="SYM"){
    Report<<"ptelcut = "<<ptelcut<<endl;
    Report<<"etaelcut = "<<etaelcut<<endl;
    Report<<"eta_el_excl_up = "<<eta_el_excl_up<<endl;
    Report<<"eta_el_excl_down = "<<eta_el_excl_down<<endl;
-   Report<<"zmassmin_vpj = "<<zmassmin_vpj<<endl;
-   Report<<"zmassmax_vpj = "<<zmassmax_vpj<<endl;
+   Report<<"zmassmin_sym = "<<zmassmin_sym<<endl;
+   Report<<"zmassmax_sym = "<<zmassmax_sym<<endl;
    Report<<"minnhit = "<<minnhit<<endl;
    Report<<"maxchi2 = "<<maxchi2<<endl;
    Report<<"dxycut = "<<dxycut<<endl;
    Report<<"ptjetmin = "<<ptjetmin<<endl;
    Report<<"etajetmax = "<<etajetmax<<endl;
-   Report<<"isocut = "<<vpj_isocut<<endl;
+   Report<<"isocut = "<<sym_isocut<<endl;
    Report<<"isojetcut = "<<isojetcut<<endl;
    
    static vector<std::string> TrgVector = elTrigger();
@@ -1686,25 +1642,25 @@ cout<<"### finalize"<<endl;
    Report<<"ElectronTrigger = "<<TrgVectorIter->c_str()<<endl;}
    
    Report<<endl<<"JetTrigger = "<<JetTrigger.c_str()<<endl;
-   Report<<"VPJ_TAG_ptelcut = "<<VPJ_TAG_ptelcut<<endl;
-   Report<<"VPJ_TAG_etaelcut = "<<VPJ_TAG_etaelcut<<endl;
-   Report<<"VPJ_TAG_eta_el_excl_up = "<<VPJ_TAG_eta_el_excl_up<<endl;
-   Report<<"VPJ_TAG_eta_el_excl_down = "<<VPJ_TAG_eta_el_excl_down<<endl;
-   Report<<"VPJ_TAG_minnhit = "<<VPJ_TAG_minnhit<<endl;
-   Report<<"VPJ_TAG_maxchi2 = "<<VPJ_TAG_maxchi2<<endl;
-   Report<<"VPJ_TAG_dxycut = "<<VPJ_TAG_dxycut<<endl;
-   Report<<"VPJ_TAG_isocut = "<<VPJ_TAG_isocut<<endl;
-   Report<<"VPJ_TagEiD = "<<VPJ_TagEiD.c_str()<<endl;
+   Report<<"SYM_TAG_ptelcut = "<<SYM_TAG_ptelcut<<endl;
+   Report<<"SYM_TAG_etaelcut = "<<SYM_TAG_etaelcut<<endl;
+   Report<<"SYM_TAG_eta_el_excl_up = "<<SYM_TAG_eta_el_excl_up<<endl;
+   Report<<"SYM_TAG_eta_el_excl_down = "<<SYM_TAG_eta_el_excl_down<<endl;
+   Report<<"SYM_TAG_minnhit = "<<SYM_TAG_minnhit<<endl;
+   Report<<"SYM_TAG_maxchi2 = "<<SYM_TAG_maxchi2<<endl;
+   Report<<"SYM_TAG_dxycut = "<<SYM_TAG_dxycut<<endl;
+   Report<<"SYM_TAG_isocut = "<<SYM_TAG_isocut<<endl;
+   Report<<"SYM_TagEiD = "<<SYM_TagEiD.c_str()<<endl;
    }
    
-   if(_selections=="VBTF"){
+   if(_selections=="ASYM"){
    Report<<"ptelcut0 = "<<ptelcut0<<endl;
    Report<<"ptelcut1 = "<<ptelcut1<<endl;
    Report<<"etaelcut = "<<etaelcut<<endl;
    Report<<"eta_el_excl_up = "<<eta_el_excl_up<<endl;
    Report<<"eta_el_excl_down = "<<eta_el_excl_down<<endl;
-   Report<<"zmassmin_vbtf = "<<zmassmin_vbtf<<endl;
-   Report<<"zmassmax_vbtf = "<<zmassmax_vbtf<<endl<<endl;
+   Report<<"zmassmin_asym = "<<zmassmin_asym<<endl;
+   Report<<"zmassmax_asym = "<<zmassmax_asym<<endl<<endl;
    Report<<"minnhit = "<<minnhit<<endl;
    Report<<"maxchi2 = "<<maxchi2<<endl<<endl;
    Report<<"dxycut = "<<dxycut<<endl<<endl;
@@ -1718,28 +1674,25 @@ cout<<"### finalize"<<endl;
    Report<<"ElectronTrigger = "<<TrgVectorIter->c_str()<<endl;}
    
    Report<<endl<<"JetTrigger = "<<JetTrigger.c_str()<<endl<<endl;
-   Report<<"Dau0_CombIso_EB = "<<Dau0_CombIso_EB<<endl;   Report<<"Dau0_sihih_EB = "<<Dau0_sihih_EB<<endl;   Report<<"Dau0_Dphi_vtx_EB = "<<Dau0_Dphi_vtx_EB<<endl;   Report<<"Dau0_Deta_vtx_EB = "<<Dau0_Deta_vtx_EB<<endl;   Report<<"Dau0_HovE_EB = "<<Dau0_HovE_EB<<endl;
-   Report<<"Dau0_CombIso_EE = "<<Dau0_CombIso_EE<<endl;   Report<<"Dau0_sihih_EE = "<<Dau0_sihih_EE<<endl;   Report<<"Dau0_Dphi_vtx_EE = "<<Dau0_Dphi_vtx_EE<<endl;   Report<<"Dau0_Deta_vtx_EE = "<<Dau0_Deta_vtx_EE<<endl;   Report<<"Dau0_HovE_EE = "<<Dau0_HovE_EE<<endl<<endl;
-   Report<<"Dau1_CombIso_EB = "<<Dau1_CombIso_EB<<endl;   Report<<"Dau1_sihih_EB = "<<Dau1_sihih_EB<<endl;   Report<<"Dau1_Dphi_vtx_EB = "<<Dau1_Dphi_vtx_EB<<endl;   Report<<"Dau1_Deta_vtx_EB = "<<Dau1_Deta_vtx_EB<<endl;   Report<<"Dau1_HovE_EB = "<<Dau1_HovE_EB<<endl;
-   Report<<"Dau1_CombIso_EE = "<<Dau1_CombIso_EE<<endl;   Report<<"Dau1_sihih_EE = "<<Dau1_sihih_EE<<endl;   Report<<"Dau1_Dphi_vtx_EE = "<<Dau1_Dphi_vtx_EE<<endl;   Report<<"Dau1_Deta_vtx_EE = "<<Dau1_Deta_vtx_EE<<endl;   Report<<"Dau1_HovE_EE = "<<Dau1_HovE_EE<<endl<<endl;
-   Report<<"VBTF0_TAG_ptelcut = "<<VBTF0_TAG_ptelcut<<endl;
-   Report<<"VBTF0_TAG_etaelcut = "<<VBTF0_TAG_etaelcut<<endl;
-   Report<<"VBTF0_TAG_eta_el_excl_up = "<<VBTF0_TAG_eta_el_excl_up<<endl;
-   Report<<"VBTF0_TAG_eta_el_excl_down = "<<VBTF0_TAG_eta_el_excl_down<<endl;
-   Report<<"VBTF0_TAG_minnhit = "<<VBTF0_TAG_minnhit<<endl;
-   Report<<"VBTF0_TAG_maxchi2 = "<<VBTF0_TAG_maxchi2<<endl;
-   Report<<"VBTF0_TAG_dxycut = "<<VBTF0_TAG_dxycut<<endl;
-   Report<<"VBTF0_TAG_isocut = "<<VBTF0_TAG_isocut<<endl;
-   Report<<"VBTF0_TagEiD = "<<VBTF0_TagEiD.c_str()<<endl<<endl;
-   Report<<"VBTF1_TAG_ptelcut = "<<VBTF1_TAG_ptelcut<<endl;
-   Report<<"VBTF1_TAG_etaelcut = "<<VBTF1_TAG_etaelcut<<endl;
-   Report<<"VBTF1_TAG_eta_el_excl_up = "<<VBTF1_TAG_eta_el_excl_up<<endl;
-   Report<<"VBTF1_TAG_eta_el_excl_down = "<<VBTF1_TAG_eta_el_excl_down<<endl;
-   Report<<"VBTF1_TAG_minnhit = "<<VBTF1_TAG_minnhit<<endl;
-   Report<<"VBTF1_TAG_maxchi2 = "<<VBTF1_TAG_maxchi2<<endl;
-   Report<<"VBTF1_TAG_dxycut = "<<VBTF1_TAG_dxycut<<endl;
-   Report<<"VBTF1_TAG_isocut = "<<VBTF1_TAG_isocut<<endl; 
-   Report<<"VBTF1_TagEiD = "<<VBTF1_TagEiD.c_str()<<endl;
+   
+   Report<<"ASYM0_TAG_ptelcut = "<<ASYM0_TAG_ptelcut<<endl;
+   Report<<"ASYM0_TAG_etaelcut = "<<ASYM0_TAG_etaelcut<<endl;
+   Report<<"ASYM0_TAG_eta_el_excl_up = "<<ASYM0_TAG_eta_el_excl_up<<endl;
+   Report<<"ASYM0_TAG_eta_el_excl_down = "<<ASYM0_TAG_eta_el_excl_down<<endl;
+   Report<<"ASYM0_TAG_minnhit = "<<ASYM0_TAG_minnhit<<endl;
+   Report<<"ASYM0_TAG_maxchi2 = "<<ASYM0_TAG_maxchi2<<endl;
+   Report<<"ASYM0_TAG_dxycut = "<<ASYM0_TAG_dxycut<<endl;
+   Report<<"ASYM0_TAG_isocut = "<<ASYM0_TAG_isocut<<endl;
+   Report<<"ASYM0_TagEiD = "<<ASYM0_TagEiD.c_str()<<endl<<endl;
+   Report<<"ASYM1_TAG_ptelcut = "<<ASYM1_TAG_ptelcut<<endl;
+   Report<<"ASYM1_TAG_etaelcut = "<<ASYM1_TAG_etaelcut<<endl;
+   Report<<"ASYM1_TAG_eta_el_excl_up = "<<ASYM1_TAG_eta_el_excl_up<<endl;
+   Report<<"ASYM1_TAG_eta_el_excl_down = "<<ASYM1_TAG_eta_el_excl_down<<endl;
+   Report<<"ASYM1_TAG_minnhit = "<<ASYM1_TAG_minnhit<<endl;
+   Report<<"ASYM1_TAG_maxchi2 = "<<ASYM1_TAG_maxchi2<<endl;
+   Report<<"ASYM1_TAG_dxycut = "<<ASYM1_TAG_dxycut<<endl;
+   Report<<"ASYM1_TAG_isocut = "<<ASYM1_TAG_isocut<<endl; 
+   Report<<"ASYM1_TagEiD = "<<ASYM1_TagEiD.c_str()<<endl;
    }
    
    Report.close();

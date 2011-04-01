@@ -76,7 +76,7 @@ public :
    
    TH1D *RecoIsoJetPt_123456, *RecoJetPt_123456, *recLeadIsoJetPt_123456, *recLeadIsoJetEta_123456, *JetCounter_123456, *IsoJetCounter_1, *IsoJetCounter_12, *IsoJetCounter_123, *IsoJetCounter_1234, *IsoJetCounter_12345, *IsoJetCounter_123456;
    
-   TH1D *HEnergy_IsoJet_ElType, *EMEnergy_IsoJet_ElType, *Jet_EMEnergy, *Jet_HEnergy, *MinDeltaR_ZDau, *AllJetCharge, *IsoJetCharge, *NotIsoJetCharge, *DeltaR_IsoJet, *DeltaR_NotIsoJet, *DeltaR_IsoJet_ElType;
+   TH1D *MinDeltaR_ZDau, *AllJetCharge, *IsoJetCharge, *NotIsoJetCharge, *DeltaR_IsoJet, *DeltaR_NotIsoJet, *DeltaR_IsoJet_ElType;
    
    TH1D *ChargeMisID_Pt_Acc, *ChargeMisID_Eta_Acc, *ChargeMisID_Hit_Acc, *ChargeMisID_fBrem_Acc, *ChargeMisID_IP_Acc, *ChargeMisID_RecoExclJet_Acc, *ChargeMisID_RecoInclJet_Acc;
    
@@ -143,7 +143,7 @@ private:
   
   bool _GenParticleMatch;
   
-  int _entries, _EventsPerFile, _EventNumber, _ProcEvents, _fileCounter, _Acc, _Trg, _Qual, _Imp, _Iso, _EiD;
+  int _entries, _EventsPerFile, _EventNumber, _ProcEvents, _fileCounter, _Acc, _Trg, _Conv, _Imp, _Iso, _EiD;
   
   std::string _selections, _JetType, _ReportName, _sample;
 

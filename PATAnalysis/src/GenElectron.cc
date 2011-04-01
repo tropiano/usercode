@@ -42,7 +42,7 @@ genLeadElPt_Acc(0), genSecElPt_Acc(0), genLeadElEta_Acc(0), genSecElEta_Acc(0),
 
 JetMinDeltaRZDau_GEN(0),
 
-_ptjetmin(30.), _etajetmax(3.), _norm(1.), _Norm(false), _Sumw2(false), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _file(0), _dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _selections("VBTF"), _histovector()
+_ptjetmin(30.), _etajetmax(3.), _norm(1.), _Norm(false), _Sumw2(false), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _file(0), _dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _selections("ASYM"), _histovector()
 {   }
 
 void GenElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
@@ -193,7 +193,7 @@ void  GenElectron::process(const fwlite::Event& iEvent)
    std::vector<const reco::GenJet*> isogenjets;
  
    for(unsigned int i = 0; i < genjets.size(); i++){
-   if(IsoJet((*zgenHandle)[0],*genjets[i], "GEN"))isogenjets.push_back(genjets[i]);}
+   if(IsoJet<reco::Candidate>(zdaughters,*genjets[i]))isogenjets.push_back(genjets[i]);}
      
    //Events with a selected GEN Zee - NO Acceptance cuts applied
    if(GenSelected((*zgenHandle)[0], _selections)&&zdaughters.size()!=0){
@@ -248,7 +248,7 @@ void  GenElectron::process(const fwlite::Event& iEvent)
       
       for(unsigned int i = 0; i < genjets.size(); i++){
       GenJetPt_Acc->Fill(genjets[i]->pt());
-      JetMinDeltaRZDau_GEN->Fill(MinDeltaRZDau((*zgenHandle)[0],*genjets[i], "GEN"));
+      JetMinDeltaRZDau_GEN->Fill(MinDeltaRZDau<reco::Candidate>(zdaughters,*genjets[i]));
       }
       
       for(unsigned int i = 0; i < isogenjets.size(); i++){

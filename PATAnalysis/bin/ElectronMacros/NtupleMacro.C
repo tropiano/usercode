@@ -27,7 +27,7 @@
 
 using namespace std;
 
-//Selections: "VPJ" = V+jets selections (old); "VBTF" = Vector Boson Task Force (new)
+//Selections: "SYM" = V+jets selections (old); "ASYM" = Vector Boson Task Force (new)
 
 void Ntuple_Plots(){
 

@@ -25,7 +25,7 @@
 
 using namespace std;
 
-//Selections: "VPJ" = V+jets selections (old); "VBTF" = Vector Boson Task Force (new)
+//Selections: "SYM" = V+jets selections (old); "ASYM" = Vector Boson Task Force (new)
 
 void recZ_Plots(string selections){
 
@@ -136,7 +136,7 @@ string Tab_cut = "True";
 	//Selections
 	int _Acc  = 1;
 	int _Trg  = 2;
-	int _Qual = 0;
+	int _Conv = 0;
 	int _Imp  = 3;
 	int _Iso  = 4;
 	int _EiD  = 5;
@@ -148,17 +148,17 @@ string Tab_cut = "True";
 	for(int i=0; i<7; i++){
        _RecoCutFlags[i] = "_1";}
    
-       if(selections=="VPJ"){
-       _RecoCutFlags[_Acc] =  "_AccVPJ";
-       _RecoCutFlags[_Iso] =  "_IsoVPJ";
-       _RecoCutFlags[_EiD] =  "_EiDVPJ";}
-       if(selections=="VBTF"){
-       _RecoCutFlags[_Acc] =  "_AccVBTF";
-       _RecoCutFlags[_Iso] =  "_IsoVBTF";
-       _RecoCutFlags[_EiD] =  "_EiDVBTF";}
+       if(selections=="SYM"){
+       _RecoCutFlags[_Acc] =  "_AccSYM";
+       _RecoCutFlags[_Iso] =  "_IsoSYM";
+       _RecoCutFlags[_EiD] =  "_EiDSYM";}
+       if(selections=="ASYM"){
+       _RecoCutFlags[_Acc] =  "_AccASYM";
+       _RecoCutFlags[_Iso] =  "_IsoASYM";
+       _RecoCutFlags[_EiD] =  "_EiDASYM";}
      
        _RecoCutFlags[_Trg] =  "_Trg";
-       _RecoCutFlags[_Qual] = "_Qual";
+       _RecoCutFlags[_Conv] = "_ConvASYM";
        _RecoCutFlags[_Imp] =  "_Imp";
 
         

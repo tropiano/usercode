@@ -52,7 +52,7 @@ private:
   
   TFile* _file;
   
-  int _Acc, _Trg, _Qual, _Imp, _Iso, _EiD;
+  int _Acc, _Trg, _Conv, _Imp, _Iso, _EiD;
   
   std::vector<TH1D*> _histoVector;
   

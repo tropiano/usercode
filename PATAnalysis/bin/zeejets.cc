@@ -38,20 +38,7 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
-  //List of Source Files
-  
-  string Data = "SourceFiles/ZeeCollisionsSep11.txt";  
-  string Zpj = "SourceFiles/Zpj_Madgraph_ALL.txt";
-  string Wpj = "SourceFiles/WJets_Madgraph_ALL.txt";
-  string tt = "SourceFiles/TTbar_Madgraph_ALL.txt";
-  string bce_2030 = "SourceFiles/QCD_BCE_Pt20to30.txt";
-  string bce_3080 = "SourceFiles/QCD_BCE_Pt30to80.txt";
-  string bce_80170 = "SourceFiles/QCD_BCE_Pt80to170.txt";
-  string em_2030 = "SourceFiles/QCD_EMEnriched_Pt20to30.txt";
-  string em_3080 = "SourceFiles/QCD_EMEnriched_Pt30to80.txt";
-  string em_80170 = "SourceFiles/QCD_EMEnriched_Pt80to170.txt";
-  
-  int PreDefName, ProcEvents;
+int PreDefName, ProcEvents;
   string sourceList, sample, outNameSuf;
 
   if (argc<3) {
@@ -63,24 +50,60 @@ int main(int argc, char *argv[]) {
     
   //Number of events to be processed
   ProcEvents=atoi(argv[2]);
-    
-  //Selections: "VPJ" = V+jets selections (symmetric); "VBTF" = Vector Boson Task Force (a-symmetric)
-  string selections = "VBTF";
+
+  //List of Source Files  
+  string Data = "SourceFiles/ZeeCollisionsSep11.txt";  
+  string Zpj = "SourceFiles/Zpj_Madgraph_ALL.txt";
+  string Wpj = "SourceFiles/WJets_Madgraph_ALL.txt";
+  string tt = "SourceFiles/TTbar_Madgraph_ALL.txt";
+  string bce_2030 = "SourceFiles/QCD_BCE_Pt20to30.txt";
+  string bce_3080 = "SourceFiles/QCD_BCE_Pt30to80.txt";
+  string bce_80170 = "SourceFiles/QCD_BCE_Pt80to170.txt";
+  string em_2030 = "SourceFiles/QCD_EMEnriched_Pt20to30.txt";
+  string em_3080 = "SourceFiles/QCD_EMEnriched_Pt30to80.txt";
+  string em_80170 = "SourceFiles/QCD_EMEnriched_Pt80to170.txt";
   
-  //Jet Type - "CALO": CaloJets, "PF": PFJets
+  //Sample: Data -> "data"; MC-> "mc"
+  sample = "data";
+  
+  //Modules
+  bool GEN = true;
+  bool RECO = true;
+  bool EFF = true;
+  bool NTUPLE = true;
+  
+  //Ntuple - "zcand" = saves only z candidates; "acc" = save only events with Z in the acceptance; "all" = saves all the events  
+  string NtupleFill = "all";
+  
+  //Cuts
+  int Acc = 1;
+  int Trg = 2;
+  int Imp = 3;
+  int Conv = 4;
+  int Iso = 5;
+  int EiD = 6;
+  
+  //Selections: "SYM" = V+jets selections (symmetric); "ASYM" = Vector Boson Task Force (a-symmetric)
+  string selections = "ASYM";
+  
+  //Jet Type - "PF": PFJets, "PFL1CORR": PFJets L1 Corrected
   string JetType = "PF";
   
   //Jet multiplicity for Tag&Probe: "incl" = Inclusive; "excl" = Exclusive
   string TPMult = "incl";
   
   //Normalization
-  string Norm = "True";
+  string Norm = "False";
   string Sumw2= "True";
   double targetLumi = 50.; //pb-1
   if(PreDefName==0) Norm="False";   // Do not normalize for data
-
-  sample = "mc";
   
+  //Gen Particle Matching
+  string GenParticleMatch = "False";
+  
+  //Number of CPUs
+  int CPU = 8;
+
   if(PreDefName==0){
     sourceList = Data.c_str();  
     sample = "data";}
@@ -124,40 +147,17 @@ int main(int argc, char *argv[]) {
   EventsPerFile = 0;
   EventNumber = 0;}
   
-  //Gen Particle Matching
-  string GenParticleMatch = "False";
-  
-  //Ntuple - "zcand" = saves only z candidates; "all" = saves all the events
-  string NtupleFill = "zcand";
-  
-  //Modules
-  bool GEN = true;
-  bool RECO = true;
-  bool EFF = true;
-  bool NTUPLE = true;
-  
-  //Cuts
-  int Acc = 1;
-  int Trg = 2;
-  int Qual = 0;
-  int Imp = 3;
-  int Iso = 4;
-  int EiD = 5;
-  
-  //Number of CPUs
-  int CPU = 8;
-  
   //Log
   bool Log = false;
   
   //Path of PATAnalysis dir - DO NOT FORGET THE SLASH AT THE END OF THE PATH
-  string path="/data/sfrosali/Zjets/Commit/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/";
+  string path="/data/sfrosali/Zjets/Commit/CMSSW_3_8_7/src/Firenze/PATAnalysis/bin/";
   
   if(sample=="data"){
   GenParticleMatch = "False";
   GEN = false;}
 
-  makeCfg(sample, selections, JetType, TPMult, GEN, RECO, EFF, NTUPLE, Acc, Trg, Qual, Imp, Iso, EiD, path.c_str(), sourceList.c_str(), outputName.c_str(), Norm.c_str(), Sumw2.c_str(), EventsPerFile, EventNumber, ProcEvents, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  makeCfg(sample, selections, JetType, TPMult, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), sourceList.c_str(), outputName.c_str(), Norm.c_str(), Sumw2.c_str(), EventsPerFile, EventNumber, ProcEvents, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
 
   gEnv->SetValue("Proof.Sandbox", "/data/sfrosali/.proof");
 

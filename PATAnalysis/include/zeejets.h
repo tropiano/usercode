@@ -172,7 +172,7 @@ TDSet* getDS(const char* filename){
   return out; 
 }
 
-void makeCfg(string sample, string selections, string JetType, string TPMult, bool GEN, bool RECO, bool EFF, bool NTUPLE, int Acc, int Trg, int Qual, int Imp, int Iso, int EiD, const char* path, const char* sourceList, const char *outFile, const char* Norm, const char* Sumw2, int EventsPerFile, int EventNumber, int ProcEvents, double xsec, double targetLumi, const char* GenParticleMatch, string NtupleFill){
+void makeCfg(string sample, string selections, string JetType, string TPMult, bool GEN, bool RECO, bool EFF, bool NTUPLE, int Acc, int Trg, int Conv, int Imp, int Iso, int EiD, const char* path, const char* sourceList, const char *outFile, const char* Norm, const char* Sumw2, int EventsPerFile, int EventNumber, int ProcEvents, double xsec, double targetLumi, const char* GenParticleMatch, string NtupleFill){
 
 //cfg
 string cfgPath = path;
@@ -229,7 +229,7 @@ cfg<<"JetType = cms.string(\""<<JetType.c_str()<<"\"),"<<std::endl;
 cfg<<"ReportName        = cms.string(\""<<RepName.c_str()<<"\"),"<<std::endl;
 cfg<<"Acc = cms.int32("<<Acc<<"),"<<std::endl;
 cfg<<"Trg = cms.int32("<<Trg<<"),"<<std::endl;
-cfg<<"Qual = cms.int32("<<Qual<<"),"<<std::endl;
+cfg<<"Conv = cms.int32("<<Conv<<"),"<<std::endl;
 cfg<<"Imp = cms.int32("<<Imp<<"),"<<std::endl;
 cfg<<"Iso = cms.int32("<<Iso<<"),"<<std::endl;
 cfg<<"EiD = cms.int32("<<EiD<<"),"<<std::endl;
@@ -261,7 +261,7 @@ cfg<<"EventNumber  = cms.int32("<<EventNumber<<"),"<<std::endl;
 cfg<<"ProcEvents  = cms.int32("<<ProcEvents<<"),"<<std::endl;
 cfg<<"Acc = cms.int32("<<Acc<<"),"<<std::endl;
 cfg<<"Trg = cms.int32("<<Trg<<"),"<<std::endl;
-cfg<<"Qual = cms.int32("<<Qual<<"),"<<std::endl;
+cfg<<"Conv = cms.int32("<<Conv<<"),"<<std::endl;
 cfg<<"Imp = cms.int32("<<Imp<<"),"<<std::endl;
 cfg<<"Iso = cms.int32("<<Iso<<"),"<<std::endl;
 cfg<<"EiD = cms.int32("<<EiD<<")"<<std::endl;
@@ -274,11 +274,10 @@ cfg<<"type        = cms.string(\"RecoElectronNtuple\"),"<<std::endl;
 cfg<<"Name        = cms.string(\"RecoElectronNtuple\"),"<<std::endl;
 cfg<<"sourceFileList = cms.string(\""<<Source.c_str()<<"\"),"<<std::endl;
 cfg<<"Selections = cms.string(\""<<selections.c_str()<<"\"),"<<std::endl;
-cfg<<"JetType = cms.string(\""<<JetType.c_str()<<"\"),"<<std::endl;
 cfg<<"Sample = cms.string(\""<<sample.c_str()<<"\"),"<<std::endl;
 cfg<<"Acc = cms.int32("<<Acc<<"),"<<std::endl;
 cfg<<"Trg = cms.int32("<<Trg<<"),"<<std::endl;
-cfg<<"Qual = cms.int32("<<Qual<<"),"<<std::endl;
+cfg<<"Conv = cms.int32("<<Conv<<"),"<<std::endl;
 cfg<<"Imp = cms.int32("<<Imp<<"),"<<std::endl;
 cfg<<"Iso = cms.int32("<<Iso<<"),"<<std::endl;
 cfg<<"EiD = cms.int32("<<EiD<<"),"<<std::endl;
