@@ -306,7 +306,7 @@ bool trigmatch = false;
 static vector<std::string> TrgVector = elTrigger();
 static vector<std::string>::iterator TrgVectorIter;
 for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
-const TriggerObjectStandAloneCollection MatchElectron = Electron.triggerObjectMatchesByPath(TrgVectorIter->c_str());
+const TriggerObjectStandAloneCollection MatchElectron = Electron.triggerObjectMatchesByPath(TrgVectorIter->c_str(), true);
 if(MatchElectron.size()) trigmatch = true;
 }
 return trigmatch;
