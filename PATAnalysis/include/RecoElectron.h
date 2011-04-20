@@ -129,6 +129,8 @@ public :
  
 private:
 
+  int run;
+
   double _targetLumi;
   
   double _xsec;

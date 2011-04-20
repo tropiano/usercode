@@ -9,26 +9,51 @@ selectedElectrons.cut = cms.string("pt > 10. & abs(eta) < 3.")
 
 
 #Z candidate combiner
-zeerec = cms.EDFilter('CandViewShallowCloneCombiner',
+# zeerec = cms.EDFilter('CandViewShallowCloneCombiner',
+#  decay = cms.string('selectedElectrons@+ selectedElectrons@-'),
+#  cut   = cms.string('50 < mass < 130'),
+#  name  = cms.string('Zeerec'),
+#  roles = cms.vstring('e1', 'e2')
+#)
+#zeerecSameChargePlus = cms.EDFilter('CandViewShallowCloneCombiner',
+#  decay = cms.string('selectedElectrons@+ selectedElectrons@+'),
+#  cut   = cms.string('50 < mass < 130'),
+#  name  = cms.string('Zeerec_samechargeplus'),
+#  roles = cms.vstring('e1', 'e2')
+#)
+
+#zeerecSameChargeMinus = cms.EDFilter('CandViewShallowCloneCombiner',
+#  decay = cms.string('selectedElectrons@- selectedElectrons@-'),
+#  cut   = cms.string('50 < mass < 130'),
+#  name  = cms.string('Zeerec_samechargeminus'),
+#  roles = cms.vstring('e1', 'e2')
+#)
+
+
+
+
+zeerec = cms.EDProducer('CandViewCombiner',
   decay = cms.string('selectedElectrons@+ selectedElectrons@-'),
   cut   = cms.string('50 < mass < 130'),
   name  = cms.string('Zeerec'),
   roles = cms.vstring('e1', 'e2')
 )
 
-zeerecSameChargePlus = cms.EDFilter('CandViewShallowCloneCombiner',
+
+zeerecSameChargePlus = cms.EDProducer('CandViewCombiner',
   decay = cms.string('selectedElectrons@+ selectedElectrons@+'),
   cut   = cms.string('50 < mass < 130'),
   name  = cms.string('Zeerec_samechargeplus'),
   roles = cms.vstring('e1', 'e2')
 )
 
-zeerecSameChargeMinus = cms.EDFilter('CandViewShallowCloneCombiner',
+zeerecSameChargeMinus = cms.EDProducer('CandViewCombiner',
   decay = cms.string('selectedElectrons@- selectedElectrons@-'),
   cut   = cms.string('50 < mass < 130'),
   name  = cms.string('Zeerec_samechargeminus'),
   roles = cms.vstring('e1', 'e2')
 )
+
 
 zeerecSequence = cms.Sequence(selectedElectrons * (zeerec + zeerecSameChargePlus + zeerecSameChargeMinus))
 

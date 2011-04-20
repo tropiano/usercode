@@ -679,6 +679,8 @@ EfficiencyElectron::~EfficiencyElectron(){
 void  EfficiencyElectron::process(const fwlite::Event& iEvent){
 
    _file->cd();
+   
+   run = iEvent.id().run();
 
    fwlite::Handle<std::vector<reco::CompositeCandidate> > zrecHandle;
    zrecHandle.getByLabel(iEvent, "zeerec");
@@ -807,7 +809,7 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
      if(zrecHandle->size()){
      
      //Events with a selected Zee 1
-     if (GenSelectedInAcceptance((*zgenHandle)[0], _selections)&&RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle)){
+     if (GenSelectedInAcceptance((*zgenHandle)[0], _selections)&&RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
      
      //Eff vs Z variables
      genMassZEff_1->Fill((*zgenHandle)[0].mass());
@@ -829,7 +831,7 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
      }
      
      //Events with a selected Zee 1+2
-     if (GenSelectedInAcceptance((*zgenHandle)[0], _selections)&&RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle)){
+     if (GenSelectedInAcceptance((*zgenHandle)[0], _selections)&&RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
      
      //Eff vs Z variables
      genMassZEff_12->Fill((*zgenHandle)[0].mass());
@@ -851,7 +853,7 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
      }
      
      //Events with a selected Zee 1+2+3
-     if (GenSelectedInAcceptance((*zgenHandle)[0], _selections)&&RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle)[0], *triggerHandle)){
+     if (GenSelectedInAcceptance((*zgenHandle)[0], _selections)&&RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
      
      //Eff vs Z variables
      genMassZEff_123->Fill((*zgenHandle)[0].mass());
@@ -873,7 +875,7 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
      }
      
      //Events with a selected Zee 1+2+3+4
-     if (GenSelectedInAcceptance((*zgenHandle)[0], _selections)&&RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandle)[0], *triggerHandle)){
+     if (GenSelectedInAcceptance((*zgenHandle)[0], _selections)&&RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
      
      //Eff vs Z variables
      genMassZEff_1234->Fill((*zgenHandle)[0].mass());
@@ -895,7 +897,7 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
      }
      
      //Events with a selected Zee 1+2+3+4+5
-     if (GenSelectedInAcceptance((*zgenHandle)[0], _selections)&&RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandle)[0], *triggerHandle)){
+     if (GenSelectedInAcceptance((*zgenHandle)[0], _selections)&&RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandle)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
       
       //Eff vs Z variables
       genMassZEff_12345->Fill((*zgenHandle)[0].mass());
@@ -917,7 +919,7 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
 }
 
 //Events with a selected Zee 1+2+3+4+5+6
-     if (GenSelectedInAcceptance((*zgenHandle)[0], _selections)&&RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[6].c_str(), (*zrecHandle)[0], *triggerHandle)){
+     if (GenSelectedInAcceptance((*zgenHandle)[0], _selections)&&RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandle)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandle)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[6].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
       
       //Eff vs Z variables
       genMassZEff_123456->Fill((*zgenHandle)[0].mass());

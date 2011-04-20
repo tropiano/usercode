@@ -90,7 +90,7 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    zeetree->Branch("TrgBit",&TrgBit,"TrgBit/I");
    zeetree->Branch("OneElTrgMatch",&OneElTrgMatch,"OneElTrgMatch/I");
    
-   static vector<std::string> elTriggers = elTrigger();
+   static map<std::string, std::pair<int, int> > elTriggers = elTrigger();
    
    if(elTriggers.size()>10)throw cms::Exception("PATAnalysis:RecoElectronNtuple_TooManyTriggers") << "ERROR! Too Many Triggers! Modify elTrigVector size!";
    
@@ -99,9 +99,9 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    
    if(elTriggers.size()<10){
    int i = 0;
-   static vector<std::string>::iterator TrgVectorIter;
+   static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;
    for(TrgVectorIter = elTriggers.begin(); TrgVectorIter != elTriggers.end(); TrgVectorIter++){
-   _elTrigVector[i] = TrgVectorIter->c_str();
+   _elTrigVector[i] = TrgVectorIter->first.c_str();
    i++;
    }
    }
@@ -661,11 +661,11 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    if(isTriggerAvailable(*triggerHandle, _elTrigVector[8].c_str()))elTrg9=1;
    if(isTriggerAvailable(*triggerHandle, _elTrigVector[9].c_str()))elTrg10=1;
    
-   if(isElTriggerAvailable(*triggerHandle)){
+   if(isElTriggerAvailable(*triggerHandle, run)){
    TrgBit=0;
-   if(isElectronTriggered(*triggerHandle)){
+   if(isElectronTriggered(*triggerHandle, run)){
    TrgBit=1;
-   if(RecSelected_TrgMatch(*recdau0)||RecSelected_TrgMatch(*recdau1)){
+   if(RecSelected_TrgMatch(*recdau0, run)||RecSelected_TrgMatch(*recdau1, run)){
    OneElTrgMatch=1;
    }
    }
@@ -673,17 +673,17 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    
    //Cut flags
    
-   if (RecSelected("_AccSYM", (*zrecHandle)[0], *triggerHandle))cutAccSYM=1;
-   if (RecSelected("_AccASYM", (*zrecHandle)[0], *triggerHandle))cutAccASYM=1;
-   if (RecSelected("_Trg", (*zrecHandle)[0], *triggerHandle))cutTrg=1;
-   if (RecSelected("_Imp", (*zrecHandle)[0], *triggerHandle))cutImp=1;
-   if (RecSelected("_ConvASYM", (*zrecHandle)[0], *triggerHandle))cutConvASYM=1;
-   if (RecSelected("_IsoSYM", (*zrecHandle)[0], *triggerHandle))cutIsoSYM=1;
-   if (RecSelected("_IsoASYM", (*zrecHandle)[0], *triggerHandle))cutIsoASYM=1;
-   if (RecSelected("_EiDSYM", (*zrecHandle)[0], *triggerHandle))cutEiDSYM=1;
-   if (RecSelected("_EiDASYM", (*zrecHandle)[0], *triggerHandle))cutEiDASYM=1;
+   if (RecSelected("_AccSYM", (*zrecHandle)[0], *triggerHandle, run))cutAccSYM=1;
+   if (RecSelected("_AccASYM", (*zrecHandle)[0], *triggerHandle, run))cutAccASYM=1;
+   if (RecSelected("_Trg", (*zrecHandle)[0], *triggerHandle, run))cutTrg=1;
+   if (RecSelected("_Imp", (*zrecHandle)[0], *triggerHandle, run))cutImp=1;
+   if (RecSelected("_ConvASYM", (*zrecHandle)[0], *triggerHandle, run))cutConvASYM=1;
+   if (RecSelected("_IsoSYM", (*zrecHandle)[0], *triggerHandle, run))cutIsoSYM=1;
+   if (RecSelected("_IsoASYM", (*zrecHandle)[0], *triggerHandle, run))cutIsoASYM=1;
+   if (RecSelected("_EiDSYM", (*zrecHandle)[0], *triggerHandle, run))cutEiDSYM=1;
+   if (RecSelected("_EiDASYM", (*zrecHandle)[0], *triggerHandle, run))cutEiDASYM=1;
    
-   if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle)){
+   if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
    
       const reco::GsfTrackRef& track0 = recdau0->gsfTrack();
       const reco::GsfTrackRef& track1 = recdau1->gsfTrack();
@@ -856,7 +856,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
 
    //stricter cuts
       
-      if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandle)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[6].c_str(), (*zrecHandle)[0], *triggerHandle)){
+      if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandle)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandle)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[6].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
   
       zmass_AllCuts=(*zrecHandle)[0].mass();
       

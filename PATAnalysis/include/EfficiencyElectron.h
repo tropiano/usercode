@@ -80,7 +80,7 @@ private:
   TagAndProbeFiller* _TagProbe_Electron1_12345;
   TagAndProbeFiller* _TagProbe_Electron1_123456;
   
-  int _nbin;
+  int run, _nbin;
   
   double _xmin;
 

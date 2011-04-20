@@ -826,7 +826,8 @@ RecoElectron::~RecoElectron(){
 
 void  RecoElectron::process(const fwlite::Event& iEvent)
 {
-
+   
+   run = iEvent.id().run();
 
    double weight = 1.;
    _file->cd();
@@ -916,7 +917,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      }
    
      //Events with a selected Zee SC - SELECTIONS: 1
-     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandleSC)[0], *triggerHandle)){
+     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)){
      
      //Z variables
      recPtZSC_1->Fill((*zrecHandleSC)[0].pt());
@@ -936,7 +937,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      }
      
      //Events with a selected Zee SC - SELECTIONS: 1+2
-     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandleSC)[0], *triggerHandle)){
+     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)){
      
      //Z variables
      recPtZSC_12->Fill((*zrecHandleSC)[0].pt());
@@ -956,7 +957,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      }
    
      //Events with a selected Zee SC - SELECTIONS: 1+2+3
-     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandleSC)[0], *triggerHandle)){
+     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)){
      
      //Z variables
      recPtZSC_123->Fill((*zrecHandleSC)[0].pt());
@@ -976,7 +977,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      }
    
      //Events with a selected Zee SC - SELECTIONS: 1+2+3+4
-     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandleSC)[0], *triggerHandle)){
+     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)){
      
      //Z variables
      recPtZSC_1234->Fill((*zrecHandleSC)[0].pt());
@@ -997,7 +998,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      }
      
      //Events with a selected Zee SC - SELECTIONS: 1+2+3+4+5
-     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandleSC)[0], *triggerHandle)){
+     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)){
      
      //Z variables
      recPtZSC_12345->Fill((*zrecHandleSC)[0].pt());
@@ -1017,7 +1018,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      }
      
      //Events with a selected Zee SC - SELECTIONS: 1+2+3+4+5+6
-     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandleSC)[0], *triggerHandle)&&RecSelected(_RecoCutFlags[6].c_str(), (*zrecHandleSC)[0], *triggerHandle)){
+     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[6].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)){
      
      //Z variables
      recPtZSC_123456->Fill((*zrecHandleSC)[0].pt());
@@ -1224,7 +1225,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
    if(zrecHandle->size()){
      
      //Events with a selected Zee - SELECTIONS: 1
-     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle)){
+     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
      
      //Z variables
      recPtZ_1->Fill((*zrecHandle)[0].pt());
@@ -1247,7 +1248,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      }
    
      //Events with a selected Zee - SELECTIONS: 1+2
-     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle)){
+     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
     
      //Z variables
      recPtZ_12->Fill((*zrecHandle)[0].pt());
@@ -1270,7 +1271,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      }
      
      //Events with a selected Zee - SELECTIONS: 1+2+3
-     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle)[0], *triggerHandle)){
+     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
     
      //Z variables
      recPtZ_123->Fill((*zrecHandle)[0].pt());
@@ -1293,7 +1294,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      }
     
      //Events with a selected Zee - SELECTIONS: 1+2+3+4
-     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandle)[0], *triggerHandle)){
+     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
      
      //Z variables
      recPtZ_1234->Fill((*zrecHandle)[0].pt());
@@ -1316,7 +1317,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
     }
     
     //Events with a selected Zee - SELECTIONS: 1+2+3+4+5
-     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandle)[0], *triggerHandle)){
+     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
 
       //Z variables     
       recPtZ_12345->Fill((*zrecHandle)[0].pt());
@@ -1339,7 +1340,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
       }
   
      //Events with a selected Zee - SELECTIONS: 1+2+3+4+5+6
-     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandle)[0], *triggerHandle) && RecSelected(_RecoCutFlags[6].c_str(), (*zrecHandle)[0], *triggerHandle)){
+     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[6].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
      
       //Z variables     
       recPtZ_123456->Fill((*zrecHandle)[0].pt());
@@ -1465,7 +1466,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
    if(_RecoCutFlags[fcount+1] == IsoFlag.c_str()){   
    bool PreIso = false;
    for(int n = 1; n < fcount+1; n++){
-   if(RecSelected(_RecoCutFlags[n].c_str(), (*zrecHandle)[0], *triggerHandle)){
+   if(RecSelected(_RecoCutFlags[n].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
    PreIso = true;
    }else{
    PreIso = false;
@@ -1491,7 +1492,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
    if(_RecoCutFlags[fcount+1] == EiDFlag.c_str()){   
    bool PreEiD = false;
    for(int n = 1; n < fcount+1; n++){
-   if(RecSelected(_RecoCutFlags[n].c_str(), (*zrecHandle)[0], *triggerHandle)){
+   if(RecSelected(_RecoCutFlags[n].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
    PreEiD = true;
    }else{
    PreEiD = false;
@@ -1510,7 +1511,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      SigmaIEtaIEta_PreEiD->Fill(dau1->sigmaIetaIeta());     
      }
      
-   if(PreEiD && RecSelected(_RecoCutFlags[fcount+1].c_str(), (*zrecHandle)[0], *triggerHandle)){
+   if(PreEiD && RecSelected(_RecoCutFlags[fcount+1].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
      HoverE_EiD->Fill(dau0->hcalOverEcal());
      HoverE_EiD->Fill(dau1->hcalOverEcal());
      DeltaEtaIn_EiD->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
@@ -1621,6 +1622,13 @@ void RecoElectron::finalize(){
    
    Report<<"Cut values applied:"<<endl<<endl;
    
+   static map<std::string, std::pair<int, int> > TrgVector = elTrigger();
+   static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;
+   for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
+   Report<<"ElectronTrigger = "<<TrgVectorIter->first.c_str()<<"	Run range = "<<TrgVectorIter->second.first<<" to "<<TrgVectorIter->second.second<<endl;}
+   
+   Report<<endl<<"JetTrigger = "<<JetTrigger.c_str()<<endl;
+   
    if(_selections=="SYM"){
    Report<<"ptelcut = "<<ptelcut<<endl;
    Report<<"etaelcut = "<<etaelcut<<endl;
@@ -1635,13 +1643,7 @@ void RecoElectron::finalize(){
    Report<<"etajetmax = "<<etajetmax<<endl;
    Report<<"isocut = "<<sym_isocut<<endl;
    Report<<"isojetcut = "<<isojetcut<<endl;
-   
-   static vector<std::string> TrgVector = elTrigger();
-   static vector<std::string>::iterator TrgVectorIter;
-   for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
-   Report<<"ElectronTrigger = "<<TrgVectorIter->c_str()<<endl;}
-   
-   Report<<endl<<"JetTrigger = "<<JetTrigger.c_str()<<endl;
+ 
    Report<<"SYM_TAG_ptelcut = "<<SYM_TAG_ptelcut<<endl;
    Report<<"SYM_TAG_etaelcut = "<<SYM_TAG_etaelcut<<endl;
    Report<<"SYM_TAG_eta_el_excl_up = "<<SYM_TAG_eta_el_excl_up<<endl;
@@ -1667,13 +1669,6 @@ void RecoElectron::finalize(){
    Report<<"ptjetmin = "<<ptjetmin<<endl;
    Report<<"etajetmax = "<<etajetmax<<endl<<endl;
    Report<<"isojetcut = "<<isojetcut<<endl<<endl;
-   
-   static vector<std::string> TrgVector = elTrigger();
-   static vector<std::string>::iterator TrgVectorIter;
-   for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
-   Report<<"ElectronTrigger = "<<TrgVectorIter->c_str()<<endl;}
-   
-   Report<<endl<<"JetTrigger = "<<JetTrigger.c_str()<<endl<<endl;
    
    Report<<"ASYM0_TAG_ptelcut = "<<ASYM0_TAG_ptelcut<<endl;
    Report<<"ASYM0_TAG_etaelcut = "<<ASYM0_TAG_etaelcut<<endl;

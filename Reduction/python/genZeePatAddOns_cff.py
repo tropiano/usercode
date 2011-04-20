@@ -2,14 +2,16 @@ import FWCore.ParameterSet.Config as cms
 
 
 ##select gen eons from Z clustering the possible QED final state photon
-genEMinusStatus3 = cms.EDFilter('Status3MotherCombiner',
+# genEMinusStatus3 = cms.EDFilter('Status3MotherCombiner',
+genEMinusStatus3 = cms.EDProducer('Status3MotherCombiner',
   src = cms.InputTag('genParticles'),
   motherId = cms.int32(11),
   requestedStaus3Daughters = cms.vint32(),
   motherCharge = cms.int32(-1)
 )
 
-genEPlusStatus3 = cms.EDFilter('Status3MotherCombiner',
+# genEPlusStatus3 = cms.EDFilter('Status3MotherCombiner',
+genEPlusStatus3 = cms.EDProducer('Status3MotherCombiner',
   src = cms.InputTag('genParticles'),
   motherId = cms.int32(-11),
   requestedStaus3Daughters = cms.vint32(),
@@ -27,7 +29,8 @@ genEPlusStatus3Selector = cms.EDFilter('CandViewSelector',
 )
 
 ##Z ee with QED FS photons
-zeegenfull = cms.EDFilter('CandViewShallowCloneCombiner',
+# zeegenfull = cms.EDFilter('CandViewShallowCloneCombiner',
+zeegenfull = cms.EDProducer('CandViewCombiner',
    decay = cms.string('genEPlusStatus3Selector@+ genEMinusStatus3Selector@-'),
    cut   = cms.string('20 < mass < 10000'),
    name  = cms.string('ZeeGenFull'),
@@ -45,7 +48,8 @@ genEPlusSelector = cms.EDFilter('CandViewSelector',
    cut = cms.string('status == 1 & pdgId == -11 & pt > 0 & abs(eta) < 100.')
 )
 ## Z ee wothout QED FS photons
-zeegen = cms.EDFilter('CandViewShallowCloneCombiner',
+#zeegen = cms.EDFilter('CandViewShallowCloneCombiner',
+zeegen = cms.EDProducer('CandViewCombiner',
    decay = cms.string('genEPlusSelector@+ genEMinusSelector@-'),
    cut   = cms.string('20 < mass < 10000'),
    name  = cms.string('ZeeGen'),

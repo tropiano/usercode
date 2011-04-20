@@ -14,6 +14,7 @@
 #include "PhysicsTools/PatUtils/interface/TriggerHelper.h"
 
 #include <vector>
+#include <map>
 #include <math.h>
 #include <sstream>
 #include <string>
@@ -33,25 +34,46 @@ using namespace TMath;
 ////////////////////////////////// Selection Cuts ////////////////////////////////////////////////
 
 //Electron TRIGGER
-static vector<std::string> elTrigger() {
-static vector<std::string> TrgVector;
 
-TrgVector.push_back("HLT_Ele10_LW_L1R");
-TrgVector.push_back("HLT_Ele15_SW_L1R");
-TrgVector.push_back("HLT_Ele15_SW_CaloEleId_L1R");
-TrgVector.push_back("HLT_Ele17_SW_CaloEleId_L1R");
-TrgVector.push_back("HLT_Ele17_SW_TightEleId_L1R");
-TrgVector.push_back("HLT_Ele17_SW_TighterEleIdIsol_L1R_v2");
-TrgVector.push_back("HLT_Ele17_SW_TighterEleIdIsol_L1R_v3"); 
+//Trigger flags
+static bool elTrgMatchReq = false;
+static bool TrgRange = true;
 
-//TrgVector.push_back("HLT_Ele15_LW_L1R");
-//TrgVector.push_back("HLT_Ele15_SW_EleId_L1R");
+static map<std::string, std::pair<int, int> > elTrigger() {
+
+typedef std::pair<int, int> rrange;
+
+rrange rr1, rr2, rr3, rr4, rr5, rr6, rr7;
+rr1 = make_pair(136033, 139980);
+rr2 = make_pair(140058, 141882);
+rr3 = make_pair(141956, 144114);
+rr4 = make_pair(146428, 147116);
+rr5 = make_pair(147196, 148058);
+rr6 = make_pair(148819, 149064);
+rr7 = make_pair(149181, 149442);
+
+if(TrgRange == false){
+rr1 = make_pair(-1, 999999999);
+rr2 = make_pair(-1, 999999999);
+rr3 = make_pair(-1, 999999999);
+rr4 = make_pair(-1, 999999999);
+rr5 = make_pair(-1, 999999999);
+rr6 = make_pair(-1, 999999999);
+rr7 = make_pair(-1, 999999999);
+}
+
+static map<std::string, rrange > TrgVector;
+
+TrgVector["HLT_Ele10_LW_L1R"] = rr1;
+TrgVector["HLT_Ele15_SW_L1R"] = rr2;
+TrgVector["HLT_Ele15_SW_CaloEleId_L1R"] = rr3;
+TrgVector["HLT_Ele17_SW_CaloEleId_L1R"] = rr4;
+TrgVector["HLT_Ele17_SW_TightEleId_L1R"] = rr5;
+TrgVector["HLT_Ele17_SW_TighterEleIdIsol_L1R_v2"] = rr6;
+TrgVector["HLT_Ele17_SW_TighterEleIdIsol_L1R_v3"] = rr7; 
 
 return TrgVector;
 }
-
-//TrgMatch
-static bool elTrgMatchReq = true;
 
 //Jet TRIGGER
 static string JetTrigger = "HLT_Jet30U";
@@ -129,13 +151,13 @@ inline bool isTriggerAvailable(const pat::TriggerEvent& triggers, std::string tr
   return true;}
 }
 
-inline bool isElTriggerAvailable(const pat::TriggerEvent& triggers){
+inline bool isElTriggerAvailable(const pat::TriggerEvent& triggers, int run){
   bool Triggered = false;
-  static vector<std::string> TrgVector = elTrigger();
-  static vector<std::string>::iterator TrgVectorIter;
+  static map<std::string, std::pair<int, int> > TrgVector = elTrigger();
+  static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;  
   for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
-  const pat::TriggerPath* path = triggers.path(TrgVectorIter->c_str());
-  if(path)Triggered = true;
+  const pat::TriggerPath* path = triggers.path(TrgVectorIter->first.c_str());
+  if(path && (TrgVectorIter->second.first<=run && run<=TrgVectorIter->second.second))Triggered = true;
   }
   return Triggered;
 }
@@ -149,13 +171,24 @@ inline bool isTriggered(const pat::TriggerEvent& triggers, std::string triggerna
   return path->wasAccept();
 }
 
-inline bool isElectronTriggered(const pat::TriggerEvent& triggers){
+inline bool isElectronTriggered(const pat::TriggerEvent& triggers, int run){
   bool Triggered = false;
-  static vector<std::string> TrgVector = elTrigger();
-  static vector<std::string>::iterator TrgVectorIter;
+  static map<std::string, std::pair<int, int> > TrgVector = elTrigger();
+  static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;
   for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
-  if(isTriggered(triggers, TrgVectorIter->c_str()))Triggered = true;}
+  if( isTriggered(triggers, TrgVectorIter->first.c_str()) && (TrgVectorIter->second.first<=run && run<=TrgVectorIter->second.second) )Triggered = true;}
   return Triggered;
+}
+
+inline bool RecSelected_TrgMatch(const pat::Electron& Electron, int run){
+bool trigmatch = false;
+static map<std::string, std::pair<int, int> > TrgVector = elTrigger();
+static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;
+for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
+const TriggerObjectStandAloneCollection MatchElectron = Electron.triggerObjectMatchesByPath(TrgVectorIter->first.c_str(), true);
+if(MatchElectron.size() && (TrgVectorIter->second.first<=run && run<=TrgVectorIter->second.second) ) trigmatch = true;
+}
+return trigmatch;
 }
 
 inline bool isJetTriggered(const pat::TriggerEvent& triggers){
@@ -300,19 +333,8 @@ inline bool GenSelectedInAcceptance(const reco::CompositeCandidate& ZGEN, string
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // REC SELECTION
-
-inline bool RecSelected_TrgMatch(const pat::Electron& Electron){
-bool trigmatch = false;
-static vector<std::string> TrgVector = elTrigger();
-static vector<std::string>::iterator TrgVectorIter;
-for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
-const TriggerObjectStandAloneCollection MatchElectron = Electron.triggerObjectMatchesByPath(TrgVectorIter->c_str(), true);
-if(MatchElectron.size()) trigmatch = true;
-}
-return trigmatch;
-}
   
-inline bool RecSelected(string Flag, const reco::CompositeCandidate& ZREC, const pat::TriggerEvent& triggers){
+inline bool RecSelected(string Flag, const reco::CompositeCandidate& ZREC, const pat::TriggerEvent& triggers, int run){
 
   std::vector<const pat::Electron*> zdaughters = ZRECDaughters(ZREC);
   
@@ -353,9 +375,9 @@ inline bool RecSelected(string Flag, const reco::CompositeCandidate& ZREC, const
   else if(Flag=="_Trg"){
   bool cutTrg = false;
   if(elTrgMatchReq==true){
-  if(isElectronTriggered(triggers)&&(RecSelected_TrgMatch(*dau0)||RecSelected_TrgMatch(*dau1)))cutTrg=true;
+  if(isElectronTriggered(triggers, run)&&(RecSelected_TrgMatch(*dau0, run)||RecSelected_TrgMatch(*dau1, run)))cutTrg=true;
   }else if(elTrgMatchReq==false){
-  if(isElectronTriggered(triggers))cutTrg=true;
+  if(isElectronTriggered(triggers, run))cutTrg=true;
   }
   return cutTrg;
          }
