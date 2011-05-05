@@ -46,7 +46,7 @@ int main(){
   pl->Save("*","/raid/lenzip/CMSSW/test/CMSSW_3_3_6/src/Firenze/PATAnalysis/bin/Log.txt");
 
   TDSet* dsmc = getDS("testproof.txt") ;
-  TNamed* configmc = new TNamed("ConfigFile", "/data/lenzip/RapGap/CMSSW_3_5_6/src/Firenze/PATAnalysis/bin/testproof.py");
+  TNamed* configmc = new TNamed("ConfigFile", "/data/lenzip/RapGap/CMSSW_3_5_6/src/Firenze/PATAnalysis/bin/PythonMuons/testproof.py");
   p->AddInput(configmc);
   p->Process(dsmc, "FWLiteTSelector");
   p->ClearInput();

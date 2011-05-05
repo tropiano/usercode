@@ -21,19 +21,20 @@ using namespace std;
 
 /*
 -1. Unknown
-0.  Data
-1.  ZJets_Madgraph_Spring10
-2.  Zee_Pythia_Spring10
-3.  WJets_Madgraph_Spring10
-4.  Wenu_Pythia_Spring10
-5.  TTbarJets_Madgraph_Spring10
-6.  TTbar_Pythia_Spring10
-7.  QCD_BCtoE_Pythia_Pt20to30_Spring10
-8.  QCD_BCtoE_Pythia_Pt30to80_Spring10
-9.  QCD_BCtoE_Pythia_Pt80to170_Spring10
-10. QCD_EMEnriched_Pythia_Pt20to30_Spring10  (skimmed)
-11. QCD_EMEnriched_Pythia_Pt30to80_Spring10  (skimmed)
-12. QCD_EMEnriched_Pythia_Pt80to170_Spring10 (skimmed)
+0.  Data_RUN2010A (skimmed)
+1.  Data_RUN2010B (skimmed)
+2.  Z_Madgraph
+3.  TT_Pythia (skimmed)
+4.  Wlnu_Madgraph (skimmed)
+5.  WWEE_Pythia (skimmed)
+6.  ZZEE_Pythia (skimmed)
+7.  WZEE_Pythia (skimmed)
+8.  QCD_BCtoE_Pythia_Pt20to30 (skimmed)
+9.  QCD_BCtoE_Pythia_Pt30to80 (skimmed)
+10. QCD_BCtoE_Pythia_Pt80to170 (skimmed)
+11. QCD_EMEnriched_Pythia_Pt20to30  (skimmed)
+12. QCD_EMEnriched_Pythia_Pt30to80  (skimmed)
+13. QCD_EMEnriched_Pythia_Pt80to170 (skimmed)
 */
 
 int main(int argc, char *argv[]) {
@@ -52,20 +53,25 @@ int PreDefName, ProcEvents;
   ProcEvents=atoi(argv[2]);
 
   //List of Source Files  
-  string Data = "SourceFiles/ZeeCollisionsSep11.txt";  
-  string Zpj = "SourceFiles/Zpj_Madgraph_ALL.txt";
-  string Wpj = "SourceFiles/WJets_Madgraph_ALL.txt";
-  string tt = "SourceFiles/TTbar_Madgraph_ALL.txt";
-  //string tt = "SourceFiles/DATAEE_RUN2010A.list";
-  string bce_2030 = "SourceFiles/QCD_BCE_Pt20to30.txt";
-  string bce_3080 = "SourceFiles/QCD_BCE_Pt30to80.txt";
-  string bce_80170 = "SourceFiles/QCD_BCE_Pt80to170.txt";
-  string em_2030 = "SourceFiles/QCD_EMEnriched_Pt20to30.txt";
-  string em_3080 = "SourceFiles/QCD_EMEnriched_Pt30to80.txt";
-  string em_80170 = "SourceFiles/QCD_EMEnriched_Pt80to170.txt";
+ 
+  string Data_RUN2010A = "SourceFilesElectrons/DATAEE_RUN2010A.list";
+  string Data_RUN2010B = "SourceFilesElectrons/DATAEE_RUN2010B.list";
+  string Zpj = "SourceFilesElectrons/MADGRAPHEEPU.list";
+  string TT = "SourceFilesElectrons/TTPYTHIAEE.list"; 
+  string Wlnu = "SourceFilesElectrons/WJETSEE.list";
+  string WWEE = "SourceFilesElectrons/WWEE.list";
+  string ZZEE = "SourceFilesElectrons/ZZEE.list";
+  string WZEE = "SourceFilesElectrons/WZEE.list";
+  string bce_2030 = "SourceFilesElectrons/ ";
+  string bce_3080 = "SourceFilesElectrons/QCDBCE30.list";
+  string bce_80170 = "SourceFilesElectrons/QCDBCE80.list";
+  string em_2030 = "SourceFilesElectrons/QCDEM20.list";
+  string em_3080 = "SourceFilesElectrons/QCDEM30.list";
+  string em_80170 = "SourceFilesElectrons/QCDEM80.list";
+
   
   //Sample: Data -> "data"; MC-> "mc"
-  sample = "data";
+  sample = "mc";
   
   //Modules
   bool GEN = true;
@@ -74,30 +80,30 @@ int PreDefName, ProcEvents;
   bool NTUPLE = true;
   
   //Ntuple - "zcand" = saves only z candidates; "acc" = save only events with Z in the acceptance; "all" = saves all the events  
-  string NtupleFill = "all";
+  string NtupleFill = "acc";
   
   //Cuts
-  int Acc = 1;
-  int Trg = 2;
-  int Imp = 3;
+  int Acc  = 1;
+  int Trg  = 2;
+  int Imp  = 3;
   int Conv = 4;
-  int Iso = 5;
-  int EiD = 6;
+  int Iso  = 5;
+  int EiD  = 6;
   
   //Selections: "SYM" = V+jets selections (symmetric); "ASYM" = Vector Boson Task Force (a-symmetric)
   string selections = "ASYM";
   
   //Jet Type - "PF": PFJets, "PFL1CORR": PFJets L1 Corrected
-  string JetType = "PF";
+  string JetType = "PFL1CORR";
   
   //Jet multiplicity for Tag&Probe: "incl" = Inclusive; "excl" = Exclusive
   string TPMult = "incl";
   
   //Normalization
-  string Norm = "False";
+  string Norm = "True";
   string Sumw2= "True";
   double targetLumi = 50.; //pb-1
-  if(PreDefName==0) Norm="False";   // Do not normalize for data
+  if(PreDefName==0 || PreDefName==1) Norm="False";   // Do not normalize for data
   
   //Gen Particle Matching
   string GenParticleMatch = "False";
@@ -106,25 +112,34 @@ int PreDefName, ProcEvents;
   int CPU = 8;
 
   if(PreDefName==0){
-    sourceList = Data.c_str();  
+    sourceList = Data_RUN2010A.c_str();  
     sample = "data";}
-  else if (PreDefName==1)
+  else if (PreDefName==1){
+    sourceList = Data_RUN2010B.c_str();
+    sample = "data";}
+  else if (PreDefName==2)
     sourceList = Zpj.c_str();
   else if (PreDefName==3)
-    sourceList = Wpj.c_str();
+    sourceList = TT.c_str();
+  else if (PreDefName==4)
+    sourceList = Wlnu.c_str();
   else if (PreDefName==5)
-    sourceList = tt.c_str();
+    sourceList = WWEE.c_str();
+  else if (PreDefName==6)
+    sourceList = ZZEE.c_str();
   else if (PreDefName==7)
-    sourceList = bce_2030.c_str();
+    sourceList = WZEE.c_str();
   else if (PreDefName==8)
-    sourceList = bce_3080.c_str();
+    sourceList = bce_2030.c_str();
   else if (PreDefName==9)
-    sourceList = bce_80170.c_str();
+    sourceList = bce_3080.c_str();
   else if (PreDefName==10)
-    sourceList = em_2030.c_str();
+    sourceList = bce_80170.c_str();
   else if (PreDefName==11)
-    sourceList = em_3080.c_str();
+    sourceList = em_2030.c_str();
   else if (PreDefName==12)
+    sourceList = em_3080.c_str();
+  else if (PreDefName==13)
     sourceList = em_80170.c_str();
 
   cout << "RUNNING ON " << sourceList << endl;
@@ -152,7 +167,7 @@ int PreDefName, ProcEvents;
   bool Log = false;
   
   //Path of PATAnalysis dir - DO NOT FORGET THE SLASH AT THE END OF THE PATH
-  string path="/data/sfrosali/Zjets/CMSSW_3_8_7/src/Firenze/PATAnalysis/bin/";
+  string path="/data/sfrosali/Zjets/Commit/CMSSW_3_8_7/src/Firenze/PATAnalysis/bin";
   
   if(sample=="data"){
   GenParticleMatch = "False";

@@ -1462,7 +1462,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
  
    for(int fcount = 1; fcount<7; fcount++){
    
-   if(fcount != 5){
+   if(fcount != 6){
    if(_RecoCutFlags[fcount+1] == IsoFlag.c_str()){   
    bool PreIso = false;
    for(int n = 1; n < fcount+1; n++){
@@ -1488,7 +1488,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      }
      }
      
-   if(fcount != 5){
+   if(fcount != 6){
    if(_RecoCutFlags[fcount+1] == EiDFlag.c_str()){   
    bool PreEiD = false;
    for(int n = 1; n < fcount+1; n++){

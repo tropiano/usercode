@@ -176,8 +176,6 @@ void  GenElectron::process(const fwlite::Event& iEvent)
    
    if(zgenHandle->size()){
    
-   if(zgenHandle->size()>1)throw cms::Exception("PATAnalysis:GenElectron_MoreThanOneGENZ") << "ERROR! More than one GEN Z found!";
-   
    zdaughters = ZGENDaughters((*zgenHandle)[0]);
    const reco::Candidate *dau0 = 0;
    const reco::Candidate *dau1 = 0;

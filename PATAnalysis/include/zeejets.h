@@ -14,38 +14,40 @@ using namespace std;
 
 /*
 -1. Unknown
-0.  Data
-1.  ZJets_Madgraph_Spring10
-2.  Zee_Pythia_Spring10
-3.  WJets_Madgraph_Spring10
-4.  Wenu_Pythia_Spring10
-5.  TTbarJets_Madgraph_Spring10
-6.  TTbar_Pythia_Spring10
-7.  QCD_BCtoE_Pythia_Pt20to30_Spring10
-8.  QCD_BCtoE_Pythia_Pt30to80_Spring10
-9.  QCD_BCtoE_Pythia_Pt80to170_Spring10
-10. QCD_EMEnriched_Pythia_Pt20to30_Spring10  (skimmed)
-11. QCD_EMEnriched_Pythia_Pt30to80_Spring10  (skimmed)
-12. QCD_EMEnriched_Pythia_Pt80to170_Spring10 (skimmed)
+0.  Data_RUN2010A (skimmed)
+1.  Data_RUN2010B (skimmed)
+2.  Z_Madgraph
+3.  TT_Pythia (skimmed)
+4.  Wlnu_Madgraph (skimmed)
+5.  WWEE_Pythia (skimmed)
+6.  ZZEE_Pythia (skimmed)
+7.  WZEE_Pythia (skimmed)
+8.  QCD_BCtoE_Pythia_Pt20to30 (skimmed)
+9.  QCD_BCtoE_Pythia_Pt30to80 (skimmed)
+10. QCD_BCtoE_Pythia_Pt80to170 (skimmed)
+11. QCD_EMEnriched_Pythia_Pt20to30  (skimmed)
+12. QCD_EMEnriched_Pythia_Pt30to80  (skimmed)
+13. QCD_EMEnriched_Pythia_Pt80to170 (skimmed)
 */
 
 static string SampleName;
 
 inline void name(int i){
 if(i==-1)SampleName="";
-else if(i==0)SampleName="Data";
-else if(i==1)SampleName="ZJets_Madgraph_Spring10";
-else if(i==2)SampleName="Zee_Pythia_Spring10";
-else if(i==3)SampleName="WJets_Madgraph_Spring10";
-else if(i==4)SampleName="Wenu_Pythia_Spring10";
-else if(i==5)SampleName="TTbarJets_Madgraph_Spring10";
-else if(i==6)SampleName="TTbar_Pythia_Spring10";
-else if(i==7)SampleName="QCD_BCtoE_Pythia_Pt20to30_Spring10";
-else if(i==8)SampleName="QCD_BCtoE_Pythia_Pt30to80_Spring10";
-else if(i==9)SampleName="QCD_BCtoE_Pythia_Pt80to170_Spring10";
-else if(i==10)SampleName="QCD_EMEnriched_Pythia_Pt20to30_Spring10";
-else if(i==11)SampleName="QCD_EMEnriched_Pythia_Pt30to80_Spring10";
-else if(i==12)SampleName="QCD_EMEnriched_Pythia_Pt80to170_Spring10";
+else if(i==0)SampleName="Data_RUN2010A";
+else if(i==1)SampleName="Data_RUN2010B";
+else if(i==2)SampleName="Z_Madgraph";
+else if(i==3)SampleName="TT_Pythia";
+else if(i==4)SampleName="Wlnu_Madgraph";
+else if(i==5)SampleName="WWEE_Pythia";
+else if(i==6)SampleName="ZZEE_Pythia";
+else if(i==7)SampleName="WZEE_Pythia";
+else if(i==8)SampleName="QCD_BCtoE_Pythia_Pt20to30";
+else if(i==9)SampleName="QCD_BCtoE_Pythia_Pt30to80";
+else if(i==10)SampleName="QCD_BCtoE_Pythia_Pt80to170";
+else if(i==11)SampleName="QCD_EMEnriched_Pythia_Pt20to30";
+else if(i==12)SampleName="QCD_EMEnriched_Pythia_Pt30to80";
+else if(i==13)SampleName="QCD_EMEnriched_Pythia_Pt80to170";
 else SampleName="";
 }
 
@@ -61,95 +63,102 @@ par ParStruct = {1., 1., 0, 0};
 void Parameters(int i, par* Par){
 switch(i){
 case(0):
-//Data
+//Data RUN2010A (skimmed)
 Par->_xsec=1.;
 Par->_EventFilter=1.;
 Par->_EventsPerFile=0;
 Par->_EventNumber=0;
 break;
 case(1):
-//ZJets_Madgraph_Spring10
-Par->_xsec=2946.;
+//Data RUN2010B  (skimmed)
+Par->_xsec=1.;
 Par->_EventFilter=1.;
 Par->_EventsPerFile=0;
 Par->_EventNumber=0;
 break;
 case(2):
-//Zee_Pythia_Spring10
-Par->_xsec=1667.;
+//Z_Madgraph
+Par->_xsec=3048.0;
 Par->_EventFilter=1.;
 Par->_EventsPerFile=0;
 Par->_EventNumber=0;
 break;
 case(3):
-//WJets_Madgraph_Spring10
-Par->_xsec=30936.;
+//TT_Pythia (skimmed)
+Par->_xsec=157.5;
 Par->_EventFilter=1.;
 Par->_EventsPerFile=0;
-Par->_EventNumber=0;
+Par->_EventNumber=1095950.0;
 break;
 case(4):
-//Wenu_Pythia_Spring10
-Par->_xsec=8159.;
+//Wlnu_Madgraph (skimmed)
+Par->_xsec=31314.0;
 Par->_EventFilter=1.;
 Par->_EventsPerFile=0;
-Par->_EventNumber=0;
+Par->_EventNumber=10919050.0;
 break;
 case(5):
-//TTbarJets_Madgraph_Spring10
-Par->_xsec=162.;
+//WWEE_Pythia (skimmed)
+Par->_xsec=43.0; //(NLO xsec)
 Par->_EventFilter=1.;
 Par->_EventsPerFile=0;
-Par->_EventNumber=0;
+Par->_EventNumber=1661760.0;
 break;
 case(6):
-//TTbar_Pythia_Spring10
-Par->_xsec=162.;
+//ZZEE_Pythia (skimmed)
+Par->_xsec=5.9; //(NLO xsec)
 Par->_EventFilter=1.;
 Par->_EventsPerFile=0;
-Par->_EventNumber=0;
+Par->_EventNumber=2013368.0;
 break;
 case(7):
-//QCD_BCtoE_Pythia_Pt20to30_Spring10
-Par->_xsec=235500000.;
-Par->_EventFilter=0.00046;
+//WZEE_Pythia (skimmed)
+Par->_xsec=18.2; //(NLO xsec)
+Par->_EventFilter=1.;
 Par->_EventsPerFile=0;
-Par->_EventNumber=0;
+Par->_EventNumber=1390880.0;
 break;
 case(8):
-//QCD_BCtoE_Pythia_Pt30to80_Spring10
-Par->_xsec=59300000.;
-Par->_EventFilter=0.00234;
+//QCD_BCtoE_Pythia_Pt20to30 (skimmed)
+Par->_xsec=236000000.;
+Par->_EventFilter=0.00056;
 Par->_EventsPerFile=0;
-Par->_EventNumber=0;
+Par->_EventNumber=0; //Da sistemare perchè ancora non prodotto
 break;
 case(9):
-//QCD_BCtoE_Pythia_Pt80to170_Spring10
-Par->_xsec=906000.;
-Par->_EventFilter=0.0104;
+//QCD_BCtoE_Pythia_Pt30to80 (skimmed)
+Par->_xsec=59500000.;
+Par->_EventFilter=0.0023;
 Par->_EventsPerFile=0;
-Par->_EventNumber=0;
+Par->_EventNumber=1485584.0;
 break;
 case(10):
-//QCD_EMEnriched_Pythia_Pt20to30_Spring10  (skimmed)
-Par->_xsec=235500000.;
-Par->_EventFilter=0.0073;
+//QCD_BCtoE_Pythia_Pt80to170 (skimmed)
+Par->_xsec=900000.;
+Par->_EventFilter=0.0104;
 Par->_EventsPerFile=0;
-Par->_EventNumber=33809839;
+Par->_EventNumber=1043390.0;
 break;
 case(11):
-//QCD_EMEnriched_Pythia_Pt30to80_Spring10  (skimmed)
-Par->_xsec=59300000.;
-Par->_EventFilter=0.059;
+//QCD_EMEnriched_Pythia_Pt20to30  (skimmed)
+Par->_xsec=236000000.;
+Par->_EventFilter=0.0104;
 Par->_EventsPerFile=0;
-Par->_EventNumber=42377278;
+Par->_EventNumber=35166540.0;
 break;
 case(12):
-//QCD_EMEnriched_Pythia_Pt80to170_Spring10  (skimmed)
-Par->_xsec=906000.;
-Par->_EventFilter=0.148;
+//QCD_EMEnriched_Pythia_Pt30to80  (skimmed)
+Par->_xsec=59500000.;
+Par->_EventFilter=0.065;
 Par->_EventsPerFile=0;
-Par->_EventNumber=5394911;
+Par->_EventNumber=65834019.0;
+break;
+case(13):
+//QCD_EMEnriched_Pythia_Pt80to170  (skimmed)
+Par->_xsec=900000.;
+Par->_EventFilter=0.155;
+Par->_EventsPerFile=0;
+Par->_EventNumber=6495834.0;
 break;
 default:
 Par->_xsec=1.;

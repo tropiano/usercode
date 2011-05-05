@@ -36,7 +36,7 @@ using namespace TMath;
 //Electron TRIGGER
 
 //Trigger flags
-static bool elTrgMatchReq = false;
+static bool elTrgMatchReq = true;
 static bool TrgRange = true;
 
 static map<std::string, std::pair<int, int> > elTrigger() {

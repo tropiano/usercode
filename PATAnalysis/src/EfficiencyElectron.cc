@@ -747,8 +747,6 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
  
    if(_sample=="mc" && zgenHandle->size()!=0){
    
-   if(zgenHandle->size()>1)throw cms::Exception("PATAnalysis:EfficiencyElectron_MoreThanOneGENZ") << "ERROR! More than one GEN Z found!";
-   
    //Z Gen daughters order
    
    double genleadelpt = 0; 

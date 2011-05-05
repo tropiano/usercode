@@ -521,8 +521,6 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    
    if(_sample=="mc" && zgenHandle->size()!=0){
    
-   if(zgenHandle->size()>1)throw cms::Exception("PATAnalysis:RecoElectronNtuple_MoreThanOneGENZ") << "ERROR! More than one GEN Z found!";
-   
    std::vector<const reco::Candidate*> zgendaughters;
    const reco::Candidate *gendau0 = 0;
    const reco::Candidate *gendau1 = 0;
@@ -665,9 +663,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    TrgBit=0;
    if(isElectronTriggered(*triggerHandle, run)){
    TrgBit=1;
-   if(RecSelected_TrgMatch(*recdau0, run)||RecSelected_TrgMatch(*recdau1, run)){
-   OneElTrgMatch=1;
-   }
+   if(RecSelected_TrgMatch(*recdau0, run)||RecSelected_TrgMatch(*recdau1, run))OneElTrgMatch=1;
    }
    }
    
