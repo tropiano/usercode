@@ -167,7 +167,7 @@ int PreDefName, ProcEvents;
   bool Log = false;
   
   //Path of PATAnalysis dir - DO NOT FORGET THE SLASH AT THE END OF THE PATH
-  string path="/data/sfrosali/Zjets/Commit/CMSSW_3_8_7/src/Firenze/PATAnalysis/bin";
+  string path="/data/sfrosali/Zjets/CMSSW_3_9_7/src/Firenze/PATAnalysis/bin";
   
   if(sample=="data"){
   GenParticleMatch = "False";
