@@ -119,21 +119,33 @@ private:
   float jetpt1;
   float jeteta1;
   float jetConst1;
+  float jetbDiscr1;
+  
   float jetpt2;
   float jeteta2;
   float jetConst2;
+  float jetbDiscr2;
+  
   float jetpt3;
   float jeteta3;
   float jetConst3;
+  float jetbDiscr3;
+  
   float jetpt4;
   float jeteta4;
   float jetConst4;
+  float jetbDiscr4;
+  
   float jetpt5;
   float jeteta5;
   float jetConst5;
+  float jetbDiscr5;
+  
   float jetpt6;
   float jeteta6;
   float jetConst6;
+  float jetbDiscr6;
+  
   float EtStar1;
   float EtStar2;
   float ProdStar;
@@ -166,6 +178,11 @@ private:
   float etamoment;
   float phimoment;
   float leptonveto;  
+  float NbtagHPloose;
+  float NbtagHPmedium;
+  float NbtagHEloose;
+  float NbtagHEmedium;
+  
   //file and tree
   TFile* output;
   TTree* TopTree;
@@ -274,19 +291,15 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   iEvent.getByLabel(vertexSrc_,vertexHandle);
   edm::View<reco::Vertex> vertex = *vertexHandle;
 
+  //get trigger
   edm::Handle<pat::TriggerEvent> triggerHandle;
   iEvent.getByLabel(triggerSrc_, triggerHandle);
-
-  //get trigger
-  //Handle<edm::View<pat::TriggerPath> > triggerHandle;
-  //iEvent.getByLabel(triggerSrc_,triggerHandle);
   pat::TriggerEvent trigger = *triggerHandle;
   
   std::vector<pat::Jet> all_jets;
   std::vector<pat::Jet> selec_jets;
   bool triggered = false;
   int nvertex    = 0;
-  //bool isVertex  = false;
   
   std::vector<pat::Jet> selec_jets_electrons;
   //std::cout<<"trigger path "<<*(trigger.acceptedPaths().begin())<<std::endl;
@@ -295,8 +308,6 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     {
       cout<<"trigger path "<<ipath->name()<<endl;
       }*/
-  
-  //cout<<"trigger paths: "<<trigger.paths()<<endl;
   
   for(std::vector<std::string>::const_iterator iname = triggerName_.begin(); iname!=triggerName_.end(); iname++)
     {
@@ -328,14 +339,9 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
       }
       
       if(nvertex){
-	//vertex=1;
 	n_vertex=nvertex;
-	
 	for(edm::View<pat::Jet>::const_iterator ijet=jets.begin(); ijet!=jets.end(); ++ijet)
 	  {
-	    //cout << "this jet has a discriminator of: " << ijet->bDiscriminator("trackCountingHighEffBJetTags") << endl; 
-	    //all_jets.push_back(*ijet); 
-	    //Double_t deltaR=reco::deltaR2(ijet->eta(),ijet->phi(),selec_electrons.front().eta(),selec_electrons.front().phi());
 	    if(ijet->pt()>jets_ptcut_                           //pt cut
 	       && fabs(ijet->eta())<jets_etacut_                //eta cut
 	       //&& deltaR>jets_deltarcut_                      //electron rejection cut
@@ -350,7 +356,6 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 		chargedHadEnergyFrac=ijet->chargedHadronEnergyFraction();
 		
 		chargedEmEnergyFrac=ijet->chargedEmEnergyFraction();
-		//cout<<"neutral em energy fraction: " << ijet->neutralEmEnergyFraction()<<endl;
 		selec_jets.push_back(*ijet);
 		//histContainer_["deltaR"]->Fill(deltaR);
 	      } 
@@ -371,23 +376,9 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 	       //&& (fabs(ielectron->dB())<d0Cut_) 
 	       )
 	      vetoelectron=true;
-	    
-	    /*selec_electrons.push_back(*ielectron);
-	      else if(
-	      (ielectron->et()>20)                                              pt cut
-	      && (fabs(ielectron->eta())<2.5)
-	      && (((ielectron->dr03TkSumPt()+ielectron->dr03EcalRecHitSumEt()+ielectron->dr03HcalTowerSumEt())/ielectron->et())<0.1) //isolation
-	      && (id1 || id3)
-	      )
-	      loose_electrons.push_back(*ielectron);*/
+	   
 	  }
-	  /*		histContainer_["selected_electrons"]->Fill(selec_electrons.size());
-	  //exactly one electron
-	  if(selec_electrons.size()==1) histContainer_["cut_3"]->Fill(1);
-	  else return;
-	  //impact parameter                                                    
-	  if(selec_electrons.front().gsfTrack()->trackerExpectedHitsInner().numberOfHits()==0) histContainer_["cut_4"]->Fill(1);
-	  else return;*/
+	 
 	for(edm::View<pat::Muon>::const_iterator imuon=muons.begin(); imuon!=muons.end(); ++imuon)
 	  {
 	    if (//(imuon->isGood("AllGlobalMuons")>0)
@@ -396,17 +387,12 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 		&&(((imuon->hcalIso()+imuon->ecalIso()+imuon->trackIso())/imuon->pt())<relIso_) )
 	      //((imuon->isolationR03()->sumPt()+imuon->isolationR03()->emEt()+imuon->isolationR03()->hadEt())/imuon->pt()<0.2))
 	      vetomuon=true;
-	  }
-	
+	  }	
 	selected_jets=selec_jets.size();
-	
+
 	if(selec_jets.size()>5){
-	  //histContainer_["6jets"]->Fill(1);
-	  //veto after the jets cut 
+	  
 	  if(vetoelectron || vetomuon)	  leptonveto=1;
-	}
-	
-	if(selec_jets.size()>5){
 	  //jet related variables
 	  std::vector<double> EtStar;
 	  for(std::vector<pat::Jet>::iterator iseljets = selec_jets.begin();iseljets != selec_jets.end();++iseljets)
@@ -461,9 +447,11 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 	      if(iseljets->bDiscriminator(btag_algo1_) > discr_cut2_)
 		{
 		  btaggedmedium1++;
-		  }
+		}
 	    }
-	  //NbtagHP=btaggedmedium1;
+	  
+	  NbtagHPmedium=btaggedmedium1;
+	  NbtagHPloose=btaggedloose1;
 	  
 	  int btaggedmedium2=0;
 	  int btaggedloose2=0;
@@ -480,32 +468,22 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 		btaggedmedium2++;
 	      }
 	      
+	      
 	      if(!btaggedloose1){
 		//fill jet shapes only if it's not b-tagged
-		//cout<<"eta moment"<<endl;
 		etamoment=iseljets->etaetaMoment();
-		  //cout<<"phi moment"<<endl;
 		phimoment=iseljets->phiphiMoment();
 	      }
 	    }
-	  //NbtagHE=btaggedmedium2;
 	  
-	  bool kin=false;
-	  if (aplanarity>=0.05 &&
-	      sphericity>=0.19 &&
-	      centrality>=0.50 &&
-	      sumEt>=310 &&
-	      sumEt_3>=180 && 
-	      sumE>=310 &&
-	      C>=0.34 &&
-	      D>=0.11 && 
-	      circularity>=0.33) kin=true;
-	  
+	  NbtagHEmedium=btaggedmedium2;
+	  NbtagHEloose=btaggedloose2;
+	   
 	  std::vector<pat::Jet>::iterator ijet = selec_jets.begin();
 	  jetpt1=ijet->pt();
 	  jeteta1=ijet->eta();
 	  jetConst1=ijet->associatedTracks().size();
-	  
+	  jetbDiscr1=ijet->bDiscriminator(btag_algo2_);
 	  //if(ijet->associatedTracks().size())
 	  //cout<<"tracce con dz rispetto al vertice: "<< ijet->associatedTracks()[0]->dz(pv.position()) <<endl;
 	  
@@ -515,6 +493,8 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 	      jetpt2=ijet->pt();
 	      jeteta2=ijet->eta();
 	      jetConst2=ijet->associatedTracks().size();
+	      jetbDiscr2=ijet->bDiscriminator(btag_algo2_);
+	 
 	    }
 	  if(ijet!=selec_jets.end())
 	    {
@@ -522,6 +502,8 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 		jetpt3=ijet->pt();
 		jeteta3=ijet->eta();
 		jetConst3=ijet->associatedTracks().size();
+		jetbDiscr3=ijet->bDiscriminator(btag_algo2_);
+	 
 	    }
 	  if(ijet!=selec_jets.end())
 	    {
@@ -529,6 +511,8 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 		jetpt4=ijet->pt();
 		jeteta4=ijet->eta();
 		jetConst4=ijet->associatedTracks().size();
+		jetbDiscr4=ijet->bDiscriminator(btag_algo2_);
+	 
 	    }
 	  
 	  if(ijet!=selec_jets.end())
@@ -537,6 +521,8 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 	      jetpt5=ijet->pt();
 	      jeteta5=ijet->eta();
 	      jetConst5=ijet->associatedTracks().size();
+	      jetbDiscr5=ijet->bDiscriminator(btag_algo2_);
+	 
 	    }
 	  if(ijet!=selec_jets.end())
 	    {
@@ -544,13 +530,15 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 	      jetpt6=ijet->pt();
 	      jeteta6=ijet->eta();
 	      jetConst6=ijet->associatedTracks().size();
+	      jetbDiscr6=ijet->bDiscriminator(btag_algo2_);
+	 
 	    }
-	  
+	  TopTree->Fill();
+  
 	}
       }
     }
   
-  TopTree->Fill();
   
 #ifdef THIS_IS_AN_EVENT_EXAMPLE
   Handle<ExampleData> pIn;
@@ -581,21 +569,32 @@ TopAnalyzerTree::beginJob()
   TopTree->Branch("jetpt1",     &jetpt1,          "jetpt1/F",    bufsize);
   TopTree->Branch("jeteta1",    &jeteta1,         "jeteta1/F",   bufsize);
   TopTree->Branch("jetConst1",  &jetConst1,       "jetConst1/F", bufsize);
+  TopTree->Branch("jetbDiscr1", &jetbDiscr1,      "jetbDiscr1/F", bufsize);
+  
   TopTree->Branch("jetpt2",     &jetpt2,          "jetpt2/F",    bufsize);
   TopTree->Branch("jeteta2",    &jeteta2,         "jeteta2/F",   bufsize);
   TopTree->Branch("jetConst2",  &jetConst2,       "jetConst2/F", bufsize);
+  TopTree->Branch("jetbDiscr2", &jetbDiscr2,      "jetbDiscr2/F", bufsize);
+  
   TopTree->Branch("jetpt3",     &jetpt3,          "jetpt3/F",    bufsize);
   TopTree->Branch("jeteta3",    &jeteta3,         "jeteta3/F",   bufsize);
-  TopTree->Branch("jetConst3",  &jetConst3,"jetConst3/F", bufsize);
+  TopTree->Branch("jetConst3",  &jetConst3,       "jetConst3/F", bufsize);
+  TopTree->Branch("jetbDiscr3", &jetbDiscr3,      "jetbDiscr3/F", bufsize);
+  
   TopTree->Branch("jetpt4",     &jetpt4,          "jetpt4/F",    bufsize);
   TopTree->Branch("jeteta4",    &jeteta4,         "jeteta4/F",   bufsize);
   TopTree->Branch("jetConst4",  &jetConst4,       "jetConst4/F", bufsize);
+  TopTree->Branch("jetbDiscr4", &jetbDiscr4,      "jetbDiscr4/F", bufsize);
+  
   TopTree->Branch("jetpt5",     &jetpt5,          "jetpt5/F",    bufsize);
   TopTree->Branch("jeteta5",    &jeteta5,         "jeteta5/F",   bufsize);
   TopTree->Branch("jetConst5",  &jetConst5,       "jetConst5/F", bufsize);
+  TopTree->Branch("jetbDiscr5", &jetbDiscr5,      "jetbDiscr5/F", bufsize);
+  
   TopTree->Branch("jetpt6",     &jetpt6,          "jetpt6/F",    bufsize);
   TopTree->Branch("jeteta6",    &jeteta6,         "jeteta6/F",   bufsize);
   TopTree->Branch("jetConst6",  &jetConst6,       "jetConst6/F", bufsize);
+  TopTree->Branch("jetbDiscr6", &jetbDiscr6,      "jetbDiscr6/F", bufsize);
   
   //jet shapes
   TopTree->Branch("EtStar1",      &EtStar1,      "EtStar1/F",      bufsize);
@@ -631,6 +630,11 @@ TopAnalyzerTree::beginJob()
   TopTree->Branch("etamoment",             &etamoment,              "etamoment/F",             bufsize);
   TopTree->Branch("phimoment",             &phimoment,              "phimoment/F",             bufsize);
   TopTree->Branch("leptonveto",            &leptonveto,             "leptonveto/F",             bufsize);
+  
+  TopTree->Branch("NbtagHPloose",            &NbtagHPloose,             "NbtagHPloose/F",             bufsize);
+  TopTree->Branch("NbtagHPmedium",           &NbtagHPmedium,            "NbtagHPmedium/F",             bufsize);
+  TopTree->Branch("NbtagHEloose",            &NbtagHEloose,             "NbtagHEloose/F",             bufsize);
+  TopTree->Branch("NbtagHEmedium",           &NbtagHEmedium,            "NbtagHEmedium/F",             bufsize);
   
 }
 // ------------ method called once each job just after ending the event loop  ------------
