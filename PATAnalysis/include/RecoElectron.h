@@ -149,7 +149,9 @@ private:
   
   std::string _selections, _JetType, _ReportName, _sample;
 
-  TFile* _file;  
+  TFile* _file;
+  
+  std::string _sourceFileList;
 
   std::string _RecoCutFlags[7];
 

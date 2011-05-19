@@ -53,10 +53,10 @@ string Tab_cut = "True";
 	TFile *Z_TF = TFile::Open("Simulazioni/Z_Madgraph.root");
 	
 	//Data
-	TFile *Data_TF = TFile::Open("Dati/Data_RUN2010.root");
+	TFile *Data_TF = TFile::Open("Dati/Data_RUN2010_399_NoTrgMatch.root");
 	
 	//Output
-	string out = "NtuplePlots";        
+	string out = "NtuplePlots_Test";        
 	string output = out;
 	output+=".root";
 	TFile* outplots = new TFile(output.c_str(), "RECREATE");
@@ -124,6 +124,12 @@ string Tab_cut = "True";
 	
 	TH1D* DeltaPhiZJet =  new TH1D("DeltaPhiZJet","Delta Phi separation from Z and jet in 1 jet events",80,-7,7);
 	
+	TH1D* ZMass_Data = new TH1D("ZMass_Data","Z Mass, Data (black) MC (red)",200,50,150);
+	TH1D* ZMass_Data_Barrel = new TH1D("ZMass_Data_Barrel","Z Mass, Data (black) MC (red) - Barrel",200,50,150);
+	TH1D* ZMass_Data_Endcap = new TH1D("ZMass_Data_Endcap","Z Mass, Data (black) MC (red) - Endcap",200,50,150);
+	TH1D* ZMass_MC = new TH1D("ZMass_MC","Z Mass, Data (black) MC (red)",200,50,150);
+	TH1D* ZMass_MC_Barrel = new TH1D("ZMass_MC_Barrel","Z Mass, Data (black) MC (red) - Barrel",200,50,150);
+	TH1D* ZMass_MC_Endcap = new TH1D("ZMass_MC_Endcap","Z Mass, Data (black) MC (red) - Endcap",200,50,150);
 	
 	//Build histograms by Tree
 	TCanvas *tmp = new TCanvas;
@@ -132,6 +138,10 @@ string Tab_cut = "True";
 	data_tree->Draw("zeta >> ZEta1Jet_Data","zmass_AllCuts>0 && npfjetsele==1");
 	data_tree->Draw("zpt/pfjetpt1 >> PtZoverPtJet_1PFJet_Data","zmass_AllCuts>0 && npfjetsele==1 && pfjetpt1>15 && pfjeteta1<2.5");
 	data_tree->Draw("zpt/pfl1jetpt1 >> PtZoverPtJet_1PFLICORRJet_Data","zmass_AllCuts>0 && npfl1jetsele==1 && pfl1jetpt1>30 && pfl1jeteta1<3");
+	
+	data_tree->Draw("zmass >> ZMass_Data","cutAccASYM==1 && cutTrg==1 && cutImp==1 && cutConvASYM==1 && cutIsoASYM==1 && cutEiDASYM==1");
+	data_tree->Draw("zmass >> ZMass_Data_Barrel","(elept1>20 && elept1>10 && eleeta1<1.4442 && eleeta2<1.4442) && (cutTrg==1 && cutImp==1 && cutConvASYM==1 && cutIsoASYM==1 && cutEiDASYM==1)");
+	data_tree->Draw("zmass >> ZMass_Data_Endcap","(elept1>20 && elept1>10 && eleeta1<2.5 && eleeta2<2.5 && eleeta1>1.566 && eleeta2>1.566) && (cutTrg==1 && cutImp==1 && cutConvASYM==1 && cutIsoASYM==1 && cutEiDASYM==1)");
 	
 	Z_tree->Draw("zeta >> ZEta0Jet_MC","(zmass_AllCuts>0 && npfjetsele==0)*weight");
 	Z_tree->Draw("zeta >> ZEta1Jet_MC","(zmass_AllCuts>0 && npfjetsele==1)*weight");
@@ -143,6 +153,10 @@ string Tab_cut = "True";
 	Z_tree->Draw("(pfl1jetpt1-acc_jetgenpt1)/acc_jetgenpt1 >> ResJetPt_PFLICORR_MC_1D","(npfl1jetsele>0 && acc_gennjetsele>0 && (((acc_jetgeneta1-pfl1jeteta1)^2+(acc_jetgenphi1-pfl1jetphi1)^2)<0.0625))*weight");
 	
 	Z_tree->Draw("pfjetphi1-zphi >> DeltaPhiZJet","(zmass_AllCuts>0 && npfjetsele==1)*weight");
+	
+	Z_tree->Draw("zmass >> ZMass_MC","(cutAccASYM==1 && cutTrg==1 && cutImp==1 && cutConvASYM==1 && cutIsoASYM==1 && cutEiDASYM==1)*weight");
+	Z_tree->Draw("zmass >> ZMass_MC_Barrel","(elept1>20 && elept1>10 && eleeta1<1.4442 && eleeta2<1.4442 && cutTrg==1 && cutImp==1 && cutConvASYM==1 && cutIsoASYM==1 && cutEiDASYM==1)*weight");
+	Z_tree->Draw("zmass >> ZMass_MC_Endcap","(elept1>20 && elept1>10 && eleeta1<2.5 && eleeta2<2.5 && eleeta1>1.566 && eleeta2>1.566 && cutTrg==1 && cutImp==1 && cutConvASYM==1 && cutIsoASYM==1 && cutEiDASYM==1)*weight");
 	
 	tmp->Close();
 	
@@ -169,6 +183,13 @@ string Tab_cut = "True";
 	PtZoverPtJet_1PFJet_MC->Scale(scale);
 	PtZoverPtJet_1PFLICORRJet_Data->Sumw2();
 	PtZoverPtJet_1PFLICORRJet_MC->Scale(scale);
+	
+	//ZMass_Data->Sumw2();
+	ZMass_MC->Scale(scale);
+	//ZMass_Data_Barrel->Sumw2();
+	ZMass_MC_Barrel->Scale(scale);
+	//ZMass_Data_Endcap->Sumw2();
+	ZMass_MC_Endcap->Scale(scale);
 	
 	//Plots
 	TCanvas *tree_eta0jet = new TCanvas;
@@ -226,6 +247,45 @@ string Tab_cut = "True";
 	PtZoverPtJet_1PFLICORRJet_Data->Draw("same");
 	tree_pfl1ptratio->Write("PtZoverPtJet_1PFLICORRJet.root");
 	tree_pfl1ptratio->Close();
+	
+	TCanvas *tree_zmass = new TCanvas;
+	ZMass_MC->SetLineColor(2);
+	ZMass_MC->SetLineWidth(2);
+	ZMass_MC->SetMarkerColor(col_Z);
+	ZMass_MC->Rebin(rebin_recMassZ);
+	ZMass_MC->Draw("hist");
+	ZMass_Data->SetLineWidth(2);
+	ZMass_Data->SetMarkerStyle(20);
+	ZMass_Data->Rebin(rebin_recMassZ);
+	ZMass_Data->Draw("same");
+	tree_zmass->Write("ZMass_Data-MC.root");
+	tree_zmass->Close();
+	
+	TCanvas *tree_zmass_barrel = new TCanvas;
+	ZMass_MC_Barrel->SetLineColor(2);
+	ZMass_MC_Barrel->SetLineWidth(2);
+	ZMass_MC_Barrel->SetMarkerColor(col_Z);
+	ZMass_MC_Barrel->Rebin(rebin_recMassZ);
+	ZMass_MC_Barrel->Draw("hist");
+	ZMass_Data_Barrel->SetLineWidth(2);
+	ZMass_Data_Barrel->SetMarkerStyle(20);
+	ZMass_Data_Barrel->Rebin(rebin_recMassZ);
+	ZMass_Data_Barrel->Draw("same");
+	tree_zmass_barrel->Write("ZMass_Data-MC_Barrel.root");
+	tree_zmass_barrel->Close();
+	
+	TCanvas *tree_zmass_endcap = new TCanvas;
+	ZMass_MC_Endcap->SetLineColor(2);
+	ZMass_MC_Endcap->SetLineWidth(2);
+	ZMass_MC_Endcap->SetMarkerColor(col_Z);
+	ZMass_MC_Endcap->Rebin(rebin_recMassZ);
+	ZMass_MC_Endcap->Draw("hist");
+	ZMass_Data_Endcap->SetLineWidth(2);
+	ZMass_Data_Endcap->SetMarkerStyle(20);
+	ZMass_Data_Endcap->Rebin(rebin_recMassZ);
+	ZMass_Data_Endcap->Draw("same");
+	tree_zmass_endcap->Write("ZMass_Data-MC_Endcap.root");
+	tree_zmass_endcap->Close();
 		
   outplots->Write();
   outplots->Close();

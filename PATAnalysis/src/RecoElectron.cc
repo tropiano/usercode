@@ -103,7 +103,7 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
     _file = out; 
   
    std::string dirname = iConfig.getParameter<std::string>("Name");
-   std::string sourceFileList = iConfig.getParameter<std::string>("sourceFileList");
+   _sourceFileList = iConfig.getParameter<std::string>("sourceFileList");
    _selections = iConfig.getParameter<std::string>("Selections");
    _sample = iConfig.getParameter<std::string>("Sample");
    _targetLumi= iConfig.getParameter<double>("targetLumi");
@@ -796,7 +796,7 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
   
   TChain *ch = new TChain("Events");
   ifstream infile;
-  infile.open(sourceFileList.c_str());
+  infile.open(_sourceFileList.c_str());
   string datafile;
   while(getline (infile, datafile)){
     ch->Add(datafile.c_str());
@@ -1595,6 +1595,7 @@ void RecoElectron::finalize(){
    ofstream Report;
    Report.open(_ReportName.c_str());
    Report<<endl<<endl<<"----- Sample Info -----"<<endl<<endl;
+   Report<<"Source File = "<<_sourceFileList.c_str()<<endl;
    Report<<"File number = "<<_fileCounter<<endl;
    Report<<"Number of events = "<<_entries<<endl;
    Report<<"Number of events obtained from: ";
@@ -1626,6 +1627,11 @@ void RecoElectron::finalize(){
    static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;
    for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
    Report<<"ElectronTrigger = "<<TrgVectorIter->first.c_str()<<"	Run range = "<<TrgVectorIter->second.first<<" to "<<TrgVectorIter->second.second<<endl;}
+   
+   if(elTrgMatchReq==true){
+   Report<<endl<<"Trigger Match Required"<<endl;
+   }else{
+   Report<<endl<<"Trigger Match NOT Required"<<endl;}
    
    Report<<endl<<"JetTrigger = "<<JetTrigger.c_str()<<endl;
    
