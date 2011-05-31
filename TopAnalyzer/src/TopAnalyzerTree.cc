@@ -13,7 +13,7 @@
 //
 // Original Author:  Obluraski
 //         Created:  Fri Jul  3 15:48:26 CEST 2009
-// $Id$
+// $Id: TopAnalyzerTree.cc,v 1.2 2011/05/12 13:41:44 tropiano Exp $
 //
 //
 
@@ -212,6 +212,23 @@ std::vector<math::XYZVector> makeVecForEventShapeTree(std::vector<pat::Jet> jets
   return p;
 }
 
+double etaetaMomentHome(pat::Jet jet) {
+  //std::cout<< "in etaetaMoment " << std::endl;
+  std::vector<const reco::Candidate*> towers = jet.getJetConstituentsQuick();
+  //std::cout<< "got the constituents " << std::endl;
+  double sumw = 0;
+  double sum = 0;
+  double sum2 = 0;
+  int i = towers.size();
+  while (--i >= 0) {
+    double value = towers[i]->eta();
+    double weight = towers[i]->et();
+    sumw += weight;
+    sum += value * weight;
+    sum2 += value * value * weight;
+  }
+  return sumw > 0 ? (sum2 - sum*sum/sumw ) / sumw : 0;
+}
 
 TopAnalyzerTree::TopAnalyzerTree(const edm::ParameterSet& iConfig):
   outputFile_(iConfig.getUntrackedParameter<std::string>("outputFile")),
@@ -266,10 +283,12 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   iEvent.getByLabel(elecSrc_,electronsHandle);
   edm::View<pat::Electron> electrons = *electronsHandle;
 
+  //cout<< "electrons found" << endl;
   // get muon collection
   Handle<edm::View<pat::Muon> > muonsHandle;
   iEvent.getByLabel(muonSrc_,muonsHandle);
   edm::View<pat::Muon> muons = *muonsHandle;
+  //cout<< "muons found" << endl;
 
   // get photon collection
   /*Handle<edm::View<pat::Photon> > photonsHandle;
@@ -285,17 +304,20 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   Handle<edm::View<pat::Jet> > jetsHandle;
   iEvent.getByLabel(jetSrc_,jetsHandle);
   edm::View<pat::Jet> jets = *jetsHandle;
+  //cout<< "jets found" << endl;
 
   // get vertex
   Handle<edm::View<reco::Vertex> > vertexHandle;
   iEvent.getByLabel(vertexSrc_,vertexHandle);
   edm::View<reco::Vertex> vertex = *vertexHandle;
+  //cout<< "vertex found" << endl;
 
   //get trigger
   edm::Handle<pat::TriggerEvent> triggerHandle;
   iEvent.getByLabel(triggerSrc_, triggerHandle);
   pat::TriggerEvent trigger = *triggerHandle;
   
+
   std::vector<pat::Jet> all_jets;
   std::vector<pat::Jet> selec_jets;
   bool triggered = false;
@@ -320,6 +342,8 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   
   if(triggered)
     {
+
+      //cout<< "triggered" << endl;
       //histContainer_["trigger"]->Fill(1);
       //vertex requirement
       if(vertex.size()<1) return;  
@@ -334,6 +358,7 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 	    {
 	      //isVertex = true;
 	      nvertex++;
+	      //cout<< "found one vertex" << endl;
 	    }
 	}
       }
@@ -354,8 +379,8 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 		chargedEmEnergy=ijet->chargedEmEnergy();
 		chargedHadronEnergy=ijet->chargedHadronEnergy();
 		chargedHadEnergyFrac=ijet->chargedHadronEnergyFraction();
-		
 		chargedEmEnergyFrac=ijet->chargedEmEnergyFraction();
+		//cout<< "energy fraction variables filled" << endl;
 		selec_jets.push_back(*ijet);
 		//histContainer_["deltaR"]->Fill(deltaR);
 	      } 
@@ -375,6 +400,7 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 	       && (((ielectron->dr03TkSumPt()+ielectron->dr03EcalRecHitSumEt()+ielectron->dr03HcalTowerSumEt())/ielectron->p4().Pt())<relIso_) //isolation
 	       //&& (fabs(ielectron->dB())<d0Cut_) 
 	       )
+	      //cout<< "electron found" << endl;
 	      vetoelectron=true;
 	   
 	  }
@@ -385,7 +411,9 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 		(imuon->pt()>muonveto_ptcut_)
 		&&(fabs(imuon->eta())<muonveto_etacut_)
 		&&(((imuon->hcalIso()+imuon->ecalIso()+imuon->trackIso())/imuon->pt())<relIso_) )
+	      
 	      //((imuon->isolationR03()->sumPt()+imuon->isolationR03()->emEt()+imuon->isolationR03()->hadEt())/imuon->pt()<0.2))
+	      //cout<< "muon found" << endl;
 	      vetomuon=true;
 	  }	
 	selected_jets=selec_jets.size();
@@ -401,6 +429,7 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 	      double E  = iseljets->energy();
 	      double Et = iseljets->et();
 	      EtStar.push_back( Et*(1-(pz*pz)/(E*E)) );
+	      //cout<< "retrieved pz, Et, E of the jets" << endl;
 	    }
 	  double ProdStar = TMath::GeomMean(EtStar.begin()+2,EtStar.end());
 	  
@@ -409,7 +438,7 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 	  
 	  //kinematical selection
 	  EventShapeVariables eventshape(makeVecForEventShapeTree(selec_jets));
-	  
+	  //cout<< "event shapes made" << endl;
 	  aplanarity  = eventshape.aplanarity();
 	  sphericity  = eventshape.sphericity();
 	  circularity = eventshape.circularity();
@@ -419,7 +448,7 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 	  DeltaPhi    = reco::deltaPhi(selec_jets[0].phi(), selec_jets[1].phi());
 	  sumEt       = 0;
 	  sumE        = 0;
-	  
+	  //cout<< "event shapes filled" << endl;
 	  for(std::vector<pat::Jet>::iterator iseljets = selec_jets.begin();iseljets != selec_jets.end();++iseljets)
 	    {
 	      sumEt          += iseljets->et();
@@ -439,6 +468,7 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 	  for(std::vector<pat::Jet>::iterator iseljets = selec_jets.begin();iseljets != selec_jets.end();++iseljets)
 	    {
 	      HPdiscr=iseljets->bDiscriminator(btag_algo1_);
+	      //cout<< "b discriminator filled" << endl;
 	      if(iseljets->bDiscriminator(btag_algo1_) > discr_cut1_)
 		{
 		  btaggedloose1++;
@@ -460,6 +490,7 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 	  for(std::vector<pat::Jet>::iterator iseljets = selec_jets.begin();iseljets != selec_jets.end();++iseljets)
 	    {
 	      HEdiscr=iseljets->bDiscriminator(btag_algo2_);
+	      //cout<< "2nd b discriminator filled" << endl;
 	      if(iseljets->bDiscriminator(btag_algo2_) > discr_cut3_){
 		btaggedloose2++;
 		bJetPtHE=iseljets->pt();
@@ -469,11 +500,12 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 	      }
 	      
 	      
-	      if(!btaggedloose1){
+	      //if(!btaggedloose1){
 		//fill jet shapes only if it's not b-tagged
-		etamoment=iseljets->etaetaMoment();
-		phimoment=iseljets->phiphiMoment();
-	      }
+		//etamoment=etaetaMomentHome(*iseljets);
+		//phimoment=iseljets->phiphiMoment();
+		//cout<< "eta moments, phi moments filled " << etamoment << endl;
+	      //}
 	    }
 	  
 	  NbtagHEmedium=btaggedmedium2;
@@ -483,6 +515,7 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 	  jetpt1=ijet->pt();
 	  jeteta1=ijet->eta();
 	  jetConst1=ijet->associatedTracks().size();
+	  //cout<< "associated tracks filled" << endl;
 	  jetbDiscr1=ijet->bDiscriminator(btag_algo2_);
 	  //if(ijet->associatedTracks().size())
 	  //cout<<"tracce con dz rispetto al vertice: "<< ijet->associatedTracks()[0]->dz(pv.position()) <<endl;
