@@ -94,7 +94,7 @@ static double ptelcut = 20.;    //Gev/c
 static double zmassmin_sym = 50.;   //Gev/c^2
 static double zmassmax_sym = 130.;  //Gev/c^2
 static double sym_isocut = 0.1;   //CombRelIso
-static string eID_SYM = "eidRobustLoose";
+static string eID_SYM = "simpleEleId80cIso";
 
 // SYM Tag cuts
 static double SYM_TAG_ptelcut = 25.;    //Gev/c
@@ -380,7 +380,13 @@ inline bool RecSelected(string Flag, const reco::CompositeCandidate& ZREC, const
   if(isElectronTriggered(triggers, run))cutTrg=true;
   }
   return cutTrg;
-         }
+  }
+  else if(Flag=="_ConvSYM"){
+  if(dau0->isElectronIDAvailable(eID_SYM.c_str()) && dau1->isElectronIDAvailable(eID_SYM.c_str())){
+  if(dau0->electronID(eID_SYM.c_str())==7.0 || dau0->electronID(eID_SYM.c_str())==4.0 || dau0->electronID(eID_SYM.c_str())==5.0 || dau0->electronID(eID_SYM.c_str())==6.0)conv0 = true;
+  if(dau1->electronID(eID_SYM.c_str())==7.0 || dau1->electronID(eID_SYM.c_str())==4.0 || dau1->electronID(eID_SYM.c_str())==5.0 || dau1->electronID(eID_SYM.c_str())==6.0)conv1 = true;}
+  return conv0 && conv1;
+  } 
   else if(Flag=="_ConvASYM"){
   if(dau0->isElectronIDAvailable(eID_ASYM0.c_str()) && dau1->isElectronIDAvailable(eID_ASYM1.c_str())){
   if(dau0->electronID(eID_ASYM0.c_str())==7.0 || dau0->electronID(eID_ASYM0.c_str())==4.0 || dau0->electronID(eID_ASYM0.c_str())==5.0 || dau0->electronID(eID_ASYM0.c_str())==6.0)conv0 = true;
@@ -636,19 +642,7 @@ inline bool singleEl_Probe_Acc_SYM(const reco::Candidate& cand){
   }else{
   return false;}
   }
-  
-inline bool singleEl_Probe_Qual(const reco::Candidate& cand){
-
-  const pat::Electron* electron = CloneCandidate(cand);
-  
-  if(electron){
-  const reco::GsfTrackRef track = electron->gsfTrack();
-  assert(track.isNonnull());
-  return track->numberOfValidHits() > minnhit && track->normalizedChi2() < maxchi2;
-  }else{
-  return false;}
-  }
-  
+    
 inline bool singleEl_Probe_Imp(const reco::Candidate& cand){
 
   const pat::Electron* electron = CloneCandidate(cand);
@@ -658,6 +652,19 @@ inline bool singleEl_Probe_Imp(const reco::Candidate& cand){
   }else{
   return false;}
   }
+  
+  inline bool singleEl_Probe_Conv_SYM(const reco::Candidate& cand){
+
+  const pat::Electron* el = CloneCandidate(cand);
+  
+  if(el){
+  bool conv = false;
+  if(el->isElectronIDAvailable(eID_SYM.c_str())) {
+  if(el->electronID(eID_SYM.c_str())==7.0 || el->electronID(eID_SYM.c_str())==4.0 || el->electronID(eID_SYM.c_str())==5.0 || el->electronID(eID_SYM.c_str())==6.0)conv = true;}
+  return conv;
+  }else{
+  return false;}
+}
   
 inline bool singleEl_Probe_Iso_SYM(const reco::Candidate& cand){
 
@@ -712,15 +719,41 @@ inline bool singleEl_Probe_Acc_ASYM1(const reco::Candidate& cand){
   }else{
   return false;}
   }
+  
+inline bool singleEl_Probe_Conv_ASYM0(const reco::Candidate& cand){
+
+  const pat::Electron* el0 = CloneCandidate(cand);
+  
+  if(el0){
+  bool conv0 = false;
+  if(el0->isElectronIDAvailable(eID_ASYM0.c_str())) {
+  if(el0->electronID(eID_ASYM0.c_str())==7.0 || el0->electronID(eID_ASYM0.c_str())==4.0 || el0->electronID(eID_ASYM0.c_str())==5.0 || el0->electronID(eID_ASYM0.c_str())==6.0)conv0 = true;}
+  return conv0;
+  }else{
+  return false;}
+}
+
+inline bool singleEl_Probe_Conv_ASYM1(const reco::Candidate& cand){
+
+  const pat::Electron* el1 = CloneCandidate(cand);
+  
+  if(el1){
+  bool conv1 = false;
+  if(el1->isElectronIDAvailable(eID_ASYM1.c_str())) {
+  if(el1->electronID(eID_ASYM1.c_str())==7.0 || el1->electronID(eID_ASYM1.c_str())==4.0 || el1->electronID(eID_ASYM1.c_str())==5.0 || el1->electronID(eID_ASYM1.c_str())==6.0)conv1 = true;}
+  return conv1;
+  }else{
+  return false;}
+}
 
 inline bool singleEl_Probe_Iso_ASYM0(const reco::Candidate& cand){
 
   const pat::Electron* el0 = CloneCandidate(cand);
   
   if(el0){
-  bool el0_ID = false; 
+  bool el0_ID = false;
   if(el0->isElectronIDAvailable(eID_ASYM0.c_str())){
-  if(el0->electronID(eID_ASYM0.c_str())==2.0)el0_ID = true;}
+  if(el0->electronID(eID_ASYM0.c_str())==7.0 || el0->electronID(eID_ASYM0.c_str())==2.0 || el0->electronID(eID_ASYM0.c_str())==3.0 || el0->electronID(eID_ASYM0.c_str())==6.0)el0_ID = true;}
   return el0_ID;
   }else{
   return false;}
@@ -731,9 +764,9 @@ inline bool singleEl_Probe_Iso_ASYM1(const reco::Candidate& cand){
   const pat::Electron* el1 = CloneCandidate(cand);
   
   if(el1){
-  bool el1_ID = false; 
+  bool el1_ID = false;
   if(el1->isElectronIDAvailable(eID_ASYM1.c_str())){
-  if(el1->electronID(eID_ASYM1.c_str())==2.0)el1_ID = true;}
+  if(el1->electronID(eID_ASYM1.c_str())==7.0 || el1->electronID(eID_ASYM1.c_str())==2.0 || el1->electronID(eID_ASYM1.c_str())==3.0 || el1->electronID(eID_ASYM1.c_str())==6.0)el1_ID = true;}
   return el1_ID;
   }else{
   return false;}
@@ -744,9 +777,9 @@ inline bool singleEl_Probe_EiD_ASYM0(const reco::Candidate& cand){
   const pat::Electron* el0 = CloneCandidate(cand);
   
   if(el0){
-  bool el0_ID = false; 
-  if(el0->isElectronIDAvailable(eID_ASYM0.c_str())){
-  if(el0->electronID(eID_ASYM0.c_str())==7.0)el0_ID = true;}
+  bool el0_ID = false;
+  if(el0->isElectronIDAvailable(eID_ASYM0.c_str())){ 
+  if(el0->electronID(eID_ASYM0.c_str())==7.0 || el0->electronID(eID_ASYM0.c_str())==1.0 || el0->electronID(eID_ASYM0.c_str())==3.0 || el0->electronID(eID_ASYM0.c_str())==5.0)el0_ID = true;}
   return el0_ID;
   }else{
   return false;}
@@ -757,9 +790,9 @@ inline bool singleEl_Probe_EiD_ASYM1(const reco::Candidate& cand){
   const pat::Electron* el1 = CloneCandidate(cand);
   
   if(el1){
-  bool el1_ID = false; 
-  if(el1->isElectronIDAvailable(eID_ASYM1.c_str())){
-  if(el1->electronID(eID_ASYM1.c_str())==7.0)el1_ID = true;}
+  bool el1_ID = false;
+  if(el1->isElectronIDAvailable(eID_ASYM1.c_str())){ 
+  if(el1->electronID(eID_ASYM1.c_str())==7.0 || el1->electronID(eID_ASYM1.c_str())==1.0 || el1->electronID(eID_ASYM1.c_str())==3.0 || el1->electronID(eID_ASYM1.c_str())==5.0)el1_ID = true;}
   return el1_ID;
   }else{
   return false;}

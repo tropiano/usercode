@@ -5,9 +5,9 @@
 #include "TH1D.h"
 #include "TGraphAsymmErrors.h"
 
-EfficiencyAnalyzerElectron::EfficiencyAnalyzerElectron(TFile* input, TFile* output, string dirname, string dirname1, TFile* training_signal, TFile* training_background): 
+EfficiencyAnalyzerElectron::EfficiencyAnalyzerElectron(TFile* input, TFile* output, string dirname, string dirname1, string dataset, TFile* training_signal, TFile* training_background): 
 
-_dir(0), _dir1(0), _dirname(dirname), _dirname1(dirname1), _output(output), 
+_dir(0), _dir1(0), _dirname(dirname), _dirname1(dirname1), _dataset(dataset), _output(output), 
 _training_signal(training_signal), _training_background(training_background)
 
 {
@@ -36,7 +36,7 @@ void EfficiencyAnalyzerElectron::analyze(int bin, std::string fitOptions){
   
   _output->cd();
   
-  TagAndProbeAnalyzer tpana(_dir, _output, _dir1, "dataset", true, _training_signal, _training_background);
+  TagAndProbeAnalyzer tpana(_dir, _output, _dir1, _dataset, true, _training_signal, _training_background);
   tpana.analyze(bin, fitOptions);
 
 }

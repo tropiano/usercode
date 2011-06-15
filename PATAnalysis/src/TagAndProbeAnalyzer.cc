@@ -10,8 +10,8 @@
 #include "RooAddPdf.h"
 #include "RooMinuit.h"
 #include "RooFormulaVar.h"
-#include "RooVoigtian.h"
-#include "RooBifurGauss.h"
+#include "RooCBShape.h"
+#include "RooBreitWigner.h"
 #include "RooSimultaneous.h"
 #include "RooChi2Var.h"
 #include "RooNLLVar.h"
@@ -23,12 +23,13 @@
 using namespace std;
 using namespace RooFit;
 
-TagAndProbeAnalyzer::TagAndProbeAnalyzer(TDirectory* input, TFile* output, TDirectory* sec_input, std::string name, bool performfits, TFile* training_signal, TFile* training_background):
+TagAndProbeAnalyzer::TagAndProbeAnalyzer(TDirectory* input, TFile* output, TDirectory* sec_input, std::string dataset, bool performfits, TFile* training_signal, TFile* training_background):
 _initialized(false),
 _input(input),
 _sec_input(sec_input),
 _output(output),
-_name(name),
+_dataset(dataset),
+_name("Fit"),
 _performfits(performfits),
 _training_signal(training_signal),
 _training_background(training_background),
@@ -46,15 +47,15 @@ _passprobe_cat("passprobe", "passprobe")
   
   TTree* tree=0; 
   TTree* tree1=0;
-
-  tree = (TTree*) _input->Get("dataset");
+  
+  tree = (TTree*) _input->Get(_dataset.c_str());
   if (!tree){
     std::cout << "Error in TagAndProbeAnalyzer::TagAndProbeAnalyzer : could not find tree named dataset in input file " << std::endl;
     return;
   }
   
   if(_sec_input){
-  tree1 = (TTree*) _sec_input->Get("dataset");
+  tree1 = (TTree*) _sec_input->Get(_dataset.c_str());
   if (!tree1){
     std::cout << "Error in TagAndProbeAnalyzer::TagAndProbeAnalyzer : could not find tree1 named dataset in input file " << std::endl;
     return;
@@ -66,7 +67,7 @@ _passprobe_cat("passprobe", "passprobe")
   _argset = new RooArgSet(_mass, _bin, _probe, _passprobe_cat, _weight );
  
   _output->cd();
-  _rootree = new RooDataSet("roodataset", "roodataset", tree, *_argset, "");//, "weight");
+  _rootree = new RooDataSet("roodataset", "roodataset", tree, *_argset, "", "weight");
   //_rootree = new RooDataSet("roodataset", "roodataset", RooArgSet(_mass, _bin, _probe, _passprobe_cat, _weight));//, Import(*tree), WeightVar("weight"));
   if(_sec_input)_rootree1 = new RooDataSet("roodataset", "roodataset", tree1, *_argset, "", "weight");
   
@@ -202,53 +203,36 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
 
   TH1* hmass = data->createHistogram("mass", 100);
   
-/*
-  RooRealVar mu_pass("mu_pass", "average_pass", hmass->GetMean(),  80, 100);
+  RooRealVar mu_pass("mu_pass", "average_pass", hmass->GetMean(),  80, 100); 
+  RooRealVar sigma_pass("sigma_pass", "sigma_pass", hmass->GetRMS(), 2, 100);
+  RooRealVar a_pass("a_pass", "a_pass", 10, 0, 100);
+  RooRealVar n_pass("n_pass", "n_pass", 5, 0, 100);
+  
   RooRealVar mu_pass2("mu_pass2", "average_pass2", hmass->GetMean(), 80, 100);
-  RooRealVar width_pass("width_pass", "width_pass", hmass->GetRMS(), 0, 10);
-  RooRealVar sigma_pass("sigma_pass", "sigma_pass", hmass->GetRMS(), 0, 20);
+  RooRealVar g_pass("g_pass", "g_pass", 10, 5, 50);
   
-  RooRealVar widthL_pass("widthL_pass", "widthL_pass", 5, 0, 30);
-  RooRealVar widthR_pass("widthR_pass", "widthR_pass", 4, 0, 15);
   RooRealVar fraction_pass("fraction_pass", "fraction_pass", 0.9, 0., 1.);
 
+  RooRealVar mu_fail("mu_fail", "average_fail", hmass->GetMean(), 80, 100); 
+  RooRealVar sigma_fail("sigma_fail", "sigma_fail", hmass->GetRMS(), 2, 100);
+  RooRealVar a_fail("a_fail", "a_fail", 10, 0, 100);
+  RooRealVar n_fail("n_fail", "n_fail", 5, 0, 100);
 
-  RooRealVar mu_fail("mu_fail", "average_fail", hmass->GetMean(), 80, 100);
   RooRealVar mu_fail2("mu_fail2", "average_fail2", hmass->GetMean(), 80, 100);
-  RooRealVar width_fail("width_fail", "width_fail", hmass->GetRMS(), 0, 10);
-  RooRealVar sigma_fail("sigma_fail", "sigma_fail", hmass->GetRMS(), 0, 20);
-
-  RooRealVar widthL_fail("widthL_fail", "widthL_fail", 5, 0, 30);
-  RooRealVar widthR_fail("widthR_fail", "widthR_fail", 4, 0, 15);
-  RooRealVar fraction_fail("fraction_fail", "fraction_fail", 0.9, 0., 1.);
-*/
-  RooRealVar mu_pass("mu_pass", "average_pass", 90, 80, 100);
-  RooRealVar mu_pass2("mu_pass2", "average_pass2", 90, 80, 100);
-  RooRealVar width_pass("width_pass", "width_pass", 2, 0, 10);
-  RooRealVar sigma_pass("sigma_pass", "sigma_pass", 1, 0, 20);
+  RooRealVar g_fail("g_fail", "g_fail", 10, 5, 50);
   
-  RooRealVar widthL_pass("widthL_pass", "widthL_pass", 15, 2, 30);
-  RooRealVar widthR_pass("widthR_pass", "widthR_pass", 4, 2, 15);
-  RooRealVar fraction_pass("fraction_pass", "fraction_pass", 0.9, 0., 1.);
+  RooRealVar fraction_fail("fraction_fail", "fraction_fail", 0.9, 0., 1.);
 
-  RooRealVar mu_fail("mu_fail", "average_fail", 90, 80, 100);
-  RooRealVar mu_fail2("mu_fail2", "average_fail2", 90, 80, 100);
-  RooRealVar width_fail("width_fail", "width_fail", 2, 0, 10);
-  RooRealVar sigma_fail("sigma_fail", "sigma_fail", 1, 0, 20);
 
-  RooRealVar widthL_fail("widthL_fail", "widthL_fail", 15, 2, 30);
-  RooRealVar widthR_fail("widthR_fail", "widthR_fail", 4, 2, 15);
-  RooRealVar fraction_fail("fraction_fail", "fraction_fail", 0.9, 0., 1.); 
+  RooCBShape crystal_pass("crystalball_pass", "crystalball_pass", _mass, mu_pass, sigma_pass, a_pass, n_pass);
+  RooBreitWigner breitwig_pass("breitwig_pass", "breitwig_pass", _mass, mu_pass2, g_pass); //try not to force the same mu_pass
+  
+  RooAddPdf signal_pass("signal_pass", "signal_pass", crystal_pass, breitwig_pass, fraction_pass);
 
-  RooVoigtian voigtian_pass("voigtian_pass", "voigtian_pass", _mass, mu_pass, width_pass, sigma_pass);
-  RooBifurGauss bifurgauss_pass("bifurgauss_pass", "bifurgauss_pass", _mass, mu_pass2, widthL_pass, widthR_pass); //try not to force the same mu_pass
-  RooAddPdf signal_pass("signal_pass", "signal_pass", voigtian_pass, bifurgauss_pass, fraction_pass);
-  //RooVoigtian signal_pass("voigtian_pass", "voigtian_pass", _mass, mu_pass, width_pass, sigma_pass);
-
-  RooVoigtian voigtian_fail("voigtian_fail", "voigtian_fail", _mass, mu_fail, width_fail, sigma_fail);
-  RooBifurGauss bifurgauss_fail("bifurgauss_fail", "bifurgauss_fail", _mass, mu_fail2, widthL_fail, widthR_fail);
-  RooAddPdf signal_fail("signal_fail", "signal_fail", voigtian_fail, bifurgauss_fail, fraction_fail);
-  //RooVoigtian signal_fail("voigtian_fail", "voigtian_fail", _mass, mu_fail, width_fail, sigma_fail);;
+  RooCBShape crystal_fail("crystalball_fail", "crystalball_fail", _mass, mu_fail, sigma_fail, a_fail, n_fail);
+  RooBreitWigner breitwig_fail("breitwig_fail", "breitwig_fail", _mass, mu_fail2, g_fail);
+  
+  RooAddPdf signal_fail("signal_fail", "signal_fail", crystal_fail, breitwig_fail, fraction_fail);
   
   // if we are using signal shape from training 
   if (_training_signal) {
@@ -266,42 +250,39 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
           else if (parname == "mu_pass2"){
           mu_pass2.setVal(par->getVal());
           mu_pass2.setConstant();
-        } else if (parname == "width_pass"){
-          width_pass.setVal(par->getVal());
-          width_pass.setConstant();
         } else if (parname == "sigma_pass"){
           sigma_pass.setVal(par->getVal());
           sigma_pass.setConstant();
-        } else if (parname == "widthL_pass"){
-          widthL_pass.setVal(par->getVal());
-          widthL_pass.setConstant();
-        } else if (parname == "widthR_pass"){
-          widthR_pass.setVal(par->getVal());
-          widthR_pass.setConstant();
+        } else if (parname == "a_pass"){
+          a_pass.setVal(par->getVal());
+          a_pass.setConstant();
+        } else if (parname == "n_pass"){
+          n_pass.setVal(par->getVal());
+          n_pass.setConstant();
+        } else if (parname == "g_pass"){
+          g_pass.setVal(par->getVal());
+          g_pass.setConstant();
         } else if (parname == "fraction_pass"){
           fraction_pass.setVal(par->getVal());
           fraction_pass.setConstant();
         } else if (parname == "mu_fail"){
           mu_fail.setVal(par->getVal());
           mu_fail.setConstant();
-        }
-        else if (parname == "mu_fail2"){
+        } else if (parname == "mu_fail2"){
           mu_fail2.setVal(par->getVal());
           mu_fail2.setConstant();
-        }
-        else if (parname == "width_fail"){
-          width_fail.setVal(par->getVal());
-          width_fail.setConstant();
-        }
-        else if (parname == "sigma_fail"){
+        } else if (parname == "sigma_fail"){
           sigma_fail.setVal(par->getVal());
           sigma_fail.setConstant();
-        } else if (parname == "widthL_fail"){
-          widthL_fail.setVal(par->getVal());
-          widthL_fail.setConstant();
-        } else if (parname == "widthR_fail"){
-          widthR_fail.setVal(par->getVal());
-          widthR_fail.setConstant();
+        } else if (parname == "a_fail"){
+          a_fail.setVal(par->getVal());
+          a_fail.setConstant();
+        } else if (parname == "n_fail"){
+          n_fail.setVal(par->getVal());
+          n_fail.setConstant();
+        } else if (parname == "g_fail"){
+          g_fail.setVal(par->getVal());
+          g_fail.setConstant();
         } else if (parname == "fraction_fail"){
           fraction_fail.setVal(par->getVal());
           fraction_fail.setConstant();

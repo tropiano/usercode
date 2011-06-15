@@ -123,7 +123,7 @@ case(8):
 Par->_xsec=236000000.;
 Par->_EventFilter=0.00056;
 Par->_EventsPerFile=0;
-Par->_EventNumber=0; //Da sistemare perchè ancora non prodotto
+Par->_EventNumber=2222329.0; 
 break;
 case(9):
 //QCD_BCtoE_Pythia_Pt30to80 (skimmed)

@@ -14,20 +14,29 @@ using namespace std;
 int main() {
 
   //Input files
-  string training_sign = "TPFiles/ZJets_Madgraph_Spring10_Signal_train.root";
-  string training_back = "TPFiles/Background_All_train.root";
-  string total = "TPFiles/Data_Aug18_25_NoTrg.root";
+  //string training_sign = "TagProbe/TPFiles/Z_Madgraph_JetPt30_train.root";
+  //string training_back = "TagProbe/TPFiles/Background_JetPt30_All_train.root";
+  //string total = "TagProbe/TPFiles/Data_RUN2010_JetPt30.root";
+  string training_sign = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/Z_Madgraph_JetPt30_train.root";
+  string training_back = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/Background_JetPt30_All_train.root";
+  string total = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/Data_RUN2010_JetPt30.root";
   
   //Output files
-  string output_train_sign =  "TPAnalyzer/TPAnalyzer_Signal_train_VBTF_Imp.root";
-  string output_train_back =  "TPAnalyzer/TPAnalyzer_Background_train_VBTF_Imp.root";
-  string output_total =  "TPAnalyzer/TPAnalyzer_Data_VBTF_Imp.root";
+  //string output_train_sign =  "TagProbe/TPAnalyzer/TPAnalyzer_Signal_JetPt30_train_Imp.root";
+  //string output_train_back =  "TagProbe/TPAnalyzer/TPAnalyzer_Background_JetPt30_train_Imp.root";
+  //string output_total =  "TagProbe/TPAnalyzer/TPAnalyzer_Data_Run2010_Dec22ReReco_JetPt30_Imp.root";
+  string output_train_sign =  
+"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TestAnalyzer/TEST_CB-BW_TrainSig_EiD_CB_Sg_2-100_a10_0-100_n5_0-100_BW_g10_5-50.root";
+  string output_train_back =  
+"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TestAnalyzer/TEST_CB-BW_TrainBack_EiD_CB_Sg_2-100_a10_0-100_n5_0-100_BW_g10_5-50.root";
+  string output_total =  
+"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TestAnalyzer/TEST_CB-BW_DATA_EiD_CB_Sg_2-100_a10_0-100_n5_0-100_BW_g10_5-50.root";
 
   //Selections used
-  string selections = "VBTF";
+  string selections = "ASYM";
   
   //Cut to evaluate
-  string cut = "_Imp";
+  string cut = "_EiDASYM";
   
   //Analyzer steps
   bool tr_sig = true;
@@ -41,32 +50,31 @@ int main() {
   string nodef_dir = "";
   string nodef_secdir = "";
   
-  //Selections
-  
+  //Cuts
   int _Acc  = 1;
   int _Trg  = 2;
-  int _Qual = 0;
   int _Imp  = 3;
-  int _Iso  = 4;
-  int _EiD  = 5;
+  int _Conv = 4;
+  int _Iso  = 5;
+  int _EiD  = 6;
 	
   string _RecoCutFlags[7];
 	
   for(int i=0; i<7; i++){
   _RecoCutFlags[i] = "_1";}
    
-  if(selections=="VPJ"){
-  _RecoCutFlags[_Acc] =  "_AccVPJ";
-  _RecoCutFlags[_Iso] =  "_IsoVPJ";
-  _RecoCutFlags[_EiD] =  "_EiDVPJ";}
-  if(selections=="VBTF"){
-  _RecoCutFlags[_Acc] =  "_AccVBTF";
-  _RecoCutFlags[_Iso] =  "_IsoVBTF";
-  _RecoCutFlags[_EiD] =  "_EiDVBTF";}
+  if(selections=="SYM"){
+   _RecoCutFlags[_Acc] =  "_AccSYM";
+   _RecoCutFlags[_Iso] =  "_IsoSYM";
+   _RecoCutFlags[_EiD] =  "_EiDSYM";}
+   if(selections=="ASYM"){
+   _RecoCutFlags[_Acc] =  "_AccASYM";
+   _RecoCutFlags[_Iso] =  "_IsoASYM";
+   _RecoCutFlags[_EiD] =  "_EiDASYM";}
      
-  _RecoCutFlags[_Trg] =  "_Trg";
-  _RecoCutFlags[_Qual] = "_Qual";
-  _RecoCutFlags[_Imp] =  "_Imp";
+   _RecoCutFlags[_Trg] =  "_Trg";
+   _RecoCutFlags[_Conv] = "_ConvASYM"; //per il momento ?? solo asimmetrico
+   _RecoCutFlags[_Imp] =  "_Imp";
   
   TFile* train_sign = 0;
   TFile* train_back = 0;
@@ -88,9 +96,11 @@ int main() {
   
   string dir = "EfficiencyElectron/";
   string sec_el_dir = "EfficiencyElectron/";
+  
+  string dataset = "datasetElectron";
 	
-  if(selections=="VPJ")dir+="Tag&Probe";
-  if(selections=="VBTF"){
+  if(selections=="SYM")dir+="Tag&Probe";
+  if(selections=="ASYM"){
   dir+="Tag&Probe0";
   sec_el_dir+="Tag&Probe1";}
 	
@@ -98,19 +108,22 @@ int main() {
   while(cut!=_RecoCutFlags[ncut]){
   dir+=_RecoCutFlags[ncut].c_str();
   sec_el_dir+=_RecoCutFlags[ncut].c_str();
+  dataset+=_RecoCutFlags[ncut].c_str();
   ncut++;
   if(ncut>6)throw cms::Exception("PATAnalysis:zeetpana_CutNotFound") << "ERROR! Cut selected not found!";
   }
-	
+  
   dir+=_RecoCutFlags[ncut].c_str();
   sec_el_dir+=_RecoCutFlags[ncut].c_str();
+  dataset+=_RecoCutFlags[ncut].c_str();
+  dataset+="_";
 	
   if(nodef_dir!="")dir=nodef_dir;
   if(nodef_secdir!="")sec_el_dir=nodef_secdir;
   
-  EfficiencyAnalyzerElectron TP_TrainSign(train_sign, out_train_sign, dir.c_str(), sec_el_dir.c_str());
-  EfficiencyAnalyzerElectron TP_TrainBack(train_back, out_train_back, dir.c_str(), sec_el_dir.c_str()); 
-  EfficiencyAnalyzerElectron TP_Total(total_in, total_out, dir.c_str(), sec_el_dir.c_str(), out_train_sign, out_train_back);
+  EfficiencyAnalyzerElectron TP_TrainSign(train_sign, out_train_sign, dir.c_str(), sec_el_dir.c_str(), dataset.c_str());
+  EfficiencyAnalyzerElectron TP_TrainBack(train_back, out_train_back, dir.c_str(), sec_el_dir.c_str(), dataset.c_str()); 
+  EfficiencyAnalyzerElectron TP_Total(total_in, total_out, dir.c_str(), sec_el_dir.c_str(), dataset.c_str(), out_train_sign, out_train_back);
  
   if(tr_sig)TP_TrainSign.analyze(massbin,"signal");
   if(tr_back)TP_TrainBack.analyze(massbin,"background");

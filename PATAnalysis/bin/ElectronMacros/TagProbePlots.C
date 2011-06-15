@@ -33,15 +33,15 @@ void TPPlots(string multiplicity, string selections){
         gROOT->SetStyle("Plain");
         
         //MonteCarlo Signal file used to evaluate the Rel. MC Eff. and the TP Eff. w/o background
-        TFile *signal_MC_file = TFile::Open("TagProbe_Signal_train_TagIso005_SYM.root");
+        TFile *signal_MC_file = TFile::Open("../../MC_Fall10_387/JetPt30/Z_Madgraph.root");
         
         //TP files (outputs of TagAndProbeAnalyzer) whit the mass fits
-        TFile *tp_123 = TFile::Open("TPAnalyzer_Total_50pb_TagIso005_SYM_Imp.root");
-        TFile *tp_1234 = TFile::Open("TPAnalyzer_Total_50pb_TagIso005_SYM_Iso.root");
-        TFile *tp_12345 = TFile::Open("TPAnalyzer_Total_50pb_TagIso005_SYM_EiD.root");
+        TFile *tp_123 = TFile::Open("TEST_CB-BW_DATA_Imp_CB_Sg_2-100_a10_0-100_n5_0-100_BW_g10_5-50.root");
+        TFile *tp_1234 = TFile::Open("TEST_CB-BW_DATA_Conv_CB_Sg_2-100_a10_0-100_n5_0-100_BW_g10_5-50.root");
+        TFile *tp_12345 = TFile::Open("TEST_CB-BW_DATA_Iso_CB_Sg_2-100_a10_0-100_n5_0-100_BW_g10_5-50.root");
         
         //outputof TPPlots macro
-        TFile* outplots = new TFile("TPStudy_TagIso005_SYM.root", "RECREATE");
+        TFile* outplots = new TFile("TPStudy_CB_Sg_2-100_a10_0-100_n5_0-100_BW_g10_5-50.root", "RECREATE");
         
         double xmin, xmax;
         
@@ -49,11 +49,11 @@ void TPPlots(string multiplicity, string selections){
         xmax=3.5;
 	
 	int _Acc  = 1;
-	int _Trg  = 2;
-	int _Conv = 0;
+	int _Trg  = 2;	
 	int _Imp  = 3;
-	int _Iso  = 4;
-	int _EiD  = 5;
+	int _Conv = 4;
+	int _Iso  = 5;
+	int _EiD  = 6;
 	
 	string _RecoCutFlags[7];
 	
@@ -62,15 +62,16 @@ void TPPlots(string multiplicity, string selections){
    
        if(selections=="SYM"){
        _RecoCutFlags[_Acc] =  "_AccSYM";
+       _RecoCutFlags[_Conv] = "_ConvSYM";
        _RecoCutFlags[_Iso] =  "_IsoSYM";
        _RecoCutFlags[_EiD] =  "_EiDSYM";}
        if(selections=="ASYM"){
        _RecoCutFlags[_Acc] =  "_AccASYM";
+       _RecoCutFlags[_Conv] = "_ConvASYM";
        _RecoCutFlags[_Iso] =  "_IsoASYM";
        _RecoCutFlags[_EiD] =  "_EiDASYM";}
      
-       _RecoCutFlags[_Trg] =  "_Trg";
-       _RecoCutFlags[_Conv] = "_ConvASYM";
+       _RecoCutFlags[_Trg] =  "_Trg";      
        _RecoCutFlags[_Imp] =  "_Imp";
     
         if(!signal_MC_file){
@@ -337,9 +338,9 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         
         //Get TP w back double eff.
         
-        TGraphAsymmErrors* tp_eff_123 = (TGraphAsymmErrors*) tp_123->Get("datasetDoubleTag&Probe");
-        TGraphAsymmErrors* tp_eff_1234 = (TGraphAsymmErrors*) tp_1234->Get("datasetDoubleTag&Probe");
-        TGraphAsymmErrors* tp_eff_12345 = (TGraphAsymmErrors*) tp_12345->Get("datasetDoubleTag&Probe");
+        TGraphAsymmErrors* tp_eff_123 = (TGraphAsymmErrors*) tp_123->Get("FitDoubleTag&Probe");
+        TGraphAsymmErrors* tp_eff_1234 = (TGraphAsymmErrors*) tp_1234->Get("FitDoubleTag&Probe");
+        TGraphAsymmErrors* tp_eff_12345 = (TGraphAsymmErrors*) tp_12345->Get("FitDoubleTag&Probe");
         
         //////////////////////////////////////////////////7
                 

@@ -36,6 +36,7 @@ private:
   TDirectory* _sec_input;
   TFile* _output;
   std::string _name;
+  std::string _dataset;
   bool _performfits;
   TFile *_training_signal, *_training_background;
   RooDataSet* _rootree; 

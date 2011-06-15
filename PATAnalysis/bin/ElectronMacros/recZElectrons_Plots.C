@@ -237,15 +237,16 @@ string Tab_cut = "True";
 	
 	if(selections=="SYM"){
 		_RecoCutFlags[_Acc] =  "_AccSYM";
+		_RecoCutFlags[_Conv] = "_ConvSYM";
 		_RecoCutFlags[_Iso] =  "_IsoSYM";
 		_RecoCutFlags[_EiD] =  "_EiDSYM";}
 	if(selections=="ASYM"){
 		_RecoCutFlags[_Acc] =  "_AccASYM";
+		_RecoCutFlags[_Conv] = "_ConvASYM";
 		_RecoCutFlags[_Iso] =  "_IsoASYM";
 		_RecoCutFlags[_EiD] =  "_EiDASYM";}
 	
-	_RecoCutFlags[_Trg] =  "_Trg";
-	_RecoCutFlags[_Conv] = "_ConvASYM";
+	_RecoCutFlags[_Trg] =  "_Trg";	
 	_RecoCutFlags[_Imp] =  "_Imp";
 
         
