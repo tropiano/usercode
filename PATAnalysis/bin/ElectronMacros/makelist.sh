@@ -2,9 +2,9 @@
 
 FLAG_POOLSOURCE=0;
 
-LIST=ZeeCollisionsSep11_2.txt
+LIST=ZMadgraph_L1FastJet_copyData.list
 TMPLIST=tmp.txt
-DIR=/data/egallo/ZeeCollisions10/Sep11/
+DIR=/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/Reduction/test/Electrons/MC_Winter10/ZMadgraph_2/crab_0_110601_123156/res/
 
 ls -l $DIR | grep root > $TMPLIST
 

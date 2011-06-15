@@ -705,6 +705,7 @@ inline bool singleEl_Probe_Acc_ASYM0(const reco::Candidate& cand){
           && (fabs(el0->eta())<eta_el_excl_down || fabs(el0->eta())>eta_el_excl_up));
   }else{
   return false;}
+  
   }
   
 inline bool singleEl_Probe_Acc_ASYM1(const reco::Candidate& cand){
@@ -731,6 +732,7 @@ inline bool singleEl_Probe_Conv_ASYM0(const reco::Candidate& cand){
   return conv0;
   }else{
   return false;}
+ 
 }
 
 inline bool singleEl_Probe_Conv_ASYM1(const reco::Candidate& cand){
@@ -757,6 +759,8 @@ inline bool singleEl_Probe_Iso_ASYM0(const reco::Candidate& cand){
   return el0_ID;
   }else{
   return false;}
+  
+  return false;
 }
 
 inline bool singleEl_Probe_Iso_ASYM1(const reco::Candidate& cand){

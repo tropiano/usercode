@@ -347,7 +347,7 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
   probe_cuts_12345.clear();
   probe_cuts_123456.clear();
   
-  for(unsigned int i = 1; i < 6; i++){
+  for(unsigned int i = 1; i < 7; i++){
   if(_RecoCutFlags[i] == "_AccSYM"){
   if(i<2)probe_cuts_1.push_back(singleEl_Probe_Acc_SYM);
   if(i<3)probe_cuts_12.push_back(singleEl_Probe_Acc_SYM);
@@ -450,7 +450,7 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
   probe_cuts0_12345.clear();
   probe_cuts0_123456.clear();
   
-  for(unsigned int i = 1; i < 6; i++){
+  for(unsigned int i = 1; i < 7; i++){
   if(_RecoCutFlags[i] == "_AccASYM"){
   if(i<2)probe_cuts0_1.push_back(singleEl_Probe_Acc_ASYM0);
   if(i<3)probe_cuts0_12.push_back(singleEl_Probe_Acc_ASYM0);
@@ -549,7 +549,7 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
   probe_cuts1_12345.clear();
   probe_cuts1_123456.clear();
   
-  for(unsigned int i = 1; i < 6; i++){
+  for(unsigned int i = 1; i < 7; i++){
   if(_RecoCutFlags[i] == "_AccASYM"){
   if(i<2)probe_cuts1_1.push_back(singleEl_Probe_Acc_ASYM1);
   if(i<3)probe_cuts1_12.push_back(singleEl_Probe_Acc_ASYM1);
