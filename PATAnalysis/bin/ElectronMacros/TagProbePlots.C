@@ -32,16 +32,17 @@ void TPPlots(string multiplicity, string selections){
 
         gROOT->SetStyle("Plain");
         
-        //MonteCarlo Signal file used to evaluate the Rel. MC Eff. and the TP Eff. w/o background
-        TFile *signal_MC_file = TFile::Open("../../MC_Fall10_387/JetPt30/Z_Madgraph.root");
+        //MonteCarlo Signal file used to evaluate the Rel. MC Rel Eff. and the TP Eff. w/o background
+        TFile *signal_MC_file = TFile::Open("../../../MC_Winter10_399/Z_Madgraph_L1FastJet_JetPt30_399.root");
         
         //TP files (outputs of TagAndProbeAnalyzer) whit the mass fits
-        TFile *tp_123 = TFile::Open("TEST_CB-BW_DATA_Imp_CB_Sg_2-100_a10_0-100_n5_0-100_BW_g10_5-50.root");
-        TFile *tp_1234 = TFile::Open("TEST_CB-BW_DATA_Conv_CB_Sg_2-100_a10_0-100_n5_0-100_BW_g10_5-50.root");
-        TFile *tp_12345 = TFile::Open("TEST_CB-BW_DATA_Iso_CB_Sg_2-100_a10_0-100_n5_0-100_BW_g10_5-50.root");
+        TFile *tp_123 = TFile::Open("DATA_Sig-CB_BW-Back-Exp_Imp.root");
+        TFile *tp_1234 = TFile::Open("DATA_Sig-CB_BW-Back-Exp_Conv.root");
+        TFile *tp_12345 = TFile::Open("DATA_Sig-CB_BW-Back-Exp_Iso.root");
+        TFile *tp_123456 = TFile::Open("DATA_Sig-CB_BW-Back-Exp_EiD.root");
         
         //outputof TPPlots macro
-        TFile* outplots = new TFile("TPStudy_CB_Sg_2-100_a10_0-100_n5_0-100_BW_g10_5-50.root", "RECREATE");
+        TFile* outplots = new TFile("TPStudy_Sig-CB_BW-Back-Exp.root", "RECREATE");
         
         double xmin, xmax;
         
@@ -71,14 +72,14 @@ void TPPlots(string multiplicity, string selections){
        _RecoCutFlags[_Iso] =  "_IsoASYM";
        _RecoCutFlags[_EiD] =  "_EiDASYM";}
      
-       _RecoCutFlags[_Trg] =  "_Trg";      
+       _RecoCutFlags[_Trg] =  "_Trg";     
        _RecoCutFlags[_Imp] =  "_Imp";
     
         if(!signal_MC_file){
 	cout<<"Error! Input files doesn't exist!"<<endl;
 	return;
 	}
-	
+
 TDirectory *REff, *R_Jet_Eff, *TP, *TP_12, *TP_123, *TP_1234, *TP_12345, *TP_123456;
 
 REff      = outplots->mkdir("Relative_Efficiency");
@@ -98,7 +99,6 @@ TPdir_name += _RecoCutFlags[6];
 TP_123456     = TP->mkdir(TPdir_name.c_str());
 	
    /////////////Efficiency - MC
-
    //Denominators
 	
    TH1D* RelEffDenom_MC(0);
@@ -124,7 +124,7 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	TH1D* MCJetNumber_123456 = (TH1D*) signal_MC_file->Get(MCJetEff_name.c_str());
 
         //Relative Efficiency from MC
-        
+             
         R_Jet_Eff->cd();
             
         TGraphAsymmErrors Eff_MC_Rel1(MCJetNumber_1, RelEffDenom_MC);
@@ -133,7 +133,7 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         TGraphAsymmErrors Eff_MC_Rel1234(MCJetNumber_1234, MCJetNumber_123);
         TGraphAsymmErrors Eff_MC_Rel12345(MCJetNumber_12345, MCJetNumber_1234);
         TGraphAsymmErrors Eff_MC_Rel123456(MCJetNumber_123456, MCJetNumber_12345);
-        
+      
         string Eff_MC_Relname="RelativeEff_MC";
         Eff_MC_Relname+=_RecoCutFlags[1].c_str();
         Eff_MC_Rel1.SetNameTitle(Eff_MC_Relname.c_str(), Eff_MC_Relname.c_str());
@@ -190,7 +190,6 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	REffJet->Write("Cut_RelativeEfficiency_VsGenJet.root");
 	REffJet->Close();
 	
-        
 ////////////////////////////////////////////////////////////////////////////////////	
 	
         //Tag And Probe
@@ -341,7 +340,8 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         TGraphAsymmErrors* tp_eff_123 = (TGraphAsymmErrors*) tp_123->Get("FitDoubleTag&Probe");
         TGraphAsymmErrors* tp_eff_1234 = (TGraphAsymmErrors*) tp_1234->Get("FitDoubleTag&Probe");
         TGraphAsymmErrors* tp_eff_12345 = (TGraphAsymmErrors*) tp_12345->Get("FitDoubleTag&Probe");
-        
+        TGraphAsymmErrors* tp_eff_123456 = (TGraphAsymmErrors*) tp_123456->Get("FitDoubleTag&Probe");
+      
         //////////////////////////////////////////////////7
                 
         int n_12 = Eff_TP_Single_12.GetN();
@@ -453,7 +453,7 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         if(selections=="SYM")veyh_123456(i) = 2 * y * Eff_TP_Single_123456.GetErrorYhigh(i);
         if(selections=="ASYM")veyh_123456(i) = TMath::Sqrt(pow(y1*Eff_TP_Single_123456.GetErrorYhigh(i),2)+pow(y*Eff_TP_Single1_123456.GetErrorYhigh(i),2));
         } 
-        
+    
         TGraphAsymmErrors Eff_TP_Double_12(vx_12, vy_12, vexl_12, vexh_12, veyl_12, veyh_12);
         TGraphAsymmErrors Eff_TP_Double_123(vx_123, vy_123, vexl_123, vexh_123, veyl_123, veyh_123);
         TGraphAsymmErrors Eff_TP_Double_1234(vx_1234, vy_1234, vexl_1234, vexh_1234, veyl_1234, veyh_1234);
@@ -482,7 +482,7 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	Eff_TP_Double_12.SetMarkerStyle(21);
 	Eff_TP_Double_12.SetMarkerColor(2);
 	Eff_TP_Double_12.Draw("AP");
-	Eff_TP_Double_12.SetTitle("Cut eff: MC (black), TP w/o back (red), TP w back (blue)");
+	Eff_TP_Double_12.SetTitle("Cut eff: MC Rel Eff (black), MC TP w/o back (red), Data (blue)");
 	Eff_TP_Double_12.GetXaxis()->SetRangeUser(xmin,xmax);
 	Eff_TP_Double_12.GetYaxis()->SetRangeUser(0.3,1.05); 
         Eff_MC_Rel12.SetLineColor(1);
@@ -506,7 +506,7 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	Eff_TP_Double_123.SetLineWidth(2);
 	Eff_TP_Double_123.SetMarkerColor(2);
 	Eff_TP_Double_123.Draw("AP");
-	Eff_TP_Double_123.SetTitle("Cut eff: MC (black), TP w/o back (red), TP w back (blue)");
+	Eff_TP_Double_123.SetTitle("Cut eff: MC Rel Eff (black), MC TP w/o back (red), Data (blue)");
 	Eff_TP_Double_123.GetXaxis()->SetRangeUser(xmin,xmax);
 	Eff_TP_Double_123.GetYaxis()->SetRangeUser(0.3,1.05);
 	tp_eff_123->SetLineColor(4);
@@ -541,7 +541,7 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	tp_eff_1234->SetMarkerStyle(23);
 	tp_eff_1234->SetMarkerColor(4);
 	tp_eff_1234->DrawClone("PSAME");	
-	Eff_TP_Double_1234.SetTitle("Cut eff: MC (black), TP w/o back (red), TP w back (blue)");
+	Eff_TP_Double_1234.SetTitle("Cut eff: MC Rel Eff (black), MC TP w/o back (red), Data (blue)");
 	Eff_TP_Double_1234.GetXaxis()->SetRangeUser(xmin,xmax);
 	Eff_TP_Double_1234.GetYaxis()->SetRangeUser(0.3,1.05);    
         Eff_MC_Rel1234.SetLineColor(1);
@@ -572,7 +572,7 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	tp_eff_12345->SetMarkerStyle(23);
 	tp_eff_12345->SetMarkerColor(4);
 	tp_eff_12345->DrawClone("PSAME");	
-	Eff_TP_Double_12345.SetTitle("Cut eff: MC (black), TP w/o back (red), TP w back (blue)");
+	Eff_TP_Double_12345.SetTitle("Cut eff: MC Rel Eff (black), MC TP w/o back (red), Data (blue)");
 	Eff_TP_Double_12345.GetXaxis()->SetRangeUser(xmin,xmax);
 	Eff_TP_Double_12345.GetYaxis()->SetRangeUser(0.3,1.05);      
         Eff_MC_Rel12345.SetLineColor(1);
@@ -599,7 +599,12 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	Eff_TP_Double_123456.SetMarkerStyle(21);
 	Eff_TP_Double_123456.SetMarkerColor(2);
 	Eff_TP_Double_123456.Draw("AP");
-	Eff_TP_Double_123456.SetTitle("Cut eff: MC (black), TP w/o back (red), TP w back (blue)");
+	tp_eff_123456->SetLineColor(4);
+	tp_eff_123456->SetLineWidth(2);
+	tp_eff_123456->SetMarkerStyle(23);
+	tp_eff_123456->SetMarkerColor(4);
+	tp_eff_123456->DrawClone("PSAME");
+	Eff_TP_Double_123456.SetTitle("Cut eff: MC Rel Eff (black), MC TP w/o back (red), Data (blue)");
 	Eff_TP_Double_123456.GetXaxis()->SetRangeUser(xmin,xmax);
 	Eff_TP_Double_123456.GetYaxis()->SetRangeUser(0.3,1.05);
         Eff_MC_Rel123456.SetLineColor(1);
@@ -669,7 +674,7 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	TP_Res2_123.SetLineWidth(2);
 	TP_Res2_123.SetMarkerColor(4);
 	TP_Res2_123.Draw("PSAME");
-	TP_Res1_123.SetTitle("TP residuals from MC: TP w/o back (red), TP w back (blue)");
+	TP_Res1_123.SetTitle("TP residuals from MC Rel Eff: MC TP w/o back (red), Data (blue)");
 	TP_Res1_123.GetXaxis()->SetRangeUser(xmin,xmax);
 	TP_Res1_123.GetYaxis()->SetRangeUser(-0.3,0.3);
 	ResTP_123->Write("ResTP_Imp.root");
@@ -722,7 +727,7 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	TP_Res2_1234.SetLineWidth(2);
 	TP_Res2_1234.SetMarkerColor(4);
 	TP_Res2_1234.Draw("PSAME");
-	TP_Res1_1234.SetTitle("TP residuals from MC: TP w/o back (red), TP w back (blue)");
+	TP_Res1_1234.SetTitle("TP residuals from MC Rel Eff: MC TP w/o back (red), Data (blue)");
 	TP_Res1_1234.GetXaxis()->SetRangeUser(xmin,xmax);
 	TP_Res1_1234.GetYaxis()->SetRangeUser(-0.3,0.3);
 	ResTP_1234->Write("ResTP_Iso.root");
@@ -775,11 +780,64 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	TP_Res2_12345.SetLineWidth(2);
 	TP_Res2_12345.SetMarkerColor(4);
 	TP_Res2_12345.Draw("PSAME");
-	TP_Res1_12345.SetTitle("TP residuals from MC: TP w/o back (red), TP w back (blue)");
+	TP_Res1_12345.SetTitle("TP residuals from MC Rel Eff: MC TP w/o back (red), Data (blue)");
 	TP_Res1_12345.GetXaxis()->SetRangeUser(xmin,xmax);
 	TP_Res1_12345.GetYaxis()->SetRangeUser(-0.3,0.3);
-	ResTP_12345->Write("ResTP_EiD.root");
+	ResTP_12345->Write("ResTP_Iso.root");
 	ResTP_12345->Close();
+	
+	TVectorD res1vx_123456(n_123456);
+        TVectorD res1vy_123456(n_123456);
+        TVectorD res1vexl_123456(n_123456);
+        TVectorD res1vexh_123456(n_123456);
+        TVectorD res1veyl_123456(n_123456);
+        TVectorD res1veyh_123456(n_123456);
+        TVectorD res2vx_123456(n_123456);
+        TVectorD res2vy_123456(n_123456);
+        TVectorD res2vexl_123456(n_123456);
+        TVectorD res2vexh_123456(n_123456);
+        TVectorD res2veyl_123456(n_123456);
+        TVectorD res2veyh_123456(n_123456);
+       
+        for ( int i = 0; i < n_123456; ++i ){
+        double x0 = 0., y0 = 0., x1 = 0., y1 = 0., x2 = 0., y2 = 0.;
+        Eff_MC_Rel12345.GetPoint(i, x0, y0);
+        Eff_TP_Double_123456.GetPoint(i, x1, y1);
+        tp_eff_123456->GetPoint(i, x2, y2);
+        res1vx_123456(i)   = i;
+        res1vexl_123456(i) = Eff_MC_Rel12345.GetErrorXlow(i);
+        res1vexh_123456(i) = Eff_MC_Rel12345.GetErrorXhigh(i);
+        res1vy_123456(i)   = y1-y0;
+        res1veyl_123456(i) = TMath::Sqrt(pow(Eff_MC_Rel12345.GetErrorYlow(i),2)+pow(Eff_TP_Double_123456.GetErrorYlow(i),2));
+        res1veyh_123456(i) = TMath::Sqrt(pow(Eff_MC_Rel12345.GetErrorYhigh(i),2)+pow(Eff_TP_Double_123456.GetErrorYhigh(i),2));
+        res2vx_123456(i)   = i;
+        res2vexl_123456(i) = Eff_MC_Rel12345.GetErrorXlow(i);
+        res2vexh_123456(i) = Eff_MC_Rel12345.GetErrorXhigh(i);
+        res2vy_123456(i)   = y2-y0;
+        res2veyl_123456(i) = TMath::Sqrt(pow(Eff_MC_Rel12345.GetErrorYlow(i),2)+pow(tp_eff_123456->GetErrorYlow(i),2));
+        res2veyh_123456(i) = TMath::Sqrt(pow(Eff_MC_Rel12345.GetErrorYhigh(i),2)+pow(tp_eff_123456->GetErrorYhigh(i),2));
+        }
+              
+        TP_123456->cd();
+        TGraphAsymmErrors TP_Res1_123456(res1vx_123456, res1vy_123456, res1vexl_123456, res1vexh_123456, res1veyl_123456, res1veyh_123456);
+        TGraphAsymmErrors TP_Res2_123456(res2vx_123456, res2vy_123456, res2vexl_123456, res2vexh_123456, res2veyl_123456, res2veyh_123456);
+        TCanvas *ResTP_123456 = new TCanvas;
+        ResTP_123456->SetGrid();
+        TP_Res1_123456.SetLineColor(2);
+	TP_Res1_123456.SetMarkerStyle(21);
+	TP_Res1_123456.SetLineWidth(2);
+	TP_Res1_123456.SetMarkerColor(2);
+	TP_Res1_123456.Draw("AP");
+	TP_Res2_123456.SetLineColor(4);
+	TP_Res2_123456.SetMarkerStyle(23);
+	TP_Res2_123456.SetLineWidth(2);
+	TP_Res2_123456.SetMarkerColor(4);
+	TP_Res2_123456.Draw("PSAME");
+	TP_Res1_123456.SetTitle("TP residuals from MC Rel Eff: MC TP w/o back (red), Data (blue)");
+	TP_Res1_123456.GetXaxis()->SetRangeUser(xmin,xmax);
+	TP_Res1_123456.GetYaxis()->SetRangeUser(-0.3,0.3);
+	ResTP_123456->Write("ResTP_EiD.root");
+	ResTP_123456->Close();
 	
 	
   outplots->Write();
