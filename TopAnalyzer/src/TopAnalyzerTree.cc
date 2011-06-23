@@ -13,7 +13,7 @@
 //
 // Original Author:  Obluraski
 //         Created:  Fri Jul  3 15:48:26 CEST 2009
-// $Id: TopAnalyzerTree.cc,v 1.2 2011/05/12 13:41:44 tropiano Exp $
+// $Id: TopAnalyzerTree.cc,v 1.3 2011/05/31 18:47:04 tropiano Exp $
 //
 //
 
@@ -45,6 +45,13 @@
 #include "DataFormats/PatCandidates/interface/TriggerPath.h"
 #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
+
+//trigger
+#include "DataFormats/Common/interface/TriggerResults.h"
+#include "FWCore/Common/interface/TriggerNames.h"
+//lumi reweighting
+#include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h" 
 
 #include "TH1.h"
 #include "TH1F.h"
@@ -93,6 +100,8 @@ private:
   edm::InputTag triggerSrc_;
   std::vector<std::string> triggerName_;
   edm::InputTag vertexSrc_;
+  bool isMC_;
+  edm::InputTag triggerTag_;
   //kinematic cuts
 
   float photon_ptcut_;
@@ -183,6 +192,7 @@ private:
   float NbtagHEloose;
   float NbtagHEmedium;
   
+  float weight;
   //file and tree
   TFile* output;
   TTree* TopTree;
@@ -212,23 +222,6 @@ std::vector<math::XYZVector> makeVecForEventShapeTree(std::vector<pat::Jet> jets
   return p;
 }
 
-double etaetaMomentHome(pat::Jet jet) {
-  //std::cout<< "in etaetaMoment " << std::endl;
-  std::vector<const reco::Candidate*> towers = jet.getJetConstituentsQuick();
-  //std::cout<< "got the constituents " << std::endl;
-  double sumw = 0;
-  double sum = 0;
-  double sum2 = 0;
-  int i = towers.size();
-  while (--i >= 0) {
-    double value = towers[i]->eta();
-    double weight = towers[i]->et();
-    sumw += weight;
-    sum += value * weight;
-    sum2 += value * value * weight;
-  }
-  return sumw > 0 ? (sum2 - sum*sum/sumw ) / sumw : 0;
-}
 
 TopAnalyzerTree::TopAnalyzerTree(const edm::ParameterSet& iConfig):
   outputFile_(iConfig.getUntrackedParameter<std::string>("outputFile")),
@@ -253,7 +246,9 @@ TopAnalyzerTree::TopAnalyzerTree(const edm::ParameterSet& iConfig):
   discr_cut4_(iConfig.getParameter<double>("BtagDiscrCut4")), 
   btag_algo1_(iConfig.getParameter<std::string>("BtagAlgo1")),
   btag_algo2_(iConfig.getParameter<std::string>("BtagAlgo2")),
-  relIso_(iConfig.getParameter<double>("RelIso"))
+  relIso_(iConfig.getParameter<double>("RelIso")),
+  isMC_(iConfig.getParameter<bool>("isMC")),
+  triggerTag_(iConfig.getParameter<edm::InputTag>("triggerTag"))
 {
   //now do what ever initialization is needed
   
@@ -288,18 +283,7 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   Handle<edm::View<pat::Muon> > muonsHandle;
   iEvent.getByLabel(muonSrc_,muonsHandle);
   edm::View<pat::Muon> muons = *muonsHandle;
-  //cout<< "muons found" << endl;
-
-  // get photon collection
-  /*Handle<edm::View<pat::Photon> > photonsHandle;
-  iEvent.getByLabel(photonSrc_,photonsHandle);
-  edm::View<pat::Photon> photons = *photonsHandle;*/
-
-  // get tau collection  
-  //Handle<edm::View<pat::Tau> > tausHandle;
-  //iEvent.getByLabel(tauSrc_,tausHandle);
-  //edm::View<pat::Tau> taus = *tausHandle;
-
+  
   // get jet collection
   Handle<edm::View<pat::Jet> > jetsHandle;
   iEvent.getByLabel(jetSrc_,jetsHandle);
@@ -312,33 +296,67 @@ TopAnalyzerTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   edm::View<reco::Vertex> vertex = *vertexHandle;
   //cout<< "vertex found" << endl;
 
-  //get trigger
-  edm::Handle<pat::TriggerEvent> triggerHandle;
+  //get trigger pat
+  /* edm::Handle<pat::TriggerEvent> triggerHandle;
   iEvent.getByLabel(triggerSrc_, triggerHandle);
-  pat::TriggerEvent trigger = *triggerHandle;
+  pat::TriggerEvent trigger = *triggerHandle;*/
   
+  edm::Handle<edm::TriggerResults>  hltresults;
+  iEvent.getByLabel(triggerTag_, hltresults);
 
+  //lumi reweighting
+  //edm::LumiReWeighting LumiWeights_;
+  
   std::vector<pat::Jet> all_jets;
   std::vector<pat::Jet> selec_jets;
   bool triggered = false;
   int nvertex    = 0;
+
+  /*Handle<std::vector< PileupSummaryInfo > >  PupInfo;
+  iEvent.getByLabel(edm::InputTag("addPileupInfo"), PupInfo);
+  
+  weight  = 1.;
+  std::vector<PileupSummaryInfo>::const_iterator PVI;
+  int npv = -1;
+  for(PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI) {
+  
+    int BX = PVI->getBunchCrossing();
+    
+    if(BX == 0) { 
+      npv = PVI->getPU_NumInteractions();
+      continue;
+    }
+
+  }
+
+  weight = LumiWeights_.weight( npv );*/
+  
+  //code to reweight events for the pile up content
+  
+
+  /*if(isMC_) {
+    LumiWeights_ = edm::LumiReWeighting("pileup_spring11.root", "pileup_data_new.root", "top/pileup", "pileup");
+    weight = LumiWeights_.weight( iEvent );
+    }*/
   
   std::vector<pat::Jet> selec_jets_electrons;
-  //std::cout<<"trigger path "<<*(trigger.acceptedPaths().begin())<<std::endl;
-  
-  /*for(std::vector<pat::TriggerPath>::const_iterator ipath = trigger.paths()->begin(); ipath!=trigger.paths()->end(); ipath++)
-    {
-      cout<<"trigger path "<<ipath->name()<<endl;
-      }*/
-  
+ 
+
+  const edm::TriggerNames TrigNames = iEvent.triggerNames(*hltresults);
+  const int ntrigs = hltresults->size();
+  //std::cout<<"number of triggers: "<< ntrigs <<std::endl;
+
   for(std::vector<std::string>::const_iterator iname = triggerName_.begin(); iname!=triggerName_.end(); iname++)
     {
-      //cout << "trigger name " << *iname << endl;
-      if(trigger.path(*iname) && trigger.path(*iname)->wasRun() && trigger.path(*iname)->wasAccept()){
-	//if(trigger.path(*iname)->wasAccept()) 
-	triggered=true;
-      }  
-    }
+      for ( int itr = 0; itr < ntrigs; ++itr ) {
+	if ( hltresults->accept( itr ) && TrigNames.triggerName(itr)== *iname) {
+	  //std::cout<<"trigger accepted: "<< *iname << std::endl;
+	  triggered=true;
+	}
+      }
+    } 
+
+  
   
   if(triggered)
     {
@@ -664,10 +682,12 @@ TopAnalyzerTree::beginJob()
   TopTree->Branch("phimoment",             &phimoment,              "phimoment/F",             bufsize);
   TopTree->Branch("leptonveto",            &leptonveto,             "leptonveto/F",             bufsize);
   
-  TopTree->Branch("NbtagHPloose",            &NbtagHPloose,             "NbtagHPloose/F",             bufsize);
+  TopTree->Branch("NbtagHPloose",            &NbtagHPloose,             "NbtagHPloose/F",              bufsize);
   TopTree->Branch("NbtagHPmedium",           &NbtagHPmedium,            "NbtagHPmedium/F",             bufsize);
-  TopTree->Branch("NbtagHEloose",            &NbtagHEloose,             "NbtagHEloose/F",             bufsize);
+  TopTree->Branch("NbtagHEloose",            &NbtagHEloose,             "NbtagHEloose/F",              bufsize);
   TopTree->Branch("NbtagHEmedium",           &NbtagHEmedium,            "NbtagHEmedium/F",             bufsize);
+  
+  TopTree->Branch("weight",                  &weight,                   "weight/F",                    bufsize);
   
 }
 // ------------ method called once each job just after ending the event loop  ------------
