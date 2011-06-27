@@ -25,7 +25,7 @@
 
 using namespace std;
 
-//multiplicity: "excl" = exclusive multiplicity; "incl" = inclusive multiplicity
+//multiplicity: "Excl" = exclusive multiplicity; "Incl" = inclusive multiplicity
 //Selections: "SYM" = V+jets selections (old); "ASYM" = Vector Boson Task Force (new)
 
 void TPPlots(string multiplicity, string selections){
@@ -39,15 +39,26 @@ void TPPlots(string multiplicity, string selections){
         TFile *tp_123 = TFile::Open("DATA_Sig-CB_BW-Back-Exp_Imp.root");
         TFile *tp_1234 = TFile::Open("DATA_Sig-CB_BW-Back-Exp_Conv.root");
         TFile *tp_12345 = TFile::Open("DATA_Sig-CB_BW-Back-Exp_Iso.root");
-        TFile *tp_123456 = TFile::Open("DATA_Sig-CB_BW-Back-Exp_EiD.root");
+        TFile *tp_123456 = TFile::Open("DATA_Sig-CB_BW-Back-Exp_EiD_NoTrBack.root");
         
-        //outputof TPPlots macro
-        TFile* outplots = new TFile("TPStudy_Sig-CB_BW-Back-Exp.root", "RECREATE");
+        //Output
+        string out = "TPStudy_TEST";
+        string output = out;
+        output+=".root";
+        TFile* outplots = new TFile(output.c_str(), "RECREATE");
+        
+        ofstream tpr;
+	string outtpr="TagProbeReport_";
+	outtpr+=out;
+	outtpr+=".txt";
+	tpr.open(outtpr.c_str());
+	tpr<<endl;
         
         double xmin, xmax;
         
         xmin=-0.5;
         xmax=3.5;
+        int cut_decimal = 10000;
 	
 	int _Acc  = 1;
 	int _Trg  = 2;	
@@ -103,12 +114,12 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	
    TH1D* RelEffDenom_MC(0);
    
-   if(multiplicity=="excl")RelEffDenom_MC = (TH1D*) signal_MC_file->Get("EfficiencyElectron/EffDenom_RecoExclJetNumber");
-   if(multiplicity=="incl")RelEffDenom_MC = (TH1D*) signal_MC_file->Get("EfficiencyElectron/EffDenom_RecoInclJetNumber");
+   if(multiplicity=="Excl")RelEffDenom_MC = (TH1D*) signal_MC_file->Get("EfficiencyElectron/EffDenom_RecoExclJetNumber");
+   if(multiplicity=="Incl")RelEffDenom_MC = (TH1D*) signal_MC_file->Get("EfficiencyElectron/EffDenom_RecoInclJetNumber");
 
 	string MCJetEff_name;
-	if(multiplicity=="excl")MCJetEff_name = "EfficiencyElectron/RecoExclJetEff";
-	if(multiplicity=="incl")MCJetEff_name = "EfficiencyElectron/RecoInclJetEff";
+	if(multiplicity=="Excl")MCJetEff_name = "EfficiencyElectron/RecoExclJetEff";
+	if(multiplicity=="Incl")MCJetEff_name = "EfficiencyElectron/RecoInclJetEff";
 	
 	MCJetEff_name+=_RecoCutFlags[1].c_str();
         TH1D* MCJetNumber_1 = (TH1D*) signal_MC_file->Get(MCJetEff_name.c_str());
@@ -527,6 +538,20 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	EffTP_123->Write(EffTP_123_name.c_str());
 	EffTP_123->Close();
 	
+	tpr<<"Relative efficiency vs "<<multiplicity<<" jet multiplicity"<<endl;
+	
+	tpr<<endl<<"Selection: "<<_RecoCutFlags[3]<<endl<<endl;
+	for(int i=0; i<4; i++){
+	double xMCeff = 0., yMCeff = 0.;
+	double xMCSigTp = 0., yMCSigTp = 0.;
+	double xDATA = 0., yDATA = 0.;
+	Eff_MC_Rel123.GetPoint(i,xMCeff,yMCeff);
+	Eff_TP_Double_123.GetPoint(i,xMCSigTp,yMCSigTp);
+	tp_eff_123->GetPoint(i,xDATA,yDATA);
+	tpr<<multiplicity<<" Mult. = "<<i<<"	MC eff. =	"<<((float)((int)(yMCeff*cut_decimal)))/cut_decimal<<"	Error High = "<<((float)((int)(Eff_MC_Rel123.GetErrorYhigh(i)*cut_decimal)))/cut_decimal<<"	Error Low = "<<((float)((int)(Eff_MC_Rel123.GetErrorYlow(i)*cut_decimal)))/cut_decimal<<endl;
+	tpr<<"		MC Sig TP =	"<<((float)((int)(yMCSigTp*cut_decimal)))/cut_decimal<<"	Error High = "<<((float)((int)(Eff_TP_Double_123.GetErrorYhigh(i)*cut_decimal)))/cut_decimal<<"	Error Low = "<<((float)((int)(Eff_TP_Double_123.GetErrorYlow(i)*cut_decimal)))/cut_decimal<<endl;
+	tpr<<"		DATA TP =	"<<((float)((int)(yDATA*cut_decimal)))/cut_decimal<<"	ErrorHigh = "<<((float)((int)(tp_eff_123->GetErrorYhigh(i)*cut_decimal)))/cut_decimal<<"	Error Low = "<<((float)((int)(tp_eff_123->GetErrorYlow(i)*cut_decimal)))/cut_decimal<<endl<<endl;}
+		
 	TP_1234->cd();
         Eff_TP_Single_1234.Write();
         Eff_TP_Double_1234.Write();
@@ -557,6 +582,18 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         EffTP_1234_name+=".root";
 	EffTP_1234->Write(EffTP_1234_name.c_str());
 	EffTP_1234->Close();
+	
+	tpr<<endl<<endl<<"Selection: "<<_RecoCutFlags[4]<<endl<<endl;
+	for(int i=0; i<4; i++){
+	double xMCeff = 0., yMCeff = 0.;
+	double xMCSigTp = 0., yMCSigTp = 0.;
+	double xDATA = 0., yDATA = 0.;
+	Eff_MC_Rel1234.GetPoint(i,xMCeff,yMCeff);
+	Eff_TP_Double_1234.GetPoint(i,xMCSigTp,yMCSigTp);
+	tp_eff_1234->GetPoint(i,xDATA,yDATA);
+	tpr<<multiplicity<<" Mult. = "<<i<<"	MC eff. =	"<<((float)((int)(yMCeff*cut_decimal)))/cut_decimal<<"	Error High = "<<((float)((int)(Eff_MC_Rel1234.GetErrorYhigh(i)*cut_decimal)))/cut_decimal<<"	Error Low = "<<((float)((int)(Eff_MC_Rel1234.GetErrorYlow(i)*cut_decimal)))/cut_decimal<<endl;
+	tpr<<"		MC Sig TP =	"<<((float)((int)(yMCSigTp*cut_decimal)))/cut_decimal<<"	Error High = "<<((float)((int)(Eff_TP_Double_1234.GetErrorYhigh(i)*cut_decimal)))/cut_decimal<<"	Error Low = "<<((float)((int)(Eff_TP_Double_1234.GetErrorYlow(i)*cut_decimal)))/cut_decimal<<endl;
+	tpr<<"		DATA TP =	"<<((float)((int)(yDATA*cut_decimal)))/cut_decimal<<"	ErrorHigh = "<<((float)((int)(tp_eff_1234->GetErrorYhigh(i)*cut_decimal)))/cut_decimal<<"	Error Low = "<<((float)((int)(tp_eff_1234->GetErrorYlow(i)*cut_decimal)))/cut_decimal<<endl<<endl;}
 	
 	TP_12345->cd();
         Eff_TP_Single_12345.Write();
@@ -590,6 +627,18 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
 	EffTP_12345->Write(EffTP_12345_name.c_str());
 	EffTP_12345->Close();
 	
+	tpr<<endl<<endl<<"Selection: "<<_RecoCutFlags[5]<<endl<<endl;
+	for(int i=0; i<4; i++){
+	double xMCeff = 0., yMCeff = 0.;
+	double xMCSigTp = 0., yMCSigTp = 0.;
+	double xDATA = 0., yDATA = 0.;
+	Eff_MC_Rel12345.GetPoint(i,xMCeff,yMCeff);
+	Eff_TP_Double_12345.GetPoint(i,xMCSigTp,yMCSigTp);
+	tp_eff_12345->GetPoint(i,xDATA,yDATA);
+	tpr<<multiplicity<<" Mult. = "<<i<<"	MC eff. =	"<<((float)((int)(yMCeff*cut_decimal)))/cut_decimal<<"	Error High = "<<((float)((int)(Eff_MC_Rel12345.GetErrorYhigh(i)*cut_decimal)))/cut_decimal<<"	Error Low = "<<((float)((int)(Eff_MC_Rel12345.GetErrorYlow(i)*cut_decimal)))/cut_decimal<<endl;
+	tpr<<"		MC Sig TP =	"<<((float)((int)(yMCSigTp*cut_decimal)))/cut_decimal<<"	Error High = "<<((float)((int)(Eff_TP_Double_12345.GetErrorYhigh(i)*cut_decimal)))/cut_decimal<<"	Error Low = "<<((float)((int)(Eff_TP_Double_12345.GetErrorYlow(i)*cut_decimal)))/cut_decimal<<endl;
+	tpr<<"		DATA TP =	"<<((float)((int)(yDATA*cut_decimal)))/cut_decimal<<"	ErrorHigh = "<<((float)((int)(tp_eff_12345->GetErrorYhigh(i)*cut_decimal)))/cut_decimal<<"	Error Low = "<<((float)((int)(tp_eff_12345->GetErrorYlow(i)*cut_decimal)))/cut_decimal<<endl<<endl;}
+	
 	TP_123456->cd();
         Eff_TP_Single_123456.Write();
         Eff_TP_Double_123456.Write();
@@ -622,6 +671,18 @@ TP_123456     = TP->mkdir(TPdir_name.c_str());
         EffTP_123456_name+=".root";
 	EffTP_123456->Write(EffTP_123456_name.c_str());
 	EffTP_123456->Close();
+	
+	tpr<<endl<<endl<<"Selection: "<<_RecoCutFlags[6]<<endl<<endl;
+	for(int i=0; i<4; i++){
+	double xMCeff = 0., yMCeff = 0.;
+	double xMCSigTp = 0., yMCSigTp = 0.;
+	double xDATA = 0., yDATA = 0.;
+	Eff_MC_Rel123456.GetPoint(i,xMCeff,yMCeff);
+	Eff_TP_Double_123456.GetPoint(i,xMCSigTp,yMCSigTp);
+	tp_eff_123456->GetPoint(i,xDATA,yDATA);
+	tpr<<multiplicity<<" Mult. = "<<i<<"	MC eff. =	"<<((float)((int)(yMCeff*cut_decimal)))/cut_decimal<<"	Error High = "<<((float)((int)(Eff_MC_Rel123456.GetErrorYhigh(i)*cut_decimal)))/cut_decimal<<"	Error Low = "<<((float)((int)(Eff_MC_Rel123456.GetErrorYlow(i)*cut_decimal)))/cut_decimal<<endl;
+	tpr<<"		MC Sig TP =	"<<((float)((int)(yMCSigTp*cut_decimal)))/cut_decimal<<"	Error High = "<<((float)((int)(Eff_TP_Double_123456.GetErrorYhigh(i)*cut_decimal)))/cut_decimal<<"	Error Low = "<<((float)((int)(Eff_TP_Double_123456.GetErrorYlow(i)*cut_decimal)))/cut_decimal<<endl;
+	tpr<<"		DATA TP =	"<<((float)((int)(yDATA*cut_decimal)))/cut_decimal<<"	ErrorHigh = "<<((float)((int)(tp_eff_123456->GetErrorYhigh(i)*cut_decimal)))/cut_decimal<<"	Error Low = "<<((float)((int)(tp_eff_123456->GetErrorYlow(i)*cut_decimal)))/cut_decimal<<endl<<endl;}
 	
 /////////////////////////////////////////////////////////////////////////////////////////
 

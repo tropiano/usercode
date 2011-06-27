@@ -824,7 +824,7 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
      GenExclJetEff_1->Fill(isogenjets.size());
      
      //Eff vs Reco Jet variables
-     for(unsigned int i = 0; (i < isogenjets.size()+1)&&((i+1)<10); i++)RecoInclJetEff_1->AddBinContent(i+1,1);
+     for(unsigned int i = 0; (i < geniso_recjets.size()+1)&&((i+1)<10); i++)RecoInclJetEff_1->AddBinContent(i+1,1);
      RecoExclJetEff_1->Fill(geniso_recjets.size());
      
      }
