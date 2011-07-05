@@ -14,29 +14,23 @@ using namespace std;
 int main() {
 
   //Input files
-  //string training_sign = "TagProbe/TPFiles/Z_Madgraph_JetPt30_train.root";
-  //string training_back = "TagProbe/TPFiles/Background_JetPt30_All_train.root";
-  //string total = "TagProbe/TPFiles/Data_RUN2010_JetPt30.root";
-  string training_sign = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/Z_Madgraph_JetPt30_train.root";
-  string training_back = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/Background_JetPt30_All_train.root";
-  string total = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/Data_RUN2010_JetPt30.root";
+  string training_sign = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/JetPt30/Z_Madgraph_L1FastJet_JetPt30_399.root";
+  string training_back = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/JetPt30/Background_JetPt30_All.root";
+  string total = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/JetPt30/Data_RUN2010A-B_L1FastJet_399.root";
   
   //Output files
-  //string output_train_sign =  "TagProbe/TPAnalyzer/TPAnalyzer_Signal_JetPt30_train_Imp.root";
-  //string output_train_back =  "TagProbe/TPAnalyzer/TPAnalyzer_Background_JetPt30_train_Imp.root";
-  //string output_total =  "TagProbe/TPAnalyzer/TPAnalyzer_Data_Run2010_Dec22ReReco_JetPt30_Imp.root";
   string output_train_sign =  
-"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TestAnalyzer/TEST_CB-BW_TrainSig_EiD_CB_Sg_2-100_a10_0-100_n5_0-100_BW_g10_5-50.root";
-  string output_train_back =  
-"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TestAnalyzer/TEST_CB-BW_TrainBack_EiD_CB_Sg_2-100_a10_0-100_n5_0-100_BW_g10_5-50.root";
+"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPAnalyzer_OldEffFormula/JetPt30_FloatMean/TrainSig_CB_Sg_2-100_a10_0-100_n5_0-100_BW_g10_5-50_Conv.root";
+  string output_train_back = 
+"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPAnalyzer_OldEffFormula/JetPt30_FloatMean/TrainBack_Exp-1_-100_100_Conv.root";
   string output_total =  
-"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TestAnalyzer/TEST_CB-BW_DATA_EiD_CB_Sg_2-100_a10_0-100_n5_0-100_BW_g10_5-50.root";
+"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPAnalyzer_OldEffFormula/JetPt30_FloatMean/DATA_Sig-CB_BW-Back-Exp_Conv.root";
 
   //Selections used
   string selections = "ASYM";
   
   //Cut to evaluate
-  string cut = "_EiDASYM";
+  string cut = "_ConvASYM";
   
   //Analyzer steps
   bool tr_sig = true;
