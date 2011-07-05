@@ -39,29 +39,29 @@ string Tab_cut = "True";
         
                 
 	//Background MC
-	TFile* QCD_EMEnriched_all_TF = TFile::Open("Simulazioni/QCD_EMEnriched_Pythia_all.root");
-	TFile* QCD_BCtoE_all_TF = TFile::Open("Simulazioni/QCD_BCtoE_Pythia_allBut20.root");
-	TFile* TTbar_TF = TFile::Open("Simulazioni/TT_Pythia.root");
-	TFile* Wlnu_TF = TFile::Open("Simulazioni/Wlnu_Madgraph.root");
-	TFile* WWEE_TF = TFile::Open("Simulazioni/WWEE_Pythia.root");
-	TFile* WZEE_TF = TFile::Open("Simulazioni/WZEE_Pythia.root");
-	TFile* ZZEE_TF = TFile::Open("Simulazioni/ZZEE_Pythia.root");
+	TFile* QCD_EMEnriched_all_TF = TFile::Open("MC_Fall10_387/JetPt15/QCD_EMEnriched_Pythia_All.root");
+	TFile* QCD_BCtoE_all_TF = TFile::Open("MC_Fall10_387/JetPt15/QCD_BCtoE_Pythia_All.root");
+	TFile* TTbar_TF = TFile::Open("MC_Fall10_387/JetPt15/TT_Pythia.root");
+	TFile* Wlnu_TF = TFile::Open("MC_Fall10_387/JetPt15/Wlnu_Madgraph.root");
+	TFile* WWEE_TF = TFile::Open("MC_Fall10_387/JetPt15/WWEE_Pythia.root");
+	TFile* WZEE_TF = TFile::Open("MC_Fall10_387/JetPt15/WZEE_Pythia.root");
+	TFile* ZZEE_TF = TFile::Open("MC_Fall10_387/JetPt15/ZZEE_Pythia.root");
 	
 	//Signal MC
-	TFile *Z_TF = TFile::Open("Simulazioni/Z_Madgraph.root");
+	TFile *Z_TF = TFile::Open("MC_Winter10_399/Z_Madgraph_L1FastJet_JetPt15_399.root");
 	
 	//Data
-	TFile *Data_TF = TFile::Open("Dati/Data_RUN2010.root");
+	TFile *Data_TF = TFile::Open("DATA_Dec22ReReco/JetPt15/Data_RUN2010A-B_L1FastJet_399.root");
 	
 	//Output
-	string out = "recZElectronsPlots";        
+	string out = "recZElectronsPlots_L1FastJet_JetPt15_399";        
 	string output = out;
 	output+=".root";
 	TFile* outplots = new TFile(output.c_str(), "RECREATE");
 	
 	//Normalization factor
 	double iniLumi = 50.; //pb-1
-	double targetLumi = 34.4; //pb-1
+	double targetLumi = 36.176; //pb-1
 	double scale = 1.;
 	if(iniLumi!=0)scale = targetLumi/iniLumi;
 
@@ -237,16 +237,15 @@ string Tab_cut = "True";
 	
 	if(selections=="SYM"){
 		_RecoCutFlags[_Acc] =  "_AccSYM";
-		_RecoCutFlags[_Conv] = "_ConvSYM";
 		_RecoCutFlags[_Iso] =  "_IsoSYM";
 		_RecoCutFlags[_EiD] =  "_EiDSYM";}
 	if(selections=="ASYM"){
 		_RecoCutFlags[_Acc] =  "_AccASYM";
-		_RecoCutFlags[_Conv] = "_ConvASYM";
 		_RecoCutFlags[_Iso] =  "_IsoASYM";
 		_RecoCutFlags[_EiD] =  "_EiDASYM";}
 	
-	_RecoCutFlags[_Trg] =  "_Trg";	
+	_RecoCutFlags[_Trg] =  "_Trg";
+	_RecoCutFlags[_Conv] = "_ConvASYM";
 	_RecoCutFlags[_Imp] =  "_Imp";
 
         

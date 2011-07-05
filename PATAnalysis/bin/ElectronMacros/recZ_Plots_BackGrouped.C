@@ -44,7 +44,7 @@ string Tab_cut = "True";
 	TFile* TTbar_TF = TFile::Open("MC_Fall10_387/JetPt30/TT_Pythia.root");
 	
 	//Signal MC
-	TFile *Z_TF = TFile::Open("MC_Winter10_399/Z_Madgraph_L1FastJet_JetPt30_399.root");
+	TFile *Z_TF = TFile::Open("MC_Winter10_399/Z_Madgraph_L1FastJet_JetPt30_EffCorr.root");
 	
 	//Data
 	TFile *Data_TF = TFile::Open("DATA_Dec22ReReco/JetPt30/Data_RUN2010A-B_L1FastJet_399.root");
@@ -490,7 +490,7 @@ Dir_4a->cd();
 	cut<<endl<< Tabcut_Mean.c_str() <<((float)((int)(histoData_1->GetMean(1)*cut_decimal)))/cut_decimal<< Tabcut_Mean_um.c_str()<<endl;
 	cut<< Tabcut_Mean_err.c_str() <<((float)((int)(histoData_1->GetMeanError()*cut_decimal)))/cut_decimal<<Tabcut_Mean_um.c_str()<<endl;
 	cut<<endl<<Tabcut_riga.c_str()<<endl;
-	cut<<endl<<Tabcut_QCD_Int.c_str()<<((float)((int)(histoQCD_1->IntegralAndError(0,-1,err_QCD_1,"")*cut_decimal)))/cut_decimal<<endl;
+	cut<<endl<<Tabcut_QCD_Int.c_str()<<((float)((long)(histoQCD_1->IntegralAndError(0,-1,err_QCD_1,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_QCD_Int_err.c_str()<<((float)((int)(err_QCD_1*cut_decimal)))/cut_decimal<<endl<<endl;
 	cut<<Tabcut_TTbar_Int.c_str()<<((float)((int)(histoTTbar_1->IntegralAndError(0,-1,err_TTbar_1,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_TTbar_Int_err.c_str()<<((float)((int)(err_TTbar_1*cut_decimal)))/cut_decimal<<endl<<endl;
@@ -499,9 +499,9 @@ Dir_4a->cd();
 	cut<<Tabcut_Z_Int.c_str()<<((float)((int)(histoZ_1->IntegralAndError(0,-1,err_Z_1,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_Z_Int_err.c_str()<<((float)((int)(err_Z_1*cut_decimal)))/cut_decimal<<endl;
 	cut<<endl<<Tabcut_riga.c_str()<<endl<<endl;
-	cut<<Tabcut_Total_Int.c_str()<<((float)((int)((histoQCD_1->IntegralAndError(0,-1,err_QCD_1,"") + histoTTbar_1->IntegralAndError(0,-1,err_TTbar_1,"") + histoEWK_1->IntegralAndError(0,-1,err_EWK_1,"") + histoZ_1->IntegralAndError(0,-1,err_Z_1,""))*cut_decimal)))/cut_decimal<<endl;
+	cut<<Tabcut_Total_Int.c_str()<<((float)((long)((histoQCD_1->IntegralAndError(0,-1,err_QCD_1,"") + histoTTbar_1->IntegralAndError(0,-1,err_TTbar_1,"") + histoEWK_1->IntegralAndError(0,-1,err_EWK_1,"") + histoZ_1->IntegralAndError(0,-1,err_Z_1,""))*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_Total_Int_err.c_str()<<((float)((int)(sqrt(pow((err_QCD_1),2) + pow((err_TTbar_1),2) + pow((err_EWK_1),2) + pow((err_Z_1),2))*cut_decimal)))/cut_decimal<<endl<<endl;
-	cut<<Tabcut_Data_Int.c_str()<<((float)((int)(histoData_1->IntegralAndError(0,-1,err_Data_1,"")*cut_decimal)))/cut_decimal<<endl;
+	cut<<Tabcut_Data_Int.c_str()<<((float)((long)(histoData_1->IntegralAndError(0,-1,err_Data_1,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_Data_Int_err.c_str()<<((float)((int)(err_Data_1*cut_decimal)))/cut_decimal<<endl;
 	cut<<endl<<Tabcut_end.c_str()<<endl;
 	}

@@ -41,29 +41,29 @@ string Tab_cut = "True";
 string Tab_jetm = "True";                
 
 	//Background MC
-	TFile* QCD_EMEnriched_all_TF = TFile::Open("Simulazioni/QCD_EMEnriched_Pythia_all.root");
-	TFile* QCD_BCtoE_all_TF = TFile::Open("Simulazioni/QCD_BCtoE_Pythia_allBut20.root");
-	TFile* TTbar_TF = TFile::Open("Simulazioni/TT_Pythia.root");
-	TFile* Wlnu_TF = TFile::Open("Simulazioni/Wlnu_Madgraph.root");
-	TFile* WWEE_TF = TFile::Open("Simulazioni/WWEE_Pythia.root");
-	TFile* WZEE_TF = TFile::Open("Simulazioni/WZEE_Pythia.root");
-	TFile* ZZEE_TF = TFile::Open("Simulazioni/ZZEE_Pythia.root");
+	TFile* QCD_EMEnriched_all_TF = TFile::Open("MC_Fall10_387/JetPt15/QCD_EMEnriched_Pythia_All.root");
+	TFile* QCD_BCtoE_all_TF = TFile::Open("MC_Fall10_387/JetPt15/QCD_BCtoE_Pythia_All.root");
+	TFile* TTbar_TF = TFile::Open("MC_Fall10_387/JetPt15/TT_Pythia.root");
+	TFile* Wlnu_TF = TFile::Open("MC_Fall10_387/JetPt15/Wlnu_Madgraph.root");
+	TFile* WWEE_TF = TFile::Open("MC_Fall10_387/JetPt15/WWEE_Pythia.root");
+	TFile* WZEE_TF = TFile::Open("MC_Fall10_387/JetPt15/WZEE_Pythia.root");
+	TFile* ZZEE_TF = TFile::Open("MC_Fall10_387/JetPt15/ZZEE_Pythia.root");
 	
 	//Signal MC
-	TFile *Z_TF = TFile::Open("Simulazioni/Z_Madgraph.root");
+	TFile *Z_TF = TFile::Open("MC_Winter10_399/Z_Madgraph_L1FastJet_JetPt15_399.root");
 	
 	//Data
-	TFile *Data_TF = TFile::Open("Dati/Data_RUN2010.root");
+	TFile *Data_TF = TFile::Open("DATA_Dec22ReReco/JetPt15/Data_RUN2010A-B_L1FastJet_399.root");
 	
 	//Output
-	string out = "recZJetsPlots";        
+	string out = "recZJetPlots_L1FastJet_JetPt15_399";        
 	string output = out;
 	output+=".root";
 	TFile* outplots = new TFile(output.c_str(), "RECREATE");
 	
 	//Normalization factor
 	double iniLumi = 50.; //pb-1
-	double targetLumi = 34.4; //pb-1
+	double targetLumi = 36.176; //pb-1
 	double scale = 1.;
 	if(iniLumi!=0)scale = targetLumi/iniLumi;
 	
@@ -121,29 +121,29 @@ string Tab_jetm = "True";
 	string Leg_Data	= "Data";
 
 	//tabella jetm
-	int decimal = 10000;
-	string Tab_title = "Number of jets			0	1	2	3	4	5";
-	string Tab_QCD_EMEnriched_all = "QCD EM Enriched	";
+	int decimal = 100;
+	string Tab_title = "Number of jets		0	1	2	3	4	5";
+	string Tab_QCD_EMEnriched_all = "QCD EM Enriched		";
 	string Tab_QCD_EMEnriched_all_err = "QCD EM Enriched Error	";
 	string Tab_QCD_BCtoE_all = "QCD b,c->e		";
 	string Tab_QCD_BCtoE_all_err = "QCD b,c->e Error	";
 	string Tab_TTbar = "TTbar+jets		";
 	string Tab_TTbar_err = "TTbar+jets Error	";
-	string Tab_Wlnu = "W->lnu		";
+	string Tab_Wlnu = "W->lnu			";
 	string Tab_Wlnu_err = "W->lnu Error		";
-	string Tab_WWEE = "WW->ee		";
+	string Tab_WWEE = "WW->ee			";
 	string Tab_WWEE_err = "WW->ee Error		";
-	string Tab_WZEE = "WZ->ee		";
+	string Tab_WZEE = "WZ->ee			";
 	string Tab_WZEE_err = "WZ->ee Error		";
-	string Tab_ZZEE = "ZZ->ee		";
+	string Tab_ZZEE = "ZZ->ee			";
 	string Tab_ZZEE_err = "ZZ->ee Error		";
-	string Tab_Z = "Z+jets		";
+	string Tab_Z = "Z+jets			";
 	string Tab_Z_err = "Z+jets Error		";
 	string Tab_riga = "-----------------------------------------------------------------------------";
-	string Tab_total = "Total				";
-	string Tab_total_err = "Total Error			";
-	string Tab_Data = "DATA				";
-	string Tab_Data_err = "DATA Error			";
+	string Tab_total = "Total			";
+	string Tab_total_err = "Total Error		";
+	string Tab_Data = "DATA			";
+	string Tab_Data_err = "DATA Error		";
 	string Tab_end = "#############################################################################";
 		
 	//tabella cut
@@ -198,16 +198,15 @@ string Tab_jetm = "True";
 	
 	if(selections=="SYM"){
 		_RecoCutFlags[_Acc] =  "_AccSYM";
-		_RecoCutFlags[_Conv] = "_ConvSYM";
 		_RecoCutFlags[_Iso] =  "_IsoSYM";
 		_RecoCutFlags[_EiD] =  "_EiDSYM";}
 	if(selections=="ASYM"){
 		_RecoCutFlags[_Acc] =  "_AccASYM";
-		_RecoCutFlags[_Conv] = "_ConvASYM";
 		_RecoCutFlags[_Iso] =  "_IsoASYM";
 		_RecoCutFlags[_EiD] =  "_EiDASYM";}
 	
-	_RecoCutFlags[_Trg] =  "_Trg";	
+	_RecoCutFlags[_Trg] =  "_Trg";
+	_RecoCutFlags[_Conv] = "_ConvASYM";
 	_RecoCutFlags[_Imp] =  "_Imp";
 	
 	
@@ -971,7 +970,7 @@ Dir_5a->cd();
 	c_1->Write(c_name.c_str());
 	c_1->Close();
 	
-	if(Tab_jetm == "True"){
+	if(Tab_jetm == "True" && a<3){
 	jetm<<endl<<"Selection = "<< c_name.c_str() <<endl;
 	jetm<<endl<<Tab_title.c_str()<<endl;
 	jetm<<endl<<Tab_QCD_EMEnriched_all.c_str();
@@ -1031,7 +1030,6 @@ Dir_5a->cd();
     if(a<3){
 	
 	if(_RecoCutFlags[2] != "_1"){
-
 	
 	TCanvas *c_12 = new TCanvas();
 
@@ -1138,7 +1136,7 @@ Dir_5a->cd();
 			jetm<<endl<<Tab_total.c_str();
 			for(int i = 1; i < 7; i++)jetm<<((float)((int)((histoQCD_EMEnriched_all_12->GetBinContent(i) + histoQCD_BCtoE_all_12->GetBinContent(i) + histoTTbar_12->GetBinContent(i) + histoWlnu_12->GetBinContent(i) + histoWWEE_12->GetBinContent(i) + histoWZEE_12->GetBinContent(i) + histoZZEE_12->GetBinContent(i) + histoZ_12->GetBinContent(i))*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_Data.c_str();
-			for(int i = 1; i < 7; i++)jetm<<histoData_1->GetBinContent(i)<<"	";
+			for(int i = 1; i < 7; i++)jetm<<histoData_12->GetBinContent(i)<<"	";
 			jetm<<endl<<endl<<Tab_end.c_str()<<endl;
 		}	
 
@@ -1176,7 +1174,6 @@ Dir_5a->cd();
 	
 
 	if(_RecoCutFlags[3] != "_1"){
-
 		
 	TCanvas *c_123 = new TCanvas();
 
@@ -1283,7 +1280,7 @@ Dir_5a->cd();
 			jetm<<endl<<Tab_total.c_str();
 			for(int i = 1; i < 7; i++)jetm<<((float)((int)((histoQCD_EMEnriched_all_123->GetBinContent(i) + histoQCD_BCtoE_all_123->GetBinContent(i) + histoTTbar_123->GetBinContent(i) + histoWlnu_123->GetBinContent(i) + histoWWEE_123->GetBinContent(i) + histoWZEE_123->GetBinContent(i) + histoZZEE_123->GetBinContent(i) + histoZ_123->GetBinContent(i))*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_Data.c_str();
-			for(int i = 1; i < 7; i++)jetm<<histoData_1->GetBinContent(i)<<"	";
+			for(int i = 1; i < 7; i++)jetm<<histoData_123->GetBinContent(i)<<"	";
 			jetm<<endl<<endl<<Tab_end.c_str()<<endl;
 		}
 
@@ -1321,7 +1318,6 @@ Dir_5a->cd();
 	
 
 	if(_RecoCutFlags[4] != "_1"){
-
 
 	TCanvas *c_1234 = new TCanvas();
 
@@ -1428,7 +1424,7 @@ Dir_5a->cd();
 			jetm<<endl<<Tab_total.c_str();
 			for(int i = 1; i < 7; i++)jetm<<((float)((int)((histoQCD_EMEnriched_all_1234->GetBinContent(i) + histoQCD_BCtoE_all_1234->GetBinContent(i) + histoTTbar_1234->GetBinContent(i) + histoWlnu_1234->GetBinContent(i) + histoWWEE_1234->GetBinContent(i) + histoWZEE_1234->GetBinContent(i) + histoZZEE_1234->GetBinContent(i) + histoZ_1234->GetBinContent(i))*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_Data.c_str();
-			for(int i = 1; i < 7; i++)jetm<<histoData_1->GetBinContent(i)<<"	";
+			for(int i = 1; i < 7; i++)jetm<<histoData_1234->GetBinContent(i)<<"	";
 			jetm<<endl<<endl<<Tab_end.c_str()<<endl;
 		}	
 
@@ -1467,7 +1463,6 @@ Dir_5a->cd();
 	
 
 	if(_RecoCutFlags[5] != "_1"){
-	
 	
 	TCanvas *c_12345 = new TCanvas();
 
@@ -1574,7 +1569,7 @@ Dir_5a->cd();
 			jetm<<endl<<Tab_total.c_str();
 			for(int i = 1; i < 7; i++)jetm<<((float)((int)((histoQCD_EMEnriched_all_12345->GetBinContent(i) + histoQCD_BCtoE_all_12345->GetBinContent(i) + histoTTbar_12345->GetBinContent(i) + histoWlnu_12345->GetBinContent(i) + histoWWEE_12345->GetBinContent(i) + histoWZEE_12345->GetBinContent(i) + histoZZEE_12345->GetBinContent(i) + histoZ_12345->GetBinContent(i))*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_Data.c_str();
-			for(int i = 1; i < 7; i++)jetm<<histoData_1->GetBinContent(i)<<"	";
+			for(int i = 1; i < 7; i++)jetm<<histoData_12345->GetBinContent(i)<<"	";
 			jetm<<endl<<endl<<Tab_end.c_str()<<endl;
 		}
 
@@ -1610,11 +1605,8 @@ Dir_5a->cd();
 
 	}
 	
-
-
 	if(_RecoCutFlags[6] != "_1"){
 
-	
 	TCanvas *c_123456 = new TCanvas();
 
 	if (log_scale == "True") {c_123456->SetLogy();}
@@ -1698,10 +1690,11 @@ Dir_5a->cd();
 	c_123456->Close();
 		
 		if(Tab_jetm == "True"){
+			
 			jetm<<endl<<"Selection = "<< c_name.c_str() <<endl;
 			jetm<<endl<<Tab_title.c_str()<<endl;
-			jetm<<endl<<Tab_QCD_EMEnriched_all.c_str();
 			
+			jetm<<endl<<Tab_QCD_EMEnriched_all.c_str();
 			for(int i = 1; i < 7; i++) jetm<<((float)((int)(histoQCD_EMEnriched_all_123456->GetBinContent(i)*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_QCD_EMEnriched_all_err.c_str();        
 			for(int i = 1; i < 7; i++) jetm<<((float)((int)(histoQCD_EMEnriched_all_123456->GetBinError(i)*decimal)))/decimal<<"	";
@@ -1769,10 +1762,12 @@ Dir_5a->cd();
 				cut<<Tabcut_Z_Int.c_str()<<((float)((int)(histoZ_123456->IntegralAndError(0,-1,err_Z_123456,"")*cut_decimal)))/cut_decimal<<endl;
 				cut<<Tabcut_Z_Int_err.c_str()<<((float)((int)(err_Z_123456*cut_decimal)))/cut_decimal<<endl;
 				cut<<endl<<Tabcut_riga.c_str()<<endl<<endl;
+				
 				cut<<Tabcut_Total_Int.c_str()<<((float)((int)((histoQCD_EMEnriched_all_123456->IntegralAndError(0,-1,err_QCD_EMEnriched_all_123456,"") + histoQCD_BCtoE_all_123456->IntegralAndError(0,-1,err_QCD_BCtoE_all_123456,"") + histoTTbar_123456->IntegralAndError(0,-1,err_TTbar_123456,"") + histoWlnu_123456->IntegralAndError(0,-1,err_Wlnu_123456,"") + histoWWEE_123456->IntegralAndError(0,-1,err_WWEE_123456,"") + histoWZEE_123456->IntegralAndError(0,-1,err_WZEE_123456,"") + histoZZEE_123456->IntegralAndError(0,-1,err_ZZEE_123456,"") + histoZ_123456->IntegralAndError(0,-1,err_Z_123456,""))*cut_decimal)))/cut_decimal<<endl;
 				cut<<Tabcut_Total_Int_err.c_str()<<((float)((int)(sqrt(pow((err_QCD_EMEnriched_all_123456),2)+pow((err_QCD_BCtoE_all_123456),2) + pow((err_TTbar_123456),2) + pow((err_Wlnu_123456),2) + pow((err_WWEE_123456),2) + pow((err_WZEE_123456),2) + pow((err_ZZEE_123456),2) + pow((err_Z_123456),2))*cut_decimal)))/cut_decimal<<endl<<endl;
 				cut<<Tabcut_Data_Int.c_str()<<((float)((int)(histoData_123456->IntegralAndError(0,-1,err_Data_123456,"")*cut_decimal)))/cut_decimal<<endl;
 				cut<<Tabcut_Data_Int_err.c_str()<<((float)((int)(err_Data_123456*cut_decimal)))/cut_decimal<<endl;
+				
 				cut<<endl<<Tabcut_end.c_str()<<endl;
 			}
 		}

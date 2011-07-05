@@ -38,30 +38,30 @@ string log_scale = "True";
 string Tab_cut = "True";
         
                 
-        //Background MC
-        TFile* QCD_EMEnriched_all_TF = TFile::Open("Simulazioni/QCD_EMEnriched_Pythia_all.root");
-        TFile* QCD_BCtoE_all_TF = TFile::Open("Simulazioni/QCD_BCtoE_Pythia_allBut20.root");
-        TFile* TTbar_TF = TFile::Open("Simulazioni/TT_Pythia.root");
-        TFile* Wlnu_TF = TFile::Open("Simulazioni/Wlnu_Madgraph.root");
-        TFile* WWEE_TF = TFile::Open("Simulazioni/WWEE_Pythia.root");
-        TFile* WZEE_TF = TFile::Open("Simulazioni/WZEE_Pythia.root");
-	    TFile* ZZEE_TF = TFile::Open("Simulazioni/ZZEE_Pythia.root");
-        
-	    //Signal MC
-        TFile *Z_TF = TFile::Open("Simulazioni/Z_Madgraph.root");
-
-        //Data
-        TFile *Data_TF = TFile::Open("Dati/Data_RUN2010.root");
+	//Background MC
+	TFile* QCD_EMEnriched_all_TF = TFile::Open("MC_Fall10_387/JetPt15/QCD_EMEnriched_Pythia_All.root");
+	TFile* QCD_BCtoE_all_TF = TFile::Open("MC_Fall10_387/JetPt15/QCD_BCtoE_Pythia_All.root");
+	TFile* TTbar_TF = TFile::Open("MC_Fall10_387/JetPt15/TT_Pythia.root");
+	TFile* Wlnu_TF = TFile::Open("MC_Fall10_387/JetPt15/Wlnu_Madgraph.root");
+	TFile* WWEE_TF = TFile::Open("MC_Fall10_387/JetPt15/WWEE_Pythia.root");
+	TFile* WZEE_TF = TFile::Open("MC_Fall10_387/JetPt15/WZEE_Pythia.root");
+	TFile* ZZEE_TF = TFile::Open("MC_Fall10_387/JetPt15/ZZEE_Pythia.root");
+	
+	//Signal MC
+	TFile *Z_TF = TFile::Open("MC_Winter10_399/Z_Madgraph_L1FastJet_JetPt15_399.root");
+	
+	//Data
+	TFile *Data_TF = TFile::Open("DATA_Dec22ReReco/JetPt15/Data_RUN2010A-B_L1FastJet_399.root");
         
         //Output
-        string out = "recZPlots";        
+        string out = "recZPlots_L1FastJet_JetPt15_399";        
         string output = out;
         output+=".root";
         TFile* outplots = new TFile(output.c_str(), "RECREATE");
 	      
         //Normalization factor
         double iniLumi = 50.; //pb-1
-        double targetLumi = 34.4; //pb-1
+        double targetLumi = 36.176; //pb-1
         double scale = 1.;
         if(iniLumi!=0)scale = targetLumi/iniLumi;
 
@@ -165,19 +165,17 @@ string Tab_cut = "True";
    
        if(selections=="SYM"){
        _RecoCutFlags[_Acc] =  "_AccSYM";
-       _RecoCutFlags[_Conv] = "_ConvSYM";
        _RecoCutFlags[_Iso] =  "_IsoSYM";
        _RecoCutFlags[_EiD] =  "_EiDSYM";}
        if(selections=="ASYM"){
        _RecoCutFlags[_Acc] =  "_AccASYM";
-       _RecoCutFlags[_Conv] = "_ConvASYM";
        _RecoCutFlags[_Iso] =  "_IsoASYM";
        _RecoCutFlags[_EiD] =  "_EiDASYM";}
      
-       _RecoCutFlags[_Trg] =  "_Trg";      
+       _RecoCutFlags[_Trg] =  "_Trg";
+       _RecoCutFlags[_Conv] = "_ConvASYM";
        _RecoCutFlags[_Imp] =  "_Imp";
-
-        
+	        
         if(!QCD_EMEnriched_all_TF){
 	cout<<"Error! QCD EM Enriched file doesn't exist!"<<endl;
 	return;
@@ -240,8 +238,8 @@ string cartella1 = "RecoElectron";
 string cartella2a = "recZ_Plots";	
 
 string cartellaplot;
-
-//grafici
+	
+	//grafici
 int rebin = 0;
 double nminX = 0., nmaxX = 0., nminY = 0. , nmaxY = 0.;
 
@@ -273,7 +271,7 @@ Dir_1->cd();
 TDirectory *Dir_2a;
 Dir_2a = Dir_1->mkdir(cartella2a.c_str());
 Dir_2a->cd();
-
+	
 TDirectoryFile *Cartella1_QCD_EMEnriched_all = (TDirectoryFile*) QCD_EMEnriched_all_TF->Get(cartella1.c_str());
 TDirectoryFile *Cartella1_QCD_EMEnriched_all_Cartella2a = (TDirectoryFile*) Cartella1_QCD_EMEnriched_all->Get(cartella2a.c_str());
 
@@ -373,6 +371,7 @@ Dir_3->cd();
 	TH1D* histoQCD_EMEnriched_all_123456 = (TH1D*) Cartella1_QCD_EMEnriched_all_Cartella2a->Get(QCD_EMEnriched_all_name.c_str());
 	histoQCD_EMEnriched_all_123456->Scale(scale);
 	histoQCD_EMEnriched_all_123456->Rebin(rebin);
+	
 	
 	string QCD_BCtoE_all_name = grafico_name.c_str();
 	QCD_BCtoE_all_name+=_RecoCutFlags[1].c_str();
@@ -585,8 +584,7 @@ Dir_3->cd();
 TDirectory *Dir_4a;
 Dir_4a = Dir_3->mkdir("Separated_Plots");
 Dir_4a->cd();
-
-	
+		
 	TCanvas *c_1 = new TCanvas();
 	
 	if (log_scale == "True") {c_1->SetLogy();}
@@ -677,9 +675,9 @@ Dir_4a->cd();
 	cut<<endl<< Tabcut_Mean.c_str() <<((float)((int)(histoData_1->GetMean(1)*cut_decimal)))/cut_decimal<< Tabcut_Mean_um.c_str()<<endl;
 	cut<< Tabcut_Mean_err.c_str() <<((float)((int)(histoData_1->GetMeanError()*cut_decimal)))/cut_decimal<<Tabcut_Mean_um.c_str()<<endl;
 	cut<<endl<<Tabcut_riga.c_str()<<endl;
-	cut<<endl<<Tabcut_QCD_EMEnriched_all_Int.c_str()<<((float)((int)(histoQCD_EMEnriched_all_1->IntegralAndError(0,-1,err_QCD_EMEnriched_all_1,"")*cut_decimal)))/cut_decimal<<endl;
+	cut<<endl<<Tabcut_QCD_EMEnriched_all_Int.c_str()<<((float)((long)(histoQCD_EMEnriched_all_1->IntegralAndError(0,-1,err_QCD_EMEnriched_all_1,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_QCD_EMEnriched_all_Int_err.c_str()<<((float)((int)(err_QCD_EMEnriched_all_1*cut_decimal)))/cut_decimal<<endl<<endl;
-	cut<<Tabcut_QCD_BCtoE_all_Int.c_str()<<((float)((int)(histoQCD_BCtoE_all_1->IntegralAndError(0,-1,err_QCD_BCtoE_all_1,"")*cut_decimal)))/cut_decimal<<endl;
+	cut<<Tabcut_QCD_BCtoE_all_Int.c_str()<<((float)((long)(histoQCD_BCtoE_all_1->IntegralAndError(0,-1,err_QCD_BCtoE_all_1,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_QCD_BCtoE_all_Int_err.c_str()<<((float)((int)(err_QCD_BCtoE_all_1*cut_decimal)))/cut_decimal<<endl<<endl;
 	cut<<Tabcut_TTbar_Int.c_str()<<((float)((int)(histoTTbar_1->IntegralAndError(0,-1,err_TTbar_1,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_TTbar_Int_err.c_str()<<((float)((int)(err_TTbar_1*cut_decimal)))/cut_decimal<<endl<<endl;
@@ -691,12 +689,12 @@ Dir_4a->cd();
 	cut<<Tabcut_WZEE_Int_err.c_str()<<((float)((int)(err_WZEE_1*cut_decimal)))/cut_decimal<<endl<<endl;
 	cut<<Tabcut_ZZEE_Int.c_str()<<((float)((int)(histoZZEE_1->IntegralAndError(0,-1,err_ZZEE_1,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_ZZEE_Int_err.c_str()<<((float)((int)(err_ZZEE_1*cut_decimal)))/cut_decimal<<endl<<endl;
-	cut<<Tabcut_Z_Int.c_str()<<((float)((int)(histoZ_1->IntegralAndError(0,-1,err_Z_1,"")*cut_decimal)))/cut_decimal<<endl;
+	cut<<Tabcut_Z_Int.c_str()<<((float)((long)(histoZ_1->IntegralAndError(0,-1,err_Z_1,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_Z_Int_err.c_str()<<((float)((int)(err_Z_1*cut_decimal)))/cut_decimal<<endl;
 	cut<<endl<<Tabcut_riga.c_str()<<endl<<endl;
-	cut<<Tabcut_Total_Int.c_str()<<((float)((int)((histoQCD_EMEnriched_all_1->IntegralAndError(0,-1,err_QCD_EMEnriched_all_1,"") + histoQCD_BCtoE_all_1->IntegralAndError(0,-1,err_QCD_BCtoE_all_1,"") + histoTTbar_1->IntegralAndError(0,-1,err_TTbar_1,"") + histoWlnu_1->IntegralAndError(0,-1,err_Wlnu_1,"") + histoWWEE_1->IntegralAndError(0,-1,err_WWEE_1,"") + histoWZEE_1->IntegralAndError(0,-1,err_WZEE_1,"") + histoZZEE_1->IntegralAndError(0,-1,err_ZZEE_1,"") + histoZ_1->IntegralAndError(0,-1,err_Z_1,""))*cut_decimal)))/cut_decimal<<endl;
+	cut<<Tabcut_Total_Int.c_str()<<((float)((long)((histoQCD_EMEnriched_all_1->IntegralAndError(0,-1,err_QCD_EMEnriched_all_1,"") + histoQCD_BCtoE_all_1->IntegralAndError(0,-1,err_QCD_BCtoE_all_1,"") + histoTTbar_1->IntegralAndError(0,-1,err_TTbar_1,"") + histoWlnu_1->IntegralAndError(0,-1,err_Wlnu_1,"") + histoWWEE_1->IntegralAndError(0,-1,err_WWEE_1,"") + histoWZEE_1->IntegralAndError(0,-1,err_WZEE_1,"") + histoZZEE_1->IntegralAndError(0,-1,err_ZZEE_1,"") + histoZ_1->IntegralAndError(0,-1,err_Z_1,""))*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_Total_Int_err.c_str()<<((float)((int)(sqrt(pow((err_QCD_EMEnriched_all_1),2)+pow((err_QCD_BCtoE_all_1),2) + pow((err_TTbar_1),2) + pow((err_Wlnu_1),2) + pow((err_WWEE_1),2) + pow((err_WZEE_1),2) + pow((err_ZZEE_1),2) + pow((err_Z_1),2))*cut_decimal)))/cut_decimal<<endl<<endl;
-	cut<<Tabcut_Data_Int.c_str()<<((float)((int)(histoData_1->IntegralAndError(0,-1,err_Data_1,"")*cut_decimal)))/cut_decimal<<endl;
+	cut<<Tabcut_Data_Int.c_str()<<((float)((long)(histoData_1->IntegralAndError(0,-1,err_Data_1,"")*cut_decimal)))/cut_decimal<<endl;
 	cut<<Tabcut_Data_Int_err.c_str()<<((float)((int)(err_Data_1*cut_decimal)))/cut_decimal<<endl;
 	cut<<endl<<Tabcut_end.c_str()<<endl;
 	}
