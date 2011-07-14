@@ -1,3 +1,0 @@
-/data/sfrosali/PATtuple/DATA/SkimGalloSep11/ZeeCollisionsSep11_1.root
-/data/sfrosali/PATtuple/DATA/SkimGalloSep11/ZeeCollisionsSep11_2.root
-/data/sfrosali/PATtuple/DATA/SkimGalloSep11/ZeeCollisionsSep11_3.root
