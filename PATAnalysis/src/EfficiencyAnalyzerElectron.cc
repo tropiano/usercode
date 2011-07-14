@@ -1,5 +1,5 @@
 #include "Firenze/PATAnalysis/include/EfficiencyAnalyzerElectron.h"
-#include "Firenze/PATAnalysis/include/TagAndProbeAnalyzer.h"
+#include "Firenze/PATAnalysis/include/TagAndProbeAnalyzerElectron.h"
 #include <iostream>
 
 #include "TH1D.h"
@@ -36,7 +36,7 @@ void EfficiencyAnalyzerElectron::analyze(int bin, std::string fitOptions){
   
   _output->cd();
   
-  TagAndProbeAnalyzer tpana(_dir, _output, _dir1, _dataset, true, _training_signal, _training_background);
+  TagAndProbeAnalyzerElectron tpana(_dir, _output, _dir1, _dataset, true, _training_signal, _training_background);
   tpana.analyze(bin, fitOptions);
 
 }

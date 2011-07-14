@@ -95,7 +95,7 @@ PixelHit_OC(0), PixelHit_SC(0), FirstPixelBarrelHit_OC(0), FirstPixelBarrelHit_S
 
 DeltaRvsCharge_JetRec(0), DeltaRvsCharge_JetRec_Iso(0), DeltaRvsCharge_JetRec_NotIso(0),
 
-_targetLumi(50.), _xsec(1.), _norm(1.), _dir(0), _charge_dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _Norm(false), _Sumw2(false), _GenParticleMatch(false), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _fileCounter(0), _Acc(1), _Trg(2), _Conv(3), _Imp(4), _Iso(5), _EiD(6), _selections("ASYM"), _JetType("PF"), _sample("data"), _file(0), _histoVector(), _histoVector2D()
+_targetLumi(50.), _xsec(1.), _norm(1.), _dir(0), _charge_dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _Norm(false), _Sumw2(false), _GenParticleMatch(false), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _fileCounter(0), _Acc(1), _Trg(2), _Conv(3), _Imp(4), _Iso(5), _EiD(6), _selections("ASYM"), _JetType("PF"), _tp_mult("excl"), _sample("data"), _file(0), _histoVector(), _histoVector2D()
 
 { }
 
@@ -115,6 +115,7 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _ProcEvents    = iConfig.getParameter<int32_t>("ProcEvents");
    _GenParticleMatch = iConfig.getParameter<bool>("GenParticleMatch");
    _JetType = iConfig.getParameter<std::string>("JetType");
+   _tp_mult = iConfig.getParameter<std::string>("TPMult");
    _ReportName = iConfig.getParameter<std::string>("ReportName");
    
    //Selections
@@ -1634,8 +1635,6 @@ void RecoElectron::finalize(){
    }else{
    Report<<endl<<"Trigger Match NOT Required"<<endl;}
    
-   Report<<endl<<"JetTrigger = "<<JetTrigger.c_str()<<endl;
-   
    if(_selections=="SYM"){
    Report<<"ptelcut = "<<ptelcut<<endl;
    Report<<"etaelcut = "<<etaelcut<<endl;
@@ -1643,12 +1642,14 @@ void RecoElectron::finalize(){
    Report<<"eta_el_excl_down = "<<eta_el_excl_down<<endl;
    Report<<"zmassmin_sym = "<<zmassmin_sym<<endl;
    Report<<"zmassmax_sym = "<<zmassmax_sym<<endl;
-   Report<<"minnhit = "<<minnhit<<endl;
-   Report<<"maxchi2 = "<<maxchi2<<endl;
    Report<<"dxycut = "<<dxycut<<endl;
    Report<<"ptjetmin = "<<ptjetmin<<endl;
    Report<<"etajetmax = "<<etajetmax<<endl;
    Report<<"isocut = "<<sym_isocut<<endl;
+   if(JetIDReq==true){
+   Report<<endl<<"Jet ID Required"<<endl;
+   }else{
+   Report<<endl<<"Jet ID NOT Required"<<endl;}
    Report<<"isojetcut = "<<isojetcut<<endl;
  
    Report<<"SYM_TAG_ptelcut = "<<SYM_TAG_ptelcut<<endl;
@@ -1670,12 +1671,22 @@ void RecoElectron::finalize(){
    Report<<"eta_el_excl_down = "<<eta_el_excl_down<<endl;
    Report<<"zmassmin_asym = "<<zmassmin_asym<<endl;
    Report<<"zmassmax_asym = "<<zmassmax_asym<<endl<<endl;
-   Report<<"minnhit = "<<minnhit<<endl;
-   Report<<"maxchi2 = "<<maxchi2<<endl<<endl;
+   Report<<"eID_ASYM0 = "<<eID_ASYM0.c_str()<<endl;
+   Report<<"eID_ASYM1 = "<<eID_ASYM0.c_str()<<endl<<endl;
    Report<<"dxycut = "<<dxycut<<endl<<endl;
    Report<<"ptjetmin = "<<ptjetmin<<endl;
-   Report<<"etajetmax = "<<etajetmax<<endl<<endl;
+   Report<<"etajetmax = "<<etajetmax<<endl;
+   if(JetIDReq==true){
+   Report<<endl<<"Jet ID Required"<<endl;
+   }else{
+   Report<<endl<<"Jet ID NOT Required"<<endl;}
    Report<<"isojetcut = "<<isojetcut<<endl<<endl;
+   
+   Report<<"Tag&Probe Multiplicity: "<<_tp_mult.c_str()<<endl;
+   if(TPTrgBitReq==true){
+   Report<<"Tag&Probe Fill: Trigger Bit Required"<<endl;
+   }else{
+   Report<<endl<<"Tag&Probe Fill: Trigger Bit NOT Required"<<endl;}
    
    Report<<"ASYM0_TAG_ptelcut = "<<ASYM0_TAG_ptelcut<<endl;
    Report<<"ASYM0_TAG_etaelcut = "<<ASYM0_TAG_etaelcut<<endl;

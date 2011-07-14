@@ -8,7 +8,7 @@
 #include "TList.h"
 #include "TFile.h"
 #include "MyPatAnalysis.h"
-#include "TagAndProbeFiller.h"
+#include "TagAndProbeFillerElectron.h"
 
 class EfficiencyElectron : public MyPatAnalysis{
 public :
@@ -33,8 +33,8 @@ public :
    *genMassZEff_12345, *genPtZEff_12345, *genEtaZEff_12345,
    *genMassZEff_123456, *genPtZEff_123456, *genEtaZEff_123456;
    
-   TH1D *GenInclJetEff_1, *GenInclJetEff_12, *GenInclJetEff_123, *GenInclJetEff_1234, *GenInclJetEff_12345, *GenInclJetEff_123456;
-   TH1D *GenExclJetEff_1, *GenExclJetEff_12, *GenExclJetEff_123, *GenExclJetEff_1234, *GenExclJetEff_12345, *GenExclJetEff_123456;
+   TH1D *RecoInclJetEffWGA_1, *RecoInclJetEffWGA_12, *RecoInclJetEffWGA_123, *RecoInclJetEffWGA_1234, *RecoInclJetEffWGA_12345, *RecoInclJetEffWGA_123456;
+   TH1D *RecoExclJetEffWGA_1, *RecoExclJetEffWGA_12, *RecoExclJetEffWGA_123, *RecoExclJetEffWGA_1234, *RecoExclJetEffWGA_12345, *RecoExclJetEffWGA_123456;
    
    TH1D *RecoInclJetEff_1, *RecoInclJetEff_12, *RecoInclJetEff_123, *RecoInclJetEff_1234, *RecoInclJetEff_12345, *RecoInclJetEff_123456;
    TH1D *RecoExclJetEff_1, *RecoExclJetEff_12, *RecoExclJetEff_123, *RecoExclJetEff_1234, *RecoExclJetEff_12345, *RecoExclJetEff_123456;
@@ -42,7 +42,7 @@ public :
    TH1D *genLeadElEtaEff_1, *genLeadElEtaEff_12, *genLeadElEtaEff_123, *genLeadElEtaEff_1234, *genLeadElEtaEff_12345, *genLeadElEtaEff_123456, 
    *genLeadElPtEff_1, *genLeadElPtEff_12, *genLeadElPtEff_123, *genLeadElPtEff_1234, *genLeadElPtEff_12345, *genLeadElPtEff_123456;
    
-   TH1D *AccDenom_genPtZ, *AccDenom_genMassZ, *AccDenom_genEtaZ, *AccDenom_genLeadElEta,     *AccDenom_genLeadElPt, *AccDenom_GenExclJetNumber, *AccDenom_RecoInclJetNumber, *AccDenom_RecoExclJetNumber, *EffDenom_genPtZ, *EffDenom_genMassZ, *EffDenom_genEtaZ, *EffDenom_genLeadElEta, *EffDenom_genLeadElPt, *EffDenom_GenExclJetNumber, *EffDenom_RecoInclJetNumber, *EffDenom_RecoExclJetNumber;
+   TH1D *AccDenom_genPtZ, *AccDenom_genMassZ, *AccDenom_genEtaZ, *AccDenom_genLeadElEta,     *AccDenom_genLeadElPt, *AccDenom_GenExclJetNumber, *AccDenom_RecoExclJetNumber, *AccDenom_RecoInclJetNumber, *AccDenom_GenInclJetNumber, *EffDenom_genPtZ, *EffDenom_genMassZ, *EffDenom_genEtaZ, *EffDenom_genLeadElEta, *EffDenom_genLeadElPt, *EffDenom_GenExclJetNumber, *EffDenom_RecoExclJetNumber, *EffDenom_RecoInclJetNumber, *EffDenom_GenInclJetNumber;
       
 private:
 
@@ -58,29 +58,32 @@ private:
   
   std::string _RecoCutFlags[7];
   
-  std::vector<bool (*)(const reco::Candidate&)> tag_cuts;
-  std::vector<bool (*)(const reco::Candidate&)> tag_cuts_0;
-  std::vector<bool (*)(const reco::Candidate&)> tag_cuts_1;
+  std::vector<bool (*)(const reco::Candidate&, int run)> tag_cuts;
+  std::vector<bool (*)(const reco::Candidate&, int run)> tag_cuts_0;
+  std::vector<bool (*)(const reco::Candidate&, int run)> tag_cuts_1;
   
-  TagAndProbeFiller* _TagProbe_Electron_12;
-  TagAndProbeFiller* _TagProbe_Electron_123;
-  TagAndProbeFiller* _TagProbe_Electron_1234;
-  TagAndProbeFiller* _TagProbe_Electron_12345;
-  TagAndProbeFiller* _TagProbe_Electron_123456;
+  TagAndProbeFillerElectron* _TagProbe_Electron_12;
+  TagAndProbeFillerElectron* _TagProbe_Electron_123;
+  TagAndProbeFillerElectron* _TagProbe_Electron_1234;
+  TagAndProbeFillerElectron* _TagProbe_Electron_12345;
+  TagAndProbeFillerElectron* _TagProbe_Electron_123456;
+  TagAndProbeFillerElectron* _TagProbe_Electron_Global;
   
-  TagAndProbeFiller* _TagProbe_Electron0_12;
-  TagAndProbeFiller* _TagProbe_Electron0_123;
-  TagAndProbeFiller* _TagProbe_Electron0_1234;
-  TagAndProbeFiller* _TagProbe_Electron0_12345;
-  TagAndProbeFiller* _TagProbe_Electron0_123456;
+  TagAndProbeFillerElectron* _TagProbe_Electron0_12;
+  TagAndProbeFillerElectron* _TagProbe_Electron0_123;
+  TagAndProbeFillerElectron* _TagProbe_Electron0_1234;
+  TagAndProbeFillerElectron* _TagProbe_Electron0_12345;
+  TagAndProbeFillerElectron* _TagProbe_Electron0_123456;
+  TagAndProbeFillerElectron* _TagProbe_Electron0_Global;
   
-  TagAndProbeFiller* _TagProbe_Electron1_12;
-  TagAndProbeFiller* _TagProbe_Electron1_123;
-  TagAndProbeFiller* _TagProbe_Electron1_1234;
-  TagAndProbeFiller* _TagProbe_Electron1_12345;
-  TagAndProbeFiller* _TagProbe_Electron1_123456;
+  TagAndProbeFillerElectron* _TagProbe_Electron1_12;
+  TagAndProbeFillerElectron* _TagProbe_Electron1_123;
+  TagAndProbeFillerElectron* _TagProbe_Electron1_1234;
+  TagAndProbeFillerElectron* _TagProbe_Electron1_12345;
+  TagAndProbeFillerElectron* _TagProbe_Electron1_123456;
+  TagAndProbeFillerElectron* _TagProbe_Electron1_Global;
   
-  int run, _nbin;
+  int _run, _nbin;
   
   double _xmin;
 

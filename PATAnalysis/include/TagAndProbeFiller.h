@@ -7,14 +7,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
-
-/*
-#include "RooDataSet.h"
-#include "RooRealVar.h"
-#include "RooCategory.h"
-*/
 #include "TTree.h"
-
 #include "DataFormats/Candidate/interface/Candidate.h"
 
 
@@ -49,20 +42,12 @@ private:
   std::vector<TH1D*> _v_mass_tagpassprobe;
 
   TTree* _rootree;
-  /*
-  RooDataSet* _rootree;
-  //tree vars
-  RooRealVar _mass;
-  RooRealVar _bin;
-  RooRealVar _probe, _passprobe, _weight;
-  RooCategory _passprobe_cat;
-  RooArgSet* _argset;
-  */
+  
   double _mass;
   double _bin;
-  double _probe, /*_passprobe,*/ _weight;
+  double _probe, _weight;
   double _pt1, _pt2, _pt3;
-  //char _passprobe[8];
+  
   int _passprobe;
   std::vector<bool (*)(const reco::Candidate&)> _tag_cuts;
   std::vector<bool (*)(const reco::Candidate&)> _probe_cuts;

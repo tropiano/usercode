@@ -14,23 +14,23 @@ using namespace std;
 int main() {
 
   //Input files
-  string training_sign = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/JetPt30/Z_Madgraph_L1FastJet_JetPt30_399.root";
-  string training_back = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/JetPt30/Background_JetPt30_All.root";
-  string total = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/JetPt30/Data_RUN2010A-B_L1FastJet_399.root";
+  string training_sign = "/data/sfrosali/Zjets/SecondLife/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe_Incl/TPFiles/Z_Madgraph_JetPt30_TPwTrgBit.root";
+  string training_back = "/data/sfrosali/Zjets/SecondLife/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe_Incl/TPFiles/Background_All_JetPt30_TPwTrgBit.root";
+  string total = "/data/sfrosali/Zjets/SecondLife/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe_Incl/TPFiles/Data_RUN2010A-B_JetPt30_TPwTrgBit.root";
   
   //Output files
   string output_train_sign =  
-"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPAnalyzer_OldEffFormula/JetPt30_FloatMean/TrainSig_CB_Sg_2-100_a10_0-100_n5_0-100_BW_g10_5-50_Conv.root";
-  string output_train_back = 
-"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPAnalyzer_OldEffFormula/JetPt30_FloatMean/TrainBack_Exp-1_-100_100_Conv.root";
+"/data/sfrosali/Zjets/SecondLife/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe_Incl/TPAnalyzer/TPwTrgBit/TrainSig_JetPt30_TPwTrgBit_Incl_Global.root";
+  string output_train_back =  
+"/data/sfrosali/Zjets/SecondLife/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe_Incl/TPAnalyzer/TPwTrgBit/TrainBack_JetPt30_TPwTrgBit_Incl_Global.root";
   string output_total =  
-"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPAnalyzer_OldEffFormula/JetPt30_FloatMean/DATA_Sig-CB_BW-Back-Exp_Conv.root";
+"/data/sfrosali/Zjets/SecondLife/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe_Incl/TPAnalyzer/TPwTrgBit/DATA_JetPt30_TPwTrgBit_Incl_Global.root";
 
   //Selections used
   string selections = "ASYM";
   
   //Cut to evaluate
-  string cut = "_ConvASYM";
+  string cut = "Global";
   
   //Analyzer steps
   bool tr_sig = true;
@@ -59,15 +59,16 @@ int main() {
    
   if(selections=="SYM"){
    _RecoCutFlags[_Acc] =  "_AccSYM";
+   _RecoCutFlags[_Conv] = "_ConvSYM"; 
    _RecoCutFlags[_Iso] =  "_IsoSYM";
    _RecoCutFlags[_EiD] =  "_EiDSYM";}
    if(selections=="ASYM"){
    _RecoCutFlags[_Acc] =  "_AccASYM";
+   _RecoCutFlags[_Conv] = "_ConvASYM"; 
    _RecoCutFlags[_Iso] =  "_IsoASYM";
    _RecoCutFlags[_EiD] =  "_EiDASYM";}
      
-   _RecoCutFlags[_Trg] =  "_Trg";
-   _RecoCutFlags[_Conv] = "_ConvASYM"; //per il momento ?? solo asimmetrico
+   _RecoCutFlags[_Trg] =  "_Trg";   
    _RecoCutFlags[_Imp] =  "_Imp";
   
   TFile* train_sign = 0;
@@ -97,7 +98,9 @@ int main() {
   if(selections=="ASYM"){
   dir+="Tag&Probe0";
   sec_el_dir+="Tag&Probe1";}
-	
+  
+  if(cut!="Global"){	
+  
   int ncut = 1;	
   while(cut!=_RecoCutFlags[ncut]){
   dir+=_RecoCutFlags[ncut].c_str();
@@ -111,7 +114,15 @@ int main() {
   sec_el_dir+=_RecoCutFlags[ncut].c_str();
   dataset+=_RecoCutFlags[ncut].c_str();
   dataset+="_";
-	
+  
+  }else{
+  
+  dir+="_Global";
+  sec_el_dir+="_Global";
+  dataset+="_Global_";
+  
+  }
+  	
   if(nodef_dir!="")dir=nodef_dir;
   if(nodef_secdir!="")sec_el_dir=nodef_secdir;
   

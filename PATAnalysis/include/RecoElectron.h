@@ -147,7 +147,7 @@ private:
   
   int _entries, _EventsPerFile, _EventNumber, _ProcEvents, _fileCounter, _Acc, _Trg, _Conv, _Imp, _Iso, _EiD;
   
-  std::string _selections, _JetType, _ReportName, _sample;
+  std::string _selections, _JetType, _tp_mult, _ReportName, _sample;
 
   TFile* _file;
   

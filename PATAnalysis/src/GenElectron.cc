@@ -187,7 +187,7 @@ void  GenElectron::process(const fwlite::Event& iEvent)
      
      }
    
-   std::vector<const reco::GenJet*> genjets = GetJets<reco::GenJet>(*jetgenHandle);   
+   std::vector<const reco::GenJet*> genjets = GetJets_GenJets<reco::GenJet>(*jetgenHandle);   
    std::vector<const reco::GenJet*> isogenjets;
  
    for(unsigned int i = 0; i < genjets.size(); i++){

@@ -31,13 +31,25 @@ using namespace pat;
 using namespace pat::helper;
 using namespace TMath;
 
+/*
+MODIFICHE ALLE SELEZIONI IN BASE ALLA NOTA AN-11-136
+
+Ho modificato i tagli su elettroni: IP (0.02 -> 0.035), maxEtaJet (2.5 -> 2.4), isojetcut (0.5 -> 0.3), Isolamento (combined -> relative).
+Inoltre ho aggiunto dei tagli di qualità sui jet presi dalla nota: ho modificato il metodo GetJets per i ricostruiti ma non per i generati perchè l'ID si applica solo ai ricostruiti; inoltre nell'ntupla ho salvato tutti i jet e ho inserito una flag per l'ID. 
+
+>>>>> Nella nota usano però anche un taglio per il trigger matching pari a DR<0.1 mentre per me è DR<0.5.
+Inoltre usano un veto rigettando tutti gli eventi con un muone con pt>15. Queste cose richiedono modifiche nelle pattuple.
+
+*/
+
 ////////////////////////////////// Selection Cuts ////////////////////////////////////////////////
 
 //Electron TRIGGER
 
 //Trigger flags
 static bool elTrgMatchReq = true;
-static bool TrgRange = true;
+static bool TrgRange = false;
+static bool TPTrgBitReq = true;
 
 static map<std::string, std::pair<int, int> > elTrigger() {
 
@@ -79,15 +91,20 @@ return TrgVector;
 static string JetTrigger = "HLT_Jet30U";
 
 //Common cuts
+
+//Electrons
 static double etaelcut = 2.5;
 static double eta_el_excl_up = 1.566;               //Excluded Eta region
 static double eta_el_excl_down = 1.4442;           //Excluded Eta region
 static double minnhit = 11.;
 static double maxchi2 = 10.;
-static double dxycut = 0.02;     //cm
-static double ptjetmin = 15.;   //Gev/c
-static double etajetmax = 2.5;
-static double isojetcut = 0.5; //Isolation jet - Z electron
+static double dxycut = 0.035;     //cm
+
+//Jets
+static bool JetIDReq = true;
+static double ptjetmin = 30.;   //Gev/c
+static double etajetmax = 2.4;
+static double isojetcut = 0.3; //Isolation jet - Z electron
 
 //SYM cuts
 static double ptelcut = 20.;    //Gev/c
@@ -114,8 +131,13 @@ static double zmassmin_asym = 60.;   //Gev/c^2
 static double zmassmax_asym = 120.;  //Gev/c^2
 
 //New cuts ASYM: tuned on Spring10. CombRelIso used. WP = 80 for dau0, 95 for dau1
-static string eID_ASYM0 = "simpleEleId80cIso";
-static string eID_ASYM1 = "simpleEleId95cIso";
+
+//Combined Iso//static string eID_ASYM0 = "simpleEleId80cIso";
+//static string eID_ASYM1 = "simpleEleId95cIso";
+
+//Relative Iso
+static string eID_ASYM0 = "simpleEleId80relIso";
+static string eID_ASYM1 = "simpleEleId95relIso";
 
 // ASYM0 Tag cuts (for soft electron probe)
 static double ASYM0_TAG_ptelcut = 20.;    //Gev/c
@@ -165,7 +187,6 @@ inline bool isElTriggerAvailable(const pat::TriggerEvent& triggers, int run){
 inline bool isTriggered(const pat::TriggerEvent& triggers, std::string triggername){
   const pat::TriggerPath* path = triggers.path(triggername);
   if (!path) {
-    std::cout << "ERROR! trigger path " << triggername << " not found " << std::endl;
     return false;
   }
   return path->wasAccept();
@@ -375,7 +396,7 @@ inline bool RecSelected(string Flag, const reco::CompositeCandidate& ZREC, const
   else if(Flag=="_Trg"){
   bool cutTrg = false;
   if(elTrgMatchReq==true){
-  if(isElectronTriggered(triggers, run)&&(RecSelected_TrgMatch(*dau0, run)||RecSelected_TrgMatch(*dau1, run)))cutTrg=true;
+  if(isElectronTriggered(triggers, run)&&(RecSelected_TrgMatch(*dau0, run)))cutTrg=true;
   }else if(elTrgMatchReq==false){
   if(isElectronTriggered(triggers, run))cutTrg=true;
   }
@@ -484,7 +505,7 @@ template<class ELECTRON> double MinDeltaRZDau(const std::vector<const ELECTRON*>
 
 // Jet Methods
 
-template<class JET> std::vector<const JET*> GetJets(const std::vector<JET>& jets){
+template<class JET> std::vector<const JET*> GetJets_GenJets(const std::vector<JET>& jets){
   std::vector<const JET*> selectedjets;
   for (unsigned int i = 0; i < jets.size();  ++i){
     if (jets[i].pt() > ptjetmin && fabs(jets[i].eta()) < etajetmax) selectedjets.push_back(&jets[i]);
@@ -492,19 +513,29 @@ template<class JET> std::vector<const JET*> GetJets(const std::vector<JET>& jets
   return selectedjets;
 }
 
-template<class JET> double deltaYFwdBwd(const std::vector<const JET*>& jets){
-  assert(jets.size()>1);
-  double maxy = -999999;
-  double miny =  999999;
-  for (unsigned int i = 0; i < jets.size(); ++i){
-    if (jets[i]->rapidity() > maxy){
-      maxy = jets[i]->rapidity();
-    }
-    if (jets[i]->rapidity() < miny){
-      miny = jets[i]->rapidity();
-    }
+template<class JET> int jetID(const JET& jet){
+   int jetID = -1;
+   if(jet->chargedEmEnergyFraction()<0.99 && jet->neutralHadronEnergyFraction()<0.99 && jet->neutralEmEnergyFraction()<0.99 && jet->chargedHadronEnergyFraction()>0 && jet->chargedMultiplicity()>0) jetID = 1;
+   return jetID;
+}
+
+template<class JET> std::vector<const JET*> GetJets(const std::vector<JET>& jets){
+  std::vector<const JET*> selectedjets;
+  
+  bool jetIDflag = true;
+  
+  for (unsigned int i = 0; i < jets.size();  ++i){
+  
+  if(JetIDReq){
+  jetIDflag=false;
+  if(jetID(&jets[i])==1)jetIDflag=true;
   }
-  return maxy-miny ;   
+  
+  if (jets[i].pt() > ptjetmin && fabs(jets[i].eta()) < etajetmax && jetIDflag) selectedjets.push_back(&jets[i]);
+  
+  }
+  
+  return selectedjets;
 }
 
 template<class ELECTRON> bool IsoJet(const std::vector<const ELECTRON*>& electrons, const reco::Jet& jet){
@@ -549,14 +580,23 @@ inline void addHistosVsMulti(unsigned int multi, std::string name, std::string t
 // Tag & Probe
 
 //Conditions required to fill TagAndProbe
-inline bool RecSelected_TagAndProbe(const reco::CompositeCandidate& ZREC, string selections){
-  if(selections=="SYM")return ZREC.mass() > zmassmin_sym && ZREC.mass() < zmassmax_sym;
-  if(selections=="ASYM")return ZREC.mass() > zmassmin_asym && ZREC.mass() < zmassmax_asym;
+inline bool RecSelected_TagAndProbe(const reco::CompositeCandidate& ZREC, string selections, const pat::TriggerEvent& triggers, int run){
+
+  bool TrgBit = true;
+  
+  if(TPTrgBitReq){
+  TrgBit=false;
+  if(isElectronTriggered(triggers, run))TrgBit=true;
+  }
+  
+  if(selections=="SYM")return ZREC.mass() > zmassmin_sym && ZREC.mass() < zmassmax_sym && TrgBit;
+  if(selections=="ASYM")return ZREC.mass() > zmassmin_asym && ZREC.mass() < zmassmax_asym && TrgBit;
   else return false;
+  
 }
 
 //Cuts applied on Tag electron
-inline bool singleEl_Tag_SYM(const reco::Candidate& cand){
+inline bool singleEl_Tag_SYM(const reco::Candidate& cand, int run){
 
   const pat::Electron* electron = CloneCandidate(cand);
 
@@ -580,7 +620,7 @@ inline bool singleEl_Tag_SYM(const reco::Candidate& cand){
  return false;}
 }
 
-inline bool singleEl_Tag_ASYM0(const reco::Candidate& cand){
+inline bool singleEl_Tag_ASYM0(const reco::Candidate& cand, int run){
 
   const pat::Electron* electron = CloneCandidate(cand);
   
@@ -604,7 +644,7 @@ inline bool singleEl_Tag_ASYM0(const reco::Candidate& cand){
  return false;}
 }
 
-inline bool singleEl_Tag_ASYM1(const reco::Candidate& cand){
+inline bool singleEl_Tag_ASYM1(const reco::Candidate& cand, int run){
 
   const pat::Electron* electron = CloneCandidate(cand);
   
@@ -630,7 +670,7 @@ inline bool singleEl_Tag_ASYM1(const reco::Candidate& cand){
 }
 
 //Probe cuts SYM
-inline bool singleEl_Probe_Acc_SYM(const reco::Candidate& cand){
+inline bool singleEl_Probe_Acc_SYM(const reco::Candidate& cand, int run){
 
   const pat::Electron* electron = CloneCandidate(cand);
   
@@ -642,8 +682,19 @@ inline bool singleEl_Probe_Acc_SYM(const reco::Candidate& cand){
   }else{
   return false;}
   }
+
+//Come va applicato il probe Trg nel caso di selezioni simmetriche?
+/*inline bool singleEl_Probe_Trg_SYM(const reco::Candidate& cand, int run){
+
+  const pat::Electron* el0 = CloneCandidate(cand);
+  
+  if(el0){
+  return (RecSelected_TrgMatch(*el0, run));
+  }else{
+  return false;}
+  }*/
     
-inline bool singleEl_Probe_Imp(const reco::Candidate& cand){
+inline bool singleEl_Probe_Imp(const reco::Candidate& cand, int run){
 
   const pat::Electron* electron = CloneCandidate(cand);
   
@@ -653,7 +704,7 @@ inline bool singleEl_Probe_Imp(const reco::Candidate& cand){
   return false;}
   }
   
-  inline bool singleEl_Probe_Conv_SYM(const reco::Candidate& cand){
+  inline bool singleEl_Probe_Conv_SYM(const reco::Candidate& cand, int run){
 
   const pat::Electron* el = CloneCandidate(cand);
   
@@ -666,7 +717,7 @@ inline bool singleEl_Probe_Imp(const reco::Candidate& cand){
   return false;}
 }
   
-inline bool singleEl_Probe_Iso_SYM(const reco::Candidate& cand){
+inline bool singleEl_Probe_Iso_SYM(const reco::Candidate& cand, int run){
 
   const pat::Electron* electron = CloneCandidate(cand);
   
@@ -676,7 +727,7 @@ inline bool singleEl_Probe_Iso_SYM(const reco::Candidate& cand){
   return false;}
   }
   
-inline bool singleEl_Probe_EiD_SYM(const reco::Candidate& cand){
+inline bool singleEl_Probe_EiD_SYM(const reco::Candidate& cand, int run){
 
   const pat::Electron* electron = CloneCandidate(cand);
   
@@ -689,12 +740,8 @@ inline bool singleEl_Probe_EiD_SYM(const reco::Candidate& cand){
   return false;}
 }
   
-inline bool singleEl_Probe_True(const reco::Candidate& cand){
-return true;
-}
-
 //Probe cuts ASYM
-inline bool singleEl_Probe_Acc_ASYM0(const reco::Candidate& cand){
+inline bool singleEl_Probe_Acc_ASYM0(const reco::Candidate& cand, int run){
 
   const pat::Electron* el0 = CloneCandidate(cand);
   
@@ -705,10 +752,9 @@ inline bool singleEl_Probe_Acc_ASYM0(const reco::Candidate& cand){
           && (fabs(el0->eta())<eta_el_excl_down || fabs(el0->eta())>eta_el_excl_up));
   }else{
   return false;}
-  
   }
   
-inline bool singleEl_Probe_Acc_ASYM1(const reco::Candidate& cand){
+inline bool singleEl_Probe_Acc_ASYM1(const reco::Candidate& cand, int run){
 
   const pat::Electron* el1 = CloneCandidate(cand);
   
@@ -721,7 +767,35 @@ inline bool singleEl_Probe_Acc_ASYM1(const reco::Candidate& cand){
   return false;}
   }
   
-inline bool singleEl_Probe_Conv_ASYM0(const reco::Candidate& cand){
+inline bool singleEl_Probe_Trg_ASYM0(const reco::Candidate& cand, int run){
+
+  const pat::Electron* el0 = CloneCandidate(cand);
+  bool TPTrgMatch=true;
+  
+  if(elTrgMatchReq){
+  TPTrgMatch=false;
+  if(el0){
+  if(RecSelected_TrgMatch(*el0, run))TPTrgMatch=true;
+  }else{
+  TPTrgMatch=false;}
+  }
+ 
+  return TPTrgMatch; 
+  
+}  
+
+//Per il momento non applico il probe Trg al second electron
+inline bool singleEl_Probe_Trg_ASYM1(const reco::Candidate& cand, int run){
+
+  const pat::Electron* el1 = CloneCandidate(cand);
+  
+  if(el1){
+  return true;
+  }else{
+  return false;}
+  }
+  
+inline bool singleEl_Probe_Conv_ASYM0(const reco::Candidate& cand, int run){
 
   const pat::Electron* el0 = CloneCandidate(cand);
   
@@ -732,10 +806,9 @@ inline bool singleEl_Probe_Conv_ASYM0(const reco::Candidate& cand){
   return conv0;
   }else{
   return false;}
- 
 }
 
-inline bool singleEl_Probe_Conv_ASYM1(const reco::Candidate& cand){
+inline bool singleEl_Probe_Conv_ASYM1(const reco::Candidate& cand, int run){
 
   const pat::Electron* el1 = CloneCandidate(cand);
   
@@ -748,7 +821,7 @@ inline bool singleEl_Probe_Conv_ASYM1(const reco::Candidate& cand){
   return false;}
 }
 
-inline bool singleEl_Probe_Iso_ASYM0(const reco::Candidate& cand){
+inline bool singleEl_Probe_Iso_ASYM0(const reco::Candidate& cand, int run){
 
   const pat::Electron* el0 = CloneCandidate(cand);
   
@@ -759,11 +832,9 @@ inline bool singleEl_Probe_Iso_ASYM0(const reco::Candidate& cand){
   return el0_ID;
   }else{
   return false;}
-  
-  return false;
 }
 
-inline bool singleEl_Probe_Iso_ASYM1(const reco::Candidate& cand){
+inline bool singleEl_Probe_Iso_ASYM1(const reco::Candidate& cand, int run){
 
   const pat::Electron* el1 = CloneCandidate(cand);
   
@@ -776,7 +847,7 @@ inline bool singleEl_Probe_Iso_ASYM1(const reco::Candidate& cand){
   return false;}
 }
 
-inline bool singleEl_Probe_EiD_ASYM0(const reco::Candidate& cand){
+inline bool singleEl_Probe_EiD_ASYM0(const reco::Candidate& cand, int run){
 
   const pat::Electron* el0 = CloneCandidate(cand);
   
@@ -789,7 +860,7 @@ inline bool singleEl_Probe_EiD_ASYM0(const reco::Candidate& cand){
   return false;}
 }
 
-inline bool singleEl_Probe_EiD_ASYM1(const reco::Candidate& cand){
+inline bool singleEl_Probe_EiD_ASYM1(const reco::Candidate& cand, int run){
 
   const pat::Electron* el1 = CloneCandidate(cand);
   
@@ -800,6 +871,10 @@ inline bool singleEl_Probe_EiD_ASYM1(const reco::Candidate& cand){
   return el1_ID;
   }else{
   return false;}
+}
+
+inline bool singleEl_Probe_True(const reco::Candidate& cand, int run){
+return true;
 }
 
     

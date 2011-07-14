@@ -236,7 +236,8 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    zeetree->Branch("eleloose2",&eleloose2,"eleloose2/I"); 
    zeetree->Branch("ele2mapID95cIso",&ele2mapID95cIso,"ele2mapID95cIso/I"); 
 
-   zeetree->Branch("npfjetsele",&npfjetsele,"npfjetsele/I");  
+   zeetree->Branch("npfjetsele",&npfjetsele,"npfjetsele/I");
+   zeetree->Branch("pfjetID1",&pfjetID1,"pfjetID1/I");
    zeetree->Branch("pfjetet1",&pfjetet1,"pfjetet1/F"); 
    zeetree->Branch("pfjetpt1",&pfjetpt1,"pfjetpt1/F");
    zeetree->Branch("pfjeteta1",&pfjeteta1,"pfjeteta1/F");
@@ -245,6 +246,7 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    zeetree->Branch("pfjetDeltaRa1",&pfjetDeltaRa1,"pfjetDeltaRa1/F");
    zeetree->Branch("pfjetDeltaRb1",&pfjetDeltaRb1,"pfjetDeltaRb1/F");
    zeetree->Branch("pfjetEmFrac1",&pfjetEmFrac1,"pfjetEmFrac1/F");
+   zeetree->Branch("pfjetID2",&pfjetID2,"pfjetID2/I");
    zeetree->Branch("pfjetet2",&pfjetet2,"pfjetet2/F"); 
    zeetree->Branch("pfjetpt2",&pfjetpt2,"pfjetpt2/F");
    zeetree->Branch("pfjeteta2",&pfjeteta2,"pfjeteta2/F");
@@ -253,6 +255,7 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    zeetree->Branch("pfjetDeltaRa2",&pfjetDeltaRa2,"pfjetDeltaRa2/F");
    zeetree->Branch("pfjetDeltaRb2",&pfjetDeltaRb2,"pfjetDeltaRb2/F");
    zeetree->Branch("pfjetEmFrac2",&pfjetEmFrac2,"pfjetEmFrac2/F");
+   zeetree->Branch("pfjetID3",&pfjetID3,"pfjetID3/I");
    zeetree->Branch("pfjetet3",&pfjetet3,"pfjetet3/F"); 
    zeetree->Branch("pfjetpt3",&pfjetpt3,"pfjetpt3/F");
    zeetree->Branch("pfjeteta3",&pfjeteta3,"pfjeteta3/F");
@@ -263,7 +266,8 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    zeetree->Branch("pfjetEmFrac3",&pfjetEmFrac3,"pfjetEmFrac3/F");
    zeetree->Branch("DeltaR_GenJetPFJet",&DeltaR_GenJetPFJet,"DeltaR_GenJetPFJet/F");
    
-   zeetree->Branch("npfl1jetsele",&npfl1jetsele,"npfl1jetsele/I");   
+   zeetree->Branch("npfl1jetsele",&npfl1jetsele,"npfl1jetsele/I");
+   zeetree->Branch("pfl1jetID1",&pfl1jetID1,"pfl1jetID1/I"); 
    zeetree->Branch("pfl1jetet1",&pfl1jetet1,"pfl1jetet1/F"); 
    zeetree->Branch("pfl1jetpt1",&pfl1jetpt1,"pfl1jetpt1/F");
    zeetree->Branch("pfl1jeteta1",&pfl1jeteta1,"pfl1jeteta1/F");
@@ -271,6 +275,7 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    zeetree->Branch("pfl1jetcharge1",&pfl1jetcharge1,"pfl1jetcharge1/F");
    zeetree->Branch("pfl1jetDeltaRa1",&pfl1jetDeltaRa1,"pfl1jetDeltaRa1/F");
    zeetree->Branch("pfl1jetDeltaRb1",&pfl1jetDeltaRb1,"pfl1jetDeltaRb1/F");
+   zeetree->Branch("pfl1jetID2",&pfl1jetID2,"pfl1jetID2/I");
    zeetree->Branch("pfl1jetet2",&pfl1jetet2,"pfl1jetet2/F"); 
    zeetree->Branch("pfl1jetpt2",&pfl1jetpt2,"pfl1jetpt2/F");
    zeetree->Branch("pfl1jeteta2",&pfl1jeteta2,"pfl1jeteta2/F");
@@ -278,6 +283,7 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    zeetree->Branch("pfl1jetcharge2",&pfl1jetcharge2,"pfl1jetcharge2/F");
    zeetree->Branch("pfl1jetDeltaRa2",&pfl1jetDeltaRa2,"pfl1jetDeltaRa2/F");
    zeetree->Branch("pfl1jetDeltaRb2",&pfl1jetDeltaRb2,"pfl1jetDeltaRb2/F");
+   zeetree->Branch("pfl1jetID3",&pfl1jetID3,"pfl1jetID3/I");
    zeetree->Branch("pfl1jetet3",&pfl1jetet3,"pfl1jetet3/F"); 
    zeetree->Branch("pfl1jetpt3",&pfl1jetpt3,"pfl1jetpt3/F");
    zeetree->Branch("pfl1jeteta3",&pfl1jeteta3,"pfl1jeteta3/F");
@@ -441,6 +447,7 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    neles = -1;
 
    npfjetsele = -1;
+   pfjetID1=-1;
    pfjetet1=0.;
    pfjetpt1=-99.;
    pfjeteta1=-99.;
@@ -449,6 +456,7 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    pfjetDeltaRa1=-99.;
    pfjetDeltaRb1=-99.;
    pfjetEmFrac1=-99.;
+   pfjetID2=-1;
    pfjetet2=0.;
    pfjetpt2=-99.;
    pfjeteta2=-99.;
@@ -457,6 +465,7 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    pfjetDeltaRa2=-99.;
    pfjetDeltaRb2=-99.;
    pfjetEmFrac2=-99.;
+   pfjetID3=-1;
    pfjetet3=0.;
    pfjetpt3=-99.;
    pfjeteta3=-99.;
@@ -470,6 +479,7 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    DeltaR_GenJetPFL1Jet=-99;
       
    npfl1jetsele = -1;
+   pfl1jetID1=-1;
    pfl1jetet1=0.;
    pfl1jetpt1=-99.;
    pfl1jeteta1=-99.;
@@ -477,6 +487,7 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    pfl1jetcharge1=-99.;
    pfl1jetDeltaRa1=-99.;
    pfl1jetDeltaRb1=-99.;
+   pfl1jetID2=-1;
    pfl1jetet2=0.;
    pfl1jetpt2=-99.;
    pfl1jeteta2=-99.;
@@ -484,6 +495,7 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    pfl1jetcharge2=-99.;
    pfl1jetDeltaRa2=-99.;
    pfl1jetDeltaRb2=-99.;
+   pfl1jetID3=-1;
    pfl1jetet3=0.;
    pfl1jetpt3=-99.;
    pfl1jeteta3=-99.;
@@ -527,7 +539,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    const reco::Candidate *gendau1 = 0;
    
    zgendaughters = ZGENDaughters((*zgenHandle)[0]);
-   std::vector<const reco::GenJet*> genjets = GetJets<reco::GenJet>(*jetgenHandle);
+   std::vector<const reco::GenJet*> genjets = GetJets_GenJets<reco::GenJet>(*jetgenHandle);
    
    if(zgendaughters.size()){
    gendau0 = zgendaughters[0];
@@ -627,8 +639,8 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    
    if(zrecHandle->size()){
 
-     std::vector<const pat::Jet*> pfrecjets = GetJets<pat::Jet>(*pfjetrecHandle);
-     std::vector<const pat::Jet*> pfl1recjets = GetJets<pat::Jet>(*pfl1jetrecHandle);
+     std::vector<const pat::Jet*> pfrecjets = GetJets_GenJets<pat::Jet>(*pfjetrecHandle);
+     std::vector<const pat::Jet*> pfl1recjets = GetJets_GenJets<pat::Jet>(*pfl1jetrecHandle);
 
      std::vector<const pat::Electron*> zrecdaughters = ZRECDaughters((*zrecHandle)[0]);
      
@@ -759,6 +771,8 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
       // fill ntuples for jets
       
       if (pfisorecjets.size()>0){
+        cout<<"### PF JET ID1 = "<<jetID(pfisorecjets[0])<<endl;
+        pfjetID1=jetID(pfisorecjets[0]);
         pfjetet1=pfisorecjets[0]->et();
         pfjetpt1=pfisorecjets[0]->pt();
         pfjeteta1=pfisorecjets[0]->eta();
@@ -785,6 +799,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
 
       }
       if (pfisorecjets.size()>1){
+        pfjetID2=jetID(pfisorecjets[1]);
         pfjetet2=pfisorecjets[1]->et();
         pfjetpt2=pfisorecjets[1]->pt();
         pfjeteta2=pfisorecjets[1]->eta();
@@ -794,6 +809,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
         pfjetDeltaRb2=Delta_R(*recdau1, *pfisorecjets[1]);
       }
       if (pfisorecjets.size()>2){
+        pfjetID3=jetID(pfisorecjets[0]);
         pfjetet3=pfisorecjets[2]->et();
         pfjetpt3=pfisorecjets[2]->pt();
         pfjeteta3=pfisorecjets[2]->eta();
@@ -804,6 +820,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
       }
       
       if (pfl1isorecjets.size()>0){
+        pfl1jetID1=jetID(pfl1isorecjets[0]);
         pfl1jetet1=pfl1isorecjets[0]->et();
         pfl1jetpt1=pfl1isorecjets[0]->pt();
         pfl1jeteta1=pfl1isorecjets[0]->eta();
@@ -830,6 +847,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
       }
       
       if (pfl1isorecjets.size()>1){
+        pfl1jetID2=jetID(pfl1isorecjets[1]);
         pfl1jetet2=pfl1isorecjets[1]->et();
         pfl1jetpt2=pfl1isorecjets[1]->pt();
         pfl1jeteta2=pfl1isorecjets[1]->eta();
@@ -839,6 +857,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
         pfl1jetDeltaRb2=Delta_R(*recdau1, *pfl1isorecjets[1]);
       }
       if (pfl1isorecjets.size()>2){
+        pfl1jetID3=jetID(pfl1isorecjets[2]);
         pfl1jetet3=pfl1isorecjets[2]->et();
         pfl1jetpt3=pfl1isorecjets[2]->pt();
         pfl1jeteta3=pfl1isorecjets[2]->eta();

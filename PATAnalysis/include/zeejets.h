@@ -235,6 +235,7 @@ cfg<<"sourceFileList = cms.string(\""<<Source.c_str()<<"\"),"<<std::endl;
 cfg<<"Selections = cms.string(\""<<selections.c_str()<<"\"),"<<std::endl;
 cfg<<"Sample = cms.string(\""<<sample.c_str()<<"\"),"<<std::endl;
 cfg<<"JetType = cms.string(\""<<JetType.c_str()<<"\"),"<<std::endl;
+cfg<<"TPMult = cms.string(\""<<TPMult.c_str()<<"\"),"<<std::endl;
 cfg<<"ReportName        = cms.string(\""<<RepName.c_str()<<"\"),"<<std::endl;
 cfg<<"Acc = cms.int32("<<Acc<<"),"<<std::endl;
 cfg<<"Trg = cms.int32("<<Trg<<"),"<<std::endl;

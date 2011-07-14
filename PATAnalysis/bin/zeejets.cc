@@ -56,7 +56,7 @@ int PreDefName, ProcEvents;
  
   string Data_RUN2010A = "SourceFilesElectrons/DATAEE_RUN2010A_L1FastJet.list";
   string Data_RUN2010B = "SourceFilesElectrons/DATAEE_RUN2010B_L1FastJet.list";
-  string Zpj = "SourceFilesElectrons/MADGRAPHEEPU.list";
+  string Zpj = "SourceFilesElectrons/ZMadgraph_L1FastJet_Winter10_399.list";
   string TT = "SourceFilesElectrons/TTPYTHIAEE.list"; 
   string Wlnu = "SourceFilesElectrons/WJETSEE.list";
   string WWEE = "SourceFilesElectrons/WWEE.list";
@@ -167,7 +167,7 @@ int PreDefName, ProcEvents;
   bool Log = false;
   
   //Path of PATAnalysis dir - DO NOT FORGET THE SLASH AT THE END OF THE PATH
-  string path="/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/";
+  string path="/data/sfrosali/Zjets/Commit/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/";
   
   if(sample=="data"){
   GenParticleMatch = "False";

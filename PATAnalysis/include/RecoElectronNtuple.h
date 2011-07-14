@@ -71,6 +71,9 @@ public :
    Float_t DeltaR_GenJetPFJet, DeltaR_GenJetPFL1Jet;
    
    Float_t CorrLeadElPt_AllCuts, CorrSecElPt_AllCuts, CorrZMass_AllCuts, CorrZPt_AllCuts;
+   
+   Int_t pfjetID1, pfjetID2, pfjetID3;
+   Int_t pfl1jetID1, pfl1jetID2, pfl1jetID3;
 
    // counters
    

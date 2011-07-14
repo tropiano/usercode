@@ -1,17 +1,17 @@
 
-#include "Firenze/PATAnalysis/include/TagAndProbeAnalyzer.h"
+#include "Firenze/PATAnalysis/include/TagAndProbeAnalyzerElectron.h"
 
 #include <iostream>
 #include <sstream>
 
 #include "RooDataHist.h"
 #include "RooPlot.h"
-#include "RooPolynomial.h"
+#include "RooExponential.h"
 #include "RooAddPdf.h"
 #include "RooMinuit.h"
 #include "RooFormulaVar.h"
-#include "RooVoigtian.h"
-#include "RooBifurGauss.h"
+#include "RooCBShape.h"
+#include "RooBreitWigner.h"
 #include "RooSimultaneous.h"
 #include "RooChi2Var.h"
 #include "RooNLLVar.h"
@@ -23,12 +23,13 @@
 using namespace std;
 using namespace RooFit;
 
-TagAndProbeAnalyzer::TagAndProbeAnalyzer(TDirectory* input, TFile* output, TDirectory* sec_input, std::string name, bool performfits, TFile* training_signal, TFile* training_background):
+TagAndProbeAnalyzerElectron::TagAndProbeAnalyzerElectron(TDirectory* input, TFile* output, TDirectory* sec_input, std::string dataset, bool performfits, TFile* training_signal, TFile* training_background):
 _initialized(false),
 _input(input),
 _sec_input(sec_input),
 _output(output),
-_name(name),
+_dataset(dataset),
+_name("Fit"),
 _performfits(performfits),
 _training_signal(training_signal),
 _training_background(training_background),
@@ -46,17 +47,17 @@ _passprobe_cat("passprobe", "passprobe")
   
   TTree* tree=0; 
   TTree* tree1=0;
-
-  tree = (TTree*) _input->Get("dataset");
+  
+  tree = (TTree*) _input->Get(_dataset.c_str());
   if (!tree){
-    std::cout << "Error in TagAndProbeAnalyzer::TagAndProbeAnalyzer : could not find tree named dataset in input file " << std::endl;
+    std::cout << "Error in TagAndProbeAnalyzerElectron::TagAndProbeAnalyzerElectron : could not find tree named dataset in input file " << std::endl;
     return;
   }
   
   if(_sec_input){
-  tree1 = (TTree*) _sec_input->Get("dataset");
+  tree1 = (TTree*) _sec_input->Get(_dataset.c_str());
   if (!tree1){
-    std::cout << "Error in TagAndProbeAnalyzer::TagAndProbeAnalyzer : could not find tree1 named dataset in input file " << std::endl;
+    std::cout << "Error in TagAndProbeAnalyzerElectron::TagAndProbeAnalyzerElectron : could not find tree1 named dataset in input file " << std::endl;
     return;
   }
   }
@@ -66,20 +67,19 @@ _passprobe_cat("passprobe", "passprobe")
   _argset = new RooArgSet(_mass, _bin, _probe, _passprobe_cat, _weight );
  
   _output->cd();
-  _rootree = new RooDataSet("roodataset", "roodataset", tree, *_argset, "");//, "weight");
-  //_rootree = new RooDataSet("roodataset", "roodataset", RooArgSet(_mass, _bin, _probe, _passprobe_cat, _weight));//, Import(*tree), WeightVar("weight"));
+  _rootree = new RooDataSet("roodataset", "roodataset", tree, *_argset, "", "weight");
   if(_sec_input)_rootree1 = new RooDataSet("roodataset", "roodataset", tree1, *_argset, "", "weight");
   
 }
 
-TagAndProbeAnalyzer::~TagAndProbeAnalyzer(){
+TagAndProbeAnalyzerElectron::~TagAndProbeAnalyzerElectron(){
   delete _argset;
 }
 
-void TagAndProbeAnalyzer::analyze(unsigned int nbins, std::string option )
+void TagAndProbeAnalyzerElectron::analyze(unsigned int nbins, std::string option )
 {
    if (!_initialized) {
-      std::cout << "Error in TagAndProbeAnalyzer::Analyze, unable to initialize the RooDataSet. Are you sure that the TagAndProbeFiller has been run?" << std::endl;
+      std::cout << "Error in TagAndProbeAnalyzerElectron::Analyze, unable to initialize the RooDataSet. Are you sure that the TagAndProbeFiller has been run?" << std::endl;
       return;  
    }
  
@@ -106,9 +106,6 @@ void TagAndProbeAnalyzer::analyze(unsigned int nbins, std::string option )
       
       tagprobe = _rootree->reduce(formula_tp.str().c_str());
       if(_sec_input)tagprobe1 = _rootree1->reduce(formula_tp.str().c_str());
-      
-      //_mass.setMin(80.); //TRY smaller range
-      //_mass.setMax(100.); //TRY smaller range
     
       std::pair<RooFitResult*, RooRealVar*>  tp_fit, tp_fit1;
       
@@ -149,8 +146,7 @@ void TagAndProbeAnalyzer::analyze(unsigned int nbins, std::string option )
           singleEfficiency1.SetPointEYhigh(i, errhigh1);
           singleEfficiency1.SetPointEYlow(i, errlow1);
         }
-        
-               
+                  
         if (tp_fit.first) delete tp_fit.first;
           if (tp_fit.second) delete tp_fit.second;
           if(_sec_input){
@@ -178,7 +174,7 @@ void TagAndProbeAnalyzer::analyze(unsigned int nbins, std::string option )
   }
 }
 
-std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data, const char* name, std::string option) {
+std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzerElectron::fit(RooAbsData* data, const char* name, std::string option) {
 
   string dirname(_input->GetName());
 
@@ -186,69 +182,42 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
 
   stringstream nllname;
   nllname << "nll_" << name;
-
-  //if we have training retrieve results
-  /*RooFitResult* training_results_signal     = (_training_signal)     ? (RooFitResult*) _training_signal    ->Get(  (dirname + "/" + nllname.str()).c_str()  ) : 0;
-  cout<<"### TRAINING = "<<(dirname + "/" + nllname.str()).c_str()<<endl;
-  RooFitResult* training_results_background = (_training_background) ? (RooFitResult*) _training_background->Get(  (dirname + "/" + nllname.str()).c_str()  ) : 0;*/
-  
-  //string test_name = "fitresult_total_fit_roodataset";
   
   RooFitResult* training_results_signal = (_training_signal) ? (RooFitResult*)_training_signal->Get(nllname.str().c_str()) : 0;
   RooFitResult* training_results_background = (_training_background) ? (RooFitResult*)_training_background->Get(nllname.str().c_str()) : 0;
 
-  //_mass.setBins(20);
-  //RooDataHist roobinned("bdata","Binned Data", RooArgSet(_mass, _passprobe_cat),*data);
-
   TH1* hmass = data->createHistogram("mass", 100);
   
-/*
-  RooRealVar mu_pass("mu_pass", "average_pass", hmass->GetMean(),  80, 100);
-  RooRealVar mu_pass2("mu_pass2", "average_pass2", hmass->GetMean(), 80, 100);
-  RooRealVar width_pass("width_pass", "width_pass", hmass->GetRMS(), 0, 10);
-  RooRealVar sigma_pass("sigma_pass", "sigma_pass", hmass->GetRMS(), 0, 20);
+  RooRealVar mu_pass("mu_pass", "average_pass", 91.,  80., 100.); 
+  RooRealVar sigma_pass("sigma_pass", "sigma_pass", hmass->GetRMS(), 2, 100);
+  RooRealVar a_pass("a_pass", "a_pass", 10, 0, 100);
+  RooRealVar n_pass("n_pass", "n_pass", 5, 0, 100);
   
-  RooRealVar widthL_pass("widthL_pass", "widthL_pass", 5, 0, 30);
-  RooRealVar widthR_pass("widthR_pass", "widthR_pass", 4, 0, 15);
+  RooRealVar mu_pass2("mu_pass2", "average_pass2", 91., 80., 100.);
+  RooRealVar g_pass("g_pass", "g_pass", 10, 5, 50);
+  
   RooRealVar fraction_pass("fraction_pass", "fraction_pass", 0.9, 0., 1.);
 
+  RooRealVar mu_fail("mu_fail", "average_fail", 91., 80., 100.); 
+  RooRealVar sigma_fail("sigma_fail", "sigma_fail", hmass->GetRMS(), 2, 100);
+  RooRealVar a_fail("a_fail", "a_fail", 10, 0, 100);
+  RooRealVar n_fail("n_fail", "n_fail", 5, 0, 100);
 
-  RooRealVar mu_fail("mu_fail", "average_fail", hmass->GetMean(), 80, 100);
-  RooRealVar mu_fail2("mu_fail2", "average_fail2", hmass->GetMean(), 80, 100);
-  RooRealVar width_fail("width_fail", "width_fail", hmass->GetRMS(), 0, 10);
-  RooRealVar sigma_fail("sigma_fail", "sigma_fail", hmass->GetRMS(), 0, 20);
-
-  RooRealVar widthL_fail("widthL_fail", "widthL_fail", 5, 0, 30);
-  RooRealVar widthR_fail("widthR_fail", "widthR_fail", 4, 0, 15);
+  RooRealVar mu_fail2("mu_fail2", "average_fail2", 91., 80., 100.);
+  RooRealVar g_fail("g_fail", "g_fail", 10, 5, 50);
+  
   RooRealVar fraction_fail("fraction_fail", "fraction_fail", 0.9, 0., 1.);
-*/
-  RooRealVar mu_pass("mu_pass", "average_pass", 90, 80, 100);
-  RooRealVar mu_pass2("mu_pass2", "average_pass2", 90, 80, 100);
-  RooRealVar width_pass("width_pass", "width_pass", 2, 0, 10);
-  RooRealVar sigma_pass("sigma_pass", "sigma_pass", 1, 0, 20);
+
+
+  RooCBShape crystal_pass("crystalball_pass", "crystalball_pass", _mass, mu_pass, sigma_pass, a_pass, n_pass);
+  RooBreitWigner breitwig_pass("breitwig_pass", "breitwig_pass", _mass, mu_pass2, g_pass); //try not to force the same mu_pass
   
-  RooRealVar widthL_pass("widthL_pass", "widthL_pass", 15, 2, 30);
-  RooRealVar widthR_pass("widthR_pass", "widthR_pass", 4, 2, 15);
-  RooRealVar fraction_pass("fraction_pass", "fraction_pass", 0.9, 0., 1.);
+  RooAddPdf signal_pass("signal_pass", "signal_pass", crystal_pass, breitwig_pass, fraction_pass);
 
-  RooRealVar mu_fail("mu_fail", "average_fail", 90, 80, 100);
-  RooRealVar mu_fail2("mu_fail2", "average_fail2", 90, 80, 100);
-  RooRealVar width_fail("width_fail", "width_fail", 2, 0, 10);
-  RooRealVar sigma_fail("sigma_fail", "sigma_fail", 1, 0, 20);
-
-  RooRealVar widthL_fail("widthL_fail", "widthL_fail", 15, 2, 30);
-  RooRealVar widthR_fail("widthR_fail", "widthR_fail", 4, 2, 15);
-  RooRealVar fraction_fail("fraction_fail", "fraction_fail", 0.9, 0., 1.); 
-
-  RooVoigtian voigtian_pass("voigtian_pass", "voigtian_pass", _mass, mu_pass, width_pass, sigma_pass);
-  RooBifurGauss bifurgauss_pass("bifurgauss_pass", "bifurgauss_pass", _mass, mu_pass2, widthL_pass, widthR_pass); //try not to force the same mu_pass
-  RooAddPdf signal_pass("signal_pass", "signal_pass", voigtian_pass, bifurgauss_pass, fraction_pass);
-  //RooVoigtian signal_pass("voigtian_pass", "voigtian_pass", _mass, mu_pass, width_pass, sigma_pass);
-
-  RooVoigtian voigtian_fail("voigtian_fail", "voigtian_fail", _mass, mu_fail, width_fail, sigma_fail);
-  RooBifurGauss bifurgauss_fail("bifurgauss_fail", "bifurgauss_fail", _mass, mu_fail2, widthL_fail, widthR_fail);
-  RooAddPdf signal_fail("signal_fail", "signal_fail", voigtian_fail, bifurgauss_fail, fraction_fail);
-  //RooVoigtian signal_fail("voigtian_fail", "voigtian_fail", _mass, mu_fail, width_fail, sigma_fail);;
+  RooCBShape crystal_fail("crystalball_fail", "crystalball_fail", _mass, mu_fail, sigma_fail, a_fail, n_fail);
+  RooBreitWigner breitwig_fail("breitwig_fail", "breitwig_fail", _mass, mu_fail2, g_fail);
+  
+  RooAddPdf signal_fail("signal_fail", "signal_fail", crystal_fail, breitwig_fail, fraction_fail);
   
   // if we are using signal shape from training 
   if (_training_signal) {
@@ -261,47 +230,43 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
         string parname(par->GetName());
         if (parname == "mu_pass"){
           mu_pass.setVal(par->getVal());
-          mu_pass.setConstant();
-        } 
-          else if (parname == "mu_pass2"){
+          //mu_pass.setConstant();
+        } else if (parname == "mu_pass2"){
           mu_pass2.setVal(par->getVal());
-          mu_pass2.setConstant();
-        } else if (parname == "width_pass"){
-          width_pass.setVal(par->getVal());
-          width_pass.setConstant();
+          //mu_pass2.setConstant();
         } else if (parname == "sigma_pass"){
           sigma_pass.setVal(par->getVal());
           sigma_pass.setConstant();
-        } else if (parname == "widthL_pass"){
-          widthL_pass.setVal(par->getVal());
-          widthL_pass.setConstant();
-        } else if (parname == "widthR_pass"){
-          widthR_pass.setVal(par->getVal());
-          widthR_pass.setConstant();
+        } else if (parname == "a_pass"){
+          a_pass.setVal(par->getVal());
+          a_pass.setConstant();
+        } else if (parname == "n_pass"){
+          n_pass.setVal(par->getVal());
+          n_pass.setConstant();
+        } else if (parname == "g_pass"){
+          g_pass.setVal(par->getVal());
+          g_pass.setConstant();
         } else if (parname == "fraction_pass"){
           fraction_pass.setVal(par->getVal());
           fraction_pass.setConstant();
         } else if (parname == "mu_fail"){
           mu_fail.setVal(par->getVal());
-          mu_fail.setConstant();
-        }
-        else if (parname == "mu_fail2"){
+          //mu_fail.setConstant();
+        } else if (parname == "mu_fail2"){
           mu_fail2.setVal(par->getVal());
-          mu_fail2.setConstant();
-        }
-        else if (parname == "width_fail"){
-          width_fail.setVal(par->getVal());
-          width_fail.setConstant();
-        }
-        else if (parname == "sigma_fail"){
+          //mu_fail2.setConstant();
+        } else if (parname == "sigma_fail"){
           sigma_fail.setVal(par->getVal());
           sigma_fail.setConstant();
-        } else if (parname == "widthL_fail"){
-          widthL_fail.setVal(par->getVal());
-          widthL_fail.setConstant();
-        } else if (parname == "widthR_fail"){
-          widthR_fail.setVal(par->getVal());
-          widthR_fail.setConstant();
+        } else if (parname == "a_fail"){
+          a_fail.setVal(par->getVal());
+          a_fail.setConstant();
+        } else if (parname == "n_fail"){
+          n_fail.setVal(par->getVal());
+          n_fail.setConstant();
+        } else if (parname == "g_fail"){
+          g_fail.setVal(par->getVal());
+          g_fail.setConstant();
         } else if (parname == "fraction_fail"){
           fraction_fail.setVal(par->getVal());
           fraction_fail.setConstant();
@@ -312,18 +277,15 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
        return make_pair((RooFitResult*) 0, (RooRealVar*) 0);
     }
   } 
-
-  //now the background
+  
+  //now the background - EXPONENTIAL
   RooFormulaVar centeredmass("centeredmass", "mass - 91.", RooArgList(_mass));
-  RooRealVar c0_pass("c0_pass", "c0_pass", 1000000.);
-  RooRealVar c1_pass("c1_pass", "c1_pass", -0.1, -2., 2.);
-  RooRealVar c2_pass("c2_pass", "c2_pass", -0.01, -1., 0.);
-  RooPolynomial background_pass("poly_pass", "poly_pass", _mass, RooArgList(c0_pass, c1_pass, c2_pass), 0);
+  
+  RooRealVar c_pass("c_pass", "c_pass", -2, -100., 100.);
+  RooExponential background_pass("exp_pass", "exp_pass", _mass, c_pass);
 
-  RooRealVar c0_fail("c0_fail", "c0_fail", 1000000.);
-  RooRealVar c1_fail("c1_fail", "c1_fail", -0.1, -2., 2.);
-  RooRealVar c2_fail("c2_fail", "c2_fail", -0.01, -1., 0.);
-  RooPolynomial background_fail("poly_fail", "poly_fail", _mass, RooArgList(c0_fail, c1_fail, c2_fail), 0); 
+  RooRealVar c_fail("c_fail", "c_fail", -2., -100., 100.);
+  RooExponential background_fail("exp_fail", "exp_fail", _mass, c_fail); 
 
 
   if (_training_background) {
@@ -334,29 +296,13 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
       for (int i = 0; i < training_results_background->floatParsFinal().getSize(); ++i) {
         RooRealVar* par = (RooRealVar*) training_results_background->floatParsFinal().at(i);
         string parname(par->GetName());
-        if (parname == "c0_pass"){
-          c0_pass.setVal(par->getVal());
-          c0_pass.setConstant();
+        if (parname == "c_pass"){
+          c_pass.setVal(par->getVal());
+          c_pass.setConstant();
         }
-        else if (parname == "c1_pass"){
-          c1_pass.setVal(par->getVal());
-          c1_pass.setConstant();
-        }
-        else if (parname == "c2_pass"){
-          c2_pass.setVal(par->getVal());
-          c2_pass.setConstant();
-        }
-        else if (parname == "c0_fail"){
-          c0_fail.setVal(par->getVal());
-          c0_fail.setConstant();
-        }
-        else if (parname == "c1_fail"){
-          c1_fail.setVal(par->getVal());
-          c1_fail.setConstant();
-        }
-        else if (parname == "c2_fail"){
-          c2_fail.setVal(par->getVal());
-          c2_fail.setConstant();
+        else if (parname == "c_fail"){
+          c_fail.setVal(par->getVal());
+          c_fail.setConstant();
         }
       }
     } else {  //either the fit did not converge or was not retrieved 
@@ -367,15 +313,14 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
  
   RooRealVar s("s", "signal yield", data->sumEntries(), 1, 300000);
   RooRealVar efficiency("efficiency", "efficiency", 0.9, 0., 0.999);
-  RooRealVar b_pass("b_pass", "background yield pass", 50, 0, 1000);
-  RooRealVar b_fail("b_fail", "background yield fail", 50, 0, 1000);
+  RooRealVar b_pass("b_pass", "background yield pass", 50, 0, 100000);
+  RooRealVar b_fail("b_fail", "background yield fail", 50, 0, 100000);
 
-  //RooFormulaVar s_fail("s_fail","s*(1.0 - efficiency)", RooArgList(s, efficiency) );
-  RooFormulaVar s_fail("s_fail","s*efficiency*(1.0 - efficiency)", RooArgList(s, efficiency) );
-  //RooFormulaVar s_pass("s_pass","s*efficiency", RooArgList(s, efficiency) );
-  RooFormulaVar s_pass("s_pass","s*efficiency*efficiency", RooArgList(s, efficiency) );
-  //RooFormulaVar s_pass("s_pass","s*efficiency", RooArgList(efficiency) );
-  //RooFormulaVar s_fail("s_fail","s*(1.0 - efficiency)", RooArgList(efficiency) ); 
+  //RooFormulaVar s_fail("s_fail","s*efficiency*(1.0 - efficiency)", RooArgList(s, efficiency) );
+  //RooFormulaVar s_pass("s_pass","s*efficiency*efficiency", RooArgList(s, efficiency) );
+  
+  RooFormulaVar s_fail("s_fail","s*(1.0 - efficiency)", RooArgList(s, efficiency) );
+  RooFormulaVar s_pass("s_pass","s*efficiency", RooArgList(s, efficiency) );
 
   RooArgList components_pass;//(signal_pass);
   RooArgList coefficients_pass;//(s_pass);
@@ -403,7 +348,7 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
     components_fail.add(background_fail);
     coefficients_fail.add(b_fail);
   } else {
-    std::cout << "Error in TagAndProbeAnalyzer::fit : Unknown option " << option << std::endl;
+    std::cout << "Error in TagAndProbeAnalyzerElectron::fit : Unknown option " << option << std::endl;
     return make_pair((RooFitResult*) 0, (RooRealVar*) 0);;   
   }
 
@@ -412,10 +357,8 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
   
   RooSimultaneous total_fit("total_fit","total_fit", _passprobe_cat);
   _passprobe_cat.setLabel("pass");
-  //total_fit.addPdf(signal_pass, _passprobe_cat.getLabel());
   total_fit.addPdf(sumpass, _passprobe_cat.getLabel());
   _passprobe_cat.setLabel("fail");
-  //total_fit.addPdf(signal_fail, _passprobe_cat.getLabel());
   total_fit.addPdf(sumfail, _passprobe_cat.getLabel());
 
  // RooFitResult* fitresult = total_fit.fitTo(*data, RooFit::Save(true), RooFit::Strategy(2), RooFit::NumCPU(8), RooFit::Extended(kTRUE), RooFit::SumW2Error(true));
@@ -430,23 +373,20 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
   name_pass << name << "PassProbe";
   stringstream name_fail;
   name_fail << name << "FailProbe";   
+  
   RooPlot * mass_pass = _mass.frame() ;
   mass_pass->SetNameTitle(name_pass.str().c_str(), name_pass.str().c_str());
   data->plotOn(mass_pass, RooFit::Cut("passprobe==passprobe::pass"), RooFit::DataError(RooAbsData::SumW2)) ;
-  //roobinned.plotOn(mass_pass, RooFit::Cut("passprobe==passprobe::pass"),  RooFit::DataError(RooDataHist::SumW2)) ;
   total_fit.plotOn(mass_pass, RooFit::Slice(_passprobe_cat, "pass"), RooFit::ProjWData(_passprobe_cat,*data));
-  //background_pass.plotOn(mass_pass);
+  total_fit.getPdf(_passprobe_cat.getLabel())->plotOn(mass_pass, Components(background_pass), LineStyle(kDashed));
   mass_pass->Write();
 
   RooPlot * mass_fail = _mass.frame() ;
   mass_fail->SetNameTitle(name_fail.str().c_str(), name_fail.str().c_str());
   data->plotOn(mass_fail, RooFit::Cut("passprobe==passprobe::fail"),  RooFit::DataError(RooAbsData::SumW2)) ;
-  //roobinned.plotOn(mass_fail, RooFit::Cut("passprobe==passprobe::fail"),  RooFit::DataError(RooDataHist::SumW2)) ;
-  _passprobe_cat.setLabel("fail");
   total_fit.plotOn(mass_fail, RooFit::Slice(_passprobe_cat, "fail"), RooFit::ProjWData(_passprobe_cat,*data));
+  //total_fit.getPdf(_passprobe_cat.getLabel())->plotOn(mass_fail, Components(background_fail), LineStyle(kDashed));
   mass_fail->Write(); 
-    
-  //roobinned.Write();
   
   delete hmass;
   delete mass_pass;
@@ -456,7 +396,7 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
 }
 
 
-TGraphAsymmErrors TagAndProbeAnalyzer::createDoubleEfficiency(const TGraphAsymmErrors& single) const {
+TGraphAsymmErrors TagAndProbeAnalyzerElectron::createDoubleEfficiency(const TGraphAsymmErrors& single) const {
   int n = single.GetN();
   TVectorD vx(n);
   TVectorD vy(n);
@@ -480,7 +420,7 @@ TGraphAsymmErrors TagAndProbeAnalyzer::createDoubleEfficiency(const TGraphAsymmE
   return doubleEff;
 }
 
-TGraphAsymmErrors TagAndProbeAnalyzer::createAsymmCutEfficiency(const TGraphAsymmErrors& single0, const TGraphAsymmErrors& single1) const {
+TGraphAsymmErrors TagAndProbeAnalyzerElectron::createAsymmCutEfficiency(const TGraphAsymmErrors& single0, const TGraphAsymmErrors& single1) const {
 
   int n = single0.GetN();
   
