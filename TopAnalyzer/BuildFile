@@ -3,6 +3,7 @@
 <use name=FWCore/ParameterSet>
 <use name=FWCore/ServiceRegistry>
 <use name=DataFormats/PatCandidates>
+<use name=DataFormats/JetReco>
 <use name=PhysicsTools/UtilAlgos>
 <use name=PhysicsTools/CandUtils>
 <use name=root>
