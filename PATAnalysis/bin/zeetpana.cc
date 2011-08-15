@@ -14,23 +14,24 @@ using namespace std;
 int main() {
 
   //Input files
-  string training_sign = "/data/sfrosali/Zjets/SecondLife/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe_Incl/TPFiles/Z_Madgraph_JetPt30_TPwTrgBit.root";
-  string training_back = "/data/sfrosali/Zjets/SecondLife/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe_Incl/TPFiles/Background_All_JetPt30_TPwTrgBit.root";
-  string total = "/data/sfrosali/Zjets/SecondLife/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe_Incl/TPFiles/Data_RUN2010A-B_JetPt30_TPwTrgBit.root";
+  string training_sign = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15_excl/TPFiles/Z_Madgraph_Winter10_D6T_JetPt15_excl.root";
+  string training_back = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15_excl/TPFiles/Background_All_Winter10_JetPt15_excl.root";
+  string total = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15_excl/TPFiles/Data_RUN2010A-B_JetPt15.root";
+  
   
   //Output files
   string output_train_sign =  
-"/data/sfrosali/Zjets/SecondLife/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe_Incl/TPAnalyzer/TPwTrgBit/TrainSig_JetPt30_TPwTrgBit_Incl_Global.root";
+"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15_excl/TPAnalyzer/TrainSig_JetPt15_Excl_Double.root";
   string output_train_back =  
-"/data/sfrosali/Zjets/SecondLife/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe_Incl/TPAnalyzer/TPwTrgBit/TrainBack_JetPt30_TPwTrgBit_Incl_Global.root";
+"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15_excl/TPAnalyzer/TrainBack_JetPt15_Excl_Double.root";
   string output_total =  
-"/data/sfrosali/Zjets/SecondLife/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe_Incl/TPAnalyzer/TPwTrgBit/DATA_JetPt30_TPwTrgBit_Incl_Global.root";
+"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15_excl/TPAnalyzer/DATA_JetPt15_Excl_Double.root";
 
   //Selections used
   string selections = "ASYM";
   
   //Cut to evaluate
-  string cut = "Global";
+  string cut = "Double";
   
   //Analyzer steps
   bool tr_sig = true;
@@ -99,7 +100,7 @@ int main() {
   dir+="Tag&Probe0";
   sec_el_dir+="Tag&Probe1";}
   
-  if(cut!="Global"){	
+  if(cut!="Global" && cut!="Double"){	
   
   int ncut = 1;	
   while(cut!=_RecoCutFlags[ncut]){
@@ -115,12 +116,14 @@ int main() {
   dataset+=_RecoCutFlags[ncut].c_str();
   dataset+="_";
   
-  }else{
-  
+  }else if(cut=="Global"){
   dir+="_Global";
   sec_el_dir+="_Global";
   dataset+="_Global_";
-  
+  }else if(cut=="Double"){
+  dir+="_Incl_Double";
+  sec_el_dir+="_Incl_Double";
+  dataset+="_Double_";
   }
   	
   if(nodef_dir!="")dir=nodef_dir;

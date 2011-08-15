@@ -31,25 +31,13 @@ using namespace pat;
 using namespace pat::helper;
 using namespace TMath;
 
-/*
-MODIFICHE ALLE SELEZIONI IN BASE ALLA NOTA AN-11-136
-
-Ho modificato i tagli su elettroni: IP (0.02 -> 0.035), maxEtaJet (2.5 -> 2.4), isojetcut (0.5 -> 0.3), Isolamento (combined -> relative).
-Inoltre ho aggiunto dei tagli di qualità sui jet presi dalla nota: ho modificato il metodo GetJets per i ricostruiti ma non per i generati perchè l'ID si applica solo ai ricostruiti; inoltre nell'ntupla ho salvato tutti i jet e ho inserito una flag per l'ID. 
-
->>>>> Nella nota usano però anche un taglio per il trigger matching pari a DR<0.1 mentre per me è DR<0.5.
-Inoltre usano un veto rigettando tutti gli eventi con un muone con pt>15. Queste cose richiedono modifiche nelle pattuple.
-
-*/
-
 ////////////////////////////////// Selection Cuts ////////////////////////////////////////////////
 
 //Electron TRIGGER
 
 //Trigger flags
 static bool elTrgMatchReq = true;
-static bool TrgRange = false;
-static bool TPTrgBitReq = true;
+static bool TrgRange = true;
 
 static map<std::string, std::pair<int, int> > elTrigger() {
 
@@ -98,12 +86,12 @@ static double eta_el_excl_up = 1.566;               //Excluded Eta region
 static double eta_el_excl_down = 1.4442;           //Excluded Eta region
 static double minnhit = 11.;
 static double maxchi2 = 10.;
-static double dxycut = 0.035;     //cm
+static double dxycut = 0.02;     //cm
 
 //Jets
-static bool JetIDReq = true;
-static double ptjetmin = 30.;   //Gev/c
-static double etajetmax = 2.4;
+static bool JetIDReq = false;
+static double ptjetmin = 15.;   //Gev/c
+static double etajetmax = 2.5;
 static double isojetcut = 0.3; //Isolation jet - Z electron
 
 //SYM cuts
@@ -132,12 +120,13 @@ static double zmassmax_asym = 120.;  //Gev/c^2
 
 //New cuts ASYM: tuned on Spring10. CombRelIso used. WP = 80 for dau0, 95 for dau1
 
-//Combined Iso//static string eID_ASYM0 = "simpleEleId80cIso";
-//static string eID_ASYM1 = "simpleEleId95cIso";
+//Combined Iso
+static string eID_ASYM0 = "simpleEleId80cIso";
+static string eID_ASYM1 = "simpleEleId95cIso";
 
 //Relative Iso
-static string eID_ASYM0 = "simpleEleId80relIso";
-static string eID_ASYM1 = "simpleEleId95relIso";
+//static string eID_ASYM0 = "simpleEleId80relIso";
+//static string eID_ASYM1 = "simpleEleId95relIso";
 
 // ASYM0 Tag cuts (for soft electron probe)
 static double ASYM0_TAG_ptelcut = 20.;    //Gev/c
@@ -160,61 +149,6 @@ static double ASYM1_TAG_maxchi2 = 9999.;
 static double ASYM1_TAG_dxycut = 0.1;     //cm
 static double ASYM1_TAG_isocut = 0.1;                        //CombRelIso
 static string ASYM1_TagEiD = ""; //if "" no EiD cut applied
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Trigger
-
-inline bool isTriggerAvailable(const pat::TriggerEvent& triggers, std::string triggername){
-  const pat::TriggerPath* path = triggers.path(triggername);
-  if(!path){
-  return false;
-  }else{
-  return true;}
-}
-
-inline bool isElTriggerAvailable(const pat::TriggerEvent& triggers, int run){
-  bool Triggered = false;
-  static map<std::string, std::pair<int, int> > TrgVector = elTrigger();
-  static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;  
-  for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
-  const pat::TriggerPath* path = triggers.path(TrgVectorIter->first.c_str());
-  if(path && (TrgVectorIter->second.first<=run && run<=TrgVectorIter->second.second))Triggered = true;
-  }
-  return Triggered;
-}
-
-inline bool isTriggered(const pat::TriggerEvent& triggers, std::string triggername){
-  const pat::TriggerPath* path = triggers.path(triggername);
-  if (!path) {
-    return false;
-  }
-  return path->wasAccept();
-}
-
-inline bool isElectronTriggered(const pat::TriggerEvent& triggers, int run){
-  bool Triggered = false;
-  static map<std::string, std::pair<int, int> > TrgVector = elTrigger();
-  static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;
-  for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
-  if( isTriggered(triggers, TrgVectorIter->first.c_str()) && (TrgVectorIter->second.first<=run && run<=TrgVectorIter->second.second) )Triggered = true;}
-  return Triggered;
-}
-
-inline bool RecSelected_TrgMatch(const pat::Electron& Electron, int run){
-bool trigmatch = false;
-static map<std::string, std::pair<int, int> > TrgVector = elTrigger();
-static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;
-for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
-const TriggerObjectStandAloneCollection MatchElectron = Electron.triggerObjectMatchesByPath(TrgVectorIter->first.c_str(), true);
-if(MatchElectron.size() && (TrgVectorIter->second.first<=run && run<=TrgVectorIter->second.second) ) trigmatch = true;
-}
-return trigmatch;
-}
-
-inline bool isJetTriggered(const pat::TriggerEvent& triggers){
-  return isTriggered(triggers, JetTrigger.c_str());
-}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -349,6 +283,61 @@ inline bool GenSelectedInAcceptance(const reco::CompositeCandidate& ZGEN, string
  return false;
  }
  
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Trigger
+
+inline bool isTriggerAvailable(const pat::TriggerEvent& triggers, std::string triggername){
+  const pat::TriggerPath* path = triggers.path(triggername);
+  if(!path){
+  return false;
+  }else{
+  return true;}
+}
+
+inline bool isElTriggerAvailable(const pat::TriggerEvent& triggers, int run){
+  bool Triggered = false;
+  static map<std::string, std::pair<int, int> > TrgVector = elTrigger();
+  static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;  
+  for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
+  const pat::TriggerPath* path = triggers.path(TrgVectorIter->first.c_str());
+  if(path && (TrgVectorIter->second.first<=run && run<=TrgVectorIter->second.second))Triggered = true;
+  }
+  return Triggered;
+}
+
+inline bool isTriggered(const pat::TriggerEvent& triggers, std::string triggername){
+  const pat::TriggerPath* path = triggers.path(triggername);
+  if (!path) {
+    return false;
+  }
+  return path->wasAccept();
+}
+
+inline bool isElectronTriggered(const pat::TriggerEvent& triggers, int run){
+  bool Triggered = false;
+  static map<std::string, std::pair<int, int> > TrgVector = elTrigger();
+  static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;
+  for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
+  if( isTriggered(triggers, TrgVectorIter->first.c_str()) && (TrgVectorIter->second.first<=run && run<=TrgVectorIter->second.second) )Triggered = true;}
+  return Triggered;
+}
+
+inline bool RecSelected_TrgMatch(const pat::Electron& Electron, int run){
+bool trigmatch = false;
+static map<std::string, std::pair<int, int> > TrgVector = elTrigger();
+static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;
+for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
+const TriggerObjectStandAloneCollection MatchElectron = Electron.triggerObjectMatchesByPath(TrgVectorIter->first.c_str(), true);
+if(MatchElectron.size() && (TrgVectorIter->second.first<=run && run<=TrgVectorIter->second.second) ) trigmatch = true;
+}
+return trigmatch;
+}
+
+inline bool isJetTriggered(const pat::TriggerEvent& triggers){
+  return isTriggered(triggers, JetTrigger.c_str());
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -581,16 +570,9 @@ inline void addHistosVsMulti(unsigned int multi, std::string name, std::string t
 
 //Conditions required to fill TagAndProbe
 inline bool RecSelected_TagAndProbe(const reco::CompositeCandidate& ZREC, string selections, const pat::TriggerEvent& triggers, int run){
-
-  bool TrgBit = true;
   
-  if(TPTrgBitReq){
-  TrgBit=false;
-  if(isElectronTriggered(triggers, run))TrgBit=true;
-  }
-  
-  if(selections=="SYM")return ZREC.mass() > zmassmin_sym && ZREC.mass() < zmassmax_sym && TrgBit;
-  if(selections=="ASYM")return ZREC.mass() > zmassmin_asym && ZREC.mass() < zmassmax_asym && TrgBit;
+  if(selections=="SYM")return ZREC.mass() > zmassmin_sym && ZREC.mass() < zmassmax_sym;
+  if(selections=="ASYM")return ZREC.mass() > zmassmin_asym && ZREC.mass() < zmassmax_asym;
   else return false;
   
 }
@@ -875,6 +857,18 @@ inline bool singleEl_Probe_EiD_ASYM1(const reco::Candidate& cand, int run){
 
 inline bool singleEl_Probe_True(const reco::Candidate& cand, int run){
 return true;
+}
+
+inline bool singleEl_Tag_AllSel_ASYM0(const reco::Candidate& cand, int run){
+   
+  return singleEl_Probe_Acc_ASYM0(cand, run) && singleEl_Probe_Trg_ASYM0(cand, run) && singleEl_Probe_Imp(cand, run) && singleEl_Probe_Conv_ASYM0(cand, run) && singleEl_Probe_Iso_ASYM0(cand, run) && singleEl_Probe_EiD_ASYM0(cand, run);
+ 
+}
+
+inline bool singleEl_Tag_AllSel_ASYM1(const reco::Candidate& cand, int run){
+   
+  return singleEl_Probe_Acc_ASYM1(cand, run) && singleEl_Probe_Trg_ASYM1(cand, run) && singleEl_Probe_Imp(cand, run) && singleEl_Probe_Conv_ASYM1(cand, run) && singleEl_Probe_Iso_ASYM1(cand, run) && singleEl_Probe_EiD_ASYM1(cand, run);
+ 
 }
 
     

@@ -95,7 +95,7 @@ PixelHit_OC(0), PixelHit_SC(0), FirstPixelBarrelHit_OC(0), FirstPixelBarrelHit_S
 
 DeltaRvsCharge_JetRec(0), DeltaRvsCharge_JetRec_Iso(0), DeltaRvsCharge_JetRec_NotIso(0),
 
-_targetLumi(50.), _xsec(1.), _norm(1.), _dir(0), _charge_dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _Norm(false), _Sumw2(false), _GenParticleMatch(false), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _fileCounter(0), _Acc(1), _Trg(2), _Conv(3), _Imp(4), _Iso(5), _EiD(6), _selections("ASYM"), _JetType("PF"), _tp_mult("excl"), _sample("data"), _file(0), _histoVector(), _histoVector2D()
+_targetLumi(50.), _xsec(1.), _norm(1.), _dir(0), _charge_dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _Norm(false), _GenParticleMatch(false), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _fileCounter(0), _Acc(1), _Trg(2), _Conv(3), _Imp(4), _Iso(5), _EiD(6), _selections("ASYM"), _JetType("PF"), _tp_mult("excl"), _sample("data"), _file(0), _histoVector(), _histoVector2D()
 
 { }
 
@@ -109,7 +109,6 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _targetLumi= iConfig.getParameter<double>("targetLumi");
    _xsec      = iConfig.getParameter<double>("CrossSection");
    _Norm      = iConfig.getParameter<bool>("Norm");
-   _Sumw2      = iConfig.getParameter<bool>("Sumw2");
    _EventsPerFile    = iConfig.getParameter<int32_t>("EventsPerFile");
    _EventNumber    = iConfig.getParameter<int32_t>("EventNumber");
    _ProcEvents    = iConfig.getParameter<int32_t>("ProcEvents");
@@ -206,22 +205,22 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    
    string recMassZ_name = "recMassZ";
    recMassZ_name+=_RecoCutFlags[1].c_str();
-   recMassZ_1 = new TH1D(recMassZ_name.c_str(), "Reconstructed Z mass", 200, 50, 150);
+   recMassZ_1 = new TH1D(recMassZ_name.c_str(), "Reconstructed Z mass", 100, 60, 120);
    _histoVector.push_back(recMassZ_1);
    recMassZ_name+=_RecoCutFlags[2].c_str();
-   recMassZ_12 = new TH1D(recMassZ_name.c_str(), "Reconstructed Z mass", 200, 50, 150);
+   recMassZ_12 = new TH1D(recMassZ_name.c_str(), "Reconstructed Z mass", 100, 60, 120);
    _histoVector.push_back(recMassZ_12);
    recMassZ_name+=_RecoCutFlags[3].c_str();
-   recMassZ_123 = new TH1D(recMassZ_name.c_str(), "Reconstructed Z mass", 200, 50, 150);
+   recMassZ_123 = new TH1D(recMassZ_name.c_str(), "Reconstructed Z mass", 100, 60, 120);
    _histoVector.push_back(recMassZ_123);
    recMassZ_name+=_RecoCutFlags[4].c_str();
-   recMassZ_1234 = new TH1D(recMassZ_name.c_str(), "Reconstructed Z mass", 200, 50, 150);
+   recMassZ_1234 = new TH1D(recMassZ_name.c_str(), "Reconstructed Z mass", 100, 60, 120);
    _histoVector.push_back(recMassZ_1234);  
    recMassZ_name+=_RecoCutFlags[5].c_str();
-   recMassZ_12345 = new TH1D(recMassZ_name.c_str(), "Reconstructed Z mass", 200, 50, 150);
+   recMassZ_12345 = new TH1D(recMassZ_name.c_str(), "Reconstructed Z mass", 100, 60, 120);
    _histoVector.push_back(recMassZ_12345);
    recMassZ_name+=_RecoCutFlags[6].c_str();
-   recMassZ_123456 = new TH1D(recMassZ_name.c_str(), "Reconstructed Z mass", 200, 50, 150);
+   recMassZ_123456 = new TH1D(recMassZ_name.c_str(), "Reconstructed Z mass", 100, 60, 120);
    _histoVector.push_back(recMassZ_123456);
    
    //Z variables - SC
@@ -270,22 +269,22 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    
    string recMassZSC_name = "recMassZSC";
    recMassZSC_name+=_RecoCutFlags[1].c_str();
-   recMassZSC_1 = new TH1D(recMassZSC_name.c_str(), "Reconstructed ZSC mass", 200, 50, 150);
+   recMassZSC_1 = new TH1D(recMassZSC_name.c_str(), "Reconstructed ZSC mass", 100, 60, 120);
    _histoVector.push_back(recMassZSC_1);
    recMassZSC_name+=_RecoCutFlags[2].c_str();
-   recMassZSC_12 = new TH1D(recMassZSC_name.c_str(), "Reconstructed ZSC mass", 200, 50, 150);
+   recMassZSC_12 = new TH1D(recMassZSC_name.c_str(), "Reconstructed ZSC mass", 100, 60, 120);
    _histoVector.push_back(recMassZSC_12);
    recMassZSC_name+=_RecoCutFlags[3].c_str();
-   recMassZSC_123 = new TH1D(recMassZSC_name.c_str(), "Reconstructed ZSC mass", 200, 50, 150);
+   recMassZSC_123 = new TH1D(recMassZSC_name.c_str(), "Reconstructed ZSC mass", 100, 60, 120);
    _histoVector.push_back(recMassZSC_123);
    recMassZSC_name+=_RecoCutFlags[4].c_str();
-   recMassZSC_1234 = new TH1D(recMassZSC_name.c_str(), "Reconstructed ZSC mass", 200, 50, 150);
+   recMassZSC_1234 = new TH1D(recMassZSC_name.c_str(), "Reconstructed ZSC mass", 100, 60, 120);
    _histoVector.push_back(recMassZSC_1234);  
    recMassZSC_name+=_RecoCutFlags[5].c_str();
-   recMassZSC_12345 = new TH1D(recMassZSC_name.c_str(), "Reconstructed ZSC mass", 200, 50, 150);
+   recMassZSC_12345 = new TH1D(recMassZSC_name.c_str(), "Reconstructed ZSC mass", 100, 60, 120);
    _histoVector.push_back(recMassZSC_12345);
    recMassZSC_name+=_RecoCutFlags[6].c_str();
-   recMassZSC_123456 = new TH1D(recMassZSC_name.c_str(), "Reconstructed ZSC mass", 200, 50, 150);
+   recMassZSC_123456 = new TH1D(recMassZSC_name.c_str(), "Reconstructed ZSC mass", 100, 60, 120);
    _histoVector.push_back(recMassZSC_123456);
    
    //Z Electron variables   
@@ -1584,10 +1583,8 @@ void RecoElectron::finalize(){
    std::vector<TH1D*>::const_iterator ibeg = _histoVector.begin();
    std::vector<TH1D*>::const_iterator iend = _histoVector.end();
    
-   if(_Sumw2){ 
    for (std::vector<TH1D*>::const_iterator i = ibeg; i != iend; ++i){
    (*i)->Sumw2();
-   }
    }
  
    for (std::vector<TH1D*>::const_iterator i = ibeg; i != iend; ++i){
@@ -1683,10 +1680,6 @@ void RecoElectron::finalize(){
    Report<<"isojetcut = "<<isojetcut<<endl<<endl;
    
    Report<<"Tag&Probe Multiplicity: "<<_tp_mult.c_str()<<endl;
-   if(TPTrgBitReq==true){
-   Report<<"Tag&Probe Fill: Trigger Bit Required"<<endl;
-   }else{
-   Report<<endl<<"Tag&Probe Fill: Trigger Bit NOT Required"<<endl;}
    
    Report<<"ASYM0_TAG_ptelcut = "<<ASYM0_TAG_ptelcut<<endl;
    Report<<"ASYM0_TAG_etaelcut = "<<ASYM0_TAG_etaelcut<<endl;

@@ -61,6 +61,8 @@ private:
   std::vector<bool (*)(const reco::Candidate&, int run)> tag_cuts;
   std::vector<bool (*)(const reco::Candidate&, int run)> tag_cuts_0;
   std::vector<bool (*)(const reco::Candidate&, int run)> tag_cuts_1;
+  std::vector<bool (*)(const reco::Candidate&, int run)> tag_cuts_0_AllSel;
+  std::vector<bool (*)(const reco::Candidate&, int run)> tag_cuts_1_AllSel;
   
   TagAndProbeFillerElectron* _TagProbe_Electron_12;
   TagAndProbeFillerElectron* _TagProbe_Electron_123;
@@ -82,6 +84,9 @@ private:
   TagAndProbeFillerElectron* _TagProbe_Electron1_12345;
   TagAndProbeFillerElectron* _TagProbe_Electron1_123456;
   TagAndProbeFillerElectron* _TagProbe_Electron1_Global;
+  
+  TagAndProbeFillerElectron* _TagProbe_Electron0_Incl_Double;
+  TagAndProbeFillerElectron* _TagProbe_Electron1_Incl_Double;
   
   int _run, _nbin;
   

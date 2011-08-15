@@ -101,7 +101,7 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _dir->cd();
    
    //Acceptance denominator
-   AccDenom_genMassZ = new TH1D("AccDenom_genMassZ", "Generated Z Mass, No acceptance cut applied", 200, 50, 150);
+   AccDenom_genMassZ = new TH1D("AccDenom_genMassZ", "Generated Z Mass, No acceptance cut applied", 100, 60, 120);
    _histoVector.push_back(AccDenom_genMassZ);
    AccDenom_genPtZ = new TH1D("AccDenom_genPtZ", "Generated Z pt, No acceptance cut applied",  200, 0, 200);
    _histoVector.push_back(AccDenom_genPtZ);
@@ -121,7 +121,7 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _histoVector.push_back(AccDenom_GenInclJetNumber);
    
    //Efficiency denominator
-   EffDenom_genMassZ = new TH1D("EffDenom_genMassZ", "Generated Z Mass, in acceptance", 200, 50, 150);
+   EffDenom_genMassZ = new TH1D("EffDenom_genMassZ", "Generated Z Mass, in acceptance", 100, 60, 120);
    _histoVector.push_back(EffDenom_genMassZ);
    EffDenom_genPtZ = new TH1D("EffDenom_genPtZ", "Generated Z pt, in acceptance",  200, 0, 200);
    _histoVector.push_back(EffDenom_genPtZ);
@@ -186,22 +186,22 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    
    string genMassZEff_name = "genMassZEff";
    genMassZEff_name+=_RecoCutFlags[1].c_str();   
-   genMassZEff_1 = new TH1D(genMassZEff_name.c_str(), "Generated Z Mass", 200, 50, 150);
+   genMassZEff_1 = new TH1D(genMassZEff_name.c_str(), "Generated Z Mass", 100, 60, 120);
    _histoVector.push_back(genMassZEff_1);
    genMassZEff_name+=_RecoCutFlags[2].c_str();
-   genMassZEff_12 = new TH1D(genMassZEff_name.c_str(), "Generated Z Mass", 200, 50, 150);
+   genMassZEff_12 = new TH1D(genMassZEff_name.c_str(), "Generated Z Mass", 100, 60, 120);
    _histoVector.push_back(genMassZEff_12);
    genMassZEff_name+=_RecoCutFlags[3].c_str();
-   genMassZEff_123 = new TH1D(genMassZEff_name.c_str(), "Generated Z Mass", 200, 50, 150);
+   genMassZEff_123 = new TH1D(genMassZEff_name.c_str(), "Generated Z Mass", 100, 60, 120);
    _histoVector.push_back(genMassZEff_123);
    genMassZEff_name+=_RecoCutFlags[4].c_str();
-   genMassZEff_1234 = new TH1D(genMassZEff_name.c_str(), "Generated Z Mass", 200, 50, 150);
+   genMassZEff_1234 = new TH1D(genMassZEff_name.c_str(), "Generated Z Mass", 100, 60, 120);
    _histoVector.push_back(genMassZEff_1234);
    genMassZEff_name+=_RecoCutFlags[5].c_str();
-   genMassZEff_12345 = new TH1D(genMassZEff_name.c_str(), "Generated Z Mass", 200, 50, 150);
+   genMassZEff_12345 = new TH1D(genMassZEff_name.c_str(), "Generated Z Mass", 100, 60, 120);
    _histoVector.push_back(genMassZEff_12345);
    genMassZEff_name+=_RecoCutFlags[6].c_str();
-   genMassZEff_123456 = new TH1D(genMassZEff_name.c_str(), "Generated Z Mass", 200, 50, 150);
+   genMassZEff_123456 = new TH1D(genMassZEff_name.c_str(), "Generated Z Mass", 100, 60, 120);
    _histoVector.push_back(genMassZEff_123456);
    
    string genPtZEff_name = "genPtZEff";
@@ -333,7 +333,9 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
   if(_selections=="SYM")tag_cuts.push_back(singleEl_Tag_SYM);
   if(_selections=="ASYM"){
   tag_cuts_0.push_back(singleEl_Tag_ASYM0);
-  tag_cuts_1.push_back(singleEl_Tag_ASYM1);}
+  tag_cuts_1.push_back(singleEl_Tag_ASYM1);
+  tag_cuts_0_AllSel.push_back(singleEl_Tag_AllSel_ASYM0);
+  tag_cuts_1_AllSel.push_back(singleEl_Tag_AllSel_ASYM1);}
   
   if(_selections=="SYM"){
   
@@ -556,6 +558,12 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
   
   _TagProbe_Electron0_Global = new TagAndProbeFillerElectron(TagDir0_Global, string(name_TPFiller0_Global.c_str()), _nbin, _xmin, _xmax, tag_cuts_1, probe_cuts0_1, probe_cuts0_123456, "hard");
   
+  //Fit del plot di massa di double electron
+  string name_TPFiller0_Double = "Electron_Double_";
+  TDirectory *TagDir0_Double = _dir->mkdir("Tag&Probe0_Incl_Double");
+  
+  _TagProbe_Electron0_Incl_Double = new TagAndProbeFillerElectron(TagDir0_Double, string(name_TPFiller0_Double.c_str()), _nbin, _xmin, _xmax, tag_cuts_1_AllSel, probe_cuts0_1, probe_cuts0_123456, "hard");
+  
   std::vector<bool (*)(const reco::Candidate&, int run)> probe_cuts1_1;
   std::vector<bool (*)(const reco::Candidate&, int run)> probe_cuts1_12;
   std::vector<bool (*)(const reco::Candidate&, int run)> probe_cuts1_123;
@@ -666,6 +674,12 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
   TDirectory *TagDir1_Global = _dir->mkdir("Tag&Probe1_Global");
   
   _TagProbe_Electron1_Global = new TagAndProbeFillerElectron(TagDir1_Global, string(name_TPFiller1_Global.c_str()), _nbin, _xmin, _xmax, tag_cuts_0, probe_cuts1_1, probe_cuts1_123456, "soft");
+  
+  //Fit del plot di massa di double electron
+  string name_TPFiller1_Double = "Electron_Double_";
+  TDirectory *TagDir1_Double = _dir->mkdir("Tag&Probe1_Incl_Double");
+  
+  _TagProbe_Electron1_Incl_Double = new TagAndProbeFillerElectron(TagDir1_Double, string(name_TPFiller1_Double.c_str()), _nbin, _xmin, _xmax, tag_cuts_0_AllSel, probe_cuts1_1, probe_cuts1_123456, "soft");
   
   }
   
@@ -1052,10 +1066,9 @@ double lumi = _entries/_xsec;
    _TagProbe_Electron1_Global->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
    }
    }
-   else if(_tp_mult=="incl"){
- 
-   for(unsigned int i = 0; i < reciso_recjets.size()+1; i++){
    
+   else if(_tp_mult=="incl"){
+   for(unsigned int i = 0; i < reciso_recjets.size()+1; i++){  
    if(_selections=="SYM"){
    _TagProbe_Electron_12->fill((*zrecHandle)[0], _run, i, _norm);
    _TagProbe_Electron_123->fill((*zrecHandle)[0], _run, i, _norm);
@@ -1081,6 +1094,12 @@ double lumi = _entries/_xsec;
    }
    
    }
+   }
+   
+   if(_selections=="ASYM"){
+   for(unsigned int i = 0; i < reciso_recjets.size()+1; i++){
+   _TagProbe_Electron0_Incl_Double->fill((*zrecHandle)[0], _run, i, _norm);
+   _TagProbe_Electron1_Incl_Double->fill((*zrecHandle)[0], _run, i, _norm);}
    }
 
 }
@@ -1114,6 +1133,9 @@ void EfficiencyElectron::finalize(){
   _TagProbe_Electron1_12345->finalize();
   _TagProbe_Electron1_123456->finalize();
   _TagProbe_Electron1_Global->finalize();
+  
+  _TagProbe_Electron0_Incl_Double->finalize();
+  _TagProbe_Electron1_Incl_Double->finalize();
   }
   
   _file->Write();

@@ -141,8 +141,6 @@ private:
   
   bool _Norm;
   
-  bool _Sumw2;
-  
   bool _GenParticleMatch;
   
   int _entries, _EventsPerFile, _EventNumber, _ProcEvents, _fileCounter, _Acc, _Trg, _Conv, _Imp, _Iso, _EiD;

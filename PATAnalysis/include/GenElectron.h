@@ -70,8 +70,6 @@ private:
   double _norm;
   
   bool _Norm;
-  
-  bool _Sumw2;
 
   int _entries, _EventsPerFile, _EventNumber, _ProcEvents;
 
