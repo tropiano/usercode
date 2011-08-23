@@ -72,6 +72,9 @@ string Tab_jetm = "True";
 
 	//FillStyle	
 	int style = 1001;
+	
+	//MaxBin
+	int MaxBin = 6;
 
 	//SetRangeUser
 	//Jets
@@ -110,7 +113,7 @@ string Tab_jetm = "True";
 
 	//tabella jetm
 	int decimal = 100;
-	string Tab_title = "Number of jets		0	1	2	3	4	5";
+	string Tab_title = "Number of jets		0	1	2	3	4	5	6";
 	string Tab_QCD = "QCD			";
 	string Tab_QCD_err = "QCD Error	";
 	string Tab_TTbar = "TTbar+jets		";
@@ -686,18 +689,18 @@ Dir_5a->cd();
 	jetm<<endl<<"Selection = "<< c_name.c_str() <<endl;
 	jetm<<endl<<Tab_title.c_str()<<endl;
 	jetm<<endl<<Tab_QCD.c_str();
-	for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoQCD_1->GetBinContent(i)*decimal)))/decimal<<"	";
+	for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)(histoQCD_1->GetBinContent(i)*decimal)))/decimal<<"	";
 	jetm<<endl<<Tab_TTbar.c_str();
-	for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoTTbar_1->GetBinContent(i)*decimal)))/decimal<<"	";
+	for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)(histoTTbar_1->GetBinContent(i)*decimal)))/decimal<<"	";
 	jetm<<endl<<Tab_EWK.c_str();
-	for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoEWK_1->GetBinContent(i)*decimal)))/decimal<<"	";
+	for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)(histoEWK_1->GetBinContent(i)*decimal)))/decimal<<"	";
 	jetm<<endl<<Tab_Z.c_str();
-	for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoZ_1->GetBinContent(i)*decimal)))/decimal<<"	";
+	for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)(histoZ_1->GetBinContent(i)*decimal)))/decimal<<"	";
 	jetm<<endl<<Tab_riga.c_str();
 	jetm<<endl<<Tab_total.c_str();
-	for(int i = 1; i < 7; i++)jetm<<((float)((int)((histoQCD_1->GetBinContent(i) + histoTTbar_1->GetBinContent(i) + histoEWK_1->GetBinContent(i) + histoZ_1->GetBinContent(i))*decimal)))/decimal<<"	";
+	for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)((histoQCD_1->GetBinContent(i) + histoTTbar_1->GetBinContent(i) + histoEWK_1->GetBinContent(i) + histoZ_1->GetBinContent(i))*decimal)))/decimal<<"	";
 	jetm<<endl<<Tab_Data.c_str();
-	for(int i = 1; i < 7; i++)jetm<<histoData_1->GetBinContent(i)<<"	";
+	for(int i = 1; i < (MaxBin+2); i++)jetm<<histoData_1->GetBinContent(i)<<"	";
 	jetm<<endl<<endl<<Tab_end.c_str()<<endl;
 	}
 
@@ -786,18 +789,18 @@ Dir_5a->cd();
 			jetm<<endl<<"Selection = "<< c_name.c_str() <<endl;
 			jetm<<endl<<Tab_title.c_str()<<endl;
 			jetm<<endl<<Tab_QCD.c_str();
-			for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoQCD_12->GetBinContent(i)*decimal)))/decimal<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)(histoQCD_12->GetBinContent(i)*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_TTbar.c_str();
-			for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoTTbar_12->GetBinContent(i)*decimal)))/decimal<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)(histoTTbar_12->GetBinContent(i)*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_EWK.c_str();
-			for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoEWK_12->GetBinContent(i)*decimal)))/decimal<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)(histoEWK_12->GetBinContent(i)*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_Z.c_str();
-			for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoZ_12->GetBinContent(i)*decimal)))/decimal<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)(histoZ_12->GetBinContent(i)*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_riga.c_str();
 			jetm<<endl<<Tab_total.c_str();
-			for(int i = 1; i < 7; i++)jetm<<((float)((int)((histoQCD_12->GetBinContent(i) + histoTTbar_12->GetBinContent(i) + histoEWK_12->GetBinContent(i) + histoZ_12->GetBinContent(i))*decimal)))/decimal<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)((histoQCD_12->GetBinContent(i) + histoTTbar_12->GetBinContent(i) + histoEWK_12->GetBinContent(i) + histoZ_12->GetBinContent(i))*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_Data.c_str();
-			for(int i = 1; i < 7; i++)jetm<<histoData_12->GetBinContent(i)<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<histoData_12->GetBinContent(i)<<"	";
 			jetm<<endl<<endl<<Tab_end.c_str()<<endl;
 		}
 		
@@ -886,18 +889,18 @@ Dir_5a->cd();
 			jetm<<endl<<"Selection = "<< c_name.c_str() <<endl;
 			jetm<<endl<<Tab_title.c_str()<<endl;
 			jetm<<endl<<Tab_QCD.c_str();
-			for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoQCD_123->GetBinContent(i)*decimal)))/decimal<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)(histoQCD_123->GetBinContent(i)*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_TTbar.c_str();
-			for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoTTbar_123->GetBinContent(i)*decimal)))/decimal<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)(histoTTbar_123->GetBinContent(i)*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_EWK.c_str();
-			for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoEWK_123->GetBinContent(i)*decimal)))/decimal<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)(histoEWK_123->GetBinContent(i)*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_Z.c_str();
-			for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoZ_123->GetBinContent(i)*decimal)))/decimal<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)(histoZ_123->GetBinContent(i)*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_riga.c_str();
 			jetm<<endl<<Tab_total.c_str();
-			for(int i = 1; i < 7; i++)jetm<<((float)((int)((histoQCD_123->GetBinContent(i) + histoTTbar_123->GetBinContent(i) + histoEWK_123->GetBinContent(i) + histoZ_123->GetBinContent(i))*decimal)))/decimal<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)((histoQCD_123->GetBinContent(i) + histoTTbar_123->GetBinContent(i) + histoEWK_123->GetBinContent(i) + histoZ_123->GetBinContent(i))*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_Data.c_str();
-			for(int i = 1; i < 7; i++)jetm<<histoData_123->GetBinContent(i)<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<histoData_123->GetBinContent(i)<<"	";
 			jetm<<endl<<endl<<Tab_end.c_str()<<endl;
 		}
 		
@@ -986,18 +989,18 @@ Dir_5a->cd();
 			jetm<<endl<<"Selection = "<< c_name.c_str() <<endl;
 			jetm<<endl<<Tab_title.c_str()<<endl;
 			jetm<<endl<<Tab_QCD.c_str();
-			for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoQCD_1234->GetBinContent(i)*decimal)))/decimal<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)(histoQCD_1234->GetBinContent(i)*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_TTbar.c_str();
-			for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoTTbar_1234->GetBinContent(i)*decimal)))/decimal<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)(histoTTbar_1234->GetBinContent(i)*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_EWK.c_str();
-			for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoEWK_1234->GetBinContent(i)*decimal)))/decimal<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)(histoEWK_1234->GetBinContent(i)*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_Z.c_str();
-			for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoZ_1234->GetBinContent(i)*decimal)))/decimal<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)(histoZ_1234->GetBinContent(i)*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_riga.c_str();
 			jetm<<endl<<Tab_total.c_str();
-			for(int i = 1; i < 7; i++)jetm<<((float)((int)((histoQCD_1234->GetBinContent(i) + histoTTbar_1234->GetBinContent(i) + histoEWK_1234->GetBinContent(i) + histoZ_1234->GetBinContent(i))*decimal)))/decimal<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)((histoQCD_1234->GetBinContent(i) + histoTTbar_1234->GetBinContent(i) + histoEWK_1234->GetBinContent(i) + histoZ_1234->GetBinContent(i))*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_Data.c_str();
-			for(int i = 1; i < 7; i++)jetm<<histoData_1234->GetBinContent(i)<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<histoData_1234->GetBinContent(i)<<"	";
 			jetm<<endl<<endl<<Tab_end.c_str()<<endl;
 		}
 		
@@ -1087,18 +1090,18 @@ Dir_5a->cd();
 			jetm<<endl<<"Selection = "<< c_name.c_str() <<endl;
 			jetm<<endl<<Tab_title.c_str()<<endl;
 			jetm<<endl<<Tab_QCD.c_str();
-			for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoQCD_12345->GetBinContent(i)*decimal)))/decimal<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)(histoQCD_12345->GetBinContent(i)*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_TTbar.c_str();
-			for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoTTbar_12345->GetBinContent(i)*decimal)))/decimal<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)(histoTTbar_12345->GetBinContent(i)*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_EWK.c_str();
-			for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoEWK_12345->GetBinContent(i)*decimal)))/decimal<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)(histoEWK_12345->GetBinContent(i)*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_Z.c_str();
-			for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoZ_12345->GetBinContent(i)*decimal)))/decimal<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)(histoZ_12345->GetBinContent(i)*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_riga.c_str();
 			jetm<<endl<<Tab_total.c_str();
-			for(int i = 1; i < 7; i++)jetm<<((float)((int)((histoQCD_12345->GetBinContent(i) + histoTTbar_12345->GetBinContent(i) + histoEWK_12345->GetBinContent(i) + histoZ_12345->GetBinContent(i))*decimal)))/decimal<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)((histoQCD_12345->GetBinContent(i) + histoTTbar_12345->GetBinContent(i) + histoEWK_12345->GetBinContent(i) + histoZ_12345->GetBinContent(i))*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_Data.c_str();
-			for(int i = 1; i < 7; i++)jetm<<histoData_12345->GetBinContent(i)<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<histoData_12345->GetBinContent(i)<<"	";
 			jetm<<endl<<endl<<Tab_end.c_str()<<endl;
 		}
 		
@@ -1186,18 +1189,18 @@ Dir_5a->cd();
 			jetm<<endl<<"Selection = "<< c_name.c_str() <<endl;
 			jetm<<endl<<Tab_title.c_str()<<endl;
 			jetm<<endl<<Tab_QCD.c_str();
-			for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoQCD_123456->GetBinContent(i)*decimal)))/decimal<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)(histoQCD_123456->GetBinContent(i)*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_TTbar.c_str();
-			for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoTTbar_123456->GetBinContent(i)*decimal)))/decimal<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)(histoTTbar_123456->GetBinContent(i)*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_EWK.c_str();
-			for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoEWK_123456->GetBinContent(i)*decimal)))/decimal<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)(histoEWK_123456->GetBinContent(i)*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_Z.c_str();
-			for(int i = 1; i < 7; i++)jetm<<((float)((int)(histoZ_123456->GetBinContent(i)*decimal)))/decimal<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)(histoZ_123456->GetBinContent(i)*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_riga.c_str();
 			jetm<<endl<<Tab_total.c_str();
-			for(int i = 1; i < 7; i++)jetm<<((float)((int)((histoQCD_123456->GetBinContent(i) + histoTTbar_123456->GetBinContent(i) + histoEWK_123456->GetBinContent(i) + histoZ_123456->GetBinContent(i))*decimal)))/decimal<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<((float)((int)((histoQCD_123456->GetBinContent(i) + histoTTbar_123456->GetBinContent(i) + histoEWK_123456->GetBinContent(i) + histoZ_123456->GetBinContent(i))*decimal)))/decimal<<"	";
 			jetm<<endl<<Tab_Data.c_str();
-			for(int i = 1; i < 7; i++)jetm<<histoData_123456->GetBinContent(i)<<"	";
+			for(int i = 1; i < (MaxBin+2); i++)jetm<<histoData_123456->GetBinContent(i)<<"	";
 			jetm<<endl<<endl<<Tab_end.c_str()<<endl;
 		}
 		

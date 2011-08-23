@@ -9,6 +9,7 @@
 #include "TFile.h"
 #include "MyPatAnalysis.h"
 
+
 class RecoElectron : public MyPatAnalysis{
 public :
    RecoElectron();
@@ -145,7 +146,7 @@ private:
   
   int _entries, _EventsPerFile, _EventNumber, _ProcEvents, _fileCounter, _Acc, _Trg, _Conv, _Imp, _Iso, _EiD;
   
-  std::string _selections, _JetType, _tp_mult, _ReportName, _sample;
+  std::string _selections, _JetType, _ReportName, _sample;
 
   TFile* _file;
   
@@ -155,6 +156,8 @@ private:
 
   std::vector<TH1D*> _histoVector;
   std::vector<TH2D*> _histoVector2D;
+  
+  int _TrgList[8];
 
 };
 #endif

@@ -519,6 +519,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    _file->cd();
    
    run       = iEvent.id().run();
+   if(_sample=="mc")run=-1;
    event     = iEvent.id().event();
    lumi      = iEvent.luminosityBlock();
 

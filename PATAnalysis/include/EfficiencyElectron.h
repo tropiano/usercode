@@ -61,31 +61,56 @@ private:
   std::vector<bool (*)(const reco::Candidate&, int run)> tag_cuts;
   std::vector<bool (*)(const reco::Candidate&, int run)> tag_cuts_0;
   std::vector<bool (*)(const reco::Candidate&, int run)> tag_cuts_1;
+  std::vector<bool (*)(const reco::Candidate&, int run)> tag_cuts_AllSel;
   std::vector<bool (*)(const reco::Candidate&, int run)> tag_cuts_0_AllSel;
   std::vector<bool (*)(const reco::Candidate&, int run)> tag_cuts_1_AllSel;
   
-  TagAndProbeFillerElectron* _TagProbe_Electron_12;
-  TagAndProbeFillerElectron* _TagProbe_Electron_123;
-  TagAndProbeFillerElectron* _TagProbe_Electron_1234;
-  TagAndProbeFillerElectron* _TagProbe_Electron_12345;
-  TagAndProbeFillerElectron* _TagProbe_Electron_123456;
-  TagAndProbeFillerElectron* _TagProbe_Electron_Global;
+  TagAndProbeFillerElectron* _TagProbe_Electron_Excl_12;
+  TagAndProbeFillerElectron* _TagProbe_Electron_Excl_123;
+  TagAndProbeFillerElectron* _TagProbe_Electron_Excl_1234;
+  TagAndProbeFillerElectron* _TagProbe_Electron_Excl_12345;
+  TagAndProbeFillerElectron* _TagProbe_Electron_Excl_123456;
+  TagAndProbeFillerElectron* _TagProbe_Electron_Excl_Global;
+  TagAndProbeFillerElectron* _TagProbe_Electron_Excl_Double;
   
-  TagAndProbeFillerElectron* _TagProbe_Electron0_12;
-  TagAndProbeFillerElectron* _TagProbe_Electron0_123;
-  TagAndProbeFillerElectron* _TagProbe_Electron0_1234;
-  TagAndProbeFillerElectron* _TagProbe_Electron0_12345;
-  TagAndProbeFillerElectron* _TagProbe_Electron0_123456;
-  TagAndProbeFillerElectron* _TagProbe_Electron0_Global;
+  TagAndProbeFillerElectron* _TagProbe_Electron0_Excl_12;
+  TagAndProbeFillerElectron* _TagProbe_Electron0_Excl_123;
+  TagAndProbeFillerElectron* _TagProbe_Electron0_Excl_1234;
+  TagAndProbeFillerElectron* _TagProbe_Electron0_Excl_12345;
+  TagAndProbeFillerElectron* _TagProbe_Electron0_Excl_123456;
+  TagAndProbeFillerElectron* _TagProbe_Electron0_Excl_Global;
+  TagAndProbeFillerElectron* _TagProbe_Electron0_Excl_Double;
   
-  TagAndProbeFillerElectron* _TagProbe_Electron1_12;
-  TagAndProbeFillerElectron* _TagProbe_Electron1_123;
-  TagAndProbeFillerElectron* _TagProbe_Electron1_1234;
-  TagAndProbeFillerElectron* _TagProbe_Electron1_12345;
-  TagAndProbeFillerElectron* _TagProbe_Electron1_123456;
-  TagAndProbeFillerElectron* _TagProbe_Electron1_Global;
+  TagAndProbeFillerElectron* _TagProbe_Electron1_Excl_12;
+  TagAndProbeFillerElectron* _TagProbe_Electron1_Excl_123;
+  TagAndProbeFillerElectron* _TagProbe_Electron1_Excl_1234;
+  TagAndProbeFillerElectron* _TagProbe_Electron1_Excl_12345;
+  TagAndProbeFillerElectron* _TagProbe_Electron1_Excl_123456;
+  TagAndProbeFillerElectron* _TagProbe_Electron1_Excl_Global;
+  TagAndProbeFillerElectron* _TagProbe_Electron1_Excl_Double;
   
+  TagAndProbeFillerElectron* _TagProbe_Electron_Incl_12;
+  TagAndProbeFillerElectron* _TagProbe_Electron_Incl_123;
+  TagAndProbeFillerElectron* _TagProbe_Electron_Incl_1234;
+  TagAndProbeFillerElectron* _TagProbe_Electron_Incl_12345;
+  TagAndProbeFillerElectron* _TagProbe_Electron_Incl_123456;
+  TagAndProbeFillerElectron* _TagProbe_Electron_Incl_Global;
+  TagAndProbeFillerElectron* _TagProbe_Electron_Incl_Double;
+  
+  TagAndProbeFillerElectron* _TagProbe_Electron0_Incl_12;
+  TagAndProbeFillerElectron* _TagProbe_Electron0_Incl_123;
+  TagAndProbeFillerElectron* _TagProbe_Electron0_Incl_1234;
+  TagAndProbeFillerElectron* _TagProbe_Electron0_Incl_12345;
+  TagAndProbeFillerElectron* _TagProbe_Electron0_Incl_123456;
+  TagAndProbeFillerElectron* _TagProbe_Electron0_Incl_Global;  
   TagAndProbeFillerElectron* _TagProbe_Electron0_Incl_Double;
+  
+  TagAndProbeFillerElectron* _TagProbe_Electron1_Incl_12;
+  TagAndProbeFillerElectron* _TagProbe_Electron1_Incl_123;
+  TagAndProbeFillerElectron* _TagProbe_Electron1_Incl_1234;
+  TagAndProbeFillerElectron* _TagProbe_Electron1_Incl_12345;
+  TagAndProbeFillerElectron* _TagProbe_Electron1_Incl_123456;
+  TagAndProbeFillerElectron* _TagProbe_Electron1_Incl_Global;  
   TagAndProbeFillerElectron* _TagProbe_Electron1_Incl_Double;
   
   int _run, _nbin;
@@ -103,8 +128,6 @@ private:
   double _targetLumi;
   
   double _xsec;
-  
-  std::string _tp_mult;
 
 };
 #endif

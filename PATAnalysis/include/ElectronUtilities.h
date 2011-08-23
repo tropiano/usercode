@@ -37,7 +37,6 @@ using namespace TMath;
 
 //Trigger flags
 static bool elTrgMatchReq = true;
-static bool TrgRange = true;
 
 static map<std::string, std::pair<int, int> > elTrigger() {
 
@@ -51,16 +50,6 @@ rr4 = make_pair(146428, 147116);
 rr5 = make_pair(147196, 148058);
 rr6 = make_pair(148819, 149064);
 rr7 = make_pair(149181, 149442);
-
-if(TrgRange == false){
-rr1 = make_pair(-1, 999999999);
-rr2 = make_pair(-1, 999999999);
-rr3 = make_pair(-1, 999999999);
-rr4 = make_pair(-1, 999999999);
-rr5 = make_pair(-1, 999999999);
-rr6 = make_pair(-1, 999999999);
-rr7 = make_pair(-1, 999999999);
-}
 
 static map<std::string, rrange > TrgVector;
 
@@ -143,7 +132,7 @@ static string ASYM0_TagEiD = ""; //if "" no EiD cut applied
 static double ASYM1_TAG_ptelcut = 10.;    //Gev/c
 static double ASYM1_TAG_etaelcut = 2.5;
 static double ASYM1_TAG_eta_el_excl_up = 1.566;               //Excluded Eta region
-static double ASYM1_TAG_eta_el_excl_down = 1.4442;           //Excluded Eta region
+static double ASYM1_TAG_eta_el_excl_down = 1.4442;            //Excluded Eta region
 static double ASYM1_TAG_minnhit = 0.;
 static double ASYM1_TAG_maxchi2 = 9999.;
 static double ASYM1_TAG_dxycut = 0.1;     //cm
@@ -300,10 +289,14 @@ inline bool isTriggerAvailable(const pat::TriggerEvent& triggers, std::string tr
 inline bool isElTriggerAvailable(const pat::TriggerEvent& triggers, int run){
   bool Triggered = false;
   static map<std::string, std::pair<int, int> > TrgVector = elTrigger();
-  static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;  
+  static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;    
   for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
   const pat::TriggerPath* path = triggers.path(TrgVectorIter->first.c_str());
+  if(run!=-1){
   if(path && (TrgVectorIter->second.first<=run && run<=TrgVectorIter->second.second))Triggered = true;
+  }else{
+  if(path)Triggered = true;
+  }
   }
   return Triggered;
 }
@@ -321,7 +314,12 @@ inline bool isElectronTriggered(const pat::TriggerEvent& triggers, int run){
   static map<std::string, std::pair<int, int> > TrgVector = elTrigger();
   static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;
   for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
-  if( isTriggered(triggers, TrgVectorIter->first.c_str()) && (TrgVectorIter->second.first<=run && run<=TrgVectorIter->second.second) )Triggered = true;}
+  if(run!=-1){
+  if( isTriggered(triggers, TrgVectorIter->first.c_str()) && (TrgVectorIter->second.first<=run && run<=TrgVectorIter->second.second) )Triggered = true;
+  }else{
+  if(isTriggered(triggers, TrgVectorIter->first.c_str()))Triggered = true;
+  }
+  }
   return Triggered;
 }
 
@@ -331,7 +329,10 @@ static map<std::string, std::pair<int, int> > TrgVector = elTrigger();
 static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;
 for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
 const TriggerObjectStandAloneCollection MatchElectron = Electron.triggerObjectMatchesByPath(TrgVectorIter->first.c_str(), true);
+if(run!=-1){
 if(MatchElectron.size() && (TrgVectorIter->second.first<=run && run<=TrgVectorIter->second.second) ) trigmatch = true;
+}else{
+if(MatchElectron.size()) trigmatch = true;}
 }
 return trigmatch;
 }
@@ -665,16 +666,23 @@ inline bool singleEl_Probe_Acc_SYM(const reco::Candidate& cand, int run){
   return false;}
   }
 
-//Come va applicato il probe Trg nel caso di selezioni simmetriche?
-/*inline bool singleEl_Probe_Trg_SYM(const reco::Candidate& cand, int run){
-
-  const pat::Electron* el0 = CloneCandidate(cand);
+//Come va applicato il probe Trg nel caso di selezioni simmetriche? Per il momento lo applico come per le sel. asimmetriche
+inline bool singleEl_Probe_Trg_SYM(const reco::Candidate& cand, int run){
   
+  const pat::Electron* el0 = CloneCandidate(cand);
+  bool TPTrgMatch=true;
+  
+  if(elTrgMatchReq){
+  TPTrgMatch=false;
   if(el0){
-  return (RecSelected_TrgMatch(*el0, run));
+  if(RecSelected_TrgMatch(*el0, run))TPTrgMatch=true;
   }else{
-  return false;}
-  }*/
+  TPTrgMatch=false;}
+  }
+ 
+  return TPTrgMatch; 
+  
+ }
     
 inline bool singleEl_Probe_Imp(const reco::Candidate& cand, int run){
 
@@ -857,6 +865,12 @@ inline bool singleEl_Probe_EiD_ASYM1(const reco::Candidate& cand, int run){
 
 inline bool singleEl_Probe_True(const reco::Candidate& cand, int run){
 return true;
+}
+
+inline bool singleEl_Tag_AllSel_SYM(const reco::Candidate& cand, int run){
+   
+  return singleEl_Probe_Acc_SYM(cand, run) && singleEl_Probe_Trg_SYM(cand, run) && singleEl_Probe_Imp(cand, run) && singleEl_Probe_Conv_SYM(cand, run) && singleEl_Probe_Iso_SYM(cand, run) && singleEl_Probe_EiD_SYM(cand, run);
+ 
 }
 
 inline bool singleEl_Tag_AllSel_ASYM0(const reco::Candidate& cand, int run){

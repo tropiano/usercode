@@ -50,7 +50,7 @@ genLeadElPtEff_1(0), genLeadElPtEff_12(0), genLeadElPtEff_123(0), genLeadElPtEff
 AccDenom_genPtZ(0), AccDenom_genMassZ(0), AccDenom_genEtaZ(0), AccDenom_genLeadElEta(0), AccDenom_genLeadElPt(0), AccDenom_GenExclJetNumber(0), AccDenom_RecoExclJetNumber(0), AccDenom_RecoInclJetNumber(0), AccDenom_GenInclJetNumber(0), 
 EffDenom_genPtZ(0), EffDenom_genMassZ(0), EffDenom_genEtaZ(0), EffDenom_genLeadElEta(0), EffDenom_genLeadElPt(0), EffDenom_GenExclJetNumber(0), EffDenom_RecoExclJetNumber(0), EffDenom_RecoInclJetNumber(0), EffDenom_GenInclJetNumber(0), 
 
-_sample("mc"), _selections("ASYM"), _JetType("PF"), _dir(0), _file(0), _Acc(1), _Trg(2), _Conv(3), _Imp(4), _Iso(5), _EiD(6), _histoVector(), _nbin(10), _xmin(-0.5), _xmax(9.5), _Norm(false), _norm(1.), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _tp_mult("incl")
+_sample("mc"), _selections("ASYM"), _JetType("PF"), _dir(0), _file(0), _Acc(1), _Trg(2), _Conv(3), _Imp(4), _Iso(5), _EiD(6), _histoVector(), _nbin(10), _xmin(-0.5), _xmax(9.5), _Norm(false), _norm(1.), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1)
 
 { }
 
@@ -68,7 +68,6 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
     _targetLumi= iConfig.getParameter<double>("targetLumi");
     _xsec      = iConfig.getParameter<double>("CrossSection");
     _JetType = iConfig.getParameter<std::string>("JetType");
-    _tp_mult = iConfig.getParameter<std::string>("TPMult");
     
     //Selections
    _Acc = iConfig.getParameter<int32_t>("Acc");
@@ -330,7 +329,9 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    
 // Tag & Probe
 
-  if(_selections=="SYM")tag_cuts.push_back(singleEl_Tag_SYM);
+  if(_selections=="SYM"){
+  tag_cuts.push_back(singleEl_Tag_SYM);
+  tag_cuts_AllSel.push_back(singleEl_Tag_AllSel_SYM);}
   if(_selections=="ASYM"){
   tag_cuts_0.push_back(singleEl_Tag_ASYM0);
   tag_cuts_1.push_back(singleEl_Tag_ASYM1);
@@ -398,50 +399,78 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
   if(i<7)probe_cuts_123456.push_back(singleEl_Probe_True);}
   }
   
-  string name_TagDir="Tag&Probe";
+  string name_TagDir_Excl="Tag&Probe_Excl";
+  string name_TagDir_Incl="Tag&Probe_Incl";
   string name_TPFiller="Electron";
   
-  name_TagDir+=_RecoCutFlags[1].c_str();
+  name_TagDir_Excl+=_RecoCutFlags[1].c_str();
+  name_TagDir_Excl+=_RecoCutFlags[2].c_str();  
+  name_TagDir_Incl+=_RecoCutFlags[1].c_str();
+  name_TagDir_Incl+=_RecoCutFlags[2].c_str();
   name_TPFiller+=_RecoCutFlags[1].c_str();
-  name_TagDir+=_RecoCutFlags[2].c_str();
   name_TPFiller+=_RecoCutFlags[2].c_str();
+  
   string name_TPFiller_12 = name_TPFiller+"_";
-  TDirectory *TagDir_12 = _dir->mkdir(name_TagDir.c_str());
+  TDirectory *TagDir_Excl_12 = _dir->mkdir(name_TagDir_Excl.c_str());
+  TDirectory *TagDir_Incl_12 = _dir->mkdir(name_TagDir_Incl.c_str());
   
-  _TagProbe_Electron_12 = new TagAndProbeFillerElectron(TagDir_12, string(name_TPFiller_12.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts_1, probe_cuts_12);
+  _TagProbe_Electron_Excl_12 = new TagAndProbeFillerElectron(TagDir_Excl_12, string(name_TPFiller_12.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts_1, probe_cuts_12);
+  _TagProbe_Electron_Incl_12 = new TagAndProbeFillerElectron(TagDir_Incl_12, string(name_TPFiller_12.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts_1, probe_cuts_12);
   
-  name_TagDir+=_RecoCutFlags[3].c_str();
   name_TPFiller+=_RecoCutFlags[3].c_str();
-  string name_TPFiller_123 = name_TPFiller+"_";
-  TDirectory *TagDir_123 = _dir->mkdir(name_TagDir.c_str());
+  string name_TPFiller_123 = name_TPFiller+"_"; 
+  name_TagDir_Excl+=_RecoCutFlags[3].c_str();
+  TDirectory *TagDir_Excl_123 = _dir->mkdir(name_TagDir_Excl.c_str());
+  name_TagDir_Incl+=_RecoCutFlags[3].c_str();
+  TDirectory *TagDir_Incl_123 = _dir->mkdir(name_TagDir_Incl.c_str());
   
-  _TagProbe_Electron_123 = new TagAndProbeFillerElectron(TagDir_123, string(name_TPFiller_123.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts_12, probe_cuts_123);
+  _TagProbe_Electron_Excl_123 = new TagAndProbeFillerElectron(TagDir_Excl_123, string(name_TPFiller_123.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts_12, probe_cuts_123);
+  _TagProbe_Electron_Incl_123 = new TagAndProbeFillerElectron(TagDir_Incl_123, string(name_TPFiller_123.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts_12, probe_cuts_123);
   
-  name_TagDir+=_RecoCutFlags[4].c_str();
   name_TPFiller+=_RecoCutFlags[4].c_str();
   string name_TPFiller_1234 = name_TPFiller+"_";
-  TDirectory *TagDir_1234 = _dir->mkdir(name_TagDir.c_str());
+  name_TagDir_Excl+=_RecoCutFlags[4].c_str();
+  TDirectory *TagDir_Excl_1234 = _dir->mkdir(name_TagDir_Excl.c_str()); 
+  name_TagDir_Incl+=_RecoCutFlags[4].c_str();
+  TDirectory *TagDir_Incl_1234 = _dir->mkdir(name_TagDir_Incl.c_str());
   
-  _TagProbe_Electron_1234 = new TagAndProbeFillerElectron(TagDir_1234, string(name_TPFiller_1234.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts_123, probe_cuts_1234);
+  _TagProbe_Electron_Excl_1234 = new TagAndProbeFillerElectron(TagDir_Excl_1234, string(name_TPFiller_1234.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts_123, probe_cuts_1234);
+  _TagProbe_Electron_Incl_1234 = new TagAndProbeFillerElectron(TagDir_Incl_1234, string(name_TPFiller_1234.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts_123, probe_cuts_1234);
   
-  name_TagDir+=_RecoCutFlags[5].c_str();
   name_TPFiller+=_RecoCutFlags[5].c_str();
   string name_TPFiller_12345 = name_TPFiller+"_";
-  TDirectory *TagDir_12345 = _dir->mkdir(name_TagDir.c_str());
+  name_TagDir_Excl+=_RecoCutFlags[5].c_str();
+  TDirectory *TagDir_Excl_12345 = _dir->mkdir(name_TagDir_Excl.c_str());
+  name_TagDir_Incl+=_RecoCutFlags[5].c_str();
+  TDirectory *TagDir_Incl_12345 = _dir->mkdir(name_TagDir_Incl.c_str());
   
-  _TagProbe_Electron_12345 = new TagAndProbeFillerElectron(TagDir_12345, string(name_TPFiller_12345.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts_1234, probe_cuts_12345);
+  _TagProbe_Electron_Excl_12345 = new TagAndProbeFillerElectron(TagDir_Excl_12345, string(name_TPFiller_12345.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts_1234, probe_cuts_12345);
+  _TagProbe_Electron_Incl_12345 = new TagAndProbeFillerElectron(TagDir_Incl_12345, string(name_TPFiller_12345.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts_1234, probe_cuts_12345);
   
-  name_TagDir+=_RecoCutFlags[6].c_str();
   name_TPFiller+=_RecoCutFlags[6].c_str();
   string name_TPFiller_123456 = name_TPFiller+"_";
-  TDirectory *TagDir_123456 = _dir->mkdir(name_TagDir.c_str());
+  name_TagDir_Excl+=_RecoCutFlags[6].c_str();  
+  TDirectory *TagDir_Excl_123456 = _dir->mkdir(name_TagDir_Excl.c_str());
+  name_TagDir_Incl+=_RecoCutFlags[6].c_str();
+  TDirectory *TagDir_Incl_123456 = _dir->mkdir(name_TagDir_Incl.c_str());
   
-  _TagProbe_Electron_123456 = new TagAndProbeFillerElectron(TagDir_123456, string(name_TPFiller_123456.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts_12345, probe_cuts_123456);
+  _TagProbe_Electron_Excl_123456 = new TagAndProbeFillerElectron(TagDir_Excl_123456, string(name_TPFiller_123456.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts_12345, probe_cuts_123456);
+  _TagProbe_Electron_Incl_123456 = new TagAndProbeFillerElectron(TagDir_Incl_123456, string(name_TPFiller_123456.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts_12345, probe_cuts_123456);
   
   string name_TPFiller_Global = "Electron_Global_";
-  TDirectory *TagDir_Global = _dir->mkdir("Tag&Probe_Global");
+  TDirectory *TagDir_Excl_Global = _dir->mkdir("Tag&Probe_Excl_Global");
+  TDirectory *TagDir_Incl_Global = _dir->mkdir("Tag&Probe_Incl_Global");
   
-  _TagProbe_Electron_Global = new TagAndProbeFillerElectron(TagDir_Global, string(name_TPFiller_Global.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts_1, probe_cuts_123456);
+  _TagProbe_Electron_Excl_Global = new TagAndProbeFillerElectron(TagDir_Excl_Global, string(name_TPFiller_Global.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts_1, probe_cuts_123456);
+  _TagProbe_Electron_Incl_Global = new TagAndProbeFillerElectron(TagDir_Incl_Global, string(name_TPFiller_Global.c_str()), _nbin, _xmin, _xmax, tag_cuts, probe_cuts_1, probe_cuts_123456);
+  
+  //Fit del plot di massa di double electron
+  string name_TPFiller_Double = "Electron_Double_";
+  TDirectory *TagDir_Excl_Double = _dir->mkdir("Tag&Probe_Excl_Double");
+  TDirectory *TagDir_Incl_Double = _dir->mkdir("Tag&Probe_Incl_Double");
+  
+  _TagProbe_Electron_Excl_Double = new TagAndProbeFillerElectron(TagDir_Excl_Double, string(name_TPFiller_Double.c_str()), _nbin, _xmin, _xmax, tag_cuts_AllSel, probe_cuts_1, probe_cuts_123456);
+  _TagProbe_Electron_Incl_Double = new TagAndProbeFillerElectron(TagDir_Incl_Double, string(name_TPFiller_Double.c_str()), _nbin, _xmin, _xmax, tag_cuts_AllSel, probe_cuts_1, probe_cuts_123456);
   
   }
   
@@ -513,56 +542,78 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
   if(i<7)probe_cuts0_123456.push_back(singleEl_Probe_True);}
   }
   
-  string name_TagDir0="Tag&Probe0";
+  string name_TagDir0_Excl="Tag&Probe0_Excl";
+  string name_TagDir0_Incl="Tag&Probe0_Incl";
   string name_TPFiller0="Electron";
   
-  name_TagDir0+=_RecoCutFlags[1].c_str();
+  name_TagDir0_Excl+=_RecoCutFlags[1].c_str();  
+  name_TagDir0_Excl+=_RecoCutFlags[2].c_str();
+  name_TagDir0_Incl+=_RecoCutFlags[1].c_str();  
+  name_TagDir0_Incl+=_RecoCutFlags[2].c_str();
   name_TPFiller0+=_RecoCutFlags[1].c_str();
-  name_TagDir0+=_RecoCutFlags[2].c_str();
   name_TPFiller0+=_RecoCutFlags[2].c_str();
+  
   string name_TPFiller0_12 = name_TPFiller0+"_";
-  TDirectory *TagDir0_12 = _dir->mkdir(name_TagDir0.c_str());
+  TDirectory *TagDir0_Excl_12 = _dir->mkdir(name_TagDir0_Excl.c_str());
+  TDirectory *TagDir0_Incl_12 = _dir->mkdir(name_TagDir0_Incl.c_str());
   
-  _TagProbe_Electron0_12 = new TagAndProbeFillerElectron(TagDir0_12, string(name_TPFiller0_12.c_str()), _nbin, _xmin, _xmax, tag_cuts_1, probe_cuts0_1, probe_cuts0_12, "hard");
+  _TagProbe_Electron0_Excl_12 = new TagAndProbeFillerElectron(TagDir0_Excl_12, string(name_TPFiller0_12.c_str()), _nbin, _xmin, _xmax, tag_cuts_1, probe_cuts0_1, probe_cuts0_12, "hard");
+  _TagProbe_Electron0_Incl_12 = new TagAndProbeFillerElectron(TagDir0_Incl_12, string(name_TPFiller0_12.c_str()), _nbin, _xmin, _xmax, tag_cuts_1, probe_cuts0_1, probe_cuts0_12, "hard");
   
-  name_TagDir0+=_RecoCutFlags[3].c_str();
   name_TPFiller0+=_RecoCutFlags[3].c_str();
   string name_TPFiller0_123 = name_TPFiller0+"_";
-  TDirectory *TagDir0_123 = _dir->mkdir(name_TagDir0.c_str());
+  name_TagDir0_Excl+=_RecoCutFlags[3].c_str(); 
+  TDirectory *TagDir0_Excl_123 = _dir->mkdir(name_TagDir0_Excl.c_str());
+  name_TagDir0_Incl+=_RecoCutFlags[3].c_str(); 
+  TDirectory *TagDir0_Incl_123 = _dir->mkdir(name_TagDir0_Incl.c_str());
   
-  _TagProbe_Electron0_123 = new TagAndProbeFillerElectron(TagDir0_123, string(name_TPFiller0_123.c_str()), _nbin, _xmin, _xmax, tag_cuts_1, probe_cuts0_12, probe_cuts0_123, "hard");
+  _TagProbe_Electron0_Excl_123 = new TagAndProbeFillerElectron(TagDir0_Excl_123, string(name_TPFiller0_123.c_str()), _nbin, _xmin, _xmax, tag_cuts_1, probe_cuts0_12, probe_cuts0_123, "hard");
+  _TagProbe_Electron0_Incl_123 = new TagAndProbeFillerElectron(TagDir0_Incl_123, string(name_TPFiller0_123.c_str()), _nbin, _xmin, _xmax, tag_cuts_1, probe_cuts0_12, probe_cuts0_123, "hard");
   
-  name_TagDir0+=_RecoCutFlags[4].c_str();
   name_TPFiller0+=_RecoCutFlags[4].c_str();
   string name_TPFiller0_1234 = name_TPFiller0+"_";
-  TDirectory *TagDir0_1234 = _dir->mkdir(name_TagDir0.c_str());
+  name_TagDir0_Excl+=_RecoCutFlags[4].c_str();
+  TDirectory *TagDir0_Excl_1234 = _dir->mkdir(name_TagDir0_Excl.c_str());
+  name_TagDir0_Incl+=_RecoCutFlags[4].c_str();
+  TDirectory *TagDir0_Incl_1234 = _dir->mkdir(name_TagDir0_Incl.c_str());
   
-  _TagProbe_Electron0_1234 = new TagAndProbeFillerElectron(TagDir0_1234, string(name_TPFiller0_1234.c_str()), _nbin, _xmin, _xmax, tag_cuts_1, probe_cuts0_123, probe_cuts0_1234, "hard");
+  _TagProbe_Electron0_Excl_1234 = new TagAndProbeFillerElectron(TagDir0_Excl_1234, string(name_TPFiller0_1234.c_str()), _nbin, _xmin, _xmax, tag_cuts_1, probe_cuts0_123, probe_cuts0_1234, "hard");
+  _TagProbe_Electron0_Incl_1234 = new TagAndProbeFillerElectron(TagDir0_Incl_1234, string(name_TPFiller0_1234.c_str()), _nbin, _xmin, _xmax, tag_cuts_1, probe_cuts0_123, probe_cuts0_1234, "hard");
   
-  name_TagDir0+=_RecoCutFlags[5].c_str();
   name_TPFiller0+=_RecoCutFlags[5].c_str();
   string name_TPFiller0_12345 = name_TPFiller0+"_";
-  TDirectory *TagDir0_12345 = _dir->mkdir(name_TagDir0.c_str());
+  name_TagDir0_Excl+=_RecoCutFlags[5].c_str();  
+  TDirectory *TagDir0_Excl_12345 = _dir->mkdir(name_TagDir0_Excl.c_str());
+  name_TagDir0_Incl+=_RecoCutFlags[5].c_str();  
+  TDirectory *TagDir0_Incl_12345 = _dir->mkdir(name_TagDir0_Incl.c_str());
   
-  _TagProbe_Electron0_12345 = new TagAndProbeFillerElectron(TagDir0_12345, string(name_TPFiller0_12345.c_str()), _nbin, _xmin, _xmax, tag_cuts_1, probe_cuts0_1234, probe_cuts0_12345, "hard");
+  _TagProbe_Electron0_Excl_12345 = new TagAndProbeFillerElectron(TagDir0_Excl_12345, string(name_TPFiller0_12345.c_str()), _nbin, _xmin, _xmax, tag_cuts_1, probe_cuts0_1234, probe_cuts0_12345, "hard");
+  _TagProbe_Electron0_Incl_12345 = new TagAndProbeFillerElectron(TagDir0_Incl_12345, string(name_TPFiller0_12345.c_str()), _nbin, _xmin, _xmax, tag_cuts_1, probe_cuts0_1234, probe_cuts0_12345, "hard");
   
-  name_TagDir0+=_RecoCutFlags[6].c_str();
   name_TPFiller0+=_RecoCutFlags[6].c_str();
   string name_TPFiller0_123456 = name_TPFiller0+"_";
-  TDirectory *TagDir0_123456 = _dir->mkdir(name_TagDir0.c_str());
+  name_TagDir0_Excl+=_RecoCutFlags[6].c_str(); 
+  TDirectory *TagDir0_Excl_123456 = _dir->mkdir(name_TagDir0_Excl.c_str());
+  name_TagDir0_Incl+=_RecoCutFlags[6].c_str(); 
+  TDirectory *TagDir0_Incl_123456 = _dir->mkdir(name_TagDir0_Incl.c_str());
   
-  _TagProbe_Electron0_123456 = new TagAndProbeFillerElectron(TagDir0_123456, string(name_TPFiller0_123456.c_str()), _nbin, _xmin, _xmax, tag_cuts_1, probe_cuts0_12345, probe_cuts0_123456, "hard");
+  _TagProbe_Electron0_Excl_123456 = new TagAndProbeFillerElectron(TagDir0_Excl_123456, string(name_TPFiller0_123456.c_str()), _nbin, _xmin, _xmax, tag_cuts_1, probe_cuts0_12345, probe_cuts0_123456, "hard");
+  _TagProbe_Electron0_Incl_123456 = new TagAndProbeFillerElectron(TagDir0_Incl_123456, string(name_TPFiller0_123456.c_str()), _nbin, _xmin, _xmax, tag_cuts_1, probe_cuts0_12345, probe_cuts0_123456, "hard");
   
   string name_TPFiller0_Global = "Electron_Global_";
-  TDirectory *TagDir0_Global = _dir->mkdir("Tag&Probe0_Global");
+  TDirectory *TagDir0_Excl_Global = _dir->mkdir("Tag&Probe0_Excl_Global");
+  TDirectory *TagDir0_Incl_Global = _dir->mkdir("Tag&Probe0_Incl_Global");
   
-  _TagProbe_Electron0_Global = new TagAndProbeFillerElectron(TagDir0_Global, string(name_TPFiller0_Global.c_str()), _nbin, _xmin, _xmax, tag_cuts_1, probe_cuts0_1, probe_cuts0_123456, "hard");
+  _TagProbe_Electron0_Excl_Global = new TagAndProbeFillerElectron(TagDir0_Excl_Global, string(name_TPFiller0_Global.c_str()), _nbin, _xmin, _xmax, tag_cuts_1, probe_cuts0_1, probe_cuts0_123456, "hard");
+  _TagProbe_Electron0_Incl_Global = new TagAndProbeFillerElectron(TagDir0_Incl_Global, string(name_TPFiller0_Global.c_str()), _nbin, _xmin, _xmax, tag_cuts_1, probe_cuts0_1, probe_cuts0_123456, "hard");
   
   //Fit del plot di massa di double electron
   string name_TPFiller0_Double = "Electron_Double_";
-  TDirectory *TagDir0_Double = _dir->mkdir("Tag&Probe0_Incl_Double");
+  TDirectory *TagDir0_Excl_Double = _dir->mkdir("Tag&Probe0_Excl_Double");
+  TDirectory *TagDir0_Incl_Double = _dir->mkdir("Tag&Probe0_Incl_Double");
   
-  _TagProbe_Electron0_Incl_Double = new TagAndProbeFillerElectron(TagDir0_Double, string(name_TPFiller0_Double.c_str()), _nbin, _xmin, _xmax, tag_cuts_1_AllSel, probe_cuts0_1, probe_cuts0_123456, "hard");
+  _TagProbe_Electron0_Excl_Double = new TagAndProbeFillerElectron(TagDir0_Excl_Double, string(name_TPFiller0_Double.c_str()), _nbin, _xmin, _xmax, tag_cuts_1_AllSel, probe_cuts0_1, probe_cuts0_123456, "hard");
+  _TagProbe_Electron0_Incl_Double = new TagAndProbeFillerElectron(TagDir0_Incl_Double, string(name_TPFiller0_Double.c_str()), _nbin, _xmin, _xmax, tag_cuts_1_AllSel, probe_cuts0_1, probe_cuts0_123456, "hard");
   
   std::vector<bool (*)(const reco::Candidate&, int run)> probe_cuts1_1;
   std::vector<bool (*)(const reco::Candidate&, int run)> probe_cuts1_12;
@@ -630,56 +681,78 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
   if(i<7)probe_cuts1_123456.push_back(singleEl_Probe_True);}
   }
   
-  string name_TagDir1="Tag&Probe1";
+  string name_TagDir1_Excl="Tag&Probe1_Excl";
+  string name_TagDir1_Incl="Tag&Probe1_Incl";
   string name_TPFiller1="Electron";
   
-  name_TagDir1+=_RecoCutFlags[1].c_str();
   name_TPFiller1+=_RecoCutFlags[1].c_str();
-  name_TagDir1+=_RecoCutFlags[2].c_str();
   name_TPFiller1+=_RecoCutFlags[2].c_str();
+  name_TagDir1_Excl+=_RecoCutFlags[1].c_str();
+  name_TagDir1_Excl+=_RecoCutFlags[2].c_str();
+  name_TagDir1_Incl+=_RecoCutFlags[1].c_str();
+  name_TagDir1_Incl+=_RecoCutFlags[2].c_str();
+  
   string name_TPFiller1_12 = name_TPFiller1+"_";
-  TDirectory *TagDir1_12 = _dir->mkdir(name_TagDir1.c_str());
+  TDirectory *TagDir1_Excl_12 = _dir->mkdir(name_TagDir1_Excl.c_str());
+  TDirectory *TagDir1_Incl_12 = _dir->mkdir(name_TagDir1_Incl.c_str());
   
-  _TagProbe_Electron1_12 = new TagAndProbeFillerElectron(TagDir1_12, string(name_TPFiller1_12.c_str()), _nbin, _xmin, _xmax, tag_cuts_0, probe_cuts1_1, probe_cuts1_12, "soft");
+  _TagProbe_Electron1_Excl_12 = new TagAndProbeFillerElectron(TagDir1_Excl_12, string(name_TPFiller1_12.c_str()), _nbin, _xmin, _xmax, tag_cuts_0, probe_cuts1_1, probe_cuts1_12, "soft");
+  _TagProbe_Electron1_Incl_12 = new TagAndProbeFillerElectron(TagDir1_Incl_12, string(name_TPFiller1_12.c_str()), _nbin, _xmin, _xmax, tag_cuts_0, probe_cuts1_1, probe_cuts1_12, "soft");
   
-  name_TagDir1+=_RecoCutFlags[3].c_str();
   name_TPFiller1+=_RecoCutFlags[3].c_str();
   string name_TPFiller1_123 = name_TPFiller1+"_";
-  TDirectory *TagDir1_123 = _dir->mkdir(name_TagDir1.c_str());
+  name_TagDir1_Excl+=_RecoCutFlags[3].c_str();  
+  TDirectory *TagDir1_Excl_123 = _dir->mkdir(name_TagDir1_Excl.c_str());
+  name_TagDir1_Incl+=_RecoCutFlags[3].c_str();  
+  TDirectory *TagDir1_Incl_123 = _dir->mkdir(name_TagDir1_Incl.c_str());
   
-  _TagProbe_Electron1_123 = new TagAndProbeFillerElectron(TagDir1_123, string(name_TPFiller1_123.c_str()), _nbin, _xmin, _xmax, tag_cuts_0, probe_cuts1_12, probe_cuts1_123, "soft");
+  _TagProbe_Electron1_Excl_123 = new TagAndProbeFillerElectron(TagDir1_Excl_123, string(name_TPFiller1_123.c_str()), _nbin, _xmin, _xmax, tag_cuts_0, probe_cuts1_12, probe_cuts1_123, "soft");
+  _TagProbe_Electron1_Incl_123 = new TagAndProbeFillerElectron(TagDir1_Incl_123, string(name_TPFiller1_123.c_str()), _nbin, _xmin, _xmax, tag_cuts_0, probe_cuts1_12, probe_cuts1_123, "soft");
   
-  name_TagDir1+=_RecoCutFlags[4].c_str();
   name_TPFiller1+=_RecoCutFlags[4].c_str();
   string name_TPFiller1_1234 = name_TPFiller1+"_";
-  TDirectory *TagDir1_1234 = _dir->mkdir(name_TagDir1.c_str());
+  name_TagDir1_Excl+=_RecoCutFlags[4].c_str();  
+  TDirectory *TagDir1_Excl_1234 = _dir->mkdir(name_TagDir1_Excl.c_str());
+  name_TagDir1_Incl+=_RecoCutFlags[4].c_str();  
+  TDirectory *TagDir1_Incl_1234 = _dir->mkdir(name_TagDir1_Incl.c_str());
   
-  _TagProbe_Electron1_1234 = new TagAndProbeFillerElectron(TagDir1_1234, string(name_TPFiller1_1234.c_str()), _nbin, _xmin, _xmax, tag_cuts_0, probe_cuts1_123, probe_cuts1_1234, "soft");
+  _TagProbe_Electron1_Excl_1234 = new TagAndProbeFillerElectron(TagDir1_Excl_1234, string(name_TPFiller1_1234.c_str()), _nbin, _xmin, _xmax, tag_cuts_0, probe_cuts1_123, probe_cuts1_1234, "soft");
+  _TagProbe_Electron1_Incl_1234 = new TagAndProbeFillerElectron(TagDir1_Incl_1234, string(name_TPFiller1_1234.c_str()), _nbin, _xmin, _xmax, tag_cuts_0, probe_cuts1_123, probe_cuts1_1234, "soft");
   
-  name_TagDir1+=_RecoCutFlags[5].c_str();
   name_TPFiller1+=_RecoCutFlags[5].c_str();
   string name_TPFiller1_12345 = name_TPFiller1+"_";
-  TDirectory *TagDir1_12345 = _dir->mkdir(name_TagDir1.c_str());
+  name_TagDir1_Excl+=_RecoCutFlags[5].c_str();  
+  TDirectory *TagDir1_Excl_12345 = _dir->mkdir(name_TagDir1_Excl.c_str());
+  name_TagDir1_Incl+=_RecoCutFlags[5].c_str();  
+  TDirectory *TagDir1_Incl_12345 = _dir->mkdir(name_TagDir1_Incl.c_str());
   
-  _TagProbe_Electron1_12345 = new TagAndProbeFillerElectron(TagDir1_12345, string(name_TPFiller1_12345.c_str()), _nbin, _xmin, _xmax, tag_cuts_0, probe_cuts1_1234, probe_cuts1_12345, "soft");
+  _TagProbe_Electron1_Excl_12345 = new TagAndProbeFillerElectron(TagDir1_Excl_12345, string(name_TPFiller1_12345.c_str()), _nbin, _xmin, _xmax, tag_cuts_0, probe_cuts1_1234, probe_cuts1_12345, "soft");
+  _TagProbe_Electron1_Incl_12345 = new TagAndProbeFillerElectron(TagDir1_Incl_12345, string(name_TPFiller1_12345.c_str()), _nbin, _xmin, _xmax, tag_cuts_0, probe_cuts1_1234, probe_cuts1_12345, "soft");
   
-  name_TagDir1+=_RecoCutFlags[6].c_str();
   name_TPFiller1+=_RecoCutFlags[6].c_str();
   string name_TPFiller1_123456 = name_TPFiller1+"_";
-  TDirectory *TagDir1_123456 = _dir->mkdir(name_TagDir1.c_str());
+  name_TagDir1_Excl+=_RecoCutFlags[6].c_str();  
+  TDirectory *TagDir1_Excl_123456 = _dir->mkdir(name_TagDir1_Excl.c_str());
+  name_TagDir1_Incl+=_RecoCutFlags[6].c_str();  
+  TDirectory *TagDir1_Incl_123456 = _dir->mkdir(name_TagDir1_Incl.c_str());
   
-  _TagProbe_Electron1_123456 = new TagAndProbeFillerElectron(TagDir1_123456, string(name_TPFiller1_123456.c_str()), _nbin, _xmin, _xmax, tag_cuts_0, probe_cuts1_12345, probe_cuts1_123456, "soft");
+  _TagProbe_Electron1_Excl_123456 = new TagAndProbeFillerElectron(TagDir1_Excl_123456, string(name_TPFiller1_123456.c_str()), _nbin, _xmin, _xmax, tag_cuts_0, probe_cuts1_12345, probe_cuts1_123456, "soft");
+  _TagProbe_Electron1_Incl_123456 = new TagAndProbeFillerElectron(TagDir1_Incl_123456, string(name_TPFiller1_123456.c_str()), _nbin, _xmin, _xmax, tag_cuts_0, probe_cuts1_12345, probe_cuts1_123456, "soft");
   
   string name_TPFiller1_Global = "Electron_Global_";
-  TDirectory *TagDir1_Global = _dir->mkdir("Tag&Probe1_Global");
+  TDirectory *TagDir1_Excl_Global = _dir->mkdir("Tag&Probe1_Excl_Global");
+  TDirectory *TagDir1_Incl_Global = _dir->mkdir("Tag&Probe1_Incl_Global");
   
-  _TagProbe_Electron1_Global = new TagAndProbeFillerElectron(TagDir1_Global, string(name_TPFiller1_Global.c_str()), _nbin, _xmin, _xmax, tag_cuts_0, probe_cuts1_1, probe_cuts1_123456, "soft");
+  _TagProbe_Electron1_Excl_Global = new TagAndProbeFillerElectron(TagDir1_Excl_Global, string(name_TPFiller1_Global.c_str()), _nbin, _xmin, _xmax, tag_cuts_0, probe_cuts1_1, probe_cuts1_123456, "soft");
+  _TagProbe_Electron1_Incl_Global = new TagAndProbeFillerElectron(TagDir1_Incl_Global, string(name_TPFiller1_Global.c_str()), _nbin, _xmin, _xmax, tag_cuts_0, probe_cuts1_1, probe_cuts1_123456, "soft");
   
   //Fit del plot di massa di double electron
   string name_TPFiller1_Double = "Electron_Double_";
-  TDirectory *TagDir1_Double = _dir->mkdir("Tag&Probe1_Incl_Double");
+  TDirectory *TagDir1_Excl_Double = _dir->mkdir("Tag&Probe1_Excl_Double");
+  TDirectory *TagDir1_Incl_Double = _dir->mkdir("Tag&Probe1_Incl_Double");
   
-  _TagProbe_Electron1_Incl_Double = new TagAndProbeFillerElectron(TagDir1_Double, string(name_TPFiller1_Double.c_str()), _nbin, _xmin, _xmax, tag_cuts_0_AllSel, probe_cuts1_1, probe_cuts1_123456, "soft");
+  _TagProbe_Electron1_Excl_Double = new TagAndProbeFillerElectron(TagDir1_Excl_Double, string(name_TPFiller1_Double.c_str()), _nbin, _xmin, _xmax, tag_cuts_0_AllSel, probe_cuts1_1, probe_cuts1_123456, "soft");
+  _TagProbe_Electron1_Incl_Double = new TagAndProbeFillerElectron(TagDir1_Incl_Double, string(name_TPFiller1_Double.c_str()), _nbin, _xmin, _xmax, tag_cuts_0_AllSel, probe_cuts1_1, probe_cuts1_123456, "soft");
   
   }
   
@@ -729,6 +802,7 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
    _file->cd();
    
    _run = iEvent.id().run();
+   if(_sample=="mc")_run=-1;
 
    fwlite::Handle<std::vector<reco::CompositeCandidate> > zrecHandle;
    zrecHandle.getByLabel(iEvent, "zeerec");
@@ -1041,65 +1115,60 @@ double lumi = _entries/_xsec;
    _norm = _targetLumi/lumi;
    }
    
-   if(_tp_mult=="excl"){
    if(_selections=="SYM"){
-   _TagProbe_Electron_12->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
-   _TagProbe_Electron_123->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
-   _TagProbe_Electron_1234->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
-   _TagProbe_Electron_12345->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
-   _TagProbe_Electron_123456->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
-   _TagProbe_Electron_Global->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
+   _TagProbe_Electron_Excl_12->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
+   _TagProbe_Electron_Excl_123->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
+   _TagProbe_Electron_Excl_1234->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
+   _TagProbe_Electron_Excl_12345->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
+   _TagProbe_Electron_Excl_123456->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
+   _TagProbe_Electron_Excl_Global->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
+   _TagProbe_Electron_Excl_Double->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
    }
    if(_selections=="ASYM"){
-   _TagProbe_Electron0_12->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
-   _TagProbe_Electron0_123->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
-   _TagProbe_Electron0_1234->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
-   _TagProbe_Electron0_12345->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
-   _TagProbe_Electron0_123456->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
-   _TagProbe_Electron0_Global->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
+   _TagProbe_Electron0_Excl_12->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
+   _TagProbe_Electron0_Excl_123->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
+   _TagProbe_Electron0_Excl_1234->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
+   _TagProbe_Electron0_Excl_12345->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
+   _TagProbe_Electron0_Excl_123456->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
+   _TagProbe_Electron0_Excl_Global->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
+   _TagProbe_Electron0_Excl_Double->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
 
-   _TagProbe_Electron1_12->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
-   _TagProbe_Electron1_123->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
-   _TagProbe_Electron1_1234->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
-   _TagProbe_Electron1_12345->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
-   _TagProbe_Electron1_123456->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
-   _TagProbe_Electron1_Global->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
-   }
+   _TagProbe_Electron1_Excl_12->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
+   _TagProbe_Electron1_Excl_123->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
+   _TagProbe_Electron1_Excl_1234->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
+   _TagProbe_Electron1_Excl_12345->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
+   _TagProbe_Electron1_Excl_123456->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
+   _TagProbe_Electron1_Excl_Global->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
+   _TagProbe_Electron1_Excl_Double->fill((*zrecHandle)[0], _run, reciso_recjets.size(), _norm);
    }
    
-   else if(_tp_mult=="incl"){
    for(unsigned int i = 0; i < reciso_recjets.size()+1; i++){  
    if(_selections=="SYM"){
-   _TagProbe_Electron_12->fill((*zrecHandle)[0], _run, i, _norm);
-   _TagProbe_Electron_123->fill((*zrecHandle)[0], _run, i, _norm);
-   _TagProbe_Electron_1234->fill((*zrecHandle)[0], _run, i, _norm);
-   _TagProbe_Electron_12345->fill((*zrecHandle)[0], _run, i, _norm);
-   _TagProbe_Electron_123456->fill((*zrecHandle)[0], _run, i, _norm);
-   _TagProbe_Electron_Global->fill((*zrecHandle)[0], _run, i, _norm);
+   _TagProbe_Electron_Incl_12->fill((*zrecHandle)[0], _run, i, _norm);
+   _TagProbe_Electron_Incl_123->fill((*zrecHandle)[0], _run, i, _norm);
+   _TagProbe_Electron_Incl_1234->fill((*zrecHandle)[0], _run, i, _norm);
+   _TagProbe_Electron_Incl_12345->fill((*zrecHandle)[0], _run, i, _norm);
+   _TagProbe_Electron_Incl_123456->fill((*zrecHandle)[0], _run, i, _norm);
+   _TagProbe_Electron_Incl_Global->fill((*zrecHandle)[0], _run, i, _norm);
+   _TagProbe_Electron_Incl_Double->fill((*zrecHandle)[0], _run, i, _norm);
    }
    if(_selections=="ASYM"){
-   _TagProbe_Electron0_12->fill((*zrecHandle)[0], _run, i, _norm);
-   _TagProbe_Electron0_123->fill((*zrecHandle)[0], _run, i, _norm);
-   _TagProbe_Electron0_1234->fill((*zrecHandle)[0], _run, i, _norm);
-   _TagProbe_Electron0_12345->fill((*zrecHandle)[0], _run, i, _norm);
-   _TagProbe_Electron0_123456->fill((*zrecHandle)[0], _run, i, _norm);
-   _TagProbe_Electron0_Global->fill((*zrecHandle)[0], _run, i, _norm);
-
-   _TagProbe_Electron1_12->fill((*zrecHandle)[0], _run, i, _norm);
-   _TagProbe_Electron1_123->fill((*zrecHandle)[0], _run, i, _norm);
-   _TagProbe_Electron1_1234->fill((*zrecHandle)[0], _run, i, _norm);
-   _TagProbe_Electron1_12345->fill((*zrecHandle)[0], _run, i, _norm);
-   _TagProbe_Electron1_123456->fill((*zrecHandle)[0], _run, i, _norm);
-   _TagProbe_Electron1_Global->fill((*zrecHandle)[0], _run, i, _norm);
-   }
-   
-   }
-   }
-   
-   if(_selections=="ASYM"){
-   for(unsigned int i = 0; i < reciso_recjets.size()+1; i++){
+   _TagProbe_Electron0_Incl_12->fill((*zrecHandle)[0], _run, i, _norm);
+   _TagProbe_Electron0_Incl_123->fill((*zrecHandle)[0], _run, i, _norm);
+   _TagProbe_Electron0_Incl_1234->fill((*zrecHandle)[0], _run, i, _norm);
+   _TagProbe_Electron0_Incl_12345->fill((*zrecHandle)[0], _run, i, _norm);
+   _TagProbe_Electron0_Incl_123456->fill((*zrecHandle)[0], _run, i, _norm);
+   _TagProbe_Electron0_Incl_Global->fill((*zrecHandle)[0], _run, i, _norm);
    _TagProbe_Electron0_Incl_Double->fill((*zrecHandle)[0], _run, i, _norm);
-   _TagProbe_Electron1_Incl_Double->fill((*zrecHandle)[0], _run, i, _norm);}
+
+   _TagProbe_Electron1_Incl_12->fill((*zrecHandle)[0], _run, i, _norm);
+   _TagProbe_Electron1_Incl_123->fill((*zrecHandle)[0], _run, i, _norm);
+   _TagProbe_Electron1_Incl_1234->fill((*zrecHandle)[0], _run, i, _norm);
+   _TagProbe_Electron1_Incl_12345->fill((*zrecHandle)[0], _run, i, _norm);
+   _TagProbe_Electron1_Incl_123456->fill((*zrecHandle)[0], _run, i, _norm);
+   _TagProbe_Electron1_Incl_Global->fill((*zrecHandle)[0], _run, i, _norm);
+   _TagProbe_Electron1_Incl_Double->fill((*zrecHandle)[0], _run, i, _norm);
+   }
    }
 
 }
@@ -1111,30 +1180,54 @@ void EfficiencyElectron::finalize(){
 
   
   if(_selections=="SYM"){
-  _TagProbe_Electron_12->finalize();
-  _TagProbe_Electron_123->finalize();
-  _TagProbe_Electron_1234->finalize();
-  _TagProbe_Electron_12345->finalize();
-  _TagProbe_Electron_123456->finalize();
-  _TagProbe_Electron_Global->finalize();
+  _TagProbe_Electron_Excl_12->finalize();
+  _TagProbe_Electron_Excl_123->finalize();
+  _TagProbe_Electron_Excl_1234->finalize();
+  _TagProbe_Electron_Excl_12345->finalize();
+  _TagProbe_Electron_Excl_123456->finalize();
+  _TagProbe_Electron_Excl_Global->finalize();
+  _TagProbe_Electron_Excl_Double->finalize();
+  
+  _TagProbe_Electron_Incl_12->finalize();
+  _TagProbe_Electron_Incl_123->finalize();
+  _TagProbe_Electron_Incl_1234->finalize();
+  _TagProbe_Electron_Incl_12345->finalize();
+  _TagProbe_Electron_Incl_123456->finalize();
+  _TagProbe_Electron_Incl_Global->finalize();
+  _TagProbe_Electron_Incl_Double->finalize();
   }
   
   if(_selections=="ASYM"){
-  _TagProbe_Electron0_12->finalize();
-  _TagProbe_Electron0_123->finalize();
-  _TagProbe_Electron0_1234->finalize();
-  _TagProbe_Electron0_12345->finalize();
-  _TagProbe_Electron0_123456->finalize();
-  _TagProbe_Electron0_Global->finalize();
+  _TagProbe_Electron0_Excl_12->finalize();
+  _TagProbe_Electron0_Excl_123->finalize();
+  _TagProbe_Electron0_Excl_1234->finalize();
+  _TagProbe_Electron0_Excl_12345->finalize();
+  _TagProbe_Electron0_Excl_123456->finalize();
+  _TagProbe_Electron0_Excl_Global->finalize();
+  _TagProbe_Electron0_Excl_Double->finalize();
   
-  _TagProbe_Electron1_12->finalize();
-  _TagProbe_Electron1_123->finalize();
-  _TagProbe_Electron1_1234->finalize();
-  _TagProbe_Electron1_12345->finalize();
-  _TagProbe_Electron1_123456->finalize();
-  _TagProbe_Electron1_Global->finalize();
-  
+  _TagProbe_Electron0_Incl_12->finalize();
+  _TagProbe_Electron0_Incl_123->finalize();
+  _TagProbe_Electron0_Incl_1234->finalize();
+  _TagProbe_Electron0_Incl_12345->finalize();
+  _TagProbe_Electron0_Incl_123456->finalize();
+  _TagProbe_Electron0_Incl_Global->finalize();
   _TagProbe_Electron0_Incl_Double->finalize();
+  
+  _TagProbe_Electron1_Excl_12->finalize();
+  _TagProbe_Electron1_Excl_123->finalize();
+  _TagProbe_Electron1_Excl_1234->finalize();
+  _TagProbe_Electron1_Excl_12345->finalize();
+  _TagProbe_Electron1_Excl_123456->finalize();
+  _TagProbe_Electron1_Excl_Global->finalize();
+  _TagProbe_Electron1_Excl_Double->finalize();
+  
+  _TagProbe_Electron1_Incl_12->finalize();
+  _TagProbe_Electron1_Incl_123->finalize();
+  _TagProbe_Electron1_Incl_1234->finalize();
+  _TagProbe_Electron1_Incl_12345->finalize();
+  _TagProbe_Electron1_Incl_123456->finalize();
+  _TagProbe_Electron1_Incl_Global->finalize();
   _TagProbe_Electron1_Incl_Double->finalize();
   }
   

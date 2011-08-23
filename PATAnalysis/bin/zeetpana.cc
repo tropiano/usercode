@@ -14,24 +14,26 @@ using namespace std;
 int main() {
 
   //Input files
-  string training_sign = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15_excl/TPFiles/Z_Madgraph_Winter10_D6T_JetPt15_excl.root";
-  string training_back = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15_excl/TPFiles/Background_All_Winter10_JetPt15_excl.root";
-  string total = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15_excl/TPFiles/Data_RUN2010A-B_JetPt15.root";
-  
+  string training_sign = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPFiles/Z_Madgraph_D6T_JetPt15.root";
+  string training_back = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPFiles/Background_All_JetPt15.root";
+  string total = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPFiles/Data_RUN2010A-B_JetPt15.root";
   
   //Output files
   string output_train_sign =  
-"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15_excl/TPAnalyzer/TrainSig_JetPt15_Excl_Double.root";
+"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/TrainSig_JetPt15_Incl_Global.root";
   string output_train_back =  
-"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15_excl/TPAnalyzer/TrainBack_JetPt15_Excl_Double.root";
+"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/TrainBack_JetPt15_Incl_Global.root";
   string output_total =  
-"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15_excl/TPAnalyzer/DATA_JetPt15_Excl_Double.root";
+"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Incl_Global.root";
 
   //Selections used
   string selections = "ASYM";
   
   //Cut to evaluate
-  string cut = "Double";
+  string cut = "Global";
+  
+  //Multiplicity - "excl" = Exclusive; "incl" = Inclusive
+  string mult = "incl";
   
   //Analyzer steps
   bool tr_sig = true;
@@ -95,13 +97,16 @@ int main() {
   
   string dataset = "datasetElectron";
 	
-  if(selections=="SYM")dir+="Tag&Probe";
-  if(selections=="ASYM"){
-  dir+="Tag&Probe0";
-  sec_el_dir+="Tag&Probe1";}
+  if(selections=="SYM" && mult=="excl")dir+="Tag&Probe_Excl";
+  if(selections=="SYM" && mult=="incl")dir+="Tag&Probe_Incl";
+  if(selections=="ASYM" && mult=="excl"){
+  dir+="Tag&Probe0_Excl";
+  sec_el_dir+="Tag&Probe1_Excl";}
+  if(selections=="ASYM" && mult=="incl"){
+  dir+="Tag&Probe0_Incl";
+  sec_el_dir+="Tag&Probe1_Incl";}
   
-  if(cut!="Global" && cut!="Double"){	
-  
+  if(cut!="Global" && cut!="Double"){	 
   int ncut = 1;	
   while(cut!=_RecoCutFlags[ncut]){
   dir+=_RecoCutFlags[ncut].c_str();
@@ -121,8 +126,8 @@ int main() {
   sec_el_dir+="_Global";
   dataset+="_Global_";
   }else if(cut=="Double"){
-  dir+="_Incl_Double";
-  sec_el_dir+="_Incl_Double";
+  dir+="_Double";
+  sec_el_dir+="_Double";
   dataset+="_Double_";
   }
   	

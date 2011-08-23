@@ -95,7 +95,7 @@ PixelHit_OC(0), PixelHit_SC(0), FirstPixelBarrelHit_OC(0), FirstPixelBarrelHit_S
 
 DeltaRvsCharge_JetRec(0), DeltaRvsCharge_JetRec_Iso(0), DeltaRvsCharge_JetRec_NotIso(0),
 
-_targetLumi(50.), _xsec(1.), _norm(1.), _dir(0), _charge_dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _Norm(false), _GenParticleMatch(false), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _fileCounter(0), _Acc(1), _Trg(2), _Conv(3), _Imp(4), _Iso(5), _EiD(6), _selections("ASYM"), _JetType("PF"), _tp_mult("excl"), _sample("data"), _file(0), _histoVector(), _histoVector2D()
+_targetLumi(50.), _xsec(1.), _norm(1.), _dir(0), _charge_dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _Norm(false), _GenParticleMatch(false), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _fileCounter(0), _Acc(1), _Trg(2), _Conv(3), _Imp(4), _Iso(5), _EiD(6), _selections("ASYM"), _JetType("PF"), _sample("data"), _file(0), _histoVector(), _histoVector2D()
 
 { }
 
@@ -114,7 +114,6 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _ProcEvents    = iConfig.getParameter<int32_t>("ProcEvents");
    _GenParticleMatch = iConfig.getParameter<bool>("GenParticleMatch");
    _JetType = iConfig.getParameter<std::string>("JetType");
-   _tp_mult = iConfig.getParameter<std::string>("TPMult");
    _ReportName = iConfig.getParameter<std::string>("ReportName");
    
    //Selections
@@ -142,7 +141,9 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _RecoCutFlags[_Trg] =  "_Trg";   
    _RecoCutFlags[_Imp] =  "_Imp";
    
-   
+   for(int i=0; i<8; i++){
+   _TrgList[i] = -1;}
+     
    cout << "RecoElectron file name : " << _file->GetName() << endl;
    _file->cd();
    _dir = _file->mkdir(dirname.c_str(), dirname.c_str());
@@ -829,6 +830,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
 {
    
    run = iEvent.id().run();
+   if(_sample=="mc")run=-1;
 
    double weight = 1.;
    _file->cd();
@@ -848,7 +850,16 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
 
    fwlite::Handle<pat::TriggerEvent> triggerHandle;
    triggerHandle.getByLabel(iEvent, "patTriggerEvent");
- 
+   
+   // Available triggers
+   static map<std::string, std::pair<int, int> > TrgVector = elTrigger();
+   static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;
+   int trg = 1;
+   for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
+   if(isTriggerAvailable(*triggerHandle,TrgVectorIter->first.c_str()))_TrgList[trg]=1;
+   trg++;
+   }
+   
    //Event plots
    
    recZnum->Fill(zrecHandle->size());
@@ -1594,6 +1605,8 @@ void RecoElectron::finalize(){
    ofstream Report;
    Report.open(_ReportName.c_str());
    Report<<endl<<endl<<"----- Sample Info -----"<<endl<<endl;
+   if(_sample=="data")Report<<"Sample is: DATA"<<endl<<endl;
+   if(_sample=="mc")Report<<"Sample is: MC"<<endl<<endl; 
    Report<<"Source File = "<<_sourceFileList.c_str()<<endl;
    Report<<"File number = "<<_fileCounter<<endl;
    Report<<"Number of events = "<<_entries<<endl;
@@ -1622,15 +1635,28 @@ void RecoElectron::finalize(){
    
    Report<<"Cut values applied:"<<endl<<endl;
    
+   Report<<"Available triggers:"<<endl<<endl;
+   static map<std::string, std::pair<int, int> > TrgVector = elTrigger();
+   static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;
+   int trg = 1;
+   for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
+   if(_TrgList[trg]==1)Report<<"ElectronTrigger = "<<TrgVectorIter->first.c_str()<<endl;
+   trg++;
+   }
+   Report<<endl;
+   
+   if(_sample=="data"){
+   Report<<"Run range required for each trigger (DATA sample):"<<endl<<endl;
    static map<std::string, std::pair<int, int> > TrgVector = elTrigger();
    static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;
    for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
-   Report<<"ElectronTrigger = "<<TrgVectorIter->first.c_str()<<"	Run range = "<<TrgVectorIter->second.first<<" to "<<TrgVectorIter->second.second<<endl;}
+   Report<<"ElectronTrigger = "<<TrgVectorIter->first.c_str()<<"		Run range = "<<TrgVectorIter->second.first<<" to "<<TrgVectorIter->second.second<<endl;}
+   }
    
    if(elTrgMatchReq==true){
-   Report<<endl<<"Trigger Match Required"<<endl;
+   Report<<"Trigger Match Required"<<endl<<endl;
    }else{
-   Report<<endl<<"Trigger Match NOT Required"<<endl;}
+   Report<<"Trigger Match NOT Required"<<endl<<endl;}
    
    if(_selections=="SYM"){
    Report<<"ptelcut = "<<ptelcut<<endl;
@@ -1678,8 +1704,6 @@ void RecoElectron::finalize(){
    }else{
    Report<<endl<<"Jet ID NOT Required"<<endl;}
    Report<<"isojetcut = "<<isojetcut<<endl<<endl;
-   
-   Report<<"Tag&Probe Multiplicity: "<<_tp_mult.c_str()<<endl;
    
    Report<<"ASYM0_TAG_ptelcut = "<<ASYM0_TAG_ptelcut<<endl;
    Report<<"ASYM0_TAG_etaelcut = "<<ASYM0_TAG_etaelcut<<endl;

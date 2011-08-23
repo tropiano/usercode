@@ -70,9 +70,11 @@ int PreDefName, ProcEvents;
   string em_2030 = "SourceFilesElectrons/QCDEM20_Winter10_START39_V9.list";
   string em_3080 = "SourceFilesElectrons/QCDEM30_Winter10_START39_V9.list";
   string em_80170 = "SourceFilesElectrons/QCDEM80_Winter10_START39_V9.list";
-
   
-  //Sample: Data -> "data"; MC-> "mc"
+  //Path of PATAnalysis dir - DO NOT FORGET THE SLASH AT THE END OF THE PATH
+  string path="/data/sfrosali/Zjets/Commit/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/";
+
+  //Sample: Data -> "data"; MC -> "mc"
   sample = "mc";
   
   //Modules
@@ -98,9 +100,6 @@ int PreDefName, ProcEvents;
   //Jet Type - "PF": PFJets, "PFL1CORR": PFJets L1 Corrected
   string JetType = "PFL1CORR";
   
-  //Jet multiplicity for Tag&Probe: "incl" = Inclusive; "excl" = Exclusive
-  string TPMult = "excl";
-  
   //Normalization
   string Norm = "True";
   double targetLumi = 50.; //pb-1
@@ -111,6 +110,9 @@ int PreDefName, ProcEvents;
   
   //Number of CPUs
   int CPU = 8;
+  
+  //Log
+  bool Log = false;
 
   if(PreDefName==0){
     sourceList = Data_RUN2010A.c_str();  
@@ -152,31 +154,133 @@ int PreDefName, ProcEvents;
   string outputName = SampleName;
   outputName+=outNameSuf;
   
-  //Parameters
-  Parameters(PreDefName, &ParStruct);
-  double xsec=ParStruct._xsec;
-  double EventFilter=ParStruct._EventFilter;
-  int EventsPerFile=ParStruct._EventsPerFile;
-  int EventNumber=ParStruct._EventNumber;
-  
-  //Parameters defined by user
-  if(PreDefName==-1){
-  xsec = 1667; //pb
-  EventFilter = 1.;
-  EventsPerFile = 0;
-  EventNumber = 0;}
-  
-  //Log
-  bool Log = false;
-  
-  //Path of PATAnalysis dir - DO NOT FORGET THE SLASH AT THE END OF THE PATH
-  string path="/data/sfrosali/Zjets/Commit/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/";
+  double xsec = 1.0; 
+  double EventFilter = 1.0;
+  int EventsPerFile = 0;
+  int EventNumber = 0;
   
   if(sample=="data"){
   GenParticleMatch = "False";
   GEN = false;}
-
-  makeCfg(sample, selections, JetType, TPMult, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), sourceList.c_str(), outputName.c_str(), Norm.c_str(), EventsPerFile, EventNumber, ProcEvents, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  
+  if(PreDefName!=-1){
+  
+  //Parameters
+  Parameters(PreDefName, &ParStruct);
+  xsec=ParStruct._xsec;
+  EventFilter=ParStruct._EventFilter;
+  EventsPerFile=ParStruct._EventsPerFile;
+  EventNumber=ParStruct._EventNumber;
+    
+  makeCfg(sample, selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), sourceList.c_str(), outputName.c_str(), Norm.c_str(), EventsPerFile, EventNumber, ProcEvents, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  
+  }else{
+  
+  Parameters(0, &ParStruct);
+  xsec=ParStruct._xsec;
+  EventFilter=ParStruct._EventFilter;
+  EventsPerFile=ParStruct._EventsPerFile;
+  EventNumber=ParStruct._EventNumber;
+  makeCfg("data", selections, JetType, false, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), Data_RUN2010A.c_str(), "Data_RUN2010A", "False", EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, "False", NtupleFill);
+  
+  Parameters(1, &ParStruct);
+  xsec=ParStruct._xsec;
+  EventFilter=ParStruct._EventFilter;
+  EventsPerFile=ParStruct._EventsPerFile;
+  EventNumber=ParStruct._EventNumber;
+  makeCfg("data", selections, JetType, false, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), Data_RUN2010B.c_str(), "Data_RUN2010B", "False", EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, "False", NtupleFill);
+  
+  Parameters(2, &ParStruct);
+  xsec=ParStruct._xsec;
+  EventFilter=ParStruct._EventFilter;
+  EventsPerFile=ParStruct._EventsPerFile;
+  EventNumber=ParStruct._EventNumber;
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), Zpj_D6T.c_str(), "Z_Madgraph_D6T", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  
+  Parameters(3, &ParStruct);
+  xsec=ParStruct._xsec;
+  EventFilter=ParStruct._EventFilter;
+  EventsPerFile=ParStruct._EventsPerFile;
+  EventNumber=ParStruct._EventNumber;
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), Zpj_Z2.c_str(), "Z_Madgraph_Z2", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  
+  Parameters(4, &ParStruct);
+  xsec=ParStruct._xsec;
+  EventFilter=ParStruct._EventFilter;
+  EventsPerFile=ParStruct._EventsPerFile;
+  EventNumber=ParStruct._EventNumber;
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), TT.c_str(), "TT_Pythia", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  
+  Parameters(5, &ParStruct);
+  xsec=ParStruct._xsec;
+  EventFilter=ParStruct._EventFilter;
+  EventsPerFile=ParStruct._EventsPerFile;
+  EventNumber=ParStruct._EventNumber;
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), Wlnu.c_str(), "Wlnu_Madgraph", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  
+  Parameters(6, &ParStruct);
+  xsec=ParStruct._xsec;
+  EventFilter=ParStruct._EventFilter;
+  EventsPerFile=ParStruct._EventsPerFile;
+  EventNumber=ParStruct._EventNumber;
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), WWEE.c_str(), "WWEE_Pythia", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  
+  Parameters(7, &ParStruct);
+  xsec=ParStruct._xsec;
+  EventFilter=ParStruct._EventFilter;
+  EventsPerFile=ParStruct._EventsPerFile;
+  EventNumber=ParStruct._EventNumber;
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), ZZEE.c_str(), "ZZEE_Pythia", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  
+  Parameters(8, &ParStruct);
+  xsec=ParStruct._xsec;
+  EventFilter=ParStruct._EventFilter;
+  EventsPerFile=ParStruct._EventsPerFile;
+  EventNumber=ParStruct._EventNumber;
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), WZEE.c_str(), "WZEE_Pythia", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  
+  Parameters(9, &ParStruct);
+  xsec=ParStruct._xsec;
+  EventFilter=ParStruct._EventFilter;
+  EventsPerFile=ParStruct._EventsPerFile;
+  EventNumber=ParStruct._EventNumber;
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), bce_2030.c_str(), "QCD_BCtoE_Pythia_Pt20to30", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  
+  Parameters(10, &ParStruct);
+  xsec=ParStruct._xsec;
+  EventFilter=ParStruct._EventFilter;
+  EventsPerFile=ParStruct._EventsPerFile;
+  EventNumber=ParStruct._EventNumber;
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), bce_3080.c_str(), "QCD_BCtoE_Pythia_Pt30to80", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  
+  Parameters(11, &ParStruct);
+  xsec=ParStruct._xsec;
+  EventFilter=ParStruct._EventFilter;
+  EventsPerFile=ParStruct._EventsPerFile;
+  EventNumber=ParStruct._EventNumber;
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), bce_80170.c_str(), "QCD_BCtoE_Pythia_Pt80to170", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  
+  Parameters(12, &ParStruct);
+  xsec=ParStruct._xsec;
+  EventFilter=ParStruct._EventFilter;
+  EventsPerFile=ParStruct._EventsPerFile;
+  EventNumber=ParStruct._EventNumber;
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), em_2030.c_str(), "QCD_EMEnriched_Pythia_Pt20to30", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  
+  Parameters(13, &ParStruct);
+  xsec=ParStruct._xsec;
+  EventFilter=ParStruct._EventFilter;
+  EventsPerFile=ParStruct._EventsPerFile;
+  EventNumber=ParStruct._EventNumber;
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), em_3080.c_str(), "QCD_EMEnriched_Pythia_Pt30to80", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  
+  Parameters(14, &ParStruct);
+  xsec=ParStruct._xsec;
+  EventFilter=ParStruct._EventFilter;
+  EventsPerFile=ParStruct._EventsPerFile;
+  EventNumber=ParStruct._EventNumber;
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), em_80170.c_str(), "QCD_EMEnriched_Pythia_Pt80to170", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  }
 
   gEnv->SetValue("Proof.Sandbox", "/data/sfrosali/.proof");
 
@@ -190,6 +294,7 @@ int PreDefName, ProcEvents;
 
   p->Exec(".x remote.C");
 
+  if(PreDefName!=-1){
   TDSet* SignalDS = getDS(sourceList.c_str());
   
   string cfgPath = path;
@@ -199,14 +304,122 @@ int PreDefName, ProcEvents;
   TNamed* configsignal = new TNamed("ConfigFile", cfgPath.c_str());
   p->AddInput(configsignal);
   p->Process(SignalDS, "FWLiteTSelector","",ProcEvents);
+  p->ClearInput();
+  delete SignalDS;
+  
+  }else{
+  
+  string cfgPath_0=path+"Data_RUN2010A.py";
+  TDSet* SignalDS_0 = getDS(Data_RUN2010A.c_str());
+  TNamed* configsignal_0 = new TNamed("ConfigFile", cfgPath_0.c_str());
+  p->AddInput(configsignal_0);
+  p->Process(SignalDS_0, "FWLiteTSelector","",-1);
+  p->ClearInput();
+  delete SignalDS_0;
+  string cfgPath_1=path+"Data_RUN2010B.py";
+  TDSet* SignalDS_1 = getDS(Data_RUN2010B.c_str());
+  TNamed* configsignal_1 = new TNamed("ConfigFile", cfgPath_1.c_str());
+  p->AddInput(configsignal_1);
+  p->Process(SignalDS_1, "FWLiteTSelector","",-1);
+  p->ClearInput();
+  delete SignalDS_1;
+  string cfgPath_2=path+"Z_Madgraph_D6T.py";
+  TDSet* SignalDS_2 = getDS(Zpj_D6T.c_str());
+  TNamed* configsignal_2 = new TNamed("ConfigFile", cfgPath_2.c_str());
+  p->AddInput(configsignal_2);
+  p->Process(SignalDS_2, "FWLiteTSelector","",-1);
+  p->ClearInput();
+  delete SignalDS_2;
+  string cfgPath_3=path+"Z_Madgraph_Z2.py";
+  TDSet* SignalDS_3 = getDS(Zpj_Z2.c_str());
+  TNamed* configsignal_3 = new TNamed("ConfigFile", cfgPath_3.c_str());
+  p->AddInput(configsignal_3);
+  p->Process(SignalDS_3, "FWLiteTSelector","",-1);
+  p->ClearInput();
+  delete SignalDS_3;
+  string cfgPath_4=path+"TT_Pythia.py";
+  TDSet* SignalDS_4 = getDS(TT.c_str());
+  TNamed* configsignal_4 = new TNamed("ConfigFile", cfgPath_4.c_str());
+  p->AddInput(configsignal_4);
+  p->Process(SignalDS_4, "FWLiteTSelector","",-1);
+  p->ClearInput();
+  delete SignalDS_4;
+  string cfgPath_5=path+"Wlnu_Madgraph.py";
+  TDSet* SignalDS_5 = getDS(Wlnu.c_str());
+  TNamed* configsignal_5 = new TNamed("ConfigFile", cfgPath_5.c_str());
+  p->AddInput(configsignal_5);
+  p->Process(SignalDS_5, "FWLiteTSelector","",-1);
+  p->ClearInput();
+  delete SignalDS_5;
+  string cfgPath_6=path+"WWEE_Pythia.py";
+  TDSet* SignalDS_6 = getDS(WWEE.c_str());
+  TNamed* configsignal_6 = new TNamed("ConfigFile", cfgPath_6.c_str());
+  p->AddInput(configsignal_6);
+  p->Process(SignalDS_6, "FWLiteTSelector","",-1);
+  p->ClearInput();
+  delete SignalDS_6; 
+  string cfgPath_7=path+"ZZEE_Pythia.py";
+  TDSet* SignalDS_7 = getDS(ZZEE.c_str());
+  TNamed* configsignal_7 = new TNamed("ConfigFile", cfgPath_7.c_str());
+  p->AddInput(configsignal_7);
+  p->Process(SignalDS_7, "FWLiteTSelector","",-1);
+  p->ClearInput();
+  delete SignalDS_7;
+  string cfgPath_8=path+"WZEE_Pythia.py";
+  TDSet* SignalDS_8 = getDS(WZEE.c_str());
+  TNamed* configsignal_8 = new TNamed("ConfigFile", cfgPath_8.c_str());
+  p->AddInput(configsignal_8);
+  p->Process(SignalDS_8, "FWLiteTSelector","",-1);
+  p->ClearInput();
+  delete SignalDS_8;
+  string cfgPath_9=path+"QCD_BCtoE_Pythia_Pt20to30.py";
+  TDSet* SignalDS_9 = getDS(bce_2030.c_str());
+  TNamed* configsignal_9 = new TNamed("ConfigFile", cfgPath_9.c_str());
+  p->AddInput(configsignal_9);
+  p->Process(SignalDS_9, "FWLiteTSelector","",-1);
+  p->ClearInput();
+  delete SignalDS_9;
+  string cfgPath_10=path+"QCD_BCtoE_Pythia_Pt30to80.py";
+  TDSet* SignalDS_10 = getDS(bce_3080.c_str());
+  TNamed* configsignal_10 = new TNamed("ConfigFile", cfgPath_10.c_str());
+  p->AddInput(configsignal_10);
+  p->Process(SignalDS_10, "FWLiteTSelector","",-1);
+  p->ClearInput();
+  delete SignalDS_10;
+  string cfgPath_11=path+"QCD_BCtoE_Pythia_Pt80to170.py";
+  TDSet* SignalDS_11 = getDS(bce_80170.c_str());
+  TNamed* configsignal_11 = new TNamed("ConfigFile", cfgPath_11.c_str());
+  p->AddInput(configsignal_11);
+  p->Process(SignalDS_11, "FWLiteTSelector","",-1);
+  p->ClearInput();
+  delete SignalDS_11;
+  string cfgPath_12=path+"QCD_EMEnriched_Pythia_Pt20to30.py";
+  TDSet* SignalDS_12 = getDS(em_2030.c_str());
+  TNamed* configsignal_12 = new TNamed("ConfigFile", cfgPath_12.c_str());
+  p->AddInput(configsignal_12);
+  p->Process(SignalDS_12, "FWLiteTSelector","",-1);
+  p->ClearInput();
+  delete SignalDS_12;
+  string cfgPath_13=path+"QCD_EMEnriched_Pythia_Pt30to80.py";
+  TDSet* SignalDS_13 = getDS(em_3080.c_str());
+  TNamed* configsignal_13 = new TNamed("ConfigFile", cfgPath_13.c_str());
+  p->AddInput(configsignal_13);
+  p->Process(SignalDS_13, "FWLiteTSelector","",-1);
+  p->ClearInput();
+  delete SignalDS_13;
+  string cfgPath_14=path+"QCD_EMEnriched_Pythia_Pt80to170.py";
+  TDSet* SignalDS_14 = getDS(em_80170.c_str());
+  TNamed* configsignal_14 = new TNamed("ConfigFile", cfgPath_14.c_str());
+  p->AddInput(configsignal_14);
+  p->Process(SignalDS_14, "FWLiteTSelector","",-1);
+  p->ClearInput();
+  delete SignalDS_14;  
+  }
   
   if(Log){ 
   TProofLog *pl = TProof::Mgr("")->GetSessionLogs();
   pl->Save("0.1",path.c_str());
   }
-  
-  p->ClearInput();
-  delete SignalDS;
 
   p->Close();
    

@@ -400,12 +400,16 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzerElectron::fit(RooAbsDat
   bpass << b_pass.getPropagatedError(*fitresult);
   
   TPaveText* tboxpass = new TPaveText(0.57, 0.70, 0.89, 0.87, "BRNDC"); 
-  tboxpass->AddText(spass.str().c_str()) ;
-  tboxpass->AddText(bpass.str().c_str()) ;
-  tboxpass->AddText(eff.str().c_str()) ;
+  tboxpass->AddText(spass.str().c_str());
+  tboxpass->AddText(bpass.str().c_str());
+  //tboxpass->AddText(eff.str().c_str());
   mass_pass->addObject(tboxpass);
   
-  total_fit.getPdf(_passprobe_cat.getLabel())->plotOn(mass_pass, Components(background_pass), LineStyle(kDashed));  
+  data->statOn(mass_pass, RooFit::Cut("passprobe==passprobe::pass"), RooFit::DataError(RooAbsData::SumW2));
+  
+  total_fit.getPdf(_passprobe_cat.getLabel())->plotOn(mass_pass, Components(background_pass), LineStyle(kDashed), "F", FillStyle(1001), FillColor(kGreen));
+  //mass_pass->getAttFill()->SetFillColor(kGreen);
+    
   mass_pass->Write();
 
   RooPlot * mass_fail = _mass.frame() ;
@@ -426,10 +430,12 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzerElectron::fit(RooAbsDat
   bfail << b_fail.getPropagatedError(*fitresult);
   
   TPaveText* tboxfail = new TPaveText(0.57, 0.70, 0.89, 0.87, "BRNDC"); 
-  tboxfail->AddText(sfail.str().c_str()) ;
-  tboxfail->AddText(bfail.str().c_str()) ;
-  tboxfail->AddText(eff.str().c_str()) ;
+  tboxfail->AddText(sfail.str().c_str());
+  tboxfail->AddText(bfail.str().c_str());
+  tboxfail->AddText(eff.str().c_str());
   mass_fail->addObject(tboxfail);
+  
+  data->statOn(mass_pass, RooFit::Cut("passprobe==passprobe::fail"));
   
   //total_fit.getPdf(_passprobe_cat.getLabel())->plotOn(mass_fail, Components(background_fail), LineStyle(kDashed));
   
