@@ -172,10 +172,19 @@ void  GenElectron::process(const fwlite::Event& iEvent)
    electronHandle.getByLabel(iEvent, "selectedElectrons");
    
    std::vector<const reco::Candidate*> zdaughters;
+   if(zgenHandle->size())zdaughters = ZGENDaughters((*zgenHandle)[0]);
+   
+   std::vector<const reco::GenJet*> genjets = GetJets_GenJets<reco::GenJet>(*jetgenHandle);   
+   std::vector<const reco::GenJet*> isogenjets;
+ 
+   if(zdaughters.size()){
+   for(unsigned int i = 0; i < genjets.size(); i++){
+   if(IsoJet<reco::Candidate>(zdaughters,*genjets[i]))isogenjets.push_back(genjets[i]);}
+   }else if(!zdaughters.size()){
+   for(unsigned int i = 0; i < genjets.size(); i++)isogenjets.push_back(genjets[i]);}
    
    if(zgenHandle->size()){
    
-   zdaughters = ZGENDaughters((*zgenHandle)[0]);
    const reco::Candidate *dau0 = 0;
    const reco::Candidate *dau1 = 0;
    
@@ -185,12 +194,6 @@ void  GenElectron::process(const fwlite::Event& iEvent)
      
      
      }
-   
-   std::vector<const reco::GenJet*> genjets = GetJets_GenJets<reco::GenJet>(*jetgenHandle);   
-   std::vector<const reco::GenJet*> isogenjets;
- 
-   for(unsigned int i = 0; i < genjets.size(); i++){
-   if(IsoJet<reco::Candidate>(zdaughters,*genjets[i]))isogenjets.push_back(genjets[i]);}
      
    //Events with a selected GEN Zee - NO Acceptance cuts applied
    if(GenSelected((*zgenHandle)[0], _selections)&&zdaughters.size()!=0){
@@ -210,11 +213,10 @@ void  GenElectron::process(const fwlite::Event& iEvent)
       genLeadElPt->Fill(leadelpt, weight);
       genLeadElEta->Fill(leadeleta, weight);
       genSecElPt->Fill(secondelpt, weight);
-      genSecElEta->Fill(secondeleta, weight);  
-   
-      GenJetCounter->Fill(genjets.size());
+      genSecElEta->Fill(secondeleta, weight); 
       
-      GenIsoJetCounter->Fill(isogenjets.size());
+      GenJetCounter->Fill(genjets.size());
+      GenIsoJetCounter->Fill(isogenjets.size()); 
    
    }
    

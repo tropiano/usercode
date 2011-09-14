@@ -84,7 +84,7 @@ int PreDefName, ProcEvents;
   bool NTUPLE = true;
   
   //Ntuple - "zcand" = saves only z candidates; "acc" = save only events with Z in the acceptance; "all" = saves all the events  
-  string NtupleFill = "acc";
+  string NtupleFill = "all";
   
   //Cuts
   int Acc  = 1;

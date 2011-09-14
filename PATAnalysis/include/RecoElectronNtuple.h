@@ -41,6 +41,7 @@ public :
    Float_t zmass, zmass_AllCuts, zpt, zeta, zphi;
   
    Int_t numberOfZ, nelesall, neles, npfjetsele, npfl1jetsele;
+   Int_t genacc_npfjetsele, genacc_npfl1jetsele;
    
    Float_t elept1,eleeta1,elephi1,elept2,eleeta2,elephi2;
    Float_t elecharge1,eledB1,elefbrem1,eledeltaeta1,eledeltaphi1,eleHovE1,

@@ -237,6 +237,7 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    zeetree->Branch("ele2mapID95cIso",&ele2mapID95cIso,"ele2mapID95cIso/I"); 
 
    zeetree->Branch("npfjetsele",&npfjetsele,"npfjetsele/I");
+   zeetree->Branch("genacc_npfjetsele",&genacc_npfjetsele,"genacc_npfjetsele/I");
    zeetree->Branch("pfjetID1",&pfjetID1,"pfjetID1/I");
    zeetree->Branch("pfjetet1",&pfjetet1,"pfjetet1/F"); 
    zeetree->Branch("pfjetpt1",&pfjetpt1,"pfjetpt1/F");
@@ -267,6 +268,7 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    zeetree->Branch("DeltaR_GenJetPFJet",&DeltaR_GenJetPFJet,"DeltaR_GenJetPFJet/F");
    
    zeetree->Branch("npfl1jetsele",&npfl1jetsele,"npfl1jetsele/I");
+   zeetree->Branch("genacc_npfl1jetsele",&genacc_npfl1jetsele,"genacc_npfl1jetsele/I");
    zeetree->Branch("pfl1jetID1",&pfl1jetID1,"pfl1jetID1/I"); 
    zeetree->Branch("pfl1jetet1",&pfl1jetet1,"pfl1jetet1/F"); 
    zeetree->Branch("pfl1jetpt1",&pfl1jetpt1,"pfl1jetpt1/F");
@@ -447,6 +449,7 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    neles = -1;
 
    npfjetsele = -1;
+   genacc_npfjetsele = -1;
    pfjetID1=-1;
    pfjetet1=0.;
    pfjetpt1=-99.;
@@ -478,7 +481,8 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    DeltaR_GenJetPFJet=-99;
    DeltaR_GenJetPFL1Jet=-99;
       
-   npfl1jetsele = -1;
+   npfl1jetsele=-1;
+   genacc_npfl1jetsele=-1;
    pfl1jetID1=-1;
    pfl1jetet1=0.;
    pfl1jetpt1=-99.;
@@ -547,7 +551,8 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    gendau1 = zgendaughters[1];
    for(unsigned int i = 0; i < genjets.size(); i++){
    if(IsoJet<reco::Candidate>(zgendaughters,*genjets[i]))isogenjets.push_back(genjets[i]);}
-   }
+   }else if(!zgendaughters.size()){
+   for(unsigned int i = 0; i < genjets.size(); i++)isogenjets.push_back(genjets[i]);}
 
    if (GenSelected((*zgenHandle)[0], _selections)&&zgendaughters.size()!=0){   
 
@@ -638,18 +643,19 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    
    // Z REC events
    
-   if(zrecHandle->size()){
-
      std::vector<const pat::Jet*> pfrecjets = GetJets_GenJets<pat::Jet>(*pfjetrecHandle);
      std::vector<const pat::Jet*> pfl1recjets = GetJets_GenJets<pat::Jet>(*pfl1jetrecHandle);
 
-     std::vector<const pat::Electron*> zrecdaughters = ZRECDaughters((*zrecHandle)[0]);
+     std::vector<const pat::Electron*> zrecdaughters; 
      
      const pat::Electron *recdau0 = 0;
      const pat::Electron *recdau1 = 0;
 
      std::vector<const pat::Jet*> pfisorecjets;
      std::vector<const pat::Jet*> pfl1isorecjets;
+        
+     if(zrecHandle->size()){
+     zrecdaughters = ZRECDaughters((*zrecHandle)[0]);}
      
      if(zrecdaughters.size()){
      recdau0 = zrecdaughters[0];
@@ -658,9 +664,33 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
      if(IsoJet<pat::Electron>(zrecdaughters,*pfrecjets[i]))pfisorecjets.push_back(pfrecjets[i]);}
      for(unsigned int i = 0; i < pfl1recjets.size(); i++){     
      if(IsoJet<pat::Electron>(zrecdaughters,*pfl1recjets[i]))pfl1isorecjets.push_back(pfl1recjets[i]);}
-     }
+     }else if(!zrecdaughters.size()){
+     for(unsigned int i = 0; i < pfrecjets.size(); i++)pfisorecjets.push_back(pfrecjets[i]);
+     for(unsigned int i = 0; i < pfl1recjets.size(); i++)pfl1isorecjets.push_back(pfl1recjets[i]);}
+     
+     //Reco Jets isolated from GEN Z electrons in Gen Acceptance
+     std::vector<const pat::Jet*> geniso_pfisorecjets;
+     std::vector<const pat::Jet*> geniso_pfl1isorecjets;
+     if(_sample=="mc" && zgenHandle->size()!=0){
+     std::vector<const reco::Candidate*> zgendaughters = ZGENDaughters((*zgenHandle)[0]);
+     if(zgendaughters.size()){
+     for(unsigned int i = 0; i < pfrecjets.size(); i++){
+     if(IsoJet<reco::Candidate>(zgendaughters,*pfrecjets[i]))geniso_pfisorecjets.push_back(pfrecjets[i]);}
+     for(unsigned int i = 0; i < pfl1recjets.size(); i++){     
+     if(IsoJet<reco::Candidate>(zgendaughters,*pfl1recjets[i]))geniso_pfl1isorecjets.push_back(pfl1recjets[i]);}
+     }else if(!zgendaughters.size()){
+     for(unsigned int i = 0; i < pfrecjets.size(); i++)geniso_pfisorecjets.push_back(pfrecjets[i]);
+     for(unsigned int i = 0; i < pfl1recjets.size(); i++)geniso_pfl1isorecjets.push_back(pfl1recjets[i]);}
+     
+     if (GenSelectedInAcceptance((*zgenHandle)[0], _selections)&&zgendaughters.size()){
+     genacc_npfjetsele=geniso_pfisorecjets.size();
+     genacc_npfl1jetsele=geniso_pfl1isorecjets.size();}
+     
+     }//end if(GEN _sample)
    
    // loose cuts, only acceptance cuts
+   
+   if(zrecHandle->size()){
    
    if(isTriggerAvailable(*triggerHandle, _elTrigVector[0].c_str()))elTrg1=1;
    if(isTriggerAvailable(*triggerHandle, _elTrigVector[1].c_str()))elTrg2=1;
@@ -772,7 +802,6 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
       // fill ntuples for jets
       
       if (pfisorecjets.size()>0){
-        cout<<"### PF JET ID1 = "<<jetID(pfisorecjets[0])<<endl;
         pfjetID1=jetID(pfisorecjets[0]);
         pfjetet1=pfisorecjets[0]->et();
         pfjetpt1=pfisorecjets[0]->pt();

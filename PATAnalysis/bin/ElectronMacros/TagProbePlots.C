@@ -33,25 +33,23 @@ void TPPlots(string multiplicity, string selections){
         gROOT->SetStyle("Plain");
         
         //MonteCarlo Signal file used to evaluate the Rel. MC Rel Eff. and the TP Eff. w/o background
-        TFile *signal_MC_file = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/MC_Winter10_399/Signal/JetPt15/Z_Madgraph_D6T_JetPt15.root");
+        TFile *signal_MC_file = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/MC_Winter10_399/Signal/JetPt15/Z_Madgraph_Z2_JetPt15_2.root");
         
         //TP files (outputs of TagAndProbeAnalyzer) whit the mass fits
-        TFile *tp_123 = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Incl_Global.root");
-        TFile *tp_1234 = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Incl_Global.root");
-        TFile *tp_12345 = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Incl_Global.root");
-        TFile *tp_123456 = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Incl_Global.root");
-        TFile *tp_global = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Incl_Global.root");
+        TFile *tp_123 = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Excl_Global.root");
+        TFile *tp_1234 = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Excl_Global.root");
+        TFile *tp_12345 = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Excl_Global.root");
+        TFile *tp_123456 = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Excl_Global.root");
+        TFile *tp_global = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Excl_Global.root");
         
         //Output
-        string out = "TPStudy_JetPt15_Incl_Global";
+        string out = "TPStudy_JetPt15_Excl_Global";
         string output = out;
         output+=".root";
         TFile* outplots = new TFile(output.c_str(), "RECREATE");
         
         ofstream tpr;
-	string outtpr="TPReport_JetPt15_Incl_Global";
-	outtpr+=out;
-	outtpr+=".txt";
+	string outtpr="TPReport_JetPt15_Excl_Global.txt";
 	tpr.open(outtpr.c_str());
 	tpr<<endl;
         
@@ -114,8 +112,6 @@ TP_global = TP->mkdir("Tag&Probe_Global");
 	
    /////////////Efficiency - MC
    //Denominators
-   
-   cout<<"### 1"<<endl;
 	
    TH1D* RelEffDenom_MC(0);
    
@@ -210,8 +206,6 @@ TP_global = TP->mkdir("Tag&Probe_Global");
         TGraphAsymmErrors Eff_MC_global(MCJetNumber_123456, MCJetNumber_1); 
         Eff_MC_global.SetNameTitle("GlobalEff_MC", "GlobalEff_MC");
         Eff_MC_global.Write();
-        
-        cout<<"### 2"<<endl;
 	
         //////////////////////////////////////////////////////////////////////////////	
 	
@@ -286,8 +280,8 @@ TP_global = TP->mkdir("Tag&Probe_Global");
         TGraphAsymmErrors Eff_TP_Single_123456(TP_numerator_123456, TP_denominator_123456);
         TGraphAsymmErrors Eff_TP_Single_global(TP_numerator_global, TP_denominator_global);
         
-        string Eff_TP_Single_name="SingleEff_TagProbe";
-        if(selections=="ASYM")Eff_TP_Single_name="SingleEff_TagProbe0";
+        string Eff_TP_Single_name="TP_MC-SingleEff";
+        if(selections=="ASYM")Eff_TP_Single_name="TP_MC-SingleEff0";
         Eff_TP_Single_name+=_RecoCutFlags[1].c_str();
         Eff_TP_Single_name+=_RecoCutFlags[2].c_str();
         Eff_TP_Single_12.SetNameTitle(Eff_TP_Single_name.c_str(), Eff_TP_Single_name.c_str());
@@ -299,8 +293,8 @@ TP_global = TP->mkdir("Tag&Probe_Global");
         Eff_TP_Single_12345.SetNameTitle(Eff_TP_Single_name.c_str(), Eff_TP_Single_name.c_str());
         Eff_TP_Single_name+=_RecoCutFlags[6].c_str();
         Eff_TP_Single_123456.SetNameTitle(Eff_TP_Single_name.c_str(), Eff_TP_Single_name.c_str());
-        Eff_TP_Single_name="SingleEff_TagProbe_Global";
-        if(selections=="ASYM")Eff_TP_Single_name="SingleEff_TagProbe0_Global";
+        Eff_TP_Single_name="TP_MC-SingleEff_Global";
+        if(selections=="ASYM")Eff_TP_Single_name="TP_MC-SingleEff0_Global";
         Eff_TP_Single_global.SetNameTitle(Eff_TP_Single_name.c_str(), Eff_TP_Single_name.c_str());
         
         string TPDir1="EfficiencyElectron/Tag&Probe1";
@@ -308,8 +302,6 @@ TP_global = TP->mkdir("Tag&Probe_Global");
         if(multiplicity=="incl")TPDir1+="_Incl";
         
         TGraphAsymmErrors Eff_TP_Single1_12, Eff_TP_Single1_123, Eff_TP_Single1_1234, Eff_TP_Single1_12345, Eff_TP_Single1_123456, Eff_TP_Single1_global;
-        
-        cout<<"### 3"<<endl;
          
         if(selections=="ASYM"){
         
@@ -376,7 +368,7 @@ TP_global = TP->mkdir("Tag&Probe_Global");
         Eff_TP_Single1_123456.BayesDivide(TP_numerator1_123456, TP_denominator1_123456);
         Eff_TP_Single1_global.BayesDivide(TP_numerator1_global, TP_denominator1_global);
         
-        string Eff_TP_Single1_name="SingleEff_TagProbe1";
+        string Eff_TP_Single1_name="TP_MC-SingleEff1";
         Eff_TP_Single1_name+=_RecoCutFlags[1].c_str();
         Eff_TP_Single1_name+=_RecoCutFlags[2].c_str();
         Eff_TP_Single1_12.SetNameTitle(Eff_TP_Single1_name.c_str(), Eff_TP_Single1_name.c_str());
@@ -388,12 +380,10 @@ TP_global = TP->mkdir("Tag&Probe_Global");
         Eff_TP_Single1_12345.SetNameTitle(Eff_TP_Single1_name.c_str(), Eff_TP_Single1_name.c_str());
         Eff_TP_Single1_name+=_RecoCutFlags[6].c_str();
         Eff_TP_Single1_123456.SetNameTitle(Eff_TP_Single1_name.c_str(), Eff_TP_Single1_name.c_str());
-        Eff_TP_Single1_name="SingleEff_TagProbe1_Global";
+        Eff_TP_Single1_name="TP_MC-SingleEff1_Global";
         Eff_TP_Single1_global.SetNameTitle(Eff_TP_Single1_name.c_str(), Eff_TP_Single1_name.c_str());
         
         }
-        
-        cout<<"### 4"<<endl;
       
         //////////////////////////////////////////////////////////////////
         
@@ -548,7 +538,7 @@ TP_global = TP->mkdir("Tag&Probe_Global");
         TGraphAsymmErrors Eff_TP_Double_123456(vx_123456, vy_123456, vexl_123456, vexh_123456, veyl_123456, veyh_123456);
         TGraphAsymmErrors Eff_TP_Double_global(vx_global, vy_global, vexl_global, vexh_global, veyl_global, veyh_global);
         
-        string Eff_TP_Double_name="DoubleEff_TagProbe";
+        string Eff_TP_Double_name="TP_MC-DoubleEff";
         Eff_TP_Double_name+=_RecoCutFlags[1].c_str();
         Eff_TP_Double_name+=_RecoCutFlags[2].c_str();
         Eff_TP_Double_12.SetNameTitle(Eff_TP_Double_name.c_str(), Eff_TP_Double_name.c_str());
@@ -560,11 +550,12 @@ TP_global = TP->mkdir("Tag&Probe_Global");
         Eff_TP_Double_12345.SetNameTitle(Eff_TP_Double_name.c_str(), Eff_TP_Double_name.c_str());
         Eff_TP_Double_name+=_RecoCutFlags[6].c_str();
         Eff_TP_Double_123456.SetNameTitle(Eff_TP_Double_name.c_str(), Eff_TP_Double_name.c_str());
-        Eff_TP_Double_name="DoubleEff_TagProbe_Global";
+        Eff_TP_Double_name="TP_MC-DoubleEff_Global";
         Eff_TP_Double_global.SetNameTitle(Eff_TP_Double_name.c_str(), Eff_TP_Double_name.c_str());
         
         TP_12->cd();
         Eff_TP_Single_12.Write();
+        Eff_TP_Single1_12.Write();
         Eff_TP_Double_12.Write();
         TCanvas *EffTP_12 = new TCanvas;
         Eff_TP_Double_12.SetLineColor(2);
@@ -589,7 +580,9 @@ TP_global = TP->mkdir("Tag&Probe_Global");
 	
 	TP_123->cd();
         Eff_TP_Single_123.Write();
+        Eff_TP_Single1_123.Write();
         Eff_TP_Double_123.Write();
+        tp_eff_123->Write("TP_Data-Eff_123");
         TCanvas *EffTP_123 = new TCanvas;
         Eff_TP_Double_123.SetLineColor(2);
 	Eff_TP_Double_123.SetMarkerStyle(21);
@@ -633,7 +626,9 @@ TP_global = TP->mkdir("Tag&Probe_Global");
 		
 	TP_1234->cd();
         Eff_TP_Single_1234.Write();
+        Eff_TP_Single1_1234.Write();
         Eff_TP_Double_1234.Write();
+        tp_eff_1234->Write("TP_Data-Eff_1234");
         TCanvas *EffTP_1234 = new TCanvas;
         Eff_TP_Double_1234.SetLineColor(2);
         Eff_TP_Double_1234.SetLineWidth(2);
@@ -676,7 +671,9 @@ TP_global = TP->mkdir("Tag&Probe_Global");
 	
 	TP_12345->cd();
         Eff_TP_Single_12345.Write();
+        Eff_TP_Single1_12345.Write();
         Eff_TP_Double_12345.Write();
+        tp_eff_12345->Write("TP_Data-Eff_12345");
         TCanvas *EffTP_12345 = new TCanvas;
         Eff_TP_Double_12345.SetLineColor(2);
         Eff_TP_Double_12345.SetLineWidth(2);
@@ -720,7 +717,9 @@ TP_global = TP->mkdir("Tag&Probe_Global");
 	
 	TP_123456->cd();
         Eff_TP_Single_123456.Write();
+        Eff_TP_Single1_123456.Write();
         Eff_TP_Double_123456.Write();
+        tp_eff_123456->Write("TP_Data-Eff_123456");
         TCanvas *EffTP_123456 = new TCanvas;
         Eff_TP_Double_123456.SetLineColor(2);
         Eff_TP_Double_123456.SetLineWidth(2);
@@ -765,7 +764,9 @@ TP_global = TP->mkdir("Tag&Probe_Global");
 		
 	TP_global->cd();
         Eff_TP_Single_global.Write();
+        Eff_TP_Single1_global.Write();
         Eff_TP_Double_global.Write();
+        tp_eff_global->Write("TP_Data-Eff_Global");
         TCanvas *EffTP_global = new TCanvas;
         Eff_TP_Double_global.SetLineColor(2);
         Eff_TP_Double_global.SetLineWidth(2);
@@ -1071,6 +1072,7 @@ TP_global = TP->mkdir("Tag&Probe_Global");
 	ResTP_global->Write("ResTP_Global.root");
 	ResTP_global->Close();
 	
+	tpr.close();
 	
   outplots->Write();
   outplots->Close();

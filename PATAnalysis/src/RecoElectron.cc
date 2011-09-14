@@ -684,7 +684,7 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    JetCounter_123456 = new TH1D(JetCounter_name.c_str(), "Number of Reconstructed Jet per event", 10, 0, 10);
    _histoVector.push_back(JetCounter_123456);
    
-   string IsoJetCounter_name = "IsoJetCounter";
+   string IsoJetCounter_name = "IsoJetCounter";  
    IsoJetCounter_name+=_RecoCutFlags[1].c_str();
    IsoJetCounter_1 = new TH1D(IsoJetCounter_name.c_str(), "Number of Reconstructed Iso Jet per event", 10, 0, 10);
    _histoVector.push_back(IsoJetCounter_1);
@@ -903,9 +903,9 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
    if(zdaughters.size()){  
    for(unsigned int i = 0; i < recjets.size(); i++){     
    if(IsoJet<pat::Electron>(zdaughters,*recjets[i]))isorecjets.push_back(recjets[i]);
-   if(!IsoJet<pat::Electron>(zdaughters,*recjets[i]))notisorecjets.push_back(recjets[i]);
-   }
-   }
+   if(!IsoJet<pat::Electron>(zdaughters,*recjets[i]))notisorecjets.push_back(recjets[i]);}
+   }else if(!zdaughters.size()){
+   for(unsigned int i = 0; i < recjets.size(); i++)isorecjets.push_back(recjets[i]);}
    
    // Same Charge Z study
    

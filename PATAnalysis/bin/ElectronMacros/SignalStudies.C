@@ -32,13 +32,19 @@ void Signal(string sample, string selections, string mult){
 
         gROOT->SetStyle("Plain");
 
-        TFile *signal_file = TFile::Open("Z_Madgraph.root");
+        TFile *signal_file = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/MC_Winter10_399/Signal/JetPt15/Z_Madgraph_Z2_JetPt15_2.root");
         
         //Output
-        string out = "SignalStudy_ZMadgraph_JetPt30";
+        string out = "SignalStudy_ZMadgraph_JetPt15_2";
         string output = out;
         output+=".root";
         TFile* outplots = new TFile(output.c_str(), "RECREATE");
+        
+        //Normalization factor
+	double iniLumi = 50.; //pb-1
+	double targetLumi = 36.176; //pb-1
+	double scale = 1.;
+	if(iniLumi!=0)scale = targetLumi/iniLumi;
 	
 	//Selections
 	int _Acc  = 1;
@@ -74,7 +80,7 @@ void Signal(string sample, string selections, string mult){
 	return;
 	}
 
-TDirectory *GEff, *REff, *Acc, *Pt_Eff, *Eta_Eff, *RecoInclJetWGA_Eff, *RecoExclJetWGA_Eff, *RecoInclJet_Eff, *RecoExclJet_Eff, *R_RecoInclJetWGA_Eff, *R_RecoExclJetWGA_Eff, *R_RecoInclJet_Eff, *R_RecoExclJet_Eff, *Mass_Eff, *Dist, *GenRec, *IsoJet, *ChargeMisID, *TP, *TP_12, *TP_123, *TP_1234, *TP_12345, *TP_123456, *TP_Global;
+TDirectory *GEff, *REff, *Acc, *Pt_Eff, *Eta_Eff, *RecoInclJetWGA_Eff, *RecoExclJetWGA_Eff, *RecoInclJet_Eff, *RecoExclJet_Eff, *R_RecoInclJetWGA_Eff, *R_RecoExclJetWGA_Eff, *R_RecoInclJet_Eff, *R_RecoExclJet_Eff, *Mass_Eff, *Dist, *GenRec, *IsoJet, *ChargeMisID, *TP, *UCF, *TP_12, *TP_123, *TP_1234, *TP_12345, *TP_123456, *TP_Global;
 
 GEff      = outplots->mkdir("Global_Efficiency");
 REff      = outplots->mkdir("Relative_Efficiency");
@@ -95,6 +101,7 @@ R_RecoInclJet_Eff = REff->mkdir("Relative_Efficiency_vs_RecoInclJet");
 R_RecoExclJet_Eff = REff->mkdir("Relative_Efficiency_vs_RecoExclJet");
 ChargeMisID = outplots->mkdir("ChargeMisID");
 TP          = outplots->mkdir("Tag&Probe");
+UCF          = outplots->mkdir("Unfolding_CorrFactors");
 string TPdir_name = "Tag&Probe";
 TPdir_name += _RecoCutFlags[1];
 TPdir_name += _RecoCutFlags[2];
@@ -315,7 +322,7 @@ TP_Global   = TP->mkdir("Tag&Probe_Global");
 	Eff_ZMass_123456.Write(); 
 	
 		
-   //Global Efficiency calculation vs Z Pt
+        //Global Efficiency calculation vs Z Pt
 	
 	Pt_Eff->cd();
 	
@@ -1256,6 +1263,9 @@ TP_Global   = TP->mkdir("Tag&Probe_Global");
 	
 	if(selections=="ASYM")TPDir="EfficiencyElectron/Tag&Probe0";
 	
+	if(mult=="excl")TPDir+="_Excl";
+        if(mult=="incl")TPDir+="_Incl";
+	
 	TPDir+=_RecoCutFlags[1].c_str();   
 	TPDir+=_RecoCutFlags[2].c_str();
 	TPHisto+=_RecoCutFlags[1].c_str();
@@ -1299,9 +1309,11 @@ TP_Global   = TP->mkdir("Tag&Probe_Global");
 	TH1D* TP_numerator_123456 = (TH1D*) signal_file->Get(num_TP.c_str());
 	TH1D* TP_denominator_123456 = (TH1D*) signal_file->Get(den_TP.c_str());
 	
-	TPDir="EfficiencyElectron/Tag&Probe_Global";
-        TPHisto="/Electron_Global";
-        if(selections=="ASYM")TPDir="EfficiencyElectron/Tag&Probe0_Global";
+	TPDir="EfficiencyElectron/Tag&Probe";
+	if(selections=="ASYM")TPDir="EfficiencyElectron/Tag&Probe0";
+	if(mult=="excl")TPDir+="_Excl_Global";
+        if(mult=="incl")TPDir+="_Incl_Global";
+        TPHisto="/Electron_Global";    
         num_TP = TPDir+TPHisto+"_SingleCandTag&Probe_numerator";
         den_TP = TPDir+TPHisto+"_SingleCandTag&Probe_denominator";
         
@@ -1333,6 +1345,9 @@ TP_Global   = TP->mkdir("Tag&Probe_Global");
         Eff_TP_Single_Global.SetNameTitle(Eff_TP_Single_name.c_str(), Eff_TP_Single_name.c_str());
 	
 	string TPDir1="EfficiencyElectron/Tag&Probe1";
+	if(mult=="excl")TPDir1+="_Excl";
+        if(mult=="incl")TPDir1+="_Incl";
+        
         TGraphAsymmErrors Eff_TP_Single1_12, Eff_TP_Single1_123, Eff_TP_Single1_1234, Eff_TP_Single1_12345, Eff_TP_Single1_123456, Eff_TP_Single1_Global;
 	
 	if(selections=="ASYM"){
@@ -1382,7 +1397,9 @@ TP_Global   = TP->mkdir("Tag&Probe_Global");
         TH1D* TP_numerator1_123456 = (TH1D*) signal_file->Get(num_TP1.c_str());
         TH1D* TP_denominator1_123456 = (TH1D*) signal_file->Get(den_TP1.c_str());
         
-        TPDir1="EfficiencyElectron/Tag&Probe1_Global";
+        TPDir1="EfficiencyElectron/Tag&Probe1";
+        if(mult=="excl")TPDir1+="_Excl_Global";
+        if(mult=="incl")TPDir1+="_Incl_Global";
         TPHisto="/Electron_Global";
         num_TP1 = TPDir1+TPHisto+"_SingleCandTag&Probe_numerator";
         den_TP1 = TPDir1+TPHisto+"_SingleCandTag&Probe_denominator";
@@ -1390,7 +1407,7 @@ TP_Global   = TP->mkdir("Tag&Probe_Global");
         TH1D* TP_numerator1_global = (TH1D*) signal_file->Get(num_TP1.c_str());
         TH1D* TP_denominator1_global = (TH1D*) signal_file->Get(den_TP1.c_str());
         
-        Eff_TP_Single1_12.BayesDivide(TP_numerator1_12, TP_denominator1_12);       
+        Eff_TP_Single1_12.BayesDivide(TP_numerator1_12, TP_denominator1_12);     
         Eff_TP_Single1_123.BayesDivide(TP_numerator1_123, TP_denominator1_123);      
         Eff_TP_Single1_1234.BayesDivide(TP_numerator1_1234, TP_denominator1_1234);        
         Eff_TP_Single1_12345.BayesDivide(TP_numerator1_12345, TP_denominator1_12345);
@@ -1915,102 +1932,8 @@ TP_Global   = TP->mkdir("Tag&Probe_Global");
 	recExclJetN_123456->Draw("sames");}
 	JetN->Write("JetN.root");
 	JetN->Close();
-
-	if(sample=="mc"){
-////////////////////////// Gen - Rec Plots
-	GenRec->cd();
 	
-	TH1D* GENMassZ_Acc = (TH1D*) signal_file->Get("GenElectron/genZ_Plots/genMassZ_Acc");
-	TH1D* GENPtZ_Acc = (TH1D*) signal_file->Get("GenElectron/genZ_Plots/genPtZ_Acc");
-	TH1D* GENEtaZ_Acc = (TH1D*) signal_file->Get("GenElectron/genZ_Plots/genEtaZ_Acc");
-	TH1D* GENExclJetN_Acc = (TH1D*) signal_file->Get("GenElectron/genJet_Plots/GenIsoJetCounter_Acc");
-	
-	TCanvas *GenRec_ZMass = new TCanvas;
-	recMassZ_123456->SetLineColor(1);
-	recMassZ_123456->GetXaxis()->SetTitle("Z Mass");
-	recMassZ_123456->SetTitle("Reconstructed (black) and Generated (red) Z Mass");
-	recMassZ_123456->Draw();
-	GENMassZ_Acc->SetLineColor(2);
-	GENMassZ_Acc->Draw("sames");
-	GenRec_ZMass->Write("GenRec_ZMass.root");
-	GenRec_ZMass->Close();
-	
-	TCanvas *GenRec_ZPt = new TCanvas;
-	recPtZ_123456->SetLineColor(1);
-	recPtZ_123456->GetXaxis()->SetTitle("Z Pt");
-	recPtZ_123456->SetTitle("Reconstructed (black) and Generated (red) Z Pt");
-	recPtZ_123456->Draw();
-	GENPtZ_Acc->SetLineColor(2);
-	GENPtZ_Acc->Draw("sames");
-	GenRec_ZPt->Write("GenRec_ZPt.root");
-	GenRec_ZPt->Close();
-	
-	TCanvas *GenRec_ZEta = new TCanvas;
-	recEtaZ_123456->SetLineColor(1);
-	recEtaZ_123456->GetXaxis()->SetTitle("Z Eta");
-	recEtaZ_123456->SetTitle("Reconstructed (black) and Generated (red) Z Eta");
-	recEtaZ_123456->Draw();
-	GENEtaZ_Acc->SetLineColor(2);
-	GENEtaZ_Acc->Draw("sames");
-	GenRec_ZEta->Write("GenRec_ZEta.root");
-	GenRec_ZEta->Close();
-		
-	TCanvas *GenRec_ExclJetN = new TCanvas;
-	recExclJetN_123456->SetLineColor(1);
-	recExclJetN_123456->GetXaxis()->SetTitle("Jet number");
-	recExclJetN_123456->SetTitle("Reconstructed (black) and Generated (red) Exclusive Jet Number");
-	recExclJetN_123456->Draw();
-	GENExclJetN_Acc->SetLineColor(2);
-	GENExclJetN_Acc->Draw("sames");
-	GenRec_ExclJetN->Write("GenRec_ExclJetN.root");
-	GenRec_ExclJetN->Close();
-	
-/////////////////////// Jet Isolation
-		
-	IsoJet->cd();
-	
-	TH1D* GENExclJetPt = (TH1D*) signal_file->Get("GenElectron/genJet_Plots/GenJetPt_Acc");
-	TH1D* GENIsoJetPt = (TH1D*) signal_file->Get("GenElectron/genJet_Plots/GenIsoJetPt_Acc");
-	
-	string RECJetPt_name = "RecoElectron/recJet_Plots/RecoJetPt";
-	RECJetPt_name+=_RecoCutFlags[1].c_str();
-	RECJetPt_name+=_RecoCutFlags[2].c_str();
-	RECJetPt_name+=_RecoCutFlags[3].c_str();
-	RECJetPt_name+=_RecoCutFlags[4].c_str();
-	RECJetPt_name+=_RecoCutFlags[5].c_str();
-	RECJetPt_name+=_RecoCutFlags[6].c_str();
-	TH1D* RECJetPt_123456 = (TH1D*) signal_file->Get(RECJetPt_name.c_str());
-	
-	string RECIsoJetPt_name = "RecoElectron/recJet_Plots/RecoIsoJetPt";
-	RECIsoJetPt_name+=_RecoCutFlags[1].c_str();
-	RECIsoJetPt_name+=_RecoCutFlags[2].c_str();
-	RECIsoJetPt_name+=_RecoCutFlags[3].c_str();
-	RECIsoJetPt_name+=_RecoCutFlags[4].c_str();
-	RECIsoJetPt_name+=_RecoCutFlags[5].c_str();
-	RECIsoJetPt_name+=_RecoCutFlags[6].c_str();
-	TH1D* RECIsoJetPt_123456 = (TH1D*) signal_file->Get(RECIsoJetPt_name.c_str());
-	
-	TCanvas *AllJetPt = new TCanvas;
-	RECJetPt_123456->GetXaxis()->SetTitle("Jet Pt");
-	RECJetPt_123456->SetTitle("Reconstructed (black) and Generated (red) Jet Pt, NO jet-isolation cut applied");
-	RECJetPt_123456->Draw();
-	GENExclJetPt->SetLineColor(2);
-	GENExclJetPt->Draw("sames");
-	AllJetPt->Write("AllJetPt.root");
-	AllJetPt->Close();
-	
-	TCanvas *IsoJetPt = new TCanvas;
-	RECIsoJetPt_123456->GetXaxis()->SetTitle("Jet Pt");
-	RECIsoJetPt_123456->SetTitle("Reconstructed (black) and Generated (red) Jet Pt, jet-isolation cut applied");
-	RECIsoJetPt_123456->Draw();
-	GENIsoJetPt->SetLineColor(2);
-	GENIsoJetPt->Draw("sames");
-	IsoJetPt->Write("IsoJetPt.root");
-	IsoJetPt->Close();
-	
-	}
-  
-////////////////////////////////////////////////////////////////////          
+	////////////////////////////////////////////////////////////////////          
 	
 	// Charge Misidentification
 	
@@ -2059,9 +1982,138 @@ TP_Global   = TP->mkdir("Tag&Probe_Global");
 	ChargeMisID_RecoInclJet_Acc->Divide(AllEl_RecoInclJet_Acc);
 	ChargeMisID_RecoInclJet_Acc->GetXaxis()->SetTitle("RecoInclJet");
 	ChargeMisID_RecoInclJet_Acc->SetName("ChargeMisID_RecoInclJet");
-	ChargeMisID_RecoInclJet_Acc->Write();	
+	ChargeMisID_RecoInclJet_Acc->Write();
+
+	if(sample=="mc"){  /////////////MC
 	
-	effincl.close();	
+////////////////////////// Gen - Rec Plots
+
+	GenRec->cd();
+	
+	TH1D* GENMassZ_Acc = (TH1D*) signal_file->Get("GenElectron/genZ_Plots/genMassZ_Acc");
+	TH1D* GENPtZ_Acc = (TH1D*) signal_file->Get("GenElectron/genZ_Plots/genPtZ_Acc");
+	TH1D* GENEtaZ_Acc = (TH1D*) signal_file->Get("GenElectron/genZ_Plots/genEtaZ_Acc");
+	TH1D* GENExclJetN_Acc = (TH1D*) signal_file->Get("GenElectron/genJet_Plots/GenIsoJetCounter_Acc");
+	
+	TCanvas *GenRec_ZMass = new TCanvas;
+	recMassZ_123456->SetLineColor(1);
+	recMassZ_123456->GetXaxis()->SetTitle("Z Mass");
+	recMassZ_123456->SetTitle("Reconstructed (black) and Generated (red) Z Mass");
+	recMassZ_123456->Draw();
+	GENMassZ_Acc->SetLineColor(2);
+	GENMassZ_Acc->Draw("sames");
+	GenRec_ZMass->Write("GenRec_ZMass.root");
+	GenRec_ZMass->Close();
+	
+	TCanvas *GenRec_ZPt = new TCanvas;
+	recPtZ_123456->SetLineColor(1);
+	recPtZ_123456->GetXaxis()->SetTitle("Z Pt");
+	recPtZ_123456->SetTitle("Reconstructed (black) and Generated (red) Z Pt");
+	recPtZ_123456->Draw();
+	GENPtZ_Acc->SetLineColor(2);
+	GENPtZ_Acc->Draw("sames");
+	GenRec_ZPt->Write("GenRec_ZPt.root");
+	GenRec_ZPt->Close();
+	
+	TCanvas *GenRec_ZEta = new TCanvas;
+	recEtaZ_123456->SetLineColor(1);
+	recEtaZ_123456->GetXaxis()->SetTitle("Z Eta");
+	recEtaZ_123456->SetTitle("Reconstructed (black) and Generated (red) Z Eta");
+	recEtaZ_123456->Draw();
+	GENEtaZ_Acc->SetLineColor(2);
+	GENEtaZ_Acc->Draw("sames");
+	GenRec_ZEta->Write("GenRec_ZEta.root");
+	GenRec_ZEta->Close();
+		
+	TCanvas *GenRec_ExclJetN = new TCanvas;
+	recExclJetN_123456->SetLineColor(1);
+	recExclJetN_123456->GetXaxis()->SetTitle("Jet number");
+	recExclJetN_123456->SetTitle("Reconstructed (black) and Generated (red) Exclusive Jet Number");
+	recExclJetN_123456->Draw();
+	GENExclJetN_Acc->SetLineColor(2);
+	GENExclJetN_Acc->Draw("sames");
+	GenRec_ExclJetN->Write("GenRec_ExclJetN.root");
+	GenRec_ExclJetN->Close();
+	
+/////////////////////// Unfolding Correction Factors
+
+        UCF->cd();
+        
+        TH1D* GENJet_ExclMult = (TH1D*) signal_file->Get("EfficiencyElectron/EffDenom_GenExclJetNumber");
+        GENJet_ExclMult->Scale(scale);
+        TH1D* RECOJet_ExclMult = (TH1D*) signal_file->Get("EfficiencyElectron/EffDenom_RecoExclJetNumber");
+        RECOJet_ExclMult->Scale(scale);
+        
+        TCanvas *GenRec_ExclMult = new TCanvas;
+        GENJet_ExclMult->GetXaxis()->SetTitle("Jet multiplicity");
+	GENJet_ExclMult->SetTitle("Reconstructed (black) and Generated (red) Exclusive Multiplicity");
+        GENJet_ExclMult->SetLineColor(2);
+	GENJet_ExclMult->SetLineWidth(2);
+	GENJet_ExclMult->Draw("hist");
+	RECOJet_ExclMult->SetLineColor(1);
+	RECOJet_ExclMult->SetLineWidth(2);	
+	RECOJet_ExclMult->Draw("hist sames");	
+	GenRec_ExclMult->Write("GenRec_ExclMult.root");
+	GenRec_ExclMult->Close();
+	
+	GENJet_ExclMult->Sumw2();
+	RECOJet_ExclMult->Sumw2();
+	GENJet_ExclMult->Divide(RECOJet_ExclMult);        
+        GENJet_ExclMult->SetName("Unfolding_CorrFactors");
+        GENJet_ExclMult->SetLineColor(1);
+        GENJet_ExclMult->SetLineWidth(2);
+        GENJet_ExclMult->SetMarkerStyle(21);
+	GENJet_ExclMult->GetXaxis()->SetTitle("Exclusive Multiplicity");
+	GENJet_ExclMult->GetYaxis()->SetTitle("Correction Factors");
+	GENJet_ExclMult->Write();
+        		
+/////////////////////// Jet Isolation
+		
+	IsoJet->cd();
+	
+	TH1D* GENExclJetPt = (TH1D*) signal_file->Get("GenElectron/genJet_Plots/GenJetPt_Acc");
+	TH1D* GENIsoJetPt = (TH1D*) signal_file->Get("GenElectron/genJet_Plots/GenIsoJetPt_Acc");
+	
+	string RECJetPt_name = "RecoElectron/recJet_Plots/RecoJetPt";
+	RECJetPt_name+=_RecoCutFlags[1].c_str();
+	RECJetPt_name+=_RecoCutFlags[2].c_str();
+	RECJetPt_name+=_RecoCutFlags[3].c_str();
+	RECJetPt_name+=_RecoCutFlags[4].c_str();
+	RECJetPt_name+=_RecoCutFlags[5].c_str();
+	RECJetPt_name+=_RecoCutFlags[6].c_str();
+	TH1D* RECJetPt_123456 = (TH1D*) signal_file->Get(RECJetPt_name.c_str());
+	
+	string RECIsoJetPt_name = "RecoElectron/recJet_Plots/RecoIsoJetPt";
+	RECIsoJetPt_name+=_RecoCutFlags[1].c_str();
+	RECIsoJetPt_name+=_RecoCutFlags[2].c_str();
+	RECIsoJetPt_name+=_RecoCutFlags[3].c_str();
+	RECIsoJetPt_name+=_RecoCutFlags[4].c_str();
+	RECIsoJetPt_name+=_RecoCutFlags[5].c_str();
+	RECIsoJetPt_name+=_RecoCutFlags[6].c_str();
+	TH1D* RECIsoJetPt_123456 = (TH1D*) signal_file->Get(RECIsoJetPt_name.c_str());
+	
+	TCanvas *AllJetPt = new TCanvas;
+	RECJetPt_123456->GetXaxis()->SetTitle("Jet Pt");
+	RECJetPt_123456->SetTitle("Reconstructed (black) and Generated (red) Jet Pt, NO jet-isolation cut applied");
+	RECJetPt_123456->Draw();
+	GENExclJetPt->SetLineColor(2);
+	GENExclJetPt->Draw("sames");
+	AllJetPt->Write("AllJetPt.root");
+	AllJetPt->Close();
+	
+	TCanvas *IsoJetPt = new TCanvas;
+	RECIsoJetPt_123456->GetXaxis()->SetTitle("Jet Pt");
+	RECIsoJetPt_123456->SetTitle("Reconstructed (black) and Generated (red) Jet Pt, jet-isolation cut applied");
+	RECIsoJetPt_123456->Draw();
+	GENIsoJetPt->SetLineColor(2);
+	GENIsoJetPt->Draw("sames");
+	IsoJetPt->Write("IsoJetPt.root");
+	IsoJetPt->Close();
+	
+	}    /////////// END MC	
+	
+	effincl.close();
+	effexcl.close();	
 
   outplots->Write();
   outplots->Close();

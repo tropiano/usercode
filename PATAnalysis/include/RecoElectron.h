@@ -75,7 +75,9 @@ public :
    
    TH1D *HoverE_PreEiD, *DeltaEtaIn_PreEiD, *DeltaPhiIn_PreEiD, *SigmaIEtaIEta_PreEiD, *HoverE_EiD, *DeltaEtaIn_EiD, *DeltaPhiIn_EiD, *SigmaIEtaIEta_EiD;
    
-   TH1D *RecoIsoJetPt_123456, *RecoJetPt_123456, *recLeadIsoJetPt_123456, *recLeadIsoJetEta_123456, *JetCounter_123456, *IsoJetCounter_1, *IsoJetCounter_12, *IsoJetCounter_123, *IsoJetCounter_1234, *IsoJetCounter_12345, *IsoJetCounter_123456;
+   TH1D *RecoIsoJetPt_123456, *RecoJetPt_123456, *recLeadIsoJetPt_123456, *recLeadIsoJetEta_123456;
+   
+   TH1D *JetCounter_123456, *IsoJetCounter_1, *IsoJetCounter_12, *IsoJetCounter_123, *IsoJetCounter_1234, *IsoJetCounter_12345, *IsoJetCounter_123456;
    
    TH1D *MinDeltaR_ZDau, *AllJetCharge, *IsoJetCharge, *NotIsoJetCharge, *DeltaR_IsoJet, *DeltaR_NotIsoJet, *DeltaR_IsoJet_ElType;
    

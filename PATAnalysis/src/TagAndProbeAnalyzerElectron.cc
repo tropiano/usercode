@@ -89,19 +89,31 @@ void TagAndProbeAnalyzerElectron::analyze(unsigned int nbins, std::string option
    if(_sec_input)_rootree1->Write();
    
    TGraphAsymmErrors singleEfficiency, singleEfficiency1;
+   
+   _YieldPlots = _output->mkdir("YieldPlots", "YieldPlots");
+   
+   _SignalYield_0 = new TGraphAsymmErrors();
+   _SignalYield_0->SetNameTitle("SignalYield_0", "SignalYield_0");
+   _SignalYield_1 = new TGraphAsymmErrors();
+   _SignalYield_1->SetNameTitle("SignalYield_1", "SignalYield_1");
+   
+   _BackgroundYield_0 = new TGraphAsymmErrors();
+   _BackgroundYield_0->SetNameTitle("BackgroundYield_0", "BackgroundYield_0");
+   _BackgroundYield_1 = new TGraphAsymmErrors();
+   _BackgroundYield_1->SetNameTitle("BackgroundYield_1", "BackgroundYield_1");
  
-   for (unsigned int i = 0; i < nbins; ++i){
+   for (unsigned int bin = 0; bin < nbins; ++bin){
    
       stringstream name_tp;
-      name_tp << _name << "TagProbe" << i << "bin_0";
+      name_tp << _name << "TagProbe" << bin << "bin_0";
       stringstream name_tp1;
-      name_tp1 << _name << "TagProbe" << i << "bin_1";
+      name_tp1 << _name << "TagProbe" << bin << "bin_1";
       
       stringstream name_tpp;
-      name_tpp << _name << "TagPassProbe" << i << "bin";
+      name_tpp << _name << "TagPassProbe" << bin << "bin";
      
       stringstream formula_tp;
-      formula_tp << "bin==" << i << " && probe==1";
+      formula_tp << "bin==" << bin << " && probe==1";
      
       RooAbsData* tagprobe=0; 
       RooAbsData* tagprobe1=0;
@@ -111,14 +123,14 @@ void TagAndProbeAnalyzerElectron::analyze(unsigned int nbins, std::string option
     
       std::pair<RooFitResult*, RooRealVar*>  tp_fit, tp_fit1;
       
-      cout<<endl<<"### Fitting bin n. "<<i<<endl<<endl;
+      cout<<endl<<"### Fitting bin n. "<<bin<<endl<<endl;
       
-      tp_fit  = fit(tagprobe, name_tp.str().c_str(), option);
-      if(_sec_input)tp_fit1  = fit(tagprobe1, name_tp1.str().c_str(), option);
+      tp_fit  = fit(tagprobe, name_tp.str().c_str(), option, bin);
+      if(_sec_input)tp_fit1  = fit(tagprobe1, name_tp1.str().c_str(), option, bin);
       
       if(tp_fit.first && tp_fit.first->status() == 0 ){
-        cout << "Using backgound correctedvalues for " << _name << " in bin " << i << endl;  
-        singleEfficiency.SetPoint(i, i, tp_fit.second->getVal());
+        cout << "Using backgound correctedvalues for " << _name << " in bin " << bin << endl;  
+        singleEfficiency.SetPoint(bin, bin, tp_fit.second->getVal());
         double errlow = 0.;
         double errhigh = 0.;
         if (tp_fit.second->hasAsymError()){
@@ -128,14 +140,14 @@ void TagAndProbeAnalyzerElectron::analyze(unsigned int nbins, std::string option
           errlow  = TMath::Abs(tp_fit.second->getError());
           errhigh = TMath::Abs(tp_fit.second->getError());
         }
-        singleEfficiency.SetPointEYhigh(i, errhigh);
-        singleEfficiency.SetPointEYlow(i, errlow);
+        singleEfficiency.SetPointEYhigh(bin, errhigh);
+        singleEfficiency.SetPointEYlow(bin, errlow);
        }
        
        if(_sec_input){ 
         if(tp_fit1.first && tp_fit1.first->status() == 0 ){
-          cout << "Using backgound correctedvalues for " << _name << " in bin " << i << endl;  
-          singleEfficiency1.SetPoint(i, i, tp_fit1.second->getVal());
+          cout << "Using backgound correctedvalues for " << _name << " in bin " << bin << endl;  
+          singleEfficiency1.SetPoint(bin, bin, tp_fit1.second->getVal());
           double errlow1 = 0.;
           double errhigh1 = 0.;
           if (tp_fit1.second->hasAsymError()){
@@ -145,8 +157,8 @@ void TagAndProbeAnalyzerElectron::analyze(unsigned int nbins, std::string option
             errlow1  = TMath::Abs(tp_fit1.second->getError());
             errhigh1 = TMath::Abs(tp_fit1.second->getError());
           }
-          singleEfficiency1.SetPointEYhigh(i, errhigh1);
-          singleEfficiency1.SetPointEYlow(i, errlow1);
+          singleEfficiency1.SetPointEYhigh(bin, errhigh1);
+          singleEfficiency1.SetPointEYlow(bin, errlow1);
         }
                   
         if (tp_fit.first) delete tp_fit.first;
@@ -173,10 +185,17 @@ void TagAndProbeAnalyzerElectron::analyze(unsigned int nbins, std::string option
          doubleEfficiency.Write();
        }
   
-  }
+  } 
+  
+  _YieldPlots->cd();
+  
+  _SignalYield_0->Write();
+  _SignalYield_1->Write();
+  _BackgroundYield_0->Write();
+  _BackgroundYield_1->Write();
 }
 
-std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzerElectron::fit(RooAbsData* data, const char* name, std::string option) {
+std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzerElectron::fit(RooAbsData* data, const char* name, std::string option, unsigned int bin) {
 
   string dirname(_input->GetName());
 
@@ -393,11 +412,39 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzerElectron::fit(RooAbsDat
   spass << " +/- ";
   spass << s_pass.getPropagatedError(*fitresult);
   
+  cout<<"### Bin n. = "<<bin<<" - Name = "<<name<<" - Signal = "<<s_pass.getVal()<<endl;
+  cout<<"### Tipo =  "<<name[strlen(name)-1]<<endl;
+  
+  string type_pass = "";
+  type_pass+=name[strlen(name)-1];
+  
+  if(type_pass=="0"){
+  _SignalYield_0->SetPoint(bin, bin, s_pass.getVal());
+  _SignalYield_0->SetPointEYhigh(bin,s_pass.getPropagatedError(*fitresult));
+  _SignalYield_0->SetPointEYlow(bin,s_pass.getPropagatedError(*fitresult));
+  }
+  if(type_pass=="1"){
+  _SignalYield_1->SetPoint(bin, bin, s_pass.getVal());
+  _SignalYield_1->SetPointEYhigh(bin,s_pass.getPropagatedError(*fitresult));
+  _SignalYield_1->SetPointEYlow(bin,s_pass.getPropagatedError(*fitresult));
+  }
+  
   stringstream bpass;
   bpass << "Background = ";
   bpass << b_pass.getVal();
   bpass << " +/- ";
   bpass << b_pass.getPropagatedError(*fitresult);
+  
+  if(type_pass=="0"){
+  _BackgroundYield_0->SetPoint(bin, bin, b_pass.getVal());
+  _BackgroundYield_0->SetPointEYhigh(bin,b_pass.getPropagatedError(*fitresult));
+  _BackgroundYield_0->SetPointEYlow(bin,b_pass.getPropagatedError(*fitresult));
+  }
+  if(type_pass=="1"){
+  _BackgroundYield_1->SetPoint(bin, bin, b_pass.getVal());
+  _BackgroundYield_1->SetPointEYhigh(bin,b_pass.getPropagatedError(*fitresult));
+  _BackgroundYield_1->SetPointEYlow(bin,b_pass.getPropagatedError(*fitresult));
+  }
   
   TPaveText* tboxpass = new TPaveText(0.57, 0.70, 0.89, 0.87, "BRNDC"); 
   tboxpass->AddText(spass.str().c_str());
@@ -439,7 +486,7 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzerElectron::fit(RooAbsDat
   
   //total_fit.getPdf(_passprobe_cat.getLabel())->plotOn(mass_fail, Components(background_fail), LineStyle(kDashed));
   
-  mass_fail->Write(); 
+  mass_fail->Write();
   
   delete hmass;
   delete mass_pass;

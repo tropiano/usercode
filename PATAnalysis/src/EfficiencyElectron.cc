@@ -839,13 +839,13 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
    std::vector<const pat::Jet*> reciso_recjets;
    
    //Reco Jets isolated from GEN Z electrons
-   if(_sample=="mc" && zgenHandle->size()!=0){
-   zgendaughters = ZGENDaughters((*zgenHandle)[0]);
-   if(zgenHandle->size()){
+   if(_sample=="mc"){
+   if(zgenHandle->size())zgendaughters = ZGENDaughters((*zgenHandle)[0]);
+   if(zgendaughters.size()){
    for(unsigned int i = 0; i < recjets.size(); i++){
-   if(IsoJet<reco::Candidate>(zgendaughters,*recjets[i]))geniso_recjets.push_back(recjets[i]);
-   }
-   }
+   if(IsoJet<reco::Candidate>(zgendaughters,*recjets[i]))geniso_recjets.push_back(recjets[i]);}
+   }else if(!zgendaughters.size()){
+   for(unsigned int i = 0; i < recjets.size(); i++)geniso_recjets.push_back(recjets[i]);}
    }//end if(_sample)
    
    //Z Rec daughters
@@ -861,11 +861,11 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
    }
  
    //Reco Jets isolated from RECO Z electrons
-   if(zrecdaughters.size()){
-   for(unsigned int i = 0; i < recjets.size(); i++){
-   if(IsoJet<pat::Electron>(zrecdaughters,*recjets[i]))reciso_recjets.push_back(recjets[i]);
-   }
-   }
+   if(zrecdaughters.size()){  
+   for(unsigned int i = 0; i < recjets.size(); i++){     
+   if(IsoJet<pat::Electron>(zrecdaughters,*recjets[i]))reciso_recjets.push_back(recjets[i]);}
+   }else if(!zrecdaughters.size()){
+   for(unsigned int i = 0; i < recjets.size(); i++)reciso_recjets.push_back(recjets[i]);}
  
    if(_sample=="mc" && zgenHandle->size()!=0){
    
@@ -896,9 +896,9 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
      
      if(zgendaughters.size()){
      for(unsigned int i = 0; i < genjets.size(); i++){
-     if(IsoJet<reco::Candidate>(zgendaughters,*genjets[i]))isogenjets.push_back(genjets[i]);
-     }
-     }
+     if(IsoJet<reco::Candidate>(zgendaughters,*genjets[i]))isogenjets.push_back(genjets[i]);}
+     }else if(!zgendaughters.size()){
+     for(unsigned int i = 0; i < genjets.size(); i++)isogenjets.push_back(genjets[i]);}
      
      //Acceptance denominator
      if (GenSelected((*zgenHandle)[0], _selections)&&zgendaughters.size()!=0){
