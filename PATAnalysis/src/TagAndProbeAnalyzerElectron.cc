@@ -199,7 +199,7 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzerElectron::fit(RooAbsDat
 
   string dirname(_input->GetName());
 
-  cout << "bins mass" << _mass.getBins()  << endl; 
+  cout << "bin mass" << _mass.getBins()  << endl; 
 
   stringstream nllname;
   nllname << "nll_" << name;
@@ -411,9 +411,6 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzerElectron::fit(RooAbsDat
   spass << s_pass.getVal();
   spass << " +/- ";
   spass << s_pass.getPropagatedError(*fitresult);
-  
-  cout<<"### Bin n. = "<<bin<<" - Name = "<<name<<" - Signal = "<<s_pass.getVal()<<endl;
-  cout<<"### Tipo =  "<<name[strlen(name)-1]<<endl;
   
   string type_pass = "";
   type_pass+=name[strlen(name)-1];

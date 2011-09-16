@@ -55,6 +55,10 @@ string Tab_cut = "True";
 	double scale = 1.;
 	if(iniLumi!=0)scale = targetLumi/iniLumi;
 	
+	ostringstream scale_stream;
+        scale_stream << scale;
+        string scale_str = scale_stream.str();
+	
 	//Define trees
 	TTree* data_tree   = (TTree*) Data_TF->Get("RecoElectronNtuple/ZeeTree");
 	TTree* Z_tree      = (TTree*) Z_TF->Get("RecoElectronNtuple/ZeeTree");
@@ -76,12 +80,14 @@ string Tab_cut = "True";
 	string Leg_Data	= "Data";
 	
 	//Define directories
-	TDirectory *ZEta, *ZMass, *ZoJet_Pt, *JetRes, *Unfolding;
+	TDirectory *ZEta, *ZMass, *ZoJet_Pt, *JetRes, *Unfolding, *Matrix, *CorrFact;
 	ZEta = outplots->mkdir("ZEta_0-1Jets");
 	ZMass = outplots->mkdir("ZMass_Barrel-Endcap");
 	ZoJet_Pt = outplots->mkdir("ZoverJetPt_1Jet");
 	JetRes = outplots->mkdir("JetResolution");
 	Unfolding = outplots->mkdir("Unfolding");
+	Matrix = Unfolding->mkdir("ResponseMatrix");
+	CorrFact = Unfolding->mkdir("CorrFactors");
 	
 	//Define Histograms
 	ZEta->cd();
@@ -112,9 +118,14 @@ string Tab_cut = "True";
 	TH1D* ZMass_MC_Barrel = new TH1D("ZMass_MC_Barrel","Z Mass, Data (black) MC (red) - Barrel",200,50,150);
 	TH1D* ZMass_MC_Endcap = new TH1D("ZMass_MC_Endcap","Z Mass, Data (black) MC (red) - Endcap",200,50,150);
 	
-	Unfolding->cd();	
-	TH2D* UnfoldingPlot_Scat_PFL1 = new TH2D("UnfoldingPlot_Scat_PFL1","Response Matrix - Gen Jet vs PFL1 Jet",6,-0.5,5.5,6,-0.5,5.5);
-	TH2D* UnfoldingPlot_Scat_PF = new TH2D("UnfoldingPlot_Scat_PF","Response Matrix - Gen Jet vs PF Jet",6,-0.5,5.5,6,-0.5,5.5);
+	Matrix->cd();	
+	TH2D* UnfoldingPlot_Scat_PFL1 = new TH2D("UnfoldingPlot_Scat_PFL1","Response Matrix - Gen Jet vs PFL1 Jet",5,-0.5,4.5,5,-0.5,4.5);
+	TH2D* UnfoldingPlot_Scat_PF = new TH2D("UnfoldingPlot_Scat_PF","Response Matrix - Gen Jet vs PF Jet",5,-0.5,4.5,5,-0.5,4.5);
+	CorrFact->cd();
+	TH1D* GENJet_ExclMult = new TH1D("GENJet_ExclMult","Gen Jet Excl Mult.",5,-0.5,4.5);
+        TH1D* RECOJet_ExclMult = new TH1D("RECOJet_ExclMult","Reco Jet Excl Mult.",5,-0.5,4.5);
+        TH1D* GENJet_InclMult = new TH1D("GENJet_InclMult","Gen Jet Incl Mult.",5,-0.5,4.5);
+        TH1D* RECOJet_InclMult = new TH1D("RECOJet_InclMult","Reco Jet Incl Mult.",5,-0.5,4.5);
 	
 	//Build histograms by Tree
 	
@@ -151,32 +162,7 @@ string Tab_cut = "True";
 	Z_tree->Draw("zmass >> ZMass_MC","(cutAccASYM==1 && cutTrg==1 && cutImp==1 && cutConvASYM==1 && cutIsoASYM==1 && cutEiDASYM==1)*weight");
 	Z_tree->Draw("zmass >> ZMass_MC_Barrel","(elept1>20 && elept1>10 && eleeta1<1.4442 && eleeta2<1.4442 && cutTrg==1 && cutImp==1 && cutConvASYM==1 && cutIsoASYM==1 && cutEiDASYM==1)*weight");
 	Z_tree->Draw("zmass >> ZMass_MC_Endcap","(elept1>20 && elept1>10 && eleeta1<2.5 && eleeta2<2.5 && eleeta1>1.566 && eleeta2>1.566 && cutTrg==1 && cutImp==1 && cutConvASYM==1 && cutIsoASYM==1 && cutEiDASYM==1)*weight");
-	tmp4->Close();
-	
-	//Unfolding Box Plot
-	
-	Unfolding->cd();
-	TCanvas *unf_pfl1 = new TCanvas;
-	Z_tree->Draw("acc_gennjetsele:genacc_npfl1jetsele >> UnfoldingPlot_Scat_PFL1","(acc_gennjetsele>-1)*weight");	
-	UnfoldingPlot_Scat_PFL1->GetXaxis()->SetNdivisions(10);
-	UnfoldingPlot_Scat_PFL1->GetXaxis()->SetTitle("RECO Jets Number");
-	UnfoldingPlot_Scat_PFL1->GetYaxis()->SetNdivisions(10);
-	UnfoldingPlot_Scat_PFL1->GetYaxis()->SetTitle("GEN Jets Number");
-	UnfoldingPlot_Scat_PFL1->SetLineWidth(2);
-	UnfoldingPlot_Scat_PFL1->Draw("box");
-	unf_pfl1->Write("UnfoldingPlot_Box_PFL1.root");
-	unf_pfl1->Close();
-	
-	TCanvas *unf_pf = new TCanvas;
-	Z_tree->Draw("acc_gennjetsele:genacc_npfjetsele >> UnfoldingPlot_Scat_PF","(acc_gennjetsele>-1)*weight");	
-	UnfoldingPlot_Scat_PF->GetXaxis()->SetNdivisions(10);
-	UnfoldingPlot_Scat_PF->GetXaxis()->SetTitle("RECO Jets Number");
-	UnfoldingPlot_Scat_PF->GetYaxis()->SetNdivisions(10);
-	UnfoldingPlot_Scat_PF->GetYaxis()->SetTitle("GEN Jets Number");
-	UnfoldingPlot_Scat_PF->SetLineWidth(2);
-	UnfoldingPlot_Scat_PF->Draw("box");
-	unf_pf->Write("UnfoldingPlot_Box_PF.root");
-	unf_pf->Close();	
+	tmp4->Close();	
 	
 	//Color, style etc.
 	ResJetPt_PF_MC->SetMarkerStyle(7);
@@ -209,6 +195,116 @@ string Tab_cut = "True";
 	//ZMass_Data_Endcap->Sumw2();
 	ZMass_MC_Endcap->Scale(scale);
 	
+	//////////////////////// Unfolding
+	
+	Unfolding->cd();
+	
+	//Unfolding Box Plot
+	
+	Matrix->cd();	
+	
+	string cut = "(acc_gennjetsele>-1)*(weight*";
+	cut+=scale_str;
+	cut+=")";
+	
+	TCanvas *unf_pfl1 = new TCanvas;
+	Z_tree->Draw("acc_gennjetsele:genacc_npfl1jetsele >> UnfoldingPlot_Scat_PFL1",cut.c_str());	
+	UnfoldingPlot_Scat_PFL1->GetXaxis()->SetNdivisions(5);
+	UnfoldingPlot_Scat_PFL1->GetXaxis()->SetTitle("RECO Jets Number");
+	UnfoldingPlot_Scat_PFL1->GetYaxis()->SetNdivisions(5);
+	UnfoldingPlot_Scat_PFL1->GetYaxis()->SetTitle("GEN Jets Number");
+	UnfoldingPlot_Scat_PFL1->SetLineWidth(2);
+	UnfoldingPlot_Scat_PFL1->Draw("box");
+	unf_pfl1->Write("UnfoldingPlot_Box_PFL1.root");
+	unf_pfl1->Close();
+	
+	TCanvas *unf_pf = new TCanvas;
+	Z_tree->Draw("acc_gennjetsele:genacc_npfjetsele >> UnfoldingPlot_Scat_PF",cut.c_str());	
+	UnfoldingPlot_Scat_PF->GetXaxis()->SetNdivisions(5);
+	UnfoldingPlot_Scat_PF->GetXaxis()->SetTitle("RECO Jets Number");
+	UnfoldingPlot_Scat_PF->GetYaxis()->SetNdivisions(5);
+	UnfoldingPlot_Scat_PF->GetYaxis()->SetTitle("GEN Jets Number");
+	UnfoldingPlot_Scat_PF->SetLineWidth(2);
+	UnfoldingPlot_Scat_PF->Draw("box");
+	unf_pf->Write("UnfoldingPlot_Box_PF.root");
+	unf_pf->Close();
+       
+        //Make Multiplicity histograms
+        
+        CorrFact->cd();
+        
+        TCanvas *tmp5 = new TCanvas;
+        Z_tree->Draw("acc_gennjetsele >> GENJet_ExclMult",cut.c_str());
+        Z_tree->Draw("genacc_npfl1jetsele >> RECOJet_ExclMult",cut.c_str());
+        tmp5->Close();
+        
+        double errGen, errReco;
+	
+	for(int n=1; n<6; n++){
+	
+	errGen=0.;
+	errReco=0.;
+	
+	GENJet_InclMult->SetBinContent(n, GENJet_ExclMult->IntegralAndError(n, 5, errGen));
+	GENJet_InclMult->SetBinError(n, errGen);
+	RECOJet_InclMult->SetBinContent(n, RECOJet_ExclMult->IntegralAndError(n, 5, errReco));
+	RECOJet_InclMult->SetBinError(n, errReco);
+	
+	}
+	
+        // Correction Factors
+        
+        TCanvas *GenRec_ExclMult = new TCanvas;
+        GENJet_ExclMult->GetXaxis()->SetTitle("Jet multiplicity");
+	GENJet_ExclMult->SetTitle("Reconstructed (black) and Generated (red) Exclusive Multiplicity");
+        GENJet_ExclMult->SetLineColor(2);
+	GENJet_ExclMult->SetLineWidth(2);
+	GENJet_ExclMult->Draw("hist");
+	RECOJet_ExclMult->SetLineColor(1);
+	RECOJet_ExclMult->SetLineWidth(2);	
+	RECOJet_ExclMult->Draw("hist sames");	
+	GenRec_ExclMult->Write("GenRec_ExclMult.root");
+	GenRec_ExclMult->Close();
+	GENJet_ExclMult->Write("GENJet_ExclMult");
+	
+	GENJet_ExclMult->Sumw2();
+	RECOJet_ExclMult->Sumw2();
+	
+	GENJet_ExclMult->Divide(RECOJet_ExclMult);        
+        GENJet_ExclMult->SetName("Exclusive_CorrFactors");
+        GENJet_ExclMult->SetLineColor(1);
+        GENJet_ExclMult->SetLineWidth(2);
+        GENJet_ExclMult->SetMarkerStyle(20);
+	GENJet_ExclMult->GetXaxis()->SetTitle("Exclusive Multiplicity");
+	GENJet_ExclMult->GetYaxis()->SetTitle("Correction Factors");
+	
+	//Inclusive Mult.	
+        
+        TCanvas *GenRec_InclMult = new TCanvas;
+        GENJet_InclMult->GetXaxis()->SetTitle("Jet multiplicity");
+	GENJet_InclMult->SetTitle("Reconstructed (black) and Generated (red) Inclusive Multiplicity");
+        GENJet_InclMult->SetLineColor(2);
+	GENJet_InclMult->SetLineWidth(2);
+	GENJet_InclMult->Draw("hist");
+	RECOJet_InclMult->SetLineColor(1);
+	RECOJet_InclMult->SetLineWidth(2);	
+	RECOJet_InclMult->Draw("hist sames");	
+	GenRec_InclMult->Write("GenRec_InclMult.root");
+	GenRec_InclMult->Close();
+	GENJet_InclMult->Write("GENJet_InclMult");
+	
+	GENJet_InclMult->Sumw2();
+	RECOJet_InclMult->Sumw2();
+	
+	GENJet_InclMult->Divide(RECOJet_InclMult);        
+        GENJet_InclMult->SetName("Inclusive_CorrFactors");
+        GENJet_InclMult->SetLineColor(1);
+        GENJet_InclMult->SetLineWidth(2);
+        GENJet_InclMult->SetMarkerStyle(20);
+	GENJet_InclMult->GetXaxis()->SetTitle("Inclusive Multiplicity");
+	GENJet_InclMult->GetYaxis()->SetTitle("Correction Factors");
+
+
 	//Plots
 	ZEta->cd();
 	TCanvas *tree_eta0jet = new TCanvas;
@@ -238,7 +334,7 @@ string Tab_cut = "True";
 	ZEta1Jet_Data->Draw("same");
 	tree_eta1jet->Write("Conf_ZEta1Jet.root");
 	tree_eta1jet->Close();
-	
+		
 	ZoJet_Pt->cd();
 	TCanvas *tree_pfptratio = new TCanvas;
 	PtZoverPtJet_1PFJet_MC->SetLineColor(col_Z);

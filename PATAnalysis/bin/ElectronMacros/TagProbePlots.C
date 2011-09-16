@@ -36,27 +36,28 @@ void TPPlots(string multiplicity, string selections){
         TFile *signal_MC_file = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/MC_Winter10_399/Signal/JetPt15/Z_Madgraph_Z2_JetPt15_2.root");
         
         //TP files (outputs of TagAndProbeAnalyzer) whit the mass fits
-        TFile *tp_123 = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Excl_Global.root");
-        TFile *tp_1234 = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Excl_Global.root");
-        TFile *tp_12345 = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Excl_Global.root");
-        TFile *tp_123456 = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Excl_Global.root");
-        TFile *tp_global = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Excl_Global.root");
+        TFile *tp_123 = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Incl_Global.root");
+        TFile *tp_1234 = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Incl_Global.root");
+        TFile *tp_12345 = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Incl_Global.root");
+        TFile *tp_123456 = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Incl_Global.root");
+        TFile *tp_global = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Incl_Global.root");
         
         //Output
-        string out = "TPStudy_JetPt15_Excl_Global";
+        string out = "TPStudy_JetPt15_Incl_Global_5bin";
         string output = out;
         output+=".root";
         TFile* outplots = new TFile(output.c_str(), "RECREATE");
         
         ofstream tpr;
-	string outtpr="TPReport_JetPt15_Excl_Global.txt";
+	string outtpr="TPReport_JetPt15_Incl_Global_5bin.txt";
 	tpr.open(outtpr.c_str());
 	tpr<<endl;
         
         double xmin, xmax;
         
         xmin=-0.5;
-        xmax=3.5;
+        xmax=4.5;
+        
         int cut_decimal = 10000;
 	
 	int _Acc  = 1;
@@ -115,11 +116,11 @@ TP_global = TP->mkdir("Tag&Probe_Global");
 	
    TH1D* RelEffDenom_MC(0);
    
-   if(multiplicity=="excl")RelEffDenom_MC = (TH1D*) signal_MC_file->Get("EfficiencyElectron/EffDenom_GenExclJetNumber");
+   if(multiplicity=="excl")RelEffDenom_MC = (TH1D*) signal_MC_file->Get("EfficiencyElectron/EffDenom_GenInclJetNumber");
    if(multiplicity=="incl")RelEffDenom_MC = (TH1D*) signal_MC_file->Get("EfficiencyElectron/EffDenom_GenInclJetNumber");
 
 	string MCJetEff_name;
-	if(multiplicity=="excl")MCJetEff_name = "EfficiencyElectron/RecoExclJetEff";
+	if(multiplicity=="excl")MCJetEff_name = "EfficiencyElectron/RecoInclJetEff";
 	if(multiplicity=="incl")MCJetEff_name = "EfficiencyElectron/RecoInclJetEff";
 	
 	MCJetEff_name+=_RecoCutFlags[1].c_str();
@@ -215,7 +216,7 @@ TP_global = TP->mkdir("Tag&Probe_Global");
         string TPHisto="/Electron";        
         if(selections=="ASYM")TPDir="EfficiencyElectron/Tag&Probe0";
         
-        if(multiplicity=="excl")TPDir+="_Excl";
+        if(multiplicity=="excl")TPDir+="_Incl";
         if(multiplicity=="incl")TPDir+="_Incl";
  
         TPDir+=_RecoCutFlags[1].c_str();   
@@ -263,7 +264,7 @@ TP_global = TP->mkdir("Tag&Probe_Global");
              
         TPDir="EfficiencyElectron/Tag&Probe";        
         if(selections=="ASYM")TPDir="EfficiencyElectron/Tag&Probe0";
-        if(multiplicity=="excl")TPDir+="_Excl_Global";
+        if(multiplicity=="excl")TPDir+="_Incl_Global";
         if(multiplicity=="incl")TPDir+="_Incl_Global";
         TPHisto="/Electron_Global";
         
@@ -298,7 +299,7 @@ TP_global = TP->mkdir("Tag&Probe_Global");
         Eff_TP_Single_global.SetNameTitle(Eff_TP_Single_name.c_str(), Eff_TP_Single_name.c_str());
         
         string TPDir1="EfficiencyElectron/Tag&Probe1";
-        if(multiplicity=="excl")TPDir1+="_Excl";
+        if(multiplicity=="excl")TPDir1+="_Incl";
         if(multiplicity=="incl")TPDir1+="_Incl";
         
         TGraphAsymmErrors Eff_TP_Single1_12, Eff_TP_Single1_123, Eff_TP_Single1_1234, Eff_TP_Single1_12345, Eff_TP_Single1_123456, Eff_TP_Single1_global;
@@ -351,7 +352,7 @@ TP_global = TP->mkdir("Tag&Probe_Global");
         TH1D* TP_denominator1_123456 = (TH1D*) signal_MC_file->Get(den_TP1.c_str());
         
         TPDir1="EfficiencyElectron/Tag&Probe1";
-        if(multiplicity=="excl")TPDir1+="_Excl_Global";
+        if(multiplicity=="excl")TPDir1+="_Incl_Global";
         if(multiplicity=="incl")TPDir1+="_Incl_Global";
         TPHisto="/Electron_Global";
         
@@ -1034,21 +1035,21 @@ TP_global = TP->mkdir("Tag&Probe_Global");
        
         for ( int i = 0; i < n_global; ++i ){
         double x0 = 0., y0 = 0., x1 = 0., y1 = 0., x2 = 0., y2 = 0.;
-        Eff_MC_Rel12345.GetPoint(i, x0, y0);
+        Eff_MC_global.GetPoint(i, x0, y0);
         Eff_TP_Double_global.GetPoint(i, x1, y1);
         tp_eff_global->GetPoint(i, x2, y2);
         res1vx_global(i)   = i;
-        res1vexl_global(i) = Eff_MC_Rel12345.GetErrorXlow(i);
-        res1vexh_global(i) = Eff_MC_Rel12345.GetErrorXhigh(i);
+        res1vexl_global(i) = Eff_MC_global.GetErrorXlow(i);
+        res1vexh_global(i) = Eff_MC_global.GetErrorXhigh(i);
         res1vy_global(i)   = y1-y0;
-        res1veyl_global(i) = TMath::Sqrt(pow(Eff_MC_Rel12345.GetErrorYlow(i),2)+pow(Eff_TP_Double_global.GetErrorYlow(i),2));
-        res1veyh_global(i) = TMath::Sqrt(pow(Eff_MC_Rel12345.GetErrorYhigh(i),2)+pow(Eff_TP_Double_global.GetErrorYhigh(i),2));
+        res1veyl_global(i) = TMath::Sqrt(pow(Eff_MC_global.GetErrorYlow(i),2)+pow(Eff_TP_Double_global.GetErrorYlow(i),2));
+        res1veyh_global(i) = TMath::Sqrt(pow(Eff_MC_global.GetErrorYhigh(i),2)+pow(Eff_TP_Double_global.GetErrorYhigh(i),2));
         res2vx_global(i)   = i;
-        res2vexl_global(i) = Eff_MC_Rel12345.GetErrorXlow(i);
-        res2vexh_global(i) = Eff_MC_Rel12345.GetErrorXhigh(i);
+        res2vexl_global(i) = Eff_MC_global.GetErrorXlow(i);
+        res2vexh_global(i) = Eff_MC_global.GetErrorXhigh(i);
         res2vy_global(i)   = y2-y0;
-        res2veyl_global(i) = TMath::Sqrt(pow(Eff_MC_Rel12345.GetErrorYlow(i),2)+pow(tp_eff_global->GetErrorYlow(i),2));
-        res2veyh_global(i) = TMath::Sqrt(pow(Eff_MC_Rel12345.GetErrorYhigh(i),2)+pow(tp_eff_global->GetErrorYhigh(i),2));
+        res2veyl_global(i) = TMath::Sqrt(pow(Eff_MC_global.GetErrorYlow(i),2)+pow(tp_eff_global->GetErrorYlow(i),2));
+        res2veyh_global(i) = TMath::Sqrt(pow(Eff_MC_global.GetErrorYhigh(i),2)+pow(tp_eff_global->GetErrorYhigh(i),2));
         }
               
         TP_global->cd();
