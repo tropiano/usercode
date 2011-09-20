@@ -31,21 +31,26 @@ void XSec(){
         gROOT->SetStyle("Plain");
         
         double Luminosity = 36.; //pb-1
-        double JetPtMin = 15.; //Gev/c
+        double JetPtMin = 30.; //Gev/c
+        
+        //Normalization factor
+	double iniLumi = 50.; //pb-1
+	double scale = 1.;
+	if(iniLumi!=0)scale = Luminosity/iniLumi;
         
         //Output
-        string out = "XSecMeas";
+        string out = "XSecMeas_JetPt30";
         string output = out;
         output+=".root";
         TFile* outplots = new TFile(output.c_str(), "RECREATE");
         
         //Report files
         ofstream multrep;
-	multrep.open("MultReport.txt");
+	multrep.open("MultReport_JetPt30.txt");
 	multrep<<endl;
 
         ofstream xsec;
-	xsec.open("XSecReport.txt");
+	xsec.open("XSecReport_JetPt30.txt");
 	xsec<<endl;
 	
 	////////////////////////// Directories
@@ -65,31 +70,35 @@ void XSec(){
         
         //DATA: Signal and Background Yields from TP fits
         // -> DATA_Excl_Double file in TPAnalyzer
-        TFile *SB_Yields_excl = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/TestTP_ExclDouble.root");
+        TFile *SB_Yields_excl = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt30/TPAnalyzer/DATA_JetPt30_Excl_Double.root");
         
         //DATA: Tag&Probe Efficiencies
         // -> TPStudy_Excl_Global file in Efficiency_TP
-        TFile *TPEff_excl = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/Efficiency_TP/JetPt15/TPStudy_JetPt15_Excl_Global.root");
+        TFile *TPEff_excl = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/Efficiency_TP/JetPt30/TPStudy_JetPt30_Excl_Global.root");
         
         ////////////////////////// GET FILES - Inclusive quantities
         
         //DATA: Signal and Background Yields from TP fits
         // -> DATA_Incl_Double file in TPAnalyzer
-        TFile *SB_Yields_incl = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Incl_Double.root");
+        TFile *SB_Yields_incl = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt30/TPAnalyzer/DATA_JetPt30_Incl_Double.root");
         
         //DATA: Tag&Probe Efficiencies
         // -> TPStudy_Incl_Global file in Efficiency_TP
-        TFile *TPEff_incl = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/Efficiency_TP/JetPt15/TPStudy_JetPt15_Incl_Global_5bin.root");
+        TFile *TPEff_incl = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/Efficiency_TP/JetPt30/TPStudy_JetPt30_Incl_Global.root");
         
-        ////////////////////////// GET FILES - MC Efficiency (only one file)
+        ////////////////////////// GET FILES - MC 
         
         //MC: Efficiency and Acceptance
         // -> SignalStudy_ZMadgraph file in Efficiency_MC
-        TFile *MCEff = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/Efficiency_MC/SignalStudy_ZMadgraph_JetPt15_2.root");
+        TFile *MCEff = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/Efficiency_MC/JetPt30/SignalStudy_ZMadgraph_Z2_JetPt30.root");
         
         //MC: Unfolding and Correction Factors
         // -> NtuplePlots file
-        TFile *UNF = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/NtuplePlots/NtuplePlots_2.root");
+        TFile *UNF = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/Ntuple/JetPt30/NtuplePlots_JetPt30.root");
+        
+        //MC: WZ - ZZ background from MC
+        // -> WZ-ZZ_Pythia file
+        TFile *DiBosBkg = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/MC_Winter10/Background/JetPt30/WZ-ZZ_Pythia_JetPt30.root");
       
         ///////////////////////// GET HISTOGRAMS - Exclusive Quantities
         
@@ -99,6 +108,11 @@ void XSec(){
         SignalY_excl->Write("SignalYields_excl");
         TGraphAsymmErrors* BackgroundY_excl = (TGraphAsymmErrors*) SB_Yields_excl->Get("YieldPlots/BackgroundYield_0");
         BackgroundY_excl->Write("BackgYields_excl");
+        
+        //DiBoson Background: WZ, ZZ from MC
+        TH1D* DiBosBkg_excl = (TH1D*) DiBosBkg->Get("RecoElectron/recJet_Plots/IsoJetCounter_AccASYM_Trg_Imp_ConvASYM_IsoASYM_EiDASYM");
+        DiBosBkg_excl->Scale(scale);
+        DiBosBkg_excl->Write("DiBosBkg_excl");
         
         //TP Efficiencies 
         tpeffdir->cd();
@@ -133,7 +147,7 @@ void XSec(){
         SignalY_incl->Write("SignalYields_incl");
         TGraphAsymmErrors* BackgroundY_incl = (TGraphAsymmErrors*) SB_Yields_incl->Get("YieldPlots/BackgroundYield_0");
         BackgroundY_incl->Write("BackgYields_incl");
-        
+               
         //TP Efficiencies 
         tpeffdir->cd();
         TGraphAsymmErrors* TPData_Eff_incl = (TGraphAsymmErrors*) TPEff_incl->Get("Tag&Probe/Tag&Probe_Global/TP_Data-Eff_Global");
@@ -168,12 +182,12 @@ void XSec(){
         
         double BinCorrMult;
         
-        double BinUCF_excl;
+        double BinUCF_excl, BinDiBosBkg_excl;
         double xs_excl, ys_excl, xb_excl, yb_excl;
         double xtpdata_excl, ytpdata_excl, xtpmc_excl, ytpmc_excl;
         double xmceff_excl, ymceff_excl;
         
-        double BinUCF_incl;
+        double BinUCF_incl, BinDiBosBkg_incl;
         double xs_incl, ys_incl, xb_incl, yb_incl;
         double xtpdata_incl, ytpdata_incl, xtpmc_incl, ytpmc_incl;
         double xmceff_incl, ymceff_incl;
@@ -187,6 +201,7 @@ void XSec(){
         
         BinCorrMult=0.;
         BinUCF_excl=0.;
+        BinDiBosBkg_excl=0.;
         
         xs_excl=0.;
         ys_excl=0.;
@@ -205,6 +220,8 @@ void XSec(){
         multrep<<"Signal Yields = "<<ys_excl<<endl;
         BackgroundY_excl->GetPoint(i, xb_excl, yb_excl);
         multrep<<"Background Yields = "<<yb_excl<<endl;
+        BinDiBosBkg_excl = DiBosBkg_excl->GetBinContent(i+1);
+        multrep<<"WZ-ZZ Bkg Yields from MC = "<<BinDiBosBkg_excl<<endl;
         TPData_Eff_excl->GetPoint(i, xtpdata_excl, ytpdata_excl);
         multrep<<"TP Data Efficiency = "<<ytpdata_excl<<endl;
         TPMC_Eff_excl->GetPoint(i, xtpmc_excl, ytpmc_excl);
@@ -215,7 +232,7 @@ void XSec(){
         multrep<<"Unf. Correction Factor = "<<BinUCF_excl<<endl<<endl;
         
         //Corrected Multiplicity calculation
-        BinCorrMult = ((ys_excl-yb_excl)/(ymceff_excl*(ytpdata_excl/ytpmc_excl)))*BinUCF_excl;
+        BinCorrMult = ((ys_excl-yb_excl-BinDiBosBkg_excl)/(ymceff_excl*(ytpdata_excl/ytpmc_excl)))*BinUCF_excl;
         
         multrep<<"Corrected Multiplcity = "<<BinCorrMult<<endl<<endl;
         
@@ -233,6 +250,7 @@ void XSec(){
         
         BinCorrMult=0.;
         BinUCF_incl=0.;
+        BinDiBosBkg_incl=0.;
         
         xs_incl=0.;
         ys_incl=0.;
@@ -251,6 +269,10 @@ void XSec(){
         multrep<<"Signal Yields = "<<ys_incl<<endl;
         BackgroundY_incl->GetPoint(4, xb_incl, yb_incl);
         multrep<<"Background Yields = "<<yb_incl<<endl;
+        
+        for(int i=4;i<10;i++)BinDiBosBkg_incl+=DiBosBkg_excl->GetBinContent(i+1);
+        multrep<<"WZ-ZZ Bkg Yields from MC = "<<BinDiBosBkg_incl<<endl;
+        
         TPData_Eff_incl->GetPoint(4, xtpdata_incl, ytpdata_incl);
         multrep<<"TP Data Efficiency = "<<ytpdata_incl<<endl;
         TPMC_Eff_incl->GetPoint(4, xtpmc_incl, ytpmc_incl);
@@ -261,7 +283,7 @@ void XSec(){
         multrep<<"Unf. Correction Factor = "<<BinUCF_incl<<endl<<endl;
         
         //Corrected Multiplicity calculation
-        BinCorrMult = ((ys_incl-yb_incl)/(ymceff_incl*(ytpdata_incl/ytpmc_incl)))*BinUCF_incl;
+        BinCorrMult = ((ys_incl-yb_incl-BinDiBosBkg_incl)/(ymceff_incl*(ytpdata_incl/ytpmc_incl)))*BinUCF_incl;
         
         multrep<<"Corrected Multiplcity (Inclusive) = "<<BinCorrMult<<endl<<endl;
         

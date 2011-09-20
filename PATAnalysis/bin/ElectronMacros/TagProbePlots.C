@@ -116,11 +116,11 @@ TP_global = TP->mkdir("Tag&Probe_Global");
 	
    TH1D* RelEffDenom_MC(0);
    
-   if(multiplicity=="excl")RelEffDenom_MC = (TH1D*) signal_MC_file->Get("EfficiencyElectron/EffDenom_GenInclJetNumber");
+   if(multiplicity=="excl")RelEffDenom_MC = (TH1D*) signal_MC_file->Get("EfficiencyElectron/EffDenom_GenExclJetNumber");
    if(multiplicity=="incl")RelEffDenom_MC = (TH1D*) signal_MC_file->Get("EfficiencyElectron/EffDenom_GenInclJetNumber");
 
 	string MCJetEff_name;
-	if(multiplicity=="excl")MCJetEff_name = "EfficiencyElectron/RecoInclJetEff";
+	if(multiplicity=="excl")MCJetEff_name = "EfficiencyElectron/RecoExclJetEff";
 	if(multiplicity=="incl")MCJetEff_name = "EfficiencyElectron/RecoInclJetEff";
 	
 	MCJetEff_name+=_RecoCutFlags[1].c_str();
@@ -216,7 +216,7 @@ TP_global = TP->mkdir("Tag&Probe_Global");
         string TPHisto="/Electron";        
         if(selections=="ASYM")TPDir="EfficiencyElectron/Tag&Probe0";
         
-        if(multiplicity=="excl")TPDir+="_Incl";
+        if(multiplicity=="excl")TPDir+="_Excl";
         if(multiplicity=="incl")TPDir+="_Incl";
  
         TPDir+=_RecoCutFlags[1].c_str();   
@@ -264,7 +264,7 @@ TP_global = TP->mkdir("Tag&Probe_Global");
              
         TPDir="EfficiencyElectron/Tag&Probe";        
         if(selections=="ASYM")TPDir="EfficiencyElectron/Tag&Probe0";
-        if(multiplicity=="excl")TPDir+="_Incl_Global";
+        if(multiplicity=="excl")TPDir+="_Excl_Global";
         if(multiplicity=="incl")TPDir+="_Incl_Global";
         TPHisto="/Electron_Global";
         
@@ -299,7 +299,7 @@ TP_global = TP->mkdir("Tag&Probe_Global");
         Eff_TP_Single_global.SetNameTitle(Eff_TP_Single_name.c_str(), Eff_TP_Single_name.c_str());
         
         string TPDir1="EfficiencyElectron/Tag&Probe1";
-        if(multiplicity=="excl")TPDir1+="_Incl";
+        if(multiplicity=="excl")TPDir1+="_Excl";
         if(multiplicity=="incl")TPDir1+="_Incl";
         
         TGraphAsymmErrors Eff_TP_Single1_12, Eff_TP_Single1_123, Eff_TP_Single1_1234, Eff_TP_Single1_12345, Eff_TP_Single1_123456, Eff_TP_Single1_global;
@@ -352,7 +352,7 @@ TP_global = TP->mkdir("Tag&Probe_Global");
         TH1D* TP_denominator1_123456 = (TH1D*) signal_MC_file->Get(den_TP1.c_str());
         
         TPDir1="EfficiencyElectron/Tag&Probe1";
-        if(multiplicity=="excl")TPDir1+="_Incl_Global";
+        if(multiplicity=="excl")TPDir1+="_Excl_Global";
         if(multiplicity=="incl")TPDir1+="_Incl_Global";
         TPHisto="/Electron_Global";
         
