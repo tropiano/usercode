@@ -27,7 +27,7 @@
 
 using namespace std;
 
-void Ntuple_Plots(){
+void Ntuple_Plots(int JetPtMin, string tune){
 
 string Analysis_Note = "False";
 if (Analysis_Note == "False") gROOT->SetStyle("Plain");
@@ -36,15 +36,21 @@ gStyle->SetOptStat(0);
 string log_scale = "True";
 
 string Tab_cut = "True";
+
+string path = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin";
+string JetPtCut;
+if(JetPtMin==15)JetPtCut="JetPt15";
+if(JetPtMin==30)JetPtCut="JetPt30";
 	
 	//Signal MC
-	TFile *Z_TF = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/MC_Winter10_399/Signal/JetPt15/Z_Madgraph_Z2_JetPt15_2.root");
+	TFile *Z_TF = TFile::Open((path+"/MC_Winter10/Signal/"+JetPtCut+"/Z_Madgraph_"+tune+"_"+JetPtCut+".root").c_str());
 	
 	//Data
-	TFile *Data_TF = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/Data_Dec22ReReco/JetPt15/Data_RUN2010A-B_JetPt15.root");
+	TFile *Data_TF = TFile::Open((path+"/Data_Dec22ReReco/"+JetPtCut+"/Data_RUN2010A-B_"+JetPtCut+".root").c_str());
 	
 	//Output
-	string out = "NtuplePlots_2";        
+	string out = "NtuplePlots_";
+	out+=JetPtCut;     
 	string output = out;
 	output+=".root";
 	TFile* outplots = new TFile(output.c_str(), "RECREATE");
@@ -203,12 +209,8 @@ string Tab_cut = "True";
 	
 	Matrix->cd();	
 	
-	string cut = "(acc_gennjetsele>-1)*(weight*";
-	cut+=scale_str;
-	cut+=")";
-	
 	TCanvas *unf_pfl1 = new TCanvas;
-	Z_tree->Draw("acc_gennjetsele:genacc_npfl1jetsele >> UnfoldingPlot_Scat_PFL1",cut.c_str());	
+	Z_tree->Draw("acc_gennjetsele:genacc_npfl1jetsele >> UnfoldingPlot_Scat_PFL1","acc_gennjetsele>-1");	
 	UnfoldingPlot_Scat_PFL1->GetXaxis()->SetNdivisions(5);
 	UnfoldingPlot_Scat_PFL1->GetXaxis()->SetTitle("RECO Jets Number");
 	UnfoldingPlot_Scat_PFL1->GetYaxis()->SetNdivisions(5);
@@ -219,7 +221,7 @@ string Tab_cut = "True";
 	unf_pfl1->Close();
 	
 	TCanvas *unf_pf = new TCanvas;
-	Z_tree->Draw("acc_gennjetsele:genacc_npfjetsele >> UnfoldingPlot_Scat_PF",cut.c_str());	
+	Z_tree->Draw("acc_gennjetsele:genacc_npfjetsele >> UnfoldingPlot_Scat_PF","acc_gennjetsele>-1");	
 	UnfoldingPlot_Scat_PF->GetXaxis()->SetNdivisions(5);
 	UnfoldingPlot_Scat_PF->GetXaxis()->SetTitle("RECO Jets Number");
 	UnfoldingPlot_Scat_PF->GetYaxis()->SetNdivisions(5);
@@ -234,8 +236,8 @@ string Tab_cut = "True";
         CorrFact->cd();
         
         TCanvas *tmp5 = new TCanvas;
-        Z_tree->Draw("acc_gennjetsele >> GENJet_ExclMult",cut.c_str());
-        Z_tree->Draw("genacc_npfl1jetsele >> RECOJet_ExclMult",cut.c_str());
+        Z_tree->Draw("acc_gennjetsele >> GENJet_ExclMult","acc_gennjetsele>-1");
+        Z_tree->Draw("genacc_npfl1jetsele >> RECOJet_ExclMult","acc_gennjetsele>-1");
         tmp5->Close();
         
         double errGen, errReco;
@@ -245,14 +247,16 @@ string Tab_cut = "True";
 	errGen=0.;
 	errReco=0.;
 	
-	GENJet_InclMult->SetBinContent(n, GENJet_ExclMult->IntegralAndError(n, 5, errGen));
+	GENJet_InclMult->SetBinContent(n, GENJet_ExclMult->IntegralAndError(n, 10, errGen));
 	GENJet_InclMult->SetBinError(n, errGen);
-	RECOJet_InclMult->SetBinContent(n, RECOJet_ExclMult->IntegralAndError(n, 5, errReco));
+	RECOJet_InclMult->SetBinContent(n, RECOJet_ExclMult->IntegralAndError(n, 10, errReco));
 	RECOJet_InclMult->SetBinError(n, errReco);
 	
 	}
 	
         // Correction Factors
+        
+        GENJet_ExclMult->Write("GENJet_ExclMult");
         
         TCanvas *GenRec_ExclMult = new TCanvas;
         GENJet_ExclMult->GetXaxis()->SetTitle("Jet multiplicity");
@@ -265,20 +269,23 @@ string Tab_cut = "True";
 	RECOJet_ExclMult->Draw("hist sames");	
 	GenRec_ExclMult->Write("GenRec_ExclMult.root");
 	GenRec_ExclMult->Close();
-	GENJet_ExclMult->Write("GENJet_ExclMult");
-	
+		
 	GENJet_ExclMult->Sumw2();
 	RECOJet_ExclMult->Sumw2();
 	
 	GENJet_ExclMult->Divide(RECOJet_ExclMult);        
         GENJet_ExclMult->SetName("Exclusive_CorrFactors");
+        GENJet_ExclMult->SetTitle("Exclusive Correction Factors");
         GENJet_ExclMult->SetLineColor(1);
         GENJet_ExclMult->SetLineWidth(2);
         GENJet_ExclMult->SetMarkerStyle(20);
 	GENJet_ExclMult->GetXaxis()->SetTitle("Exclusive Multiplicity");
 	GENJet_ExclMult->GetYaxis()->SetTitle("Correction Factors");
+	GENJet_ExclMult->GetYaxis()->SetRangeUser(0.4,1.3);
 	
 	//Inclusive Mult.	
+	
+	GENJet_InclMult->Write("GENJet_InclMult");
         
         TCanvas *GenRec_InclMult = new TCanvas;
         GENJet_InclMult->GetXaxis()->SetTitle("Jet multiplicity");
@@ -291,18 +298,19 @@ string Tab_cut = "True";
 	RECOJet_InclMult->Draw("hist sames");	
 	GenRec_InclMult->Write("GenRec_InclMult.root");
 	GenRec_InclMult->Close();
-	GENJet_InclMult->Write("GENJet_InclMult");
-	
+		
 	GENJet_InclMult->Sumw2();
 	RECOJet_InclMult->Sumw2();
 	
 	GENJet_InclMult->Divide(RECOJet_InclMult);        
         GENJet_InclMult->SetName("Inclusive_CorrFactors");
+        GENJet_InclMult->SetTitle("Inclusive Correction Factors");
         GENJet_InclMult->SetLineColor(1);
         GENJet_InclMult->SetLineWidth(2);
         GENJet_InclMult->SetMarkerStyle(20);
 	GENJet_InclMult->GetXaxis()->SetTitle("Inclusive Multiplicity");
 	GENJet_InclMult->GetYaxis()->SetTitle("Correction Factors");
+	GENJet_InclMult->GetYaxis()->SetRangeUser(0.4,1.3);
 
 
 	//Plots

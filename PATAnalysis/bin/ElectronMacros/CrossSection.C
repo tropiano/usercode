@@ -26,36 +26,50 @@
 
 using namespace std;
 
-void XSec(){
+//JetPtMin in GeV - Tune Z2 or D6T
+
+void XSec(int JetPtMin, string tune){
 
         gROOT->SetStyle("Plain");
         
         double Luminosity = 36.; //pb-1
-        double JetPtMin = 30.; //Gev/c
+        double LuminosityErr = 1.4; //pb-1
         
         //Normalization factor
 	double iniLumi = 50.; //pb-1
 	double scale = 1.;
 	if(iniLumi!=0)scale = Luminosity/iniLumi;
+	
+	double scaleGENRECO;
+	if(tune=="Z2")scaleGENRECO = 0.044; // Z2 
+	if(tune=="D6T")scaleGENRECO = 0.043; // D6T
+	
+	string JetPtCut;
+	if(JetPtMin==15)JetPtCut="JetPt15";
+	if(JetPtMin==30)JetPtCut="JetPt30";
+	
+	int bin_excl = 4;
+	int bin_incl = 5;
         
         //Output
-        string out = "XSecMeas_JetPt30";
+        string out = "XSecMeas_";
+        out+=JetPtCut;
         string output = out;
         output+=".root";
         TFile* outplots = new TFile(output.c_str(), "RECREATE");
         
         //Report files
         ofstream multrep;
-	multrep.open("MultReport_JetPt30.txt");
+	multrep.open(("MultReport_"+JetPtCut+".txt").c_str());
 	multrep<<endl;
 
         ofstream xsec;
-	xsec.open("XSecReport_JetPt30.txt");
+	xsec.open(("XSecReport_"+JetPtCut+".txt").c_str());
 	xsec<<endl;
 	
-	////////////////////////// Directories
+	////////////////////////// Directories /////////////////////////////////////////////
 	
-        TDirectory *multdir, *yieldsdir, *tpeffdir, *mceffdir, *corrfactdir, *matrixdir, *xsecdir, *unfdir;
+        TDirectory *multdir, *yieldsdir, *tpeffdir, *mceffdir, *corrfactdir, *matrixdir, *xsecdir, *unfdir, *effcorrdir;
         
         multdir = outplots->mkdir("CorrMultiplicity");
         yieldsdir = multdir->mkdir("Yields");
@@ -64,43 +78,46 @@ void XSec(){
         corrfactdir = multdir->mkdir("CorrFactors");
         matrixdir = multdir->mkdir("ResponseMatrix");
         unfdir = multdir->mkdir("UnfoldedMult");
+        effcorrdir = multdir->mkdir("EffCorrMult");
         xsecdir = outplots->mkdir("XSec");
         
-        ////////////////////////// GET FILES - Exclusive quantities
+        ////////////////////////// GET FILES - Exclusive quantities ////////////////////////
+        
+        string path = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin";
         
         //DATA: Signal and Background Yields from TP fits
-        // -> DATA_Excl_Double file in TPAnalyzer
-        TFile *SB_Yields_excl = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt30/TPAnalyzer/DATA_JetPt30_Excl_Double.root");
+        // -> DATA_Excl_Double file in TPAnalyzer        
+        TFile *SB_Yields_excl = TFile::Open((path+"/TagProbe/"+JetPtCut+"/"+tune+"/TPAnalyzer/DATA_"+JetPtCut+"_Excl_Double.root").c_str());
         
         //DATA: Tag&Probe Efficiencies
         // -> TPStudy_Excl_Global file in Efficiency_TP
-        TFile *TPEff_excl = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/Efficiency_TP/JetPt30/TPStudy_JetPt30_Excl_Global.root");
+        TFile *TPEff_excl = TFile::Open((path+"/Efficiency_TP/"+JetPtCut+"/"+tune+"/TPStudy_"+JetPtCut+"_Excl_Global.root").c_str());
         
         ////////////////////////// GET FILES - Inclusive quantities
         
         //DATA: Signal and Background Yields from TP fits
         // -> DATA_Incl_Double file in TPAnalyzer
-        TFile *SB_Yields_incl = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt30/TPAnalyzer/DATA_JetPt30_Incl_Double.root");
+        TFile *SB_Yields_incl = TFile::Open((path+"/TagProbe/"+JetPtCut+"/"+tune+"/TPAnalyzer/DATA_"+JetPtCut+"_Incl_Double.root").c_str());
         
         //DATA: Tag&Probe Efficiencies
         // -> TPStudy_Incl_Global file in Efficiency_TP
-        TFile *TPEff_incl = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/Efficiency_TP/JetPt30/TPStudy_JetPt30_Incl_Global.root");
+        TFile *TPEff_incl = TFile::Open((path+"/Efficiency_TP/"+JetPtCut+"/"+tune+"/TPStudy_"+JetPtCut+"_Incl_Global.root").c_str());
         
         ////////////////////////// GET FILES - MC 
         
         //MC: Efficiency and Acceptance
         // -> SignalStudy_ZMadgraph file in Efficiency_MC
-        TFile *MCEff = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/Efficiency_MC/JetPt30/SignalStudy_ZMadgraph_Z2_JetPt30.root");
+        TFile *MCEff = TFile::Open((path+"/Efficiency_MC/"+JetPtCut+"/"+tune+"/SignalStudy_ZMadgraph_"+tune+"_"+JetPtCut+".root").c_str());
         
         //MC: Unfolding and Correction Factors
         // -> NtuplePlots file
-        TFile *UNF = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/Ntuple/JetPt30/NtuplePlots_JetPt30.root");
+        TFile *UNF = TFile::Open((path+"/Ntuple/"+JetPtCut+"/"+tune+"/NtuplePlots_"+JetPtCut+".root").c_str());
         
         //MC: WZ - ZZ background from MC
         // -> WZ-ZZ_Pythia file
-        TFile *DiBosBkg = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/MC_Winter10/Background/JetPt30/WZ-ZZ_Pythia_JetPt30.root");
+        TFile *DiBosBkg = TFile::Open((path+"/MC_Winter10/Background/"+JetPtCut+"/WZ-ZZ_Pythia_"+JetPtCut+".root").c_str());
       
-        ///////////////////////// GET HISTOGRAMS - Exclusive Quantities
+        ///////////////////////// GET HISTOGRAMS - Exclusive Quantities ///////////////////////
         
         //Signal and Background Yields
         yieldsdir->cd();
@@ -134,12 +151,19 @@ void XSec(){
         UCF_excl->Write("CorrFactors_excl");
         unfdir->cd();
         TH1D* GENMult_excl = (TH1D*) UNF->Get("Unfolding/CorrFactors/GENJet_ExclMult");
+        GENMult_excl->Sumw2();
+        GENMult_excl->Scale(scaleGENRECO);
         GENMult_excl->Write("GENMult_excl");
+        effcorrdir->cd();
+        TH1D* RECOMult_excl = (TH1D*) UNF->Get("Unfolding/CorrFactors/RECOJet_ExclMult");
+        RECOMult_excl->Sumw2();
+        RECOMult_excl->Scale(scaleGENRECO);
+        RECOMult_excl->Write("RECOMult_excl");
         matrixdir->cd();
         TH2D* Matrix_PFL1 = (TH2D*) UNF->Get("Unfolding/ResponseMatrix/UnfoldingPlot_Box_PFL1.root");
         Matrix_PFL1->Write("RespMatrix_Gen-PFL1");
         
-        ///////////////////////// GET HISTOGRAMS - Inclusive Quantities
+        ///////////////////////// GET HISTOGRAMS - Inclusive Quantities /////////////////////////////
         
         //Signal and Background Yields
         yieldsdir->cd();
@@ -169,37 +193,48 @@ void XSec(){
         UCF_incl->Write("CorrFactors_incl");
         unfdir->cd();
         TH1D* GENMult_incl = (TH1D*) UNF->Get("Unfolding/CorrFactors/GENJet_InclMult");
+        GENMult_incl->Sumw2();
+        GENMult_incl->Scale(scaleGENRECO);
         GENMult_incl->Write("GENMult_incl");
+        effcorrdir->cd();
+        TH1D* RECOMult_incl = (TH1D*) UNF->Get("Unfolding/CorrFactors/RECOJet_InclMult");
+        RECOMult_incl->Sumw2();
+        RECOMult_incl->Scale(scaleGENRECO);
+        RECOMult_incl->Write("RECOMult_incl");
         
-        ////////////////////////// Corrected Jet Multiplicity
+        multrep<<" Jet Pt >= "<<JetPtMin<<endl<<endl;
         
-        unfdir->cd();
+        ////////////////////////// Corrected Jet Multiplicity - EXCLUSIVE /////////////////////////////
         
-        TGraphAsymmErrors* CorrMult_graph = new TGraphAsymmErrors();
-        TH1D* CorrMult_histo = new TH1D("CorrMult_histo","DATA - Corrected Multiplicity",5,-0.5,4.5);
-        TGraphAsymmErrors* GENMult_graph = new TGraphAsymmErrors();
-        TH1D* GENMult_histo = new TH1D("GENMult_histo","GEN Multiplicity",5,-0.5,4.5);
+        unfdir->cd();       
+        TGraphAsymmErrors* EXCLCorrMult_graph = new TGraphAsymmErrors();
         
-        double BinCorrMult;
+        effcorrdir->cd();
+        TGraphAsymmErrors* EXCLEffCorrMult_graph = new TGraphAsymmErrors();
         
+        double BinCorrMult_excl; 
+        double EffCorrMult_excl;       
         double BinUCF_excl, BinDiBosBkg_excl;
         double xs_excl, ys_excl, xb_excl, yb_excl;
         double xtpdata_excl, ytpdata_excl, xtpmc_excl, ytpmc_excl;
         double xmceff_excl, ymceff_excl;
         
-        double BinUCF_incl, BinDiBosBkg_incl;
-        double xs_incl, ys_incl, xb_incl, yb_incl;
-        double xtpdata_incl, ytpdata_incl, xtpmc_incl, ytpmc_incl;
-        double xmceff_incl, ymceff_incl;
+        double BinCorrMult_excl_errh;
+        double BinCorrMult_excl_errl;       
+        double BinDiBosBkg_excl_err;
+        double ys_excl_err, yb_excl_err;
+        double ytpdata_excl_errh, ytpdata_excl_errl; 
+        double ytpmc_excl_errh, ytpmc_excl_errl;
+        double ymceff_excl_errh, ymceff_excl_errl;
         
-        multrep<<" ### Unfolded Multiplicity ### "<<endl<<endl;
-        multrep<<" Jet Pt >= "<<JetPtMin<<endl<<endl;
+        multrep<<" ### Unfolded Exclusive Multiplicity ### "<<endl<<endl;       
         
-        for(int i=0;i<4;i++){
+        for(int i=0;i<bin_excl;i++){
         
-        multrep<<"---> Bin n. "<<i<<endl<<endl;
+        multrep<<"---> Bin n. "<<i<<", Jet# == "<<i<<endl<<endl;
         
-        BinCorrMult=0.;
+        BinCorrMult_excl=0.;
+        EffCorrMult_excl=0.;
         BinUCF_excl=0.;
         BinDiBosBkg_excl=0.;
         
@@ -216,39 +251,102 @@ void XSec(){
         xmceff_excl=0.;
         ymceff_excl=0.;
         
+        BinCorrMult_excl_errh=0.; BinCorrMult_excl_errl=0.;       
+        BinDiBosBkg_excl_err=0.;
+        ys_excl_err=0.; 
+        yb_excl_err=0.;
+        ytpdata_excl_errh=0.; ytpdata_excl_errl=0.;
+        ytpmc_excl_errh=0.; ytpmc_excl_errl=0.;
+        ymceff_excl_errh=0.; ymceff_excl_errl=0.;
+        
         SignalY_excl->GetPoint(i, xs_excl, ys_excl);
-        multrep<<"Signal Yields = "<<ys_excl<<endl;
+        ys_excl_err = SignalY_excl->GetErrorY(i);
+        multrep<<"Signal Yields = "<<ys_excl<<" +/- "<<ys_excl_err<<endl;
+        
         BackgroundY_excl->GetPoint(i, xb_excl, yb_excl);
-        multrep<<"Background Yields = "<<yb_excl<<endl;
+        yb_excl_err = BackgroundY_excl->GetErrorY(i);
+        multrep<<"Background Yields = "<<yb_excl<<" +/- "<<yb_excl_err<<endl;
+        
         BinDiBosBkg_excl = DiBosBkg_excl->GetBinContent(i+1);
-        multrep<<"WZ-ZZ Bkg Yields from MC = "<<BinDiBosBkg_excl<<endl;
+        BinDiBosBkg_excl_err = DiBosBkg_excl->GetBinError(i+1);
+        multrep<<"WZ-ZZ Bkg Yields from MC = "<<BinDiBosBkg_excl<<" +/- "<<BinDiBosBkg_excl_err<<endl;
+        
         TPData_Eff_excl->GetPoint(i, xtpdata_excl, ytpdata_excl);
-        multrep<<"TP Data Efficiency = "<<ytpdata_excl<<endl;
+        ytpdata_excl_errh = TPData_Eff_excl->GetErrorYhigh(i);
+        ytpdata_excl_errl = TPData_Eff_excl->GetErrorYlow(i);
+        multrep<<"TP Data Efficiency = "<<ytpdata_excl<<" (+) "<<ytpdata_excl_errh<< " (-) "<<ytpdata_excl_errl<<endl;
+        
         TPMC_Eff_excl->GetPoint(i, xtpmc_excl, ytpmc_excl);
-        multrep<<"TP MC Efficiency = "<<ytpmc_excl<<endl;       
+        ytpmc_excl_errh = TPMC_Eff_excl->GetErrorYhigh(i);
+        ytpmc_excl_errl = TPMC_Eff_excl->GetErrorYlow(i);
+        multrep<<"TP MC Efficiency = "<<ytpmc_excl<<" (+) "<<ytpmc_excl_errh<< " (-) "<<ytpmc_excl_errl<<endl;
+               
         MC_Eff_excl->GetPoint(i, xmceff_excl, ymceff_excl);
-        multrep<<"MC Global Efficiency = "<<ymceff_excl<<endl;
+        ymceff_excl_errh = MC_Eff_excl->GetErrorYhigh(i);
+        ymceff_excl_errl = MC_Eff_excl->GetErrorYlow(i);
+        multrep<<"MC Global Efficiency = "<<ymceff_excl<<" (+) "<<ymceff_excl_errh<< " (-) "<<ymceff_excl_errl<<endl;
+        
         BinUCF_excl = UCF_excl->GetBinContent(i+1);
         multrep<<"Unf. Correction Factor = "<<BinUCF_excl<<endl<<endl;
         
         //Corrected Multiplicity calculation
-        BinCorrMult = ((ys_excl-yb_excl-BinDiBosBkg_excl)/(ymceff_excl*(ytpdata_excl/ytpmc_excl)))*BinUCF_excl;
+        EffCorrMult_excl = ((ys_excl-yb_excl-BinDiBosBkg_excl)/(ymceff_excl*(ytpdata_excl/ytpmc_excl)));  
+        BinCorrMult_excl = EffCorrMult_excl*BinUCF_excl;
         
-        multrep<<"Corrected Multiplcity = "<<BinCorrMult<<endl<<endl;
+        BinCorrMult_excl_errh = BinCorrMult_excl*sqrt(((pow(ys_excl_err,2)+pow(yb_excl_err,2)+pow(BinDiBosBkg_excl_err,2))/pow((ys_excl-yb_excl-BinDiBosBkg_excl),2))+pow((ytpdata_excl_errh/ytpdata_excl),2)+pow((ytpmc_excl_errh/ytpmc_excl),2)+pow((ymceff_excl_errh/ymceff_excl),2));
         
-        CorrMult_graph->SetPoint(i, i, BinCorrMult);
-        CorrMult_graph->SetPointEXlow(i, 0.5);
-        CorrMult_graph->SetPointEXhigh(i, 0.5);
+        BinCorrMult_excl_errl = BinCorrMult_excl*sqrt(((pow(ys_excl_err,2)+pow(yb_excl_err,2)+pow(BinDiBosBkg_excl_err,2))/pow((ys_excl-yb_excl-BinDiBosBkg_excl),2))+pow((ytpdata_excl_errl/ytpdata_excl),2)+pow((ytpmc_excl_errl/ytpmc_excl),2)+pow((ymceff_excl_errl/ymceff_excl),2));
         
-        CorrMult_histo->SetBinContent(i+1, BinCorrMult);  
+        multrep<<"Corrected Excl. Multiplcity = "<<BinCorrMult_excl<<" (+) "<<BinCorrMult_excl_errh<<" (-) "<<BinCorrMult_excl_errl<<endl<<endl;
         
+        EXCLCorrMult_graph->SetPoint(i, i, BinCorrMult_excl);
+        EXCLCorrMult_graph->SetPointEYhigh(i, BinCorrMult_excl_errh);
+        EXCLCorrMult_graph->SetPointEYlow(i, BinCorrMult_excl_errl);
+        EXCLCorrMult_graph->SetPointEXhigh(i, 0.5);
+        EXCLCorrMult_graph->SetPointEXlow(i, 0.5);
+        
+        EXCLEffCorrMult_graph->SetPoint(i, i, EffCorrMult_excl);
+        EXCLEffCorrMult_graph->SetPointEYhigh(i, BinCorrMult_excl_errh);
+        EXCLEffCorrMult_graph->SetPointEYlow(i, BinCorrMult_excl_errl);
+        EXCLEffCorrMult_graph->SetPointEXhigh(i, 0.5);
+        EXCLEffCorrMult_graph->SetPointEXlow(i, 0.5);
         }
         
-        // Bin n.4 -> jet incl. mult. >= 4
+        unfdir->cd();
+        EXCLCorrMult_graph->Write("EXCLCorrMult_graph");
+        effcorrdir->cd();
+        EXCLEffCorrMult_graph->Write("EXCLEffCorrMult_graph");
         
-        multrep<<"---> Bin n. 4 (inclusive)"<<endl<<endl;
+        ////////////////////////// Corrected Jet Multiplicity - INCLUSIVE /////////////////////////////
         
-        BinCorrMult=0.;
+        unfdir->cd();
+        TGraphAsymmErrors* INCLCorrMult_graph = new TGraphAsymmErrors();
+        effcorrdir->cd();
+        TGraphAsymmErrors* INCLEffCorrMult_graph = new TGraphAsymmErrors();
+        
+        double BinCorrMult_incl;
+        double EffCorrMult_incl;       
+        double BinUCF_incl, BinDiBosBkg_incl;
+        double xs_incl, ys_incl, xb_incl, yb_incl;
+        double xtpdata_incl, ytpdata_incl, xtpmc_incl, ytpmc_incl;
+        double xmceff_incl, ymceff_incl;
+        
+        double BinCorrMult_incl_errh;
+        double BinCorrMult_incl_errl;       
+        double BinDiBosBkg_incl_err;
+        double ys_incl_err, yb_incl_err;
+        double ytpdata_incl_errh, ytpdata_incl_errl; 
+        double ytpmc_incl_errh, ytpmc_incl_errl;
+        double ymceff_incl_errh, ymceff_incl_errl;
+        
+        multrep<<" ### Unfolded Inclusive Multiplicity ### "<<endl<<endl;       
+        
+        for(int i=0;i<bin_incl;i++){
+        
+        multrep<<"---> Bin n. "<<i<<", Jet# >= "<<i<<endl<<endl;
+        
+        BinCorrMult_incl=0.;
+        EffCorrMult_incl=0.;
         BinUCF_incl=0.;
         BinDiBosBkg_incl=0.;
         
@@ -265,322 +363,593 @@ void XSec(){
         xmceff_incl=0.;
         ymceff_incl=0.;
         
-        SignalY_incl->GetPoint(4, xs_incl, ys_incl);
-        multrep<<"Signal Yields = "<<ys_incl<<endl;
-        BackgroundY_incl->GetPoint(4, xb_incl, yb_incl);
-        multrep<<"Background Yields = "<<yb_incl<<endl;
+        BinCorrMult_incl_errh=0.; BinCorrMult_incl_errl=0.;       
+        BinDiBosBkg_incl_err=0.;
+        ys_incl_err=0.; 
+        yb_incl_err=0.;
+        ytpdata_incl_errh=0.; ytpdata_incl_errl=0.;
+        ytpmc_incl_errh=0.; ytpmc_incl_errl=0.;
+        ymceff_incl_errh=0.; ymceff_incl_errl=0.;
         
-        for(int i=4;i<10;i++)BinDiBosBkg_incl+=DiBosBkg_excl->GetBinContent(i+1);
-        multrep<<"WZ-ZZ Bkg Yields from MC = "<<BinDiBosBkg_incl<<endl;
+        SignalY_incl->GetPoint(i, xs_incl, ys_incl);
+        ys_incl_err = SignalY_incl->GetErrorY(i);
+        multrep<<"Signal Yields = "<<ys_incl<<" +/- "<<ys_incl_err<<endl;
         
-        TPData_Eff_incl->GetPoint(4, xtpdata_incl, ytpdata_incl);
-        multrep<<"TP Data Efficiency = "<<ytpdata_incl<<endl;
-        TPMC_Eff_incl->GetPoint(4, xtpmc_incl, ytpmc_incl);
-        multrep<<"TP MC Efficiency = "<<ytpmc_incl<<endl;       
-        MC_Eff_incl->GetPoint(4, xmceff_incl, ymceff_incl);
-        multrep<<"MC Global Efficiency = "<<ymceff_incl<<endl;
-        BinUCF_incl = UCF_incl->GetBinContent(5);
+        BackgroundY_incl->GetPoint(i, xb_incl, yb_incl);
+        yb_incl_err = BackgroundY_incl->GetErrorY(i);
+        multrep<<"Background Yields = "<<yb_incl<<" +/- "<<yb_incl_err<<endl;
+        
+        BinDiBosBkg_incl = DiBosBkg_excl->IntegralAndError(i+1, 10, BinDiBosBkg_incl_err);
+        multrep<<"WZ-ZZ Bkg Yields from MC = "<<BinDiBosBkg_incl<<" +/- "<<BinDiBosBkg_incl_err<<endl;
+        
+        TPData_Eff_incl->GetPoint(i, xtpdata_incl, ytpdata_incl);
+        ytpdata_incl_errh = TPData_Eff_incl->GetErrorYhigh(i);
+        ytpdata_incl_errl = TPData_Eff_incl->GetErrorYlow(i);
+        multrep<<"TP Data Efficiency = "<<ytpdata_incl<<" (+) "<<ytpdata_incl_errh<< " (-) "<<ytpdata_incl_errl<<endl;
+        
+        TPMC_Eff_incl->GetPoint(i, xtpmc_incl, ytpmc_incl);
+        ytpmc_incl_errh = TPMC_Eff_incl->GetErrorYhigh(i);
+        ytpmc_incl_errl = TPMC_Eff_incl->GetErrorYlow(i);
+        multrep<<"TP MC Efficiency = "<<ytpmc_incl<<" (+) "<<ytpmc_incl_errh<< " (-) "<<ytpmc_incl_errl<<endl;
+               
+        MC_Eff_incl->GetPoint(i, xmceff_incl, ymceff_incl);
+        ymceff_incl_errh = MC_Eff_incl->GetErrorYhigh(i);
+        ymceff_incl_errl = MC_Eff_incl->GetErrorYlow(i);
+        multrep<<"MC Global Efficiency = "<<ymceff_incl<<" (+) "<<ymceff_incl_errh<< " (-) "<<ymceff_incl_errl<<endl;
+        
+        BinUCF_incl = UCF_incl->GetBinContent(i+1);
         multrep<<"Unf. Correction Factor = "<<BinUCF_incl<<endl<<endl;
         
         //Corrected Multiplicity calculation
-        BinCorrMult = ((ys_incl-yb_incl-BinDiBosBkg_incl)/(ymceff_incl*(ytpdata_incl/ytpmc_incl)))*BinUCF_incl;
+        EffCorrMult_incl = ((ys_incl-yb_incl-BinDiBosBkg_incl)/(ymceff_incl*(ytpdata_incl/ytpmc_incl)));
+        BinCorrMult_incl = EffCorrMult_incl*BinUCF_incl;
         
-        multrep<<"Corrected Multiplcity (Inclusive) = "<<BinCorrMult<<endl<<endl;
+        BinCorrMult_incl_errh = BinCorrMult_incl*sqrt(((pow(ys_incl_err,2)+pow(yb_incl_err,2)+pow(BinDiBosBkg_incl_err,2))/pow((ys_incl-yb_incl-BinDiBosBkg_incl),2))+pow((ytpdata_incl_errh/ytpdata_incl),2)+pow((ytpmc_incl_errh/ytpmc_incl),2)+pow((ymceff_incl_errh/ymceff_incl),2));
         
-        CorrMult_graph->SetPoint(4, 4, BinCorrMult);
-        CorrMult_graph->SetPointEXlow(4, 0.5);
-        CorrMult_graph->SetPointEXhigh(4, 0.5);
+        BinCorrMult_incl_errl = BinCorrMult_incl*sqrt(((pow(ys_incl_err,2)+pow(yb_incl_err,2)+pow(BinDiBosBkg_incl_err,2))/pow((ys_incl-yb_incl-BinDiBosBkg_incl),2))+pow((ytpdata_incl_errl/ytpdata_incl),2)+pow((ytpmc_incl_errl/ytpmc_incl),2)+pow((ymceff_incl_errl/ymceff_incl),2));
         
-        CorrMult_histo->SetBinContent(5, BinCorrMult);
+        multrep<<"Corrected Incl. Multiplcity = "<<BinCorrMult_incl<<" (+) "<<BinCorrMult_incl_errh<<" (-) "<<BinCorrMult_incl_errl<<endl<<endl;
         
-        ////////////////////////// Make Multiplicity Plots
+        INCLCorrMult_graph->SetPoint(i, i, BinCorrMult_incl);
+        INCLCorrMult_graph->SetPointEYhigh(i, BinCorrMult_incl_errh);
+        INCLCorrMult_graph->SetPointEYlow(i, BinCorrMult_incl_errl);
+        INCLCorrMult_graph->SetPointEXhigh(i, 0.5);
+        INCLCorrMult_graph->SetPointEXlow(i, 0.5);
         
-	TCanvas *UnfMult = new TCanvas;
-	CorrMult_graph->SetTitle("DATA - Corrected Multiplicity");
-	CorrMult_graph->GetXaxis()->SetTitle("multiplicity");
-	CorrMult_graph->GetXaxis()->SetNdivisions(10);
-        CorrMult_graph->SetLineWidth(2);
-        CorrMult_graph->SetMarkerStyle(20);
-        CorrMult_graph->Draw("AP");
-        TPaveText* bin4 = new TPaveText(0.715517, 0.0317797, 0.757184, 0.0911017, "BRNDC"); 
-        bin4->AddText("#geq");
-        bin4->SetBorderSize(0);
-        bin4->SetShadowColor(0);
-        bin4->SetFillColor(0);
-        bin4->SetTextAlign(31);
-        bin4->Draw();
-        UnfMult->Write("CorrMult_graph.root");
-        UnfMult->Close();
-        
-        //GEN Mult plot
-        for(int i=1;i<5;i++){
-        //histo
-        GENMult_histo->SetBinContent(i, GENMult_excl->GetBinContent(i));
-        GENMult_histo->SetBinError(i, GENMult_excl->GetBinError(i));
-        //graph
-        GENMult_graph->SetPoint(i-1, i-1, GENMult_excl->GetBinContent(i));
-        GENMult_graph->SetPointEXlow(i-1, 0.5);
-        GENMult_graph->SetPointEXhigh(i-1, 0.5);
-        GENMult_graph->SetPointEYlow(i-1, GENMult_excl->GetBinError(i));
-        GENMult_graph->SetPointEYhigh(i-1, GENMult_excl->GetBinError(i));
+        INCLEffCorrMult_graph->SetPoint(i, i, EffCorrMult_incl);
+        INCLEffCorrMult_graph->SetPointEYhigh(i, BinCorrMult_incl_errh);
+        INCLEffCorrMult_graph->SetPointEYlow(i, BinCorrMult_incl_errl);
+        INCLEffCorrMult_graph->SetPointEXhigh(i, 0.5);
+        INCLEffCorrMult_graph->SetPointEXlow(i, 0.5);
         }
-        //histo 
-        GENMult_histo->SetBinContent(5, GENMult_incl->GetBinContent(5));
-        GENMult_histo->SetBinError(5, GENMult_incl->GetBinError(5));
-        //graph
-        GENMult_graph->SetPoint(4, 4, GENMult_incl->GetBinContent(5));
-        GENMult_graph->SetPointEXlow(4, 0.5);
-        GENMult_graph->SetPointEXhigh(4, 0.5);
-        GENMult_graph->SetPointEYlow(4, GENMult_incl->GetBinError(5));
-        GENMult_graph->SetPointEYhigh(4, GENMult_incl->GetBinError(5));
         
-        TCanvas *genMult = new TCanvas;
-	GENMult_graph->SetTitle("GEN Multiplicity");
-	GENMult_graph->GetXaxis()->SetTitle("multiplicity");
-	GENMult_graph->GetXaxis()->SetNdivisions(10);
-        GENMult_graph->SetLineWidth(2);
-        GENMult_graph->SetMarkerStyle(20);
-        GENMult_graph->Draw("AP");
-        TPaveText* binG = new TPaveText(0.715517, 0.0317797, 0.757184, 0.0911017, "BRNDC"); 
-        binG->AddText("#geq");
-        binG->SetBorderSize(0);
-        binG->SetShadowColor(0);
-        binG->SetFillColor(0);
-        binG->SetTextAlign(31);
-        binG->Draw();
-        genMult->Write("GENMult_graph.root");
-        genMult->Close();
-                     
-        TCanvas *UnfMultComp = new TCanvas; 
-        UnfMultComp->SetLogy();    
-        GENMult_graph->SetLineColor(2);
-        GENMult_graph->SetLineWidth(2);
-        GENMult_graph->SetMarkerStyle(20);
-        GENMult_graph->SetMarkerColor(2);
-        GENMult_graph->Draw("AP");  
-	GENMult_graph->SetTitle("GEN Mult. (red) - DATA Unf.Mult. (black)");
-        CorrMult_graph->Draw("PSAME");                                   
-        TPaveText* binU = new TPaveText(0.715517, 0.0317797, 0.757184, 0.0911017, "BRNDC"); 
-        binU->AddText("#geq");
-        binU->SetBorderSize(0);
-        binU->SetShadowColor(0);
-        binU->SetFillColor(0);
-        binU->SetTextAlign(31);
-        binU->Draw();
-        UnfMultComp->Write("UnfMultComp.root");
-        UnfMultComp->Close();
+        unfdir->cd();
+        INCLCorrMult_graph->Write("INCLCorrMult_graph");
+        effcorrdir->cd();
+        INCLEffCorrMult_graph->Write("INCLEffCorrMult_graph");
         
-        CorrMult_histo->Sumw2();
-        GENMult_histo->Sumw2();
+        ///////////////// Make UNFOLDED Exclusive Multiplicity final Graphs and Histos ///////////////////
         
-        TCanvas *multRatio = new TCanvas;
-        CorrMult_histo->Divide(GENMult_histo);
-        CorrMult_histo->SetLineColor(1);
-        CorrMult_histo->SetLineWidth(2);
-        CorrMult_histo->SetMarkerStyle(20);
-        CorrMult_histo->GetXaxis()->SetNdivisions(5);
-        CorrMult_histo->GetXaxis()->SetTitle("multiplicity");
-        CorrMult_histo->GetXaxis()->SetTitleOffset(1.1);
-        CorrMult_histo->SetTitle("DATA Unf.Mult./GEN Mult.");
-        CorrMult_histo->Draw();
-        TPaveText* binUR = new TPaveText(0.764368, 0.0444915, 0.807471, 0.0868644, "BRNDC"); 
-        binUR->AddText("#geq");
-        binUR->SetBorderSize(0);
-        binUR->SetShadowColor(0);
-        binUR->SetFillColor(0);
-        binUR->SetTextAlign(31);
-        binUR->Draw();
-        multRatio->Write("UnfMultRatio.root");
-        multRatio->Close();
+        unfdir->cd();
+        
+        TGraphAsymmErrors* EXCLGENMult_graph = new TGraphAsymmErrors();
+        
+        double ygmult, yerr;
+        
+        for(int i=0;i<bin_excl;i++){
+        ygmult=0.;
+        yerr=0.;
+        ygmult = GENMult_excl->GetBinContent(i+1);
+        yerr = GENMult_excl->GetBinError(i+1);
+        EXCLGENMult_graph->SetPoint(i, i, ygmult);
+        EXCLGENMult_graph->SetPointEYhigh(i, yerr);
+        EXCLGENMult_graph->SetPointEYlow(i, yerr);
+        EXCLGENMult_graph->SetPointEXhigh(i, 0.5);
+        EXCLGENMult_graph->SetPointEXlow(i, 0.5);}
+        
+        TGraphAsymmErrors* EXCLUnfMultRatio_graph = new TGraphAsymmErrors();
+        
+        double xunf, yunf, yunf_errh, yunf_errl;
+        double xgen, ygen, ygen_err;
+        double ratio_errh, ratio_errl;
+        
+        for(int i=0;i<bin_excl;i++){
+        
+        xunf=0.;
+        yunf=0.;
+        yunf_errh=0.;
+        yunf_errl=0.;
+        xgen=0.;
+        ygen=0.;
+        ygen_err=0.;
+        ratio_errh=0.;
+        ratio_errl=0.;
+        
+        EXCLCorrMult_graph->GetPoint(i, xunf, yunf);
+        yunf_errh = EXCLCorrMult_graph->GetErrorYhigh(i);
+        yunf_errl = EXCLCorrMult_graph->GetErrorYlow(i);
+        EXCLGENMult_graph->GetPoint(i, xgen, ygen);
+        ygen_err = EXCLGENMult_graph->GetErrorY(i);
+       
+        EXCLUnfMultRatio_graph->SetPoint(i, i, yunf/ygen);
+        ratio_errh = (yunf/ygen)*sqrt(pow((yunf_errh/yunf),2)+pow((ygen_err/ygen),2));
+        ratio_errl = (yunf/ygen)*sqrt(pow((yunf_errl/yunf),2)+pow((ygen_err/ygen),2));
+        EXCLUnfMultRatio_graph->SetPointEYhigh(i, ratio_errh);
+        EXCLUnfMultRatio_graph->SetPointEYlow(i, ratio_errl);
+        EXCLUnfMultRatio_graph->SetPointEXhigh(i, 0.5);
+        EXCLUnfMultRatio_graph->SetPointEXlow(i, 0.5);       
+        }
+        
+        ///////////////////// Make UNFOLDED Exclusive Multiplicity Plots /////////////////////////////
+               
+        TCanvas *EXCLUnfMultComp = new TCanvas; 
+        EXCLUnfMultComp->SetLogy();    
+        EXCLGENMult_graph->SetLineColor(2);
+        EXCLGENMult_graph->SetLineWidth(2);
+        EXCLGENMult_graph->SetMarkerStyle(23);
+        EXCLGENMult_graph->SetMarkerColor(2);
+        EXCLGENMult_graph->GetXaxis()->SetTitle("excl. multiplicity");
+        EXCLGENMult_graph->Draw("AP");  
+	EXCLGENMult_graph->SetTitle("GEN Mult. (red) - DATA Unf.Mult. (black)");
+	EXCLCorrMult_graph->SetLineWidth(2);
+	EXCLCorrMult_graph->SetMarkerStyle(22);
+        EXCLCorrMult_graph->Draw("PSAME");                                   
+        EXCLUnfMultComp->Write("EXCLUnfMultComp.root");
+        EXCLUnfMultComp->Close();
               
+        TCanvas *EXCLmultRatio = new TCanvas;
+        EXCLUnfMultRatio_graph->SetLineColor(1);
+        EXCLUnfMultRatio_graph->SetLineWidth(2);
+        EXCLUnfMultRatio_graph->SetMarkerStyle(22);
+        EXCLUnfMultRatio_graph->GetXaxis()->SetTitle("excl. multiplicity");
+        EXCLUnfMultRatio_graph->GetXaxis()->SetTitleOffset(1.1);
+        EXCLUnfMultRatio_graph->SetName("EXCLUnfMultRatio_graph");
+        EXCLUnfMultRatio_graph->SetTitle("DATA Unf.Mult./GEN Mult.");
+        EXCLUnfMultRatio_graph->Draw("AP");
+        EXCLmultRatio->Write("EXCLUnfMultRatio.root");
+        EXCLmultRatio->Close();
         
-        ////////////////////////// Cross Section
+        ///////////////// Make UNFOLDED Inclusive Multiplicity final Graphs and Histos ///////////////////
+        
+        unfdir->cd();
+        
+        TGraphAsymmErrors* INCLGENMult_graph = new TGraphAsymmErrors();
+        
+        for(int i=0;i<bin_incl;i++){
+        ygmult=0.;
+        yerr=0.;
+        ygmult = GENMult_incl->GetBinContent(i+1);
+        yerr = GENMult_incl->GetBinError(i+1);
+        INCLGENMult_graph->SetPoint(i, i, ygmult);
+        INCLGENMult_graph->SetPointEYhigh(i, yerr);
+        INCLGENMult_graph->SetPointEYlow(i, yerr);
+        INCLGENMult_graph->SetPointEXhigh(i, 0.5);
+        INCLGENMult_graph->SetPointEXlow(i, 0.5);}
+        
+        TGraphAsymmErrors* INCLUnfMultRatio_graph = new TGraphAsymmErrors();
+        
+        for(int i=0;i<bin_incl;i++){
+        
+        xunf=0.;
+        yunf=0.;
+        yunf_errh=0.;
+        yunf_errl=0.;
+        xgen=0.;
+        ygen=0.;
+        ygen_err=0.;
+        ratio_errh=0.;
+        ratio_errl=0.;
+        
+        INCLCorrMult_graph->GetPoint(i, xunf, yunf);
+        yunf_errh = INCLCorrMult_graph->GetErrorYhigh(i);
+        yunf_errl = INCLCorrMult_graph->GetErrorYlow(i);
+        INCLGENMult_graph->GetPoint(i, xgen, ygen);
+        ygen_err = INCLGENMult_graph->GetErrorY(i);
+       
+        INCLUnfMultRatio_graph->SetPoint(i, i, yunf/ygen);
+        ratio_errh = (yunf/ygen)*sqrt(pow((yunf_errh/yunf),2)+pow((ygen_err/ygen),2));
+        ratio_errl = (yunf/ygen)*sqrt(pow((yunf_errl/yunf),2)+pow((ygen_err/ygen),2));
+        INCLUnfMultRatio_graph->SetPointEYhigh(i, ratio_errh);
+        INCLUnfMultRatio_graph->SetPointEYlow(i, ratio_errl);
+        INCLUnfMultRatio_graph->SetPointEXhigh(i, 0.5);
+        INCLUnfMultRatio_graph->SetPointEXlow(i, 0.5);       
+        }
+        
+        ///////////////////// Make UNFOLDED Inclusive Multiplicity Plots /////////////////////////////
+               
+        TCanvas *INCLUnfMultComp = new TCanvas; 
+        INCLUnfMultComp->SetLogy();    
+        INCLGENMult_graph->SetLineColor(2);
+        INCLGENMult_graph->SetLineWidth(2);
+        INCLGENMult_graph->SetMarkerStyle(23);
+        INCLGENMult_graph->SetMarkerColor(2);
+        INCLGENMult_graph->GetXaxis()->SetTitle("incl. multiplicity");
+        INCLGENMult_graph->Draw("AP");  
+	INCLGENMult_graph->SetTitle("GEN Mult. (red) - DATA Unf.Mult. (black)");
+	INCLCorrMult_graph->SetLineWidth(2);
+	INCLCorrMult_graph->SetMarkerStyle(22);
+        INCLCorrMult_graph->Draw("PSAME");                                   
+        INCLUnfMultComp->Write("INCLUnfMultComp.root");
+        INCLUnfMultComp->Close();
+              
+        TCanvas *INCLmultRatio = new TCanvas;
+        INCLUnfMultRatio_graph->SetLineColor(1);
+        INCLUnfMultRatio_graph->SetLineWidth(2);
+        INCLUnfMultRatio_graph->SetMarkerStyle(22);
+        INCLUnfMultRatio_graph->GetXaxis()->SetTitle("incl. multiplicity");
+        INCLUnfMultRatio_graph->GetXaxis()->SetTitleOffset(1.1);
+        INCLUnfMultRatio_graph->SetName("INCLUnfMultRatio_graph");
+        INCLUnfMultRatio_graph->SetTitle("DATA Unf.Mult./GEN Mult.");
+        INCLUnfMultRatio_graph->Draw("AP");
+        INCLmultRatio->Write("INCLUnfMultRatio.root");
+        INCLmultRatio->Close();
+        
+        ////////////////////// Make EFFCORR Excl. Multiplicity final Graphs and Histos ///////////////////
+        
+        effcorrdir->cd();
+        
+        TGraphAsymmErrors* EXCLRECOMult_graph = new TGraphAsymmErrors();
+      
+        for(int i=0;i<bin_excl;i++){
+        ygmult=0.;
+        yerr=0.;
+        ygmult = RECOMult_excl->GetBinContent(i+1);
+        yerr = RECOMult_excl->GetBinError(i+1);
+        EXCLRECOMult_graph->SetPoint(i, i, ygmult);
+        EXCLRECOMult_graph->SetPointEYhigh(i, yerr);
+        EXCLRECOMult_graph->SetPointEYlow(i, yerr);
+        EXCLRECOMult_graph->SetPointEXhigh(i, 0.5);
+        EXCLRECOMult_graph->SetPointEXlow(i, 0.5);}
+        
+        TGraphAsymmErrors* EXCLEffMultRatio_graph = new TGraphAsymmErrors();
+        
+        for(int i=0;i<bin_excl;i++){
+        
+        xunf=0.;
+        yunf=0.;
+        yunf_errh=0.;
+        yunf_errl=0.;
+        xgen=0.;
+        ygen=0.;
+        ygen_err=0.;
+        ratio_errh=0.;
+        ratio_errl=0.;
+        
+        EXCLEffCorrMult_graph->GetPoint(i, xunf, yunf);
+        yunf_errh = EXCLEffCorrMult_graph->GetErrorYhigh(i);
+        yunf_errl = EXCLEffCorrMult_graph->GetErrorYlow(i);
+        EXCLRECOMult_graph->GetPoint(i, xgen, ygen);
+        ygen_err = EXCLRECOMult_graph->GetErrorY(i);
+       
+        EXCLEffMultRatio_graph->SetPoint(i, i, yunf/ygen);
+        ratio_errh = (yunf/ygen)*sqrt(pow((yunf_errh/yunf),2)+pow((ygen_err/ygen),2));
+        ratio_errl = (yunf/ygen)*sqrt(pow((yunf_errl/yunf),2)+pow((ygen_err/ygen),2));
+        EXCLEffMultRatio_graph->SetPointEYhigh(i, ratio_errh);
+        EXCLEffMultRatio_graph->SetPointEYlow(i, ratio_errl);
+        EXCLEffMultRatio_graph->SetPointEXhigh(i, 0.5);
+        EXCLEffMultRatio_graph->SetPointEXlow(i, 0.5);        
+        }
+        
+        ////////////////////////// Make EFFCORR Excl. Multiplicity Plots ////////////////////////////////
+                          
+        TCanvas *EXCLEffMultComp = new TCanvas; 
+        EXCLEffMultComp->SetLogy();    
+        EXCLRECOMult_graph->SetLineColor(4);
+        EXCLRECOMult_graph->SetLineWidth(2);
+        EXCLRECOMult_graph->SetMarkerStyle(23);
+        EXCLRECOMult_graph->SetMarkerColor(4);
+        EXCLRECOMult_graph->GetXaxis()->SetTitle("excl. multiplicity");
+        EXCLRECOMult_graph->Draw("AP");  
+	EXCLRECOMult_graph->SetTitle("RECO Mult. (blue) - DATA Unf.Mult. (black)");
+	EXCLEffCorrMult_graph->SetLineWidth(2);
+	EXCLEffCorrMult_graph->SetMarkerStyle(22);
+        EXCLEffCorrMult_graph->Draw("PSAME");                                   
+        EXCLEffMultComp->Write("EXCLEffMultComp.root");
+        EXCLEffMultComp->Close();
+              
+        TCanvas *EXCLEffmultRatio = new TCanvas;
+        EXCLEffMultRatio_graph->SetLineColor(1);
+        EXCLEffMultRatio_graph->SetLineWidth(2);
+        EXCLEffMultRatio_graph->SetMarkerStyle(22);
+        EXCLEffMultRatio_graph->GetXaxis()->SetTitle("excl. multiplicity");
+        EXCLEffMultRatio_graph->GetXaxis()->SetTitleOffset(1.1);
+        EXCLEffMultRatio_graph->SetName("ExclEffMultRatio_graph");
+        EXCLEffMultRatio_graph->SetTitle("DATA Unf.Mult./RECO Mult.");
+        EXCLEffMultRatio_graph->Draw("AP");
+        EXCLEffmultRatio->Write("EXCLEffMultRatio.root");
+        EXCLEffmultRatio->Close();
+                     
+        ////////////////////// Make EFFCORR Incl. Multiplicity final Graphs and Histos ///////////////////
+        
+        effcorrdir->cd();
+        
+        TGraphAsymmErrors* INCLRECOMult_graph = new TGraphAsymmErrors();
+      
+        for(int i=0;i<bin_incl;i++){
+        ygmult=0.;
+        yerr=0.;
+        ygmult = RECOMult_incl->GetBinContent(i+1);
+        yerr = RECOMult_incl->GetBinError(i+1);
+        INCLRECOMult_graph->SetPoint(i, i, ygmult);
+        INCLRECOMult_graph->SetPointEYhigh(i, yerr);
+        INCLRECOMult_graph->SetPointEYlow(i, yerr);
+        INCLRECOMult_graph->SetPointEXhigh(i, 0.5);
+        INCLRECOMult_graph->SetPointEXlow(i, 0.5);}
+        
+        TGraphAsymmErrors* INCLEffMultRatio_graph = new TGraphAsymmErrors();
+        
+        for(int i=0;i<bin_incl;i++){
+        
+        xunf=0.;
+        yunf=0.;
+        yunf_errh=0.;
+        yunf_errl=0.;
+        xgen=0.;
+        ygen=0.;
+        ygen_err=0.;
+        ratio_errh=0.;
+        ratio_errl=0.;
+        
+        INCLEffCorrMult_graph->GetPoint(i, xunf, yunf);
+        yunf_errh = INCLEffCorrMult_graph->GetErrorYhigh(i);
+        yunf_errl = INCLEffCorrMult_graph->GetErrorYlow(i);
+        INCLRECOMult_graph->GetPoint(i, xgen, ygen);
+        ygen_err = INCLRECOMult_graph->GetErrorY(i);
+       
+        INCLEffMultRatio_graph->SetPoint(i, i, yunf/ygen);
+        ratio_errh = (yunf/ygen)*sqrt(pow((yunf_errh/yunf),2)+pow((ygen_err/ygen),2));
+        ratio_errl = (yunf/ygen)*sqrt(pow((yunf_errl/yunf),2)+pow((ygen_err/ygen),2));
+        INCLEffMultRatio_graph->SetPointEYhigh(i, ratio_errh);
+        INCLEffMultRatio_graph->SetPointEYlow(i, ratio_errl);
+        INCLEffMultRatio_graph->SetPointEXhigh(i, 0.5);
+        INCLEffMultRatio_graph->SetPointEXlow(i, 0.5);        
+        }
+        
+        ////////////////////////// Make EFFCORR Incl. Multiplicity Plots ///////////////////////////////
+                          
+        TCanvas *INCLEffMultComp = new TCanvas; 
+        INCLEffMultComp->SetLogy();    
+        INCLRECOMult_graph->SetLineColor(4);
+        INCLRECOMult_graph->SetLineWidth(2);
+        INCLRECOMult_graph->SetMarkerStyle(23);
+        INCLRECOMult_graph->SetMarkerColor(4);
+        INCLRECOMult_graph->GetXaxis()->SetTitle("incl. multiplicity");
+        INCLRECOMult_graph->Draw("AP");  
+	INCLRECOMult_graph->SetTitle("RECO Mult. (blue) - DATA Unf.Mult. (black)");
+	INCLEffCorrMult_graph->SetLineWidth(2);
+	INCLEffCorrMult_graph->SetMarkerStyle(22);
+        INCLEffCorrMult_graph->Draw("PSAME");                                   
+        INCLEffMultComp->Write("INCLEffMultComp.root");
+        INCLEffMultComp->Close();
+              
+        TCanvas *INCLEffmultRatio = new TCanvas;
+        INCLEffMultRatio_graph->SetLineColor(1);
+        INCLEffMultRatio_graph->SetLineWidth(2);
+        INCLEffMultRatio_graph->SetMarkerStyle(22);
+        INCLEffMultRatio_graph->GetXaxis()->SetTitle("incl. multiplicity");
+        INCLEffMultRatio_graph->GetXaxis()->SetTitleOffset(1.1);
+        INCLEffMultRatio_graph->SetName("InclEffMultRatio_graph");
+        INCLEffMultRatio_graph->SetTitle("DATA Unf.Mult./RECO Mult.");
+        INCLEffMultRatio_graph->Draw("AP");
+        INCLEffmultRatio->Write("INCLEffMultRatio.root");
+        INCLEffmultRatio->Close();
+        
+///////////////////////////////// Cross Sections //////////////////////////////////////////
         
         xsecdir->cd();
+               
+        double xmult, ymult, ymult_errh, ymult_errl;
+        double xsections, xsections_errh, xsections_errl;
         
-        double TotEvents = 0.;
-        double InclXSec = 0.;
-        
-        double xmult, ymult;
-        double xsections;
-        
-        TGraphAsymmErrors* XSec = new TGraphAsymmErrors();
+        TGraphAsymmErrors* EXCLXSec = new TGraphAsymmErrors();
         
         xsec<<" ### Cross Section Measurement ### "<<endl<<endl;
         xsec<<"Jet Pt >= "<<JetPtMin<<endl<<endl;
         
-	for(int i=0;i<5;i++){
+	for(int i=0;i<bin_excl;i++){
 	
 	xmult=0.;
 	ymult=0.;
+        ymult_errh=0.;
+        ymult_errl=0.;
 	xsections=0.;
+	xsections_errh=0.;
+	xsections_errl=0.;
 	
-	CorrMult_graph->GetPoint(i, xmult, ymult);
-	
-	TotEvents+=ymult;
-	
-	xsections = ymult/Luminosity;
-	
-	if(i<4)xsec<<"sigma(Z + "<<i<<" jet)		---> "<<xsections<<"	pb-1"<<endl;
-	if(i==4)xsec<<"sigma(Z + >= 4 jets)		---> "<<xsections<<"	pb-1"<<endl<<endl;
-	
-	XSec->SetPoint(i, i, xsections);
-	
-	}
-	
-	InclXSec = TotEvents/Luminosity;
-	
-	xsec<<"sigma(Z + >= 0 jets) in Acceptance = "<<InclXSec<<"	pb-1"<<endl<<endl;
-	
-	TGraphAsymmErrors* XSecRatio = new TGraphAsymmErrors();
-	
-	double xCrossSec, yCrossSec;
-	
-	for(int i=0;i<5;i++){
-	
-	xCrossSec=0.;
-	yCrossSec=0.;
-	
-	XSec->GetPoint(i, xCrossSec, yCrossSec);
-	
-	if(i<4)xsec<<"sigma(Z + "<<i<<" jet)/sigma(Z + >= 0 jets)		---> "<<yCrossSec/InclXSec<<endl;
-	if(i==4)xsec<<"sigma(Z + >= 4 jets)/sigma(Z + >= 0 jets)	---> "<<yCrossSec/InclXSec<<endl<<endl;
-	
-	XSecRatio->SetPoint(i, xCrossSec, yCrossSec/InclXSec);
-	
-	}
-	
-	////////////////////////// Inclusive Cross Section Ratios
-	
-	TGraphAsymmErrors* InclXSecRatio = new TGraphAsymmErrors();
-	
-	double xn, yn;
-	double xsecSum;
-	
-	for(int i=0;i<5;i++){
-	
-	xsecSum=0.;
-	
-	for(int j=i;j<5;j++){
-	
-	xn=0.;
-	yn=0.;
-	
-	XSecRatio->GetPoint(j, xn, yn);
-	xsecSum+=yn;}
-	
-	xsec<<"sigma(Z + >= "<<i<<" jet)/sigma(Z + >= 0 jets)	---> "<<xsecSum<<endl;
-	InclXSecRatio->SetPoint(i, i, xsecSum);
+	EXCLCorrMult_graph->GetPoint(i, xmult, ymult);
+	ymult_errh = EXCLCorrMult_graph->GetErrorYhigh(i);
+	ymult_errl = EXCLCorrMult_graph->GetErrorYlow(i);
 
+	xsections = ymult/Luminosity;
+	xsections_errh = xsections*sqrt(pow((ymult_errh/ymult),2)+pow((LuminosityErr/Luminosity),2));
+	xsections_errl = xsections*sqrt(pow((ymult_errl/ymult),2)+pow((LuminosityErr/Luminosity),2));
+	
+	xsec<<"sigma(Z + "<<i<<" jet)		---> "<<xsections<<" (+) "<<xsections_errh<<" (-) "<<xsections_errl<<"	pb"<<endl;
+	
+	EXCLXSec->SetPoint(i, i, xsections);
+	EXCLXSec->SetPointEYhigh(i, xsections_errh);
+	EXCLXSec->SetPointEYlow(i, xsections_errl);
 	}
-		
+	
 	xsec<<endl;
 	
-	TGraphAsymmErrors* InclXSecRatioRecur = new TGraphAsymmErrors();
+	TGraphAsymmErrors* INCLXSec = new TGraphAsymmErrors();
+        
+	for(int i=0;i<bin_incl;i++){
 	
-	double xn_1, yn_1;
+	xmult=0.;
+	ymult=0.;
+        ymult_errh=0.;
+        ymult_errl=0.;
+	xsections=0.;
+	xsections_errh=0.;
+	xsections_errl=0.;
 	
-	for(int i=1;i<5;i++){
+	INCLCorrMult_graph->GetPoint(i, xmult, ymult);
+	ymult_errh = INCLCorrMult_graph->GetErrorYhigh(i);
+	ymult_errl = INCLCorrMult_graph->GetErrorYlow(i);
 	
-	xn=0.;
-	yn=0.;
-	xn_1=0.;
-	yn_1=0.;
+	xsections = ymult/Luminosity;
+	xsections_errh = xsections*sqrt(pow((ymult_errh/ymult),2)+pow((LuminosityErr/Luminosity),2));
+	xsections_errl = xsections*sqrt(pow((ymult_errl/ymult),2)+pow((LuminosityErr/Luminosity),2));
 	
-	InclXSecRatio->GetPoint(i, xn, yn);
-	InclXSecRatio->GetPoint(i-1, xn_1, yn_1);
+	xsec<<"sigma(Z + >= "<<i<<" jet)		---> "<<xsections<<" (+) "<<xsections_errh<<" (-) "<<xsections_errl<<"	pb"<<endl;
 	
-	xsec<<"sigma(Z + >= "<<i<<" jet)/sigma(Z + >= "<<i-1<<" jets)	---> "<<yn/yn_1<<endl;
-	
-	InclXSecRatioRecur->SetPoint(i-1, i, yn/yn_1);
-	
+	INCLXSec->SetPoint(i, i, xsections);
+	INCLXSec->SetPointEYhigh(i, xsections_errh);
+	INCLXSec->SetPointEYlow(i, xsections_errl);	
 	}
+	
+	xsec<<endl;
+	
+	/////////////////////////////// Cross Section Ratios
+	
+	TGraphAsymmErrors* EXCLXSecRatio = new TGraphAsymmErrors();
+	
+	double INCL_xmult=0.;
+	double INCL_ymult=0.;
+	double INCL_ymult_errh=0.;
+	double INCL_ymult_errl=0.;
+	
+	INCLCorrMult_graph->GetPoint(0, INCL_xmult, INCL_ymult);
+	INCL_ymult_errh = INCLCorrMult_graph->GetErrorYhigh(0);
+	INCL_ymult_errl = INCLCorrMult_graph->GetErrorYlow(0);
+	
+	double xsec_ratio_errh, xsec_ratio_errl;
+	
+	for(int i=0;i<bin_excl;i++){
+
+	xsec_ratio_errh=0.;
+	xsec_ratio_errl=0.;
+	xmult=0.;
+	ymult=0.;
+	ymult_errh=0.;
+	ymult_errl=0.;
+
+	EXCLCorrMult_graph->GetPoint(i, xmult, ymult);
+	ymult_errh = EXCLCorrMult_graph->GetErrorYhigh(i);
+	ymult_errl = EXCLCorrMult_graph->GetErrorYlow(i);
+	
+	xsec_ratio_errh=(ymult/INCL_ymult)*sqrt(pow((ymult_errh/ymult),2)+pow((INCL_ymult_errh/INCL_ymult),2));
+	xsec_ratio_errl=(ymult/INCL_ymult)*sqrt(pow((ymult_errl/ymult),2)+pow((INCL_ymult_errl/INCL_ymult),2));
+	
+	xsec<<"sigma(Z + "<<i<<" jet)/sigma(Z + >= 0 jets)		---> "<<ymult/INCL_ymult<<" (+) "<<xsec_ratio_errh<<" (-) "<<xsec_ratio_errl<<endl;
+	
+	EXCLXSecRatio->SetPoint(i, i, ymult/INCL_ymult);
+	EXCLXSecRatio->SetPointEYhigh(i, xsec_ratio_errh);
+	EXCLXSecRatio->SetPointEYlow(i, xsec_ratio_errl);
+	}
+	
+	xsec<<endl;
+	
+	TGraphAsymmErrors* INCLXSecRatio = new TGraphAsymmErrors();
+	
+	for(int i=0;i<bin_incl;i++){
+	
+	xsec_ratio_errh=0.;
+	xsec_ratio_errl=0.;
+	xmult=0.;
+	ymult=0.;
+	ymult_errh=0.;
+	ymult_errl=0.;
+	
+	INCLCorrMult_graph->GetPoint(i, xmult, ymult);
+	ymult_errh = INCLCorrMult_graph->GetErrorYhigh(i);
+	ymult_errl = INCLCorrMult_graph->GetErrorYlow(i);
+	
+	xsec_ratio_errh=(ymult/INCL_ymult)*sqrt(pow((ymult_errh/ymult),2)+pow((INCL_ymult_errh/INCL_ymult),2));
+	xsec_ratio_errl=(ymult/INCL_ymult)*sqrt(pow((ymult_errl/ymult),2)+pow((INCL_ymult_errl/INCL_ymult),2));
+	
+	xsec<<"sigma(Z + >= "<<i<<" jet)/sigma(Z + >= 0 jets)		---> "<<ymult/INCL_ymult<<" (+) "<<xsec_ratio_errh<<" (-) "<<xsec_ratio_errl<<endl;
+	
+	INCLXSecRatio->SetPoint(i, i, ymult/INCL_ymult);
+	INCLXSecRatio->SetPointEYhigh(i, xsec_ratio_errh);
+	INCLXSecRatio->SetPointEYlow(i, xsec_ratio_errl);
+	}
+	
+	//////////////////////////////// Tot XSec in ALL PHASE SPACE
+	
+	double TotXSec = 0.; double xTotXSec = 0.;
+	double TotXSec_errh = 0.; double TotXSec_errl = 0.;
+	INCLXSec->GetPoint(0, xTotXSec, TotXSec);
+	TotXSec_errh = INCLXSec->GetErrorYhigh(0);
+	TotXSec_errl = INCLXSec->GetErrorYlow(0);
 	
 	double xAcc=0.;
 	double yAcc=0.;
 	
 	MC_Acc_incl->GetPoint(0, xAcc, yAcc);
 	
-	xsec<<endl<<"sigma(Z + >= 0 jets) in ALL PHASE SAPCE = "<<InclXSec/yAcc<<"	pb-1"<<endl<<endl;
+	xsec<<endl<<"sigma(Z + >= 0 jets) in ALL PHASE SPACE = "<<TotXSec/yAcc<<"	pb"<<endl<<endl;
 		
-	////////////////////////// Make Cross Section Plots
+	////////////////////////// Make Cross Section Plots ////////////////////////////////
         
-	TCanvas *XSecCanvas = new TCanvas;
-	XSecCanvas->SetLogy();
-	XSec->SetTitle("sigma(Z + n jets)");
-	XSec->GetXaxis()->SetTitle("multiplicity");
-	XSec->GetXaxis()->SetLimits(-0.5,4.5);
-	XSec->GetXaxis()->SetNdivisions(5);
-	XSec->GetXaxis()->SetTitleOffset(1.1);	
-        XSec->SetLineWidth(2);
-        XSec->SetMarkerStyle(20);
-        XSec->Draw("AP");
-        TPaveText* bin4_xsec = new TPaveText(0.765805, 0.0466102, 0.807471, 0.0889831, "BRNDC"); 
-        bin4_xsec->AddText("#geq");
-        bin4_xsec->SetBorderSize(0);
-        bin4_xsec->SetShadowColor(0);
-        bin4_xsec->SetFillColor(0);
-        bin4_xsec->SetTextAlign(31);
-        bin4_xsec->Draw();
-        XSecCanvas->Write("XSec.root");
-        XSecCanvas->Close();
+	TCanvas *EXCLXSecCanvas = new TCanvas;
+	EXCLXSecCanvas->SetLogy();
+	EXCLXSec->SetTitle("sigma(Z + n jets)");
+	EXCLXSec->GetXaxis()->SetTitle("excl. multiplicity");
+	EXCLXSec->GetXaxis()->SetLimits(-0.5,bin_excl-0.5);
+	EXCLXSec->GetXaxis()->SetNdivisions(bin_excl);
+	EXCLXSec->GetXaxis()->SetTitleOffset(1.1);	
+        EXCLXSec->SetLineWidth(2);
+        EXCLXSec->SetMarkerStyle(22);
+        EXCLXSec->Draw("AP");
+        EXCLXSecCanvas->Write("EXCLXSec.root");
+        EXCLXSecCanvas->Close();
         
-        TCanvas *XSecRatioCanvas = new TCanvas;
-        XSecRatioCanvas->SetLogy();
-	XSecRatio->SetTitle("sigma(Z + n jets)/sigma(Z + >= 0 jet)");
-	XSecRatio->GetXaxis()->SetTitle("multiplicity");
-	XSecRatio->GetXaxis()->SetLimits(-0.5,4.5);
-	XSecRatio->GetXaxis()->SetNdivisions(5);
-	XSecRatio->GetXaxis()->SetTitleOffset(1.1);
-        XSecRatio->SetLineWidth(2);
-        XSecRatio->SetMarkerStyle(20);
-        XSecRatio->Draw("AP");
-        TPaveText* bin4_xsecr = new TPaveText(0.765805, 0.0466102, 0.807471, 0.0889831, "BRNDC");  
-        bin4_xsecr->AddText("#geq");
-        bin4_xsecr->SetBorderSize(0);
-        bin4_xsecr->SetShadowColor(0);
-        bin4_xsecr->SetFillColor(0);
-        bin4_xsecr->SetTextAlign(31);
-        bin4_xsecr->Draw();
-        XSecRatioCanvas->Write("XSecRatio.root");
-        XSecRatioCanvas->Close();
+        TCanvas *INCLXSecCanvas = new TCanvas;
+	INCLXSecCanvas->SetLogy();
+	INCLXSec->SetTitle("sigma(Z + >= n jets)");
+	INCLXSec->GetXaxis()->SetTitle("incl. multiplicity");
+	INCLXSec->GetXaxis()->SetLimits(-0.5,bin_incl-0.5);
+	INCLXSec->GetXaxis()->SetNdivisions(bin_incl);
+	INCLXSec->GetXaxis()->SetTitleOffset(1.1);	
+        INCLXSec->SetLineWidth(2);
+        INCLXSec->SetMarkerStyle(22);
+        INCLXSec->Draw("AP");
+        INCLXSecCanvas->Write("INCLXSec.root");
+        INCLXSecCanvas->Close();
         
-        TCanvas *InclXSecRatioCanvas = new TCanvas;
-        InclXSecRatioCanvas->SetLogy();
-	InclXSecRatio->SetTitle("sigma(Z + >= n jets)/sigma(Z + >= 0 jet)");
-	InclXSecRatio->GetXaxis()->SetTitle("incl. multiplicity");
-	InclXSecRatio->GetXaxis()->SetLimits(-0.5,4.5);
-	InclXSecRatio->GetXaxis()->SetNdivisions(5);
-	InclXSecRatio->GetXaxis()->SetTitleOffset(1.1);
-        InclXSecRatio->SetLineWidth(2);
-        InclXSecRatio->SetMarkerStyle(20);
-        InclXSecRatio->Draw("AP");
-        InclXSecRatioCanvas->Write("InclXSecRatio.root");
-        InclXSecRatioCanvas->Close();
+        TCanvas *EXCLXSecRatioCanvas = new TCanvas;
+        EXCLXSecRatioCanvas->SetLogy();
+	EXCLXSecRatio->SetTitle("sigma(Z + n jets)/sigma(Z + >= 0 jet)");
+	EXCLXSecRatio->GetXaxis()->SetTitle("excl. multiplicity");
+	EXCLXSecRatio->GetXaxis()->SetLimits(-0.5,bin_excl-0.5);
+	EXCLXSecRatio->GetXaxis()->SetNdivisions(bin_excl);
+	EXCLXSecRatio->GetXaxis()->SetTitleOffset(1.1);
+        EXCLXSecRatio->SetLineWidth(2);
+        EXCLXSecRatio->SetMarkerStyle(22);
+        EXCLXSecRatio->Draw("AP");
+        EXCLXSecRatioCanvas->Write("EXCLXSecRatio.root");
+        EXCLXSecRatioCanvas->Close();
         
-        TCanvas *InclXSecRatioRCanvas = new TCanvas;
-	InclXSecRatioRecur->SetTitle("sigma(Z + >= n jets)/sigma(Z + >= (n-1) jet)");
-	InclXSecRatioRecur->GetXaxis()->SetTitle("incl. multiplicity");
-	InclXSecRatioRecur->GetXaxis()->SetLimits(0.5,4.5);
-	InclXSecRatioRecur->GetYaxis()->SetRangeUser(0.2,0.5);
-	InclXSecRatioRecur->GetXaxis()->SetNdivisions(5);
-	InclXSecRatioRecur->GetXaxis()->SetTitleOffset(1.1);
-        InclXSecRatioRecur->SetLineWidth(2);
-        InclXSecRatioRecur->SetMarkerStyle(20);
-        InclXSecRatioRecur->Draw("AP");
-        InclXSecRatioRCanvas->Write("InclXSecRatioRecur.root");
-        InclXSecRatioRCanvas->Close();
-        
-        
-        
-        
-	
-	
-	        
+        TCanvas *INCLXSecRatioCanvas = new TCanvas;
+        INCLXSecRatioCanvas->SetLogy();
+	INCLXSecRatio->SetTitle("sigma(Z + >= n jets)/sigma(Z + >= 0 jet)");
+	INCLXSecRatio->GetXaxis()->SetTitle("incl. multiplicity");
+	INCLXSecRatio->GetXaxis()->SetLimits(0.5,bin_incl-0.5);
+	INCLXSecRatio->GetYaxis()->SetRangeUser(0,0.25);
+	INCLXSecRatio->GetXaxis()->SetNdivisions(bin_incl);
+	INCLXSecRatio->GetXaxis()->SetTitleOffset(1.1);
+        INCLXSecRatio->SetLineWidth(2);
+        INCLXSecRatio->SetMarkerStyle(22);
+        INCLXSecRatio->Draw("AP");
+        INCLXSecRatioCanvas->Write("INCLXSecRatio.root");
+        INCLXSecRatioCanvas->Close();
+                
+      
         xsec.close();
         multrep.close();
         
         outplots->Write();
         outplots->Close();
+        
+        /*TPaveText* binUR = new TPaveText(0.716954, 0.0466102, 0.758621, 0.0889831, "BRNDC"); 
+        binUR->AddText("#geq");
+        binUR->SetBorderSize(0);
+        binUR->SetShadowColor(0);
+        binUR->SetFillColor(0);
+        binUR->SetTextAlign(31);
+        binUR->Draw();*/
   
 }
