@@ -190,7 +190,7 @@ TDSet* getDS(const char* filename){
   return out; 
 }
 
-void makeCfg(string sample, string selections, string JetType, bool GEN, bool RECO, bool EFF, bool NTUPLE, int Acc, int Trg, int Conv, int Imp, int Iso, int EiD, const char* path, const char* sourceList, const char *outFile, const char* Norm, int EventsPerFile, int EventNumber, int ProcEvents, double xsec, double targetLumi, const char* GenParticleMatch, string NtupleFill){
+void makeCfg(string sample, string selections, string JetType, bool GEN, bool RECO, bool EFF, bool NTUPLE, int Acc, int Trg, int Conv, int Imp, int Iso, int EiD, const char* path, const char* sourceList, const char *outFile, const char* Norm, int EventsPerFile, int EventNumber, int ProcEvents, double xsec, double targetLumi, const char* GenParticleMatch, string NtupleFill, int JECUnc, string JECUncFilePath){
 
 //cfg
 string cfgPath = path;
@@ -254,6 +254,7 @@ cfg<<"CrossSection = cms.double("<<xsec<<"),"<<std::endl;
 cfg<<"targetLumi  = cms.double("<<targetLumi<<"),"<<std::endl;
 cfg<<"Norm        = cms.bool("<<Norm<<"),"<<std::endl;
 cfg<<"GenParticleMatch = cms.bool("<<GenParticleMatch<<"),"<<std::endl;
+cfg<<"JECUnc  = cms.int32("<<JECUnc<<"),"<<std::endl;
 cfg<<"EventsPerFile  = cms.int32("<<EventsPerFile<<"),"<<std::endl;
 cfg<<"EventNumber  = cms.int32("<<EventNumber<<"),"<<std::endl;
 cfg<<"ProcEvents  = cms.int32("<<ProcEvents<<")"<<std::endl;
@@ -300,6 +301,8 @@ cfg<<"CrossSection = cms.double("<<xsec<<"),"<<std::endl;
 cfg<<"targetLumi  = cms.double("<<targetLumi<<"),"<<std::endl;
 cfg<<"Norm        = cms.bool("<<Norm<<"),"<<std::endl;
 cfg<<"NtupleFill        = cms.string(\""<<NtupleFill<<"\"),"<<std::endl;
+cfg<<"JECUnc  = cms.int32("<<JECUnc<<"),"<<std::endl;
+cfg<<"JECUncFilePath        = cms.string(\""<<JECUncFilePath<<"\"),"<<std::endl;
 cfg<<"EventsPerFile  = cms.int32("<<EventsPerFile<<"),"<<std::endl;
 cfg<<"EventNumber  = cms.int32("<<EventNumber<<"),"<<std::endl;
 cfg<<"ProcEvents  = cms.int32("<<ProcEvents<<")"<<std::endl;

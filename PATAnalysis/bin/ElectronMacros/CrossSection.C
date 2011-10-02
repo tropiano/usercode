@@ -26,9 +26,9 @@
 
 using namespace std;
 
-//JetPtMin in GeV - Tune Z2 or D6T
+//JetPtMin in GeV; Tune Z2 or D6T; jecUnc: "0" = NotApplied, "+" = Added, "-" = Subtracted 
 
-void XSec(int JetPtMin, string tune){
+void XSec(int JetPtMin, string tune, string jecUnc){
 
         gROOT->SetStyle("Plain");
         
@@ -50,9 +50,16 @@ void XSec(int JetPtMin, string tune){
 	
 	int bin_excl = 4;
 	int bin_incl = 5;
+	
+	//JEC Uncertainty
+	string JEC="";
+	if(jecUnc=="0")JEC="";
+	if(jecUnc=="+")JEC="jecUncPlus_";
+	if(jecUnc=="-")JEC="jecUncMinus_";
         
         //Output
         string out = "XSecMeas_";
+        out+=JEC;
         out+=JetPtCut;
         string output = out;
         output+=".root";
@@ -60,11 +67,11 @@ void XSec(int JetPtMin, string tune){
         
         //Report files
         ofstream multrep;
-	multrep.open(("MultReport_"+JetPtCut+".txt").c_str());
+	multrep.open(("MultReport_"+JEC+JetPtCut+".txt").c_str());
 	multrep<<endl;
 
         ofstream xsec;
-	xsec.open(("XSecReport_"+JetPtCut+".txt").c_str());
+	xsec.open(("XSecReport_"+JEC+JetPtCut+".txt").c_str());
 	xsec<<endl;
 	
 	////////////////////////// Directories /////////////////////////////////////////////
@@ -111,11 +118,11 @@ void XSec(int JetPtMin, string tune){
         
         //MC: Unfolding and Correction Factors
         // -> NtuplePlots file
-        TFile *UNF = TFile::Open((path+"/Ntuple/"+JetPtCut+"/"+tune+"/NtuplePlots_"+JetPtCut+".root").c_str());
+        TFile *UNF = TFile::Open((path+"/Ntuple/"+JetPtCut+"/"+tune+"/NtuplePlots_"+JEC+JetPtCut+".root").c_str());
         
         //MC: WZ - ZZ background from MC
         // -> WZ-ZZ_Pythia file
-        TFile *DiBosBkg = TFile::Open((path+"/MC_Winter10/Background/"+JetPtCut+"/WZ-ZZ_Pythia_"+JetPtCut+".root").c_str());
+        TFile *WZ_ZZ = TFile::Open((path+"/MC_Winter10/Background/"+JetPtCut+"/WZ-ZZ_Pythia_"+JetPtCut+".root").c_str());
       
         ///////////////////////// GET HISTOGRAMS - Exclusive Quantities ///////////////////////
         
@@ -126,10 +133,10 @@ void XSec(int JetPtMin, string tune){
         TGraphAsymmErrors* BackgroundY_excl = (TGraphAsymmErrors*) SB_Yields_excl->Get("YieldPlots/BackgroundYield_0");
         BackgroundY_excl->Write("BackgYields_excl");
         
-        //DiBoson Background: WZ, ZZ from MC
-        TH1D* DiBosBkg_excl = (TH1D*) DiBosBkg->Get("RecoElectron/recJet_Plots/IsoJetCounter_AccASYM_Trg_Imp_ConvASYM_IsoASYM_EiDASYM");
-        DiBosBkg_excl->Scale(scale);
-        DiBosBkg_excl->Write("DiBosBkg_excl");
+        //WZ, ZZ Background from MC
+        TH1D* WZ_ZZ_excl = (TH1D*) WZ_ZZ->Get("RecoElectron/recJet_Plots/IsoJetCounter_AccASYM_Trg_Imp_ConvASYM_IsoASYM_EiDASYM");
+        WZ_ZZ_excl->Scale(scale);
+        WZ_ZZ_excl->Write("WZ_ZZ_excl");
         
         //TP Efficiencies 
         tpeffdir->cd();
@@ -202,7 +209,9 @@ void XSec(int JetPtMin, string tune){
         RECOMult_incl->Scale(scaleGENRECO);
         RECOMult_incl->Write("RECOMult_incl");
         
-        multrep<<" Jet Pt >= "<<JetPtMin<<endl<<endl;
+        multrep<<" Jet Pt >=	"<<JetPtMin<<endl<<endl;
+        multrep<<" Tune =	"<<tune.c_str()<<endl<<endl;
+        multrep<<" Jec Unc =	"<<jecUnc.c_str()<<endl<<endl; 
         
         ////////////////////////// Corrected Jet Multiplicity - EXCLUSIVE /////////////////////////////
         
@@ -214,29 +223,32 @@ void XSec(int JetPtMin, string tune){
         
         double BinCorrMult_excl; 
         double EffCorrMult_excl;       
-        double BinUCF_excl, BinDiBosBkg_excl;
+        double BinUCF_excl, BinWZ_ZZ_excl;
+        
         double xs_excl, ys_excl, xb_excl, yb_excl;
-        double xtpdata_excl, ytpdata_excl, xtpmc_excl, ytpmc_excl;
+        double xtpdata_excl, ytpdata_excl; 
+        double xtpmc_excl, ytpmc_excl;
         double xmceff_excl, ymceff_excl;
         
         double BinCorrMult_excl_errh;
         double BinCorrMult_excl_errl;       
-        double BinDiBosBkg_excl_err;
+        double BinWZ_ZZ_excl_err;
+        
         double ys_excl_err, yb_excl_err;
         double ytpdata_excl_errh, ytpdata_excl_errl; 
         double ytpmc_excl_errh, ytpmc_excl_errl;
         double ymceff_excl_errh, ymceff_excl_errl;
         
-        multrep<<" ### Unfolded Exclusive Multiplicity ### "<<endl<<endl;       
+        multrep<<endl<<" ### Unfolded Exclusive Multiplicity ### "<<endl<<endl;       
         
         for(int i=0;i<bin_excl;i++){
         
-        multrep<<"---> Bin n. "<<i<<", Jet# == "<<i<<endl<<endl;
+        multrep<<"-----------> Bin n. "<<i<<", Jet# == "<<i<<" <-----------"<<endl<<endl;
         
         BinCorrMult_excl=0.;
         EffCorrMult_excl=0.;
         BinUCF_excl=0.;
-        BinDiBosBkg_excl=0.;
+        BinWZ_ZZ_excl=0.;
         
         xs_excl=0.;
         ys_excl=0.;
@@ -251,8 +263,8 @@ void XSec(int JetPtMin, string tune){
         xmceff_excl=0.;
         ymceff_excl=0.;
         
-        BinCorrMult_excl_errh=0.; BinCorrMult_excl_errl=0.;       
-        BinDiBosBkg_excl_err=0.;
+        BinCorrMult_excl_errh=0.; BinCorrMult_excl_errl=0.;  
+        BinWZ_ZZ_excl_err =0.;     
         ys_excl_err=0.; 
         yb_excl_err=0.;
         ytpdata_excl_errh=0.; ytpdata_excl_errl=0.;
@@ -267,9 +279,9 @@ void XSec(int JetPtMin, string tune){
         yb_excl_err = BackgroundY_excl->GetErrorY(i);
         multrep<<"Background Yields = "<<yb_excl<<" +/- "<<yb_excl_err<<endl;
         
-        BinDiBosBkg_excl = DiBosBkg_excl->GetBinContent(i+1);
-        BinDiBosBkg_excl_err = DiBosBkg_excl->GetBinError(i+1);
-        multrep<<"WZ-ZZ Bkg Yields from MC = "<<BinDiBosBkg_excl<<" +/- "<<BinDiBosBkg_excl_err<<endl;
+        BinWZ_ZZ_excl = WZ_ZZ_excl->GetBinContent(i+1);
+        BinWZ_ZZ_excl_err = WZ_ZZ_excl->GetBinError(i+1);
+        multrep<<"WZ-ZZ Bkg Yields from MC = "<<BinWZ_ZZ_excl<<" +/- "<<BinWZ_ZZ_excl_err<<endl;
         
         TPData_Eff_excl->GetPoint(i, xtpdata_excl, ytpdata_excl);
         ytpdata_excl_errh = TPData_Eff_excl->GetErrorYhigh(i);
@@ -286,18 +298,29 @@ void XSec(int JetPtMin, string tune){
         ymceff_excl_errl = MC_Eff_excl->GetErrorYlow(i);
         multrep<<"MC Global Efficiency = "<<ymceff_excl<<" (+) "<<ymceff_excl_errh<< " (-) "<<ymceff_excl_errl<<endl;
         
+        multrep<<"(MCGlobalEff)*Rho = "<<ymceff_excl*(ytpdata_excl/ytpmc_excl)<<endl;
+        
         BinUCF_excl = UCF_excl->GetBinContent(i+1);
         multrep<<"Unf. Correction Factor = "<<BinUCF_excl<<endl<<endl;
         
         //Corrected Multiplicity calculation
-        EffCorrMult_excl = ((ys_excl-yb_excl-BinDiBosBkg_excl)/(ymceff_excl*(ytpdata_excl/ytpmc_excl)));  
+        EffCorrMult_excl = ((ys_excl-BinWZ_ZZ_excl)/(ymceff_excl*(ytpdata_excl/ytpmc_excl)));  
         BinCorrMult_excl = EffCorrMult_excl*BinUCF_excl;
         
-        BinCorrMult_excl_errh = BinCorrMult_excl*sqrt(((pow(ys_excl_err,2)+pow(yb_excl_err,2)+pow(BinDiBosBkg_excl_err,2))/pow((ys_excl-yb_excl-BinDiBosBkg_excl),2))+pow((ytpdata_excl_errh/ytpdata_excl),2)+pow((ytpmc_excl_errh/ytpmc_excl),2)+pow((ymceff_excl_errh/ymceff_excl),2));
-        
-        BinCorrMult_excl_errl = BinCorrMult_excl*sqrt(((pow(ys_excl_err,2)+pow(yb_excl_err,2)+pow(BinDiBosBkg_excl_err,2))/pow((ys_excl-yb_excl-BinDiBosBkg_excl),2))+pow((ytpdata_excl_errl/ytpdata_excl),2)+pow((ytpmc_excl_errl/ytpmc_excl),2)+pow((ymceff_excl_errl/ymceff_excl),2));
+        //Statistical relative uncertainty on Nsig 
+        BinCorrMult_excl_errh = BinCorrMult_excl*(ys_excl_err/(ys_excl-BinWZ_ZZ_excl));        
+        BinCorrMult_excl_errl = BinCorrMult_excl*(ys_excl_err/(ys_excl-BinWZ_ZZ_excl));
         
         multrep<<"Corrected Excl. Multiplcity = "<<BinCorrMult_excl<<" (+) "<<BinCorrMult_excl_errh<<" (-) "<<BinCorrMult_excl_errl<<endl<<endl;
+        
+        multrep<<"STATISTICAL RELATIVE unc. (Nsig) = 	"<<ys_excl_err/(ys_excl-BinWZ_ZZ_excl)<<endl<<endl;
+        
+        multrep<<"SYSTEMATIC RELATIVE uncertainties:"<<endl;
+        multrep<<"WZ-ZZ background =			"<<BinWZ_ZZ_excl_err/(ys_excl-BinWZ_ZZ_excl)<<endl;
+        multrep<<"TP Eff. Data =			"<<" (High) "<<ytpdata_excl_errh/ytpdata_excl<<" (Low) "<<ytpdata_excl_errl/ytpdata_excl<<endl;
+        multrep<<"TP Eff. MC =			"<<" (High) "<<ytpmc_excl_errh/ytpmc_excl<<" (Low) "<<ytpmc_excl_errl/ytpmc_excl<<endl;         
+        multrep<<"MC Global Eff. =		"<<" (High) "<<ymceff_excl_errh/ymceff_excl<<" (Low) "<<ymceff_excl_errl/ymceff_excl<<endl;
+        multrep<<"Luminosity =				"<<LuminosityErr/Luminosity<<endl<<endl;     
         
         EXCLCorrMult_graph->SetPoint(i, i, BinCorrMult_excl);
         EXCLCorrMult_graph->SetPointEYhigh(i, BinCorrMult_excl_errh);
@@ -326,29 +349,32 @@ void XSec(int JetPtMin, string tune){
         
         double BinCorrMult_incl;
         double EffCorrMult_incl;       
-        double BinUCF_incl, BinDiBosBkg_incl;
+        double BinUCF_incl, BinWZ_ZZ_incl;
+        
         double xs_incl, ys_incl, xb_incl, yb_incl;
-        double xtpdata_incl, ytpdata_incl, xtpmc_incl, ytpmc_incl;
+        double xtpdata_incl, ytpdata_incl; 
+        double xtpmc_incl, ytpmc_incl;
         double xmceff_incl, ymceff_incl;
         
         double BinCorrMult_incl_errh;
-        double BinCorrMult_incl_errl;       
-        double BinDiBosBkg_incl_err;
+        double BinCorrMult_incl_errl;   
+        double BinWZ_ZZ_incl_err;   
+
         double ys_incl_err, yb_incl_err;
         double ytpdata_incl_errh, ytpdata_incl_errl; 
         double ytpmc_incl_errh, ytpmc_incl_errl;
         double ymceff_incl_errh, ymceff_incl_errl;
         
-        multrep<<" ### Unfolded Inclusive Multiplicity ### "<<endl<<endl;       
+        multrep<<endl<<" ### Unfolded Inclusive Multiplicity ### "<<endl<<endl;       
         
         for(int i=0;i<bin_incl;i++){
         
-        multrep<<"---> Bin n. "<<i<<", Jet# >= "<<i<<endl<<endl;
+        multrep<<"-----------> Bin n. "<<i<<", Jet# >= "<<i<<" <-----------"<<endl<<endl;
         
         BinCorrMult_incl=0.;
         EffCorrMult_incl=0.;
         BinUCF_incl=0.;
-        BinDiBosBkg_incl=0.;
+        BinWZ_ZZ_incl=0.;
         
         xs_incl=0.;
         ys_incl=0.;
@@ -364,7 +390,7 @@ void XSec(int JetPtMin, string tune){
         ymceff_incl=0.;
         
         BinCorrMult_incl_errh=0.; BinCorrMult_incl_errl=0.;       
-        BinDiBosBkg_incl_err=0.;
+        BinWZ_ZZ_incl_err=0.;
         ys_incl_err=0.; 
         yb_incl_err=0.;
         ytpdata_incl_errh=0.; ytpdata_incl_errl=0.;
@@ -379,8 +405,8 @@ void XSec(int JetPtMin, string tune){
         yb_incl_err = BackgroundY_incl->GetErrorY(i);
         multrep<<"Background Yields = "<<yb_incl<<" +/- "<<yb_incl_err<<endl;
         
-        BinDiBosBkg_incl = DiBosBkg_excl->IntegralAndError(i+1, 10, BinDiBosBkg_incl_err);
-        multrep<<"WZ-ZZ Bkg Yields from MC = "<<BinDiBosBkg_incl<<" +/- "<<BinDiBosBkg_incl_err<<endl;
+        BinWZ_ZZ_incl = WZ_ZZ_excl->IntegralAndError(i+1, 10, BinWZ_ZZ_incl_err);
+        multrep<<"WZ-ZZ Bkg Yields from MC = "<<BinWZ_ZZ_incl<<" +/- "<<BinWZ_ZZ_incl_err<<endl;
         
         TPData_Eff_incl->GetPoint(i, xtpdata_incl, ytpdata_incl);
         ytpdata_incl_errh = TPData_Eff_incl->GetErrorYhigh(i);
@@ -397,19 +423,30 @@ void XSec(int JetPtMin, string tune){
         ymceff_incl_errl = MC_Eff_incl->GetErrorYlow(i);
         multrep<<"MC Global Efficiency = "<<ymceff_incl<<" (+) "<<ymceff_incl_errh<< " (-) "<<ymceff_incl_errl<<endl;
         
+        multrep<<"(MCGlobalEff)*Rho = "<<ymceff_incl*(ytpdata_incl/ytpmc_incl)<<endl;
+        
         BinUCF_incl = UCF_incl->GetBinContent(i+1);
         multrep<<"Unf. Correction Factor = "<<BinUCF_incl<<endl<<endl;
         
         //Corrected Multiplicity calculation
-        EffCorrMult_incl = ((ys_incl-yb_incl-BinDiBosBkg_incl)/(ymceff_incl*(ytpdata_incl/ytpmc_incl)));
+        EffCorrMult_incl = ((ys_incl-BinWZ_ZZ_incl)/(ymceff_incl*(ytpdata_incl/ytpmc_incl)));
         BinCorrMult_incl = EffCorrMult_incl*BinUCF_incl;
         
-        BinCorrMult_incl_errh = BinCorrMult_incl*sqrt(((pow(ys_incl_err,2)+pow(yb_incl_err,2)+pow(BinDiBosBkg_incl_err,2))/pow((ys_incl-yb_incl-BinDiBosBkg_incl),2))+pow((ytpdata_incl_errh/ytpdata_incl),2)+pow((ytpmc_incl_errh/ytpmc_incl),2)+pow((ymceff_incl_errh/ymceff_incl),2));
-        
-        BinCorrMult_incl_errl = BinCorrMult_incl*sqrt(((pow(ys_incl_err,2)+pow(yb_incl_err,2)+pow(BinDiBosBkg_incl_err,2))/pow((ys_incl-yb_incl-BinDiBosBkg_incl),2))+pow((ytpdata_incl_errl/ytpdata_incl),2)+pow((ytpmc_incl_errl/ytpmc_incl),2)+pow((ymceff_incl_errl/ymceff_incl),2));
+        //Statistical relative uncertainty on Nsig 
+        BinCorrMult_incl_errh = BinCorrMult_incl*(ys_incl_err/(ys_incl-BinWZ_ZZ_incl));        
+        BinCorrMult_incl_errl = BinCorrMult_incl*(ys_incl_err/(ys_incl-BinWZ_ZZ_incl));
         
         multrep<<"Corrected Incl. Multiplcity = "<<BinCorrMult_incl<<" (+) "<<BinCorrMult_incl_errh<<" (-) "<<BinCorrMult_incl_errl<<endl<<endl;
         
+        multrep<<"STATISTICAL RELATIVE unc. (Nsig) = 	"<<ys_excl_err/(ys_excl-BinWZ_ZZ_excl)<<endl<<endl;
+        
+        multrep<<"SYSTEMATIC RELATIVE uncertainties:"<<endl;
+        multrep<<"WZ-ZZ background =			"<<BinWZ_ZZ_incl_err/(ys_incl-BinWZ_ZZ_incl)<<endl;
+        multrep<<"TP Eff. Data =			"<<" (High) "<<ytpdata_incl_errh/ytpdata_incl<<" (Low) "<<ytpdata_incl_errl/ytpdata_incl<<endl;
+        multrep<<"TP Eff. MC =			"<<" (High) "<<ytpmc_incl_errh/ytpmc_incl<<" (Low) "<<ytpmc_incl_errl/ytpmc_incl<<endl;
+        multrep<<"MC Global Eff. =		"<<" (High) "<<ymceff_incl_errh/ymceff_incl<<" (Low) "<<ymceff_incl_errl/ymceff_incl<<endl;
+        multrep<<"Luminosity =				"<<LuminosityErr/Luminosity<<endl<<endl;
+                
         INCLCorrMult_graph->SetPoint(i, i, BinCorrMult_incl);
         INCLCorrMult_graph->SetPointEYhigh(i, BinCorrMult_incl_errh);
         INCLCorrMult_graph->SetPointEYlow(i, BinCorrMult_incl_errl);

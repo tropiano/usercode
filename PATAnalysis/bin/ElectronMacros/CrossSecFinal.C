@@ -28,7 +28,7 @@ using namespace std;
 
 //JetPtMin in GeV 
 
-void XSecComp(int JetPtMin){
+void XSecFinal(int JetPtMin){
 
         string JetPtCut;
 	if(JetPtMin==15)JetPtCut="JetPt15";

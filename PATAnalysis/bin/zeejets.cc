@@ -99,6 +99,9 @@ int PreDefName, ProcEvents;
   
   //Jet Type - "PF": PFJets, "PFL1CORR": PFJets L1 Corrected
   string JetType = "PFL1CORR";
+  //JEC Uncertainty applied to RecoElectronNtuple: 0 = NotApplied, 1 = Added, -1 = Subtracted
+  int JECUnc = 0; //default value = 0
+  string JECUncFilePath = "/data/sfrosali/Zjets/Commit/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/JECUncertainty/Jec10V1_Uncertainty_AK5PF.txt";
   
   //Normalization
   string Norm = "True";
@@ -172,7 +175,7 @@ int PreDefName, ProcEvents;
   EventsPerFile=ParStruct._EventsPerFile;
   EventNumber=ParStruct._EventNumber;
     
-  makeCfg(sample, selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), sourceList.c_str(), outputName.c_str(), Norm.c_str(), EventsPerFile, EventNumber, ProcEvents, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  makeCfg(sample, selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), sourceList.c_str(), outputName.c_str(), Norm.c_str(), EventsPerFile, EventNumber, ProcEvents, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill, JECUnc, JECUncFilePath);
   
   }else{
   
@@ -181,105 +184,105 @@ int PreDefName, ProcEvents;
   EventFilter=ParStruct._EventFilter;
   EventsPerFile=ParStruct._EventsPerFile;
   EventNumber=ParStruct._EventNumber;
-  makeCfg("data", selections, JetType, false, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), Data_RUN2010A.c_str(), "Data_RUN2010A", "False", EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, "False", NtupleFill);
+  makeCfg("data", selections, JetType, false, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), Data_RUN2010A.c_str(), "Data_RUN2010A", "False", EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, "False", NtupleFill, JECUnc, JECUncFilePath);
   
   Parameters(1, &ParStruct);
   xsec=ParStruct._xsec;
   EventFilter=ParStruct._EventFilter;
   EventsPerFile=ParStruct._EventsPerFile;
   EventNumber=ParStruct._EventNumber;
-  makeCfg("data", selections, JetType, false, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), Data_RUN2010B.c_str(), "Data_RUN2010B", "False", EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, "False", NtupleFill);
+  makeCfg("data", selections, JetType, false, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), Data_RUN2010B.c_str(), "Data_RUN2010B", "False", EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, "False", NtupleFill, JECUnc, JECUncFilePath);
   
   Parameters(2, &ParStruct);
   xsec=ParStruct._xsec;
   EventFilter=ParStruct._EventFilter;
   EventsPerFile=ParStruct._EventsPerFile;
   EventNumber=ParStruct._EventNumber;
-  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), Zpj_D6T.c_str(), "Z_Madgraph_D6T", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), Zpj_D6T.c_str(), "Z_Madgraph_D6T", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill, JECUnc, JECUncFilePath);
   
   Parameters(3, &ParStruct);
   xsec=ParStruct._xsec;
   EventFilter=ParStruct._EventFilter;
   EventsPerFile=ParStruct._EventsPerFile;
   EventNumber=ParStruct._EventNumber;
-  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), Zpj_Z2.c_str(), "Z_Madgraph_Z2", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), Zpj_Z2.c_str(), "Z_Madgraph_Z2", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill, JECUnc, JECUncFilePath);
   
   Parameters(4, &ParStruct);
   xsec=ParStruct._xsec;
   EventFilter=ParStruct._EventFilter;
   EventsPerFile=ParStruct._EventsPerFile;
   EventNumber=ParStruct._EventNumber;
-  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), TT.c_str(), "TT_Pythia", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), TT.c_str(), "TT_Pythia", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill, JECUnc, JECUncFilePath);
   
   Parameters(5, &ParStruct);
   xsec=ParStruct._xsec;
   EventFilter=ParStruct._EventFilter;
   EventsPerFile=ParStruct._EventsPerFile;
   EventNumber=ParStruct._EventNumber;
-  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), Wlnu.c_str(), "Wlnu_Madgraph", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), Wlnu.c_str(), "Wlnu_Madgraph", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill, JECUnc, JECUncFilePath);
   
   Parameters(6, &ParStruct);
   xsec=ParStruct._xsec;
   EventFilter=ParStruct._EventFilter;
   EventsPerFile=ParStruct._EventsPerFile;
   EventNumber=ParStruct._EventNumber;
-  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), WWEE.c_str(), "WWEE_Pythia", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), WWEE.c_str(), "WWEE_Pythia", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill, JECUnc, JECUncFilePath);
   
   Parameters(7, &ParStruct);
   xsec=ParStruct._xsec;
   EventFilter=ParStruct._EventFilter;
   EventsPerFile=ParStruct._EventsPerFile;
   EventNumber=ParStruct._EventNumber;
-  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), ZZEE.c_str(), "ZZEE_Pythia", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), ZZEE.c_str(), "ZZEE_Pythia", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill, JECUnc, JECUncFilePath);
   
   Parameters(8, &ParStruct);
   xsec=ParStruct._xsec;
   EventFilter=ParStruct._EventFilter;
   EventsPerFile=ParStruct._EventsPerFile;
   EventNumber=ParStruct._EventNumber;
-  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), WZEE.c_str(), "WZEE_Pythia", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), WZEE.c_str(), "WZEE_Pythia", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill, JECUnc, JECUncFilePath);
   
   Parameters(9, &ParStruct);
   xsec=ParStruct._xsec;
   EventFilter=ParStruct._EventFilter;
   EventsPerFile=ParStruct._EventsPerFile;
   EventNumber=ParStruct._EventNumber;
-  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), bce_2030.c_str(), "QCD_BCtoE_Pythia_Pt20to30", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), bce_2030.c_str(), "QCD_BCtoE_Pythia_Pt20to30", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill, JECUnc, JECUncFilePath);
   
   Parameters(10, &ParStruct);
   xsec=ParStruct._xsec;
   EventFilter=ParStruct._EventFilter;
   EventsPerFile=ParStruct._EventsPerFile;
   EventNumber=ParStruct._EventNumber;
-  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), bce_3080.c_str(), "QCD_BCtoE_Pythia_Pt30to80", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), bce_3080.c_str(), "QCD_BCtoE_Pythia_Pt30to80", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill, JECUnc, JECUncFilePath);
   
   Parameters(11, &ParStruct);
   xsec=ParStruct._xsec;
   EventFilter=ParStruct._EventFilter;
   EventsPerFile=ParStruct._EventsPerFile;
   EventNumber=ParStruct._EventNumber;
-  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), bce_80170.c_str(), "QCD_BCtoE_Pythia_Pt80to170", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), bce_80170.c_str(), "QCD_BCtoE_Pythia_Pt80to170", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill, JECUnc, JECUncFilePath);
   
   Parameters(12, &ParStruct);
   xsec=ParStruct._xsec;
   EventFilter=ParStruct._EventFilter;
   EventsPerFile=ParStruct._EventsPerFile;
   EventNumber=ParStruct._EventNumber;
-  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), em_2030.c_str(), "QCD_EMEnriched_Pythia_Pt20to30", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), em_2030.c_str(), "QCD_EMEnriched_Pythia_Pt20to30", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill, JECUnc, JECUncFilePath);
   
   Parameters(13, &ParStruct);
   xsec=ParStruct._xsec;
   EventFilter=ParStruct._EventFilter;
   EventsPerFile=ParStruct._EventsPerFile;
   EventNumber=ParStruct._EventNumber;
-  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), em_3080.c_str(), "QCD_EMEnriched_Pythia_Pt30to80", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), em_3080.c_str(), "QCD_EMEnriched_Pythia_Pt30to80", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill, JECUnc, JECUncFilePath);
   
   Parameters(14, &ParStruct);
   xsec=ParStruct._xsec;
   EventFilter=ParStruct._EventFilter;
   EventsPerFile=ParStruct._EventsPerFile;
   EventNumber=ParStruct._EventNumber;
-  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), em_80170.c_str(), "QCD_EMEnriched_Pythia_Pt80to170", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill);
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), em_80170.c_str(), "QCD_EMEnriched_Pythia_Pt80to170", Norm.c_str(), EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, GenParticleMatch.c_str(), NtupleFill, JECUnc, JECUncFilePath);
   }
 
   gEnv->SetValue("Proof.Sandbox", "/data/sfrosali/.proof");

@@ -14,23 +14,23 @@ using namespace std;
 int main() {
 
   //Input files
-  string training_sign = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPFiles/Z_Madgraph_Z2_JetPt15.root";
-  string training_back = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPFiles/Background_All_JetPt15.root";
-  string total = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPFiles/Data_RUN2010A-B_JetPt15.root";
+  string training_sign = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt30/D6T/TPFiles/Z_Madgraph_D6T_JetPt30.root";
+  string training_back = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt30/D6T/TPFiles/Background_All_NoZDiBos_JetPt30.root";
+  string total = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt30/D6T/TPFiles/Data_RUN2010A-B_JetPt30.root";
   
   //Output files
   string output_train_sign =  
-"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/TrainSig_JetPt15_Excl_Double.root";
+"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt30/D6T/TPAnalyzer/TrainSig_JetPt30_Excl_Global.root";
   string output_train_back =  
-"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/TrainBack_JetPt15_Excl_Double.root";
+"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt30/D6T/TPAnalyzer/TrainBack_JetPt30_Excl_Global.root";
   string output_total =  
-"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Excl_Double.root";
+"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt30/D6T/TPAnalyzer/DATA_JetPt30_Excl_Global.root";
 
   //Selections used
   string selections = "ASYM";
   
   //Cut to evaluate
-  string cut = "Double";
+  string cut = "Global";
   
   //Multiplicity - "excl" = Exclusive; "incl" = Inclusive
   string mult = "excl";

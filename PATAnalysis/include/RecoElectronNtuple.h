@@ -3,6 +3,7 @@
 
 #include "DataFormats/FWLite/interface/Event.h"
 #include "MyPatAnalysis.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 #include "TTree.h"
 #include "TList.h"
 #include "TFile.h"
@@ -65,9 +66,9 @@ public :
    Float_t pfjetet2,pfjetpt2,pfjeteta2,pfjetphi2,pfjetcharge2,pfjetDeltaRa2,pfjetDeltaRb2,pfjetEmFrac2;
    Float_t pfjetet3,pfjetpt3,pfjeteta3,pfjetphi3,pfjetcharge3,pfjetDeltaRa3,pfjetDeltaRb3,pfjetEmFrac3;
    
-   Float_t pfl1jetet1,pfl1jetpt1,pfl1jeteta1,pfl1jetphi1,pfl1jetcharge1,pfl1jetDeltaRa1,pfl1jetDeltaRb1;
-   Float_t pfl1jetet2,pfl1jetpt2,pfl1jeteta2,pfl1jetphi2,pfl1jetcharge2,pfl1jetDeltaRa2,pfl1jetDeltaRb2;
-   Float_t pfl1jetet3,pfl1jetpt3,pfl1jeteta3,pfl1jetphi3,pfl1jetcharge3,pfl1jetDeltaRa3,pfl1jetDeltaRb3;
+   Float_t pfl1jetet1,pfl1jetpt1,pfl1jeteta1,pfl1jetphi1,pfl1jecUnc1,pfl1jetcharge1,pfl1jetDeltaRa1,pfl1jetDeltaRb1;
+   Float_t pfl1jetet2,pfl1jetpt2,pfl1jeteta2,pfl1jetphi2,pfl1jecUnc2,pfl1jetcharge2,pfl1jetDeltaRa2,pfl1jetDeltaRb2;
+   Float_t pfl1jetet3,pfl1jetpt3,pfl1jeteta3,pfl1jetphi3,pfl1jecUnc3,pfl1jetcharge3,pfl1jetDeltaRa3,pfl1jetDeltaRb3;
    
    Float_t DeltaR_GenJetPFJet, DeltaR_GenJetPFL1Jet;
    
@@ -103,7 +104,11 @@ private:
   
   double _xsec;
   
-  int _entries, _EventsPerFile, _EventNumber, _ProcEvents, _Acc, _Trg, _Conv, _Imp, _Iso, _EiD;
+  int _entries, _EventsPerFile, _EventNumber, _ProcEvents, _Acc, _Trg, _Conv, _Imp, _Iso, _EiD, _JECUnc;
+  
+  std::string _JECUncFilePath;
+  
+  JetCorrectionUncertainty* _jecUnc;
   
   std::string _RecoCutFlags[7];
   

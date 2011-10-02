@@ -23,6 +23,7 @@
  <use name=DataFormats/PatCandidates>
  <use name=PhysicsTools/FWLite>
  <use name=Firenze/PATAnalysis>
+ <use name=CondFormats/JetMETObjects>
  <lib name=Proof>
 </bin>
 

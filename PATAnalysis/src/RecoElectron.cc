@@ -95,7 +95,7 @@ PixelHit_OC(0), PixelHit_SC(0), FirstPixelBarrelHit_OC(0), FirstPixelBarrelHit_S
 
 DeltaRvsCharge_JetRec(0), DeltaRvsCharge_JetRec_Iso(0), DeltaRvsCharge_JetRec_NotIso(0),
 
-_targetLumi(50.), _xsec(1.), _norm(1.), _dir(0), _charge_dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _Norm(false), _GenParticleMatch(false), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _fileCounter(0), _Acc(1), _Trg(2), _Conv(3), _Imp(4), _Iso(5), _EiD(6), _selections("ASYM"), _JetType("PF"), _sample("data"), _file(0), _histoVector(), _histoVector2D()
+_targetLumi(50.), _xsec(1.), _norm(1.), _dir(0), _charge_dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _Norm(false), _GenParticleMatch(false), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _fileCounter(0), _Acc(1), _Trg(2), _Conv(3), _Imp(4), _Iso(5), _EiD(6), _JECUnc(0), _selections("ASYM"), _JetType("PF"), _sample("data"), _file(0), _histoVector(), _histoVector2D()
 
 { }
 
@@ -114,6 +114,7 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _ProcEvents    = iConfig.getParameter<int32_t>("ProcEvents");
    _GenParticleMatch = iConfig.getParameter<bool>("GenParticleMatch");
    _JetType = iConfig.getParameter<std::string>("JetType");
+   _JECUnc    = iConfig.getParameter<int32_t>("JECUnc");
    _ReportName = iConfig.getParameter<std::string>("ReportName");
    
    //Selections
@@ -1631,7 +1632,8 @@ void RecoElectron::finalize(){
    Report<<_RecoCutFlags[4].c_str()<<endl;
    Report<<_RecoCutFlags[5].c_str()<<endl;
    Report<<_RecoCutFlags[6].c_str()<<endl<<endl;
-   Report<<"Jet Type used = "<<_JetType.c_str()<<endl<<endl;
+   Report<<"Jet Type used = "<<_JetType.c_str()<<endl;
+   Report<<"JEC Uncertainty = "<<_JECUnc<<" (if 0 = not applied)"<<endl<<endl;
    
    Report<<"Cut values applied:"<<endl<<endl;
    

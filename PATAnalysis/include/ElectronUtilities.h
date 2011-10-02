@@ -12,6 +12,10 @@
 #include "DataFormats/GsfTrackReco/interface/GsfTrack.h"
 #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 #include "PhysicsTools/PatUtils/interface/TriggerHelper.h"
+#include "JetMETCorrections/Objects/interface/JetCorrector.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
+#include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 
 #include <vector>
 #include <map>
@@ -73,13 +77,11 @@ static string JetTrigger = "HLT_Jet30U";
 static double etaelcut = 2.5;
 static double eta_el_excl_up = 1.566;               //Excluded Eta region
 static double eta_el_excl_down = 1.4442;           //Excluded Eta region
-static double minnhit = 11.;
-static double maxchi2 = 10.;
 static double dxycut = 0.02;     //cm
 
 //Jets
 static bool JetIDReq = false;
-static double ptjetmin = 15.;   //Gev/c
+static double ptjetmin = 30.;   //Gev/c
 static double etajetmax = 2.5;
 static double isojetcut = 0.3; //Isolation jet - Z electron
 
@@ -507,6 +509,32 @@ template<class JET> int jetID(const JET& jet){
    int jetID = -1;
    if(jet->chargedEmEnergyFraction()<0.99 && jet->neutralHadronEnergyFraction()<0.99 && jet->neutralEmEnergyFraction()<0.99 && jet->chargedHadronEnergyFraction()>0 && jet->chargedMultiplicity()>0) jetID = 1;
    return jetID;
+}
+
+template<class JET> std::vector<const JET*> GetJets_wJECUnc(const std::vector<JET>& jets, JetCorrectionUncertainty& jecUnc, int JECUnc){
+  std::vector<const JET*> selectedjets;
+  
+  bool jetIDflag = true;
+  
+  for (unsigned int i = 0; i < jets.size();  ++i){
+  
+  if(JetIDReq){
+  jetIDflag=false;
+  if(jetID(&jets[i])==1)jetIDflag=true;
+  }
+  
+  double unc = 0;
+  
+  if(JECUnc!=0){
+  jecUnc.setJetEta(jets[i].eta());
+  jecUnc.setJetPt(jets[i].pt()); 
+  unc = jecUnc.getUncertainty(true)*JECUnc;}
+  
+  if (jets[i].pt()+(jets[i].pt()*unc) > ptjetmin && fabs(jets[i].eta()) < etajetmax && jetIDflag) selectedjets.push_back(&jets[i]);
+  
+  }
+  
+  return selectedjets;
 }
 
 template<class JET> std::vector<const JET*> GetJets(const std::vector<JET>& jets){
