@@ -49,6 +49,8 @@ public :
      eleHovE1other,eleEovP1,elesigmaetaeta1,elesigmaietaieta1; 
    Float_t elecharge2,eledB2,elefbrem2,eledeltaeta2,eledeltaphi2,eleHovE2,
      eleHovE2other,eleEovP2,elesigmaetaeta2,elesigmaietaieta2;
+   Float_t eleconvcot1,eleconvdist1,eleconvmhit1;
+   Float_t eleconvcot2,eleconvdist2,eleconvmhit2;
    Float_t elehcaliso1, eleecaliso1, eletrackiso1, elereliso1, elechisq1;
    Float_t elehcaliso2, eleecaliso2, eletrackiso2, elereliso2, elechisq2;
    Int_t elerobusttight1, elerobusttight2;

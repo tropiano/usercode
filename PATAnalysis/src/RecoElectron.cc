@@ -48,12 +48,26 @@ recLeadElPt_1234(0), recSecElPt_1234(0), recLeadElEta_1234(0), recSecElEta_1234(
 recLeadElPt_12345(0), recSecElPt_12345(0), recLeadElEta_12345(0), recSecElEta_12345(0),
 recLeadElPt_123456(0), recSecElPt_123456(0), recLeadElEta_123456(0), recSecElEta_123456(0),
 
-recLeadElIP_1(0), recSecElIP_1(0), recLeadElfBrem_1(0), recSecElfBrem_1(0),
-recLeadElIP_12(0), recSecElIP_12(0), recLeadElfBrem_12(0), recSecElfBrem_12(0),
-recLeadElIP_123(0), recSecElIP_123(0), recLeadElfBrem_123(0), recSecElfBrem_123(0), 
-recLeadElIP_1234(0), recSecElIP_1234(0), recLeadElfBrem_1234(0), recSecElfBrem_1234(0),
-recLeadElIP_12345(0), recSecElIP_12345(0), recLeadElfBrem_12345(0), recSecElfBrem_12345(0),
-recLeadElIP_123456(0), recSecElIP_123456(0), recLeadElfBrem_123456(0), recSecElfBrem_123456(0),
+recElIP_1(0), recLeadElfBrem_1(0), recSecElfBrem_1(0),
+recElIP_12(0), recLeadElfBrem_12(0), recSecElfBrem_12(0),
+recElIP_123(0), recLeadElfBrem_123(0), recSecElfBrem_123(0), 
+recElIP_1234(0), recLeadElfBrem_1234(0), recSecElfBrem_1234(0),
+recElIP_12345(0), recLeadElfBrem_12345(0), recSecElfBrem_12345(0),
+recElIP_123456(0), recLeadElfBrem_123456(0), recSecElfBrem_123456(0),
+
+recLeadElConvMissHit_1(0), recLeadElConvCotDist_1(0),
+recLeadElConvMissHit_12(0), recLeadElConvCotDist_12(0), 
+recLeadElConvMissHit_123(0), recLeadElConvCotDist_123(0), 
+recLeadElConvMissHit_1234(0), recLeadElConvCotDist_1234(0),
+recLeadElConvMissHit_12345(0), recLeadElConvCotDist_12345(0),
+recLeadElConvMissHit_123456(0), recLeadElConvCotDist_123456(0), 
+
+recSecElConvMissHit_1(0), recSecElConvCotDist_1(0),
+recSecElConvMissHit_12(0), recSecElConvCotDist_12(0), 
+recSecElConvMissHit_123(0), recSecElConvCotDist_123(0), 
+recSecElConvMissHit_1234(0), recSecElConvCotDist_1234(0), 
+recSecElConvMissHit_12345(0), recSecElConvCotDist_12345(0),
+recSecElConvMissHit_123456(0), recSecElConvCotDist_123456(0), 
 
 recPtZSC_1(0), recEtaZSC_1(0), recMassZSC_1(0), 
 recPtZSC_12(0), recEtaZSC_12(0), recMassZSC_12(0),
@@ -76,9 +90,11 @@ recLeadElIPSC_1234(0), recSecElIPSC_1234(0), recLeadElfBremSC_1234(0), recSecElf
 recLeadElIPSC_12345(0), recSecElIPSC_12345(0), recLeadElfBremSC_12345(0), recSecElfBremSC_12345(0),
 recLeadElIPSC_123456(0), recSecElIPSC_123456(0), recLeadElfBremSC_123456(0), recSecElfBremSC_123456(0),
 
-recTrackIsoLead_PreIso(0), recEcalIsoLead_PreIso(0), recHcalIsoLead_PreIso(0), recRelIsoLead_PreIso(0), recTrackIsoSec_PreIso(0), recEcalIsoSec_PreIso(0), recHcalIsoSec_PreIso(0), recRelIsoSec_PreIso(0),
+recTrackIsoLead_PreIso(0), recEcalIsoLead_PreIso(0), recHcalIsoLead_PreIso(0),  recTrackIsoSec_PreIso(0), recEcalIsoSec_PreIso(0), recHcalIsoSec_PreIso(0), 
 
-HoverE_PreEiD(0), DeltaEtaIn_PreEiD(0), DeltaPhiIn_PreEiD(0), SigmaIEtaIEta_PreEiD(0), HoverE_EiD(0), DeltaEtaIn_EiD(0), DeltaPhiIn_EiD(0), SigmaIEtaIEta_EiD(0), 
+recRelIso_Barrel_PreIso(0), recRelIso_Endcap_PreIso(0),
+
+HoverE_Barrel_PreEiD(0), DeltaEtaIn_Barrel_PreEiD(0), DeltaPhiIn_Barrel_PreEiD(0), SigmaIEtaIEta_Barrel_PreEiD(0), HoverE_Endcap_PreEiD(0), DeltaEtaIn_Endcap_PreEiD(0), DeltaPhiIn_Endcap_PreEiD(0), SigmaIEtaIEta_Endcap_PreEiD(0), 
 
 RecoIsoJetPt_123456(0), RecoJetPt_123456(0), recLeadIsoJetPt_123456(0), recLeadIsoJetEta_123456(0), JetCounter_123456(0), 
 IsoJetCounter_1(0), IsoJetCounter_12(0), IsoJetCounter_123(0), IsoJetCounter_1234(0), IsoJetCounter_12345(0), IsoJetCounter_123456(0),
@@ -373,45 +389,25 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    recSecElEta_123456  = new TH1D(recSecElEta_name.c_str(), "Reconstructed Second electron #eta", 100, -2.5, 2.5);
    _histoVector.push_back(recSecElEta_123456);
    
-   string recLeadElIP_name = "recLeadElIP";
-   recLeadElIP_name+=_RecoCutFlags[1].c_str();  
-   recLeadElIP_1 = new TH1D(recLeadElIP_name.c_str(), "Reconstructed Leading electron IP", 100, 0, 0.1);
-   _histoVector.push_back(recLeadElIP_1);
-   recLeadElIP_name+=_RecoCutFlags[2].c_str();  
-   recLeadElIP_12 = new TH1D(recLeadElIP_name.c_str(), "Reconstructed Leading electron IP", 100, 0, 0.1);
-   _histoVector.push_back(recLeadElIP_12);
-   recLeadElIP_name+=_RecoCutFlags[3].c_str();  
-   recLeadElIP_123 = new TH1D(recLeadElIP_name.c_str(), "Reconstructed Leading electron IP", 100, 0, 0.1);
-   _histoVector.push_back(recLeadElIP_123);
-   recLeadElIP_name+=_RecoCutFlags[4].c_str();  
-   recLeadElIP_1234 = new TH1D(recLeadElIP_name.c_str(), "Reconstructed Leading electron IP", 100, 0, 0.1);
-   _histoVector.push_back(recLeadElIP_1234);
-   recLeadElIP_name+=_RecoCutFlags[5].c_str();  
-   recLeadElIP_12345 = new TH1D(recLeadElIP_name.c_str(), "Reconstructed Leading electron IP", 100, 0, 0.1);
-   _histoVector.push_back(recLeadElIP_12345);
-   recLeadElIP_name+=_RecoCutFlags[6].c_str();  
-   recLeadElIP_123456 = new TH1D(recLeadElIP_name.c_str(), "Reconstructed Leading electron IP", 100, 0, 0.1);
-   _histoVector.push_back(recLeadElIP_123456);
-   
-   string recSecElIP_name = "recSecElIP";
-   recSecElIP_name+=_RecoCutFlags[1].c_str();  
-   recSecElIP_1 = new TH1D(recSecElIP_name.c_str(), "Reconstructed Second electron IP", 100, 0, 0.1);
-   _histoVector.push_back(recSecElIP_1);
-   recSecElIP_name+=_RecoCutFlags[2].c_str();  
-   recSecElIP_12 = new TH1D(recSecElIP_name.c_str(), "Reconstructed Second electron IP", 100, 0, 0.1);
-   _histoVector.push_back(recSecElIP_12);
-   recSecElIP_name+=_RecoCutFlags[3].c_str();  
-   recSecElIP_123 = new TH1D(recSecElIP_name.c_str(), "Reconstructed Second electron IP", 100, 0, 0.1);
-   _histoVector.push_back(recSecElIP_123);
-   recSecElIP_name+=_RecoCutFlags[4].c_str();  
-   recSecElIP_1234 = new TH1D(recSecElIP_name.c_str(), "Reconstructed Second electron IP", 100, 0, 0.1);
-   _histoVector.push_back(recSecElIP_1234);
-   recSecElIP_name+=_RecoCutFlags[5].c_str();  
-   recSecElIP_12345 = new TH1D(recSecElIP_name.c_str(), "Reconstructed Second electron IP", 100, 0, 0.1);
-   _histoVector.push_back(recSecElIP_12345);
-   recSecElIP_name+=_RecoCutFlags[6].c_str();  
-   recSecElIP_123456 = new TH1D(recSecElIP_name.c_str(), "Reconstructed Second electron IP", 100, 0, 0.1);
-   _histoVector.push_back(recSecElIP_123456);
+   string recElIP_name = "recElIP";
+   recElIP_name+=_RecoCutFlags[1].c_str();  
+   recElIP_1 = new TH1D(recElIP_name.c_str(), "Reconstructed electron IP", 100, 0, 0.1);
+   _histoVector.push_back(recElIP_1);
+   recElIP_name+=_RecoCutFlags[2].c_str();  
+   recElIP_12 = new TH1D(recElIP_name.c_str(), "Reconstructed electron IP", 100, 0, 0.1);
+   _histoVector.push_back(recElIP_12);
+   recElIP_name+=_RecoCutFlags[3].c_str();  
+   recElIP_123 = new TH1D(recElIP_name.c_str(), "Reconstructed electron IP", 100, 0, 0.1);
+   _histoVector.push_back(recElIP_123);
+   recElIP_name+=_RecoCutFlags[4].c_str();  
+   recElIP_1234 = new TH1D(recElIP_name.c_str(), "Reconstructed electron IP", 100, 0, 0.1);
+   _histoVector.push_back(recElIP_1234);
+   recElIP_name+=_RecoCutFlags[5].c_str();  
+   recElIP_12345 = new TH1D(recElIP_name.c_str(), "Reconstructed electron IP", 100, 0, 0.1);
+   _histoVector.push_back(recElIP_12345);
+   recElIP_name+=_RecoCutFlags[6].c_str();  
+   recElIP_123456 = new TH1D(recElIP_name.c_str(), "Reconstructed electron IP", 100, 0, 0.1);
+   _histoVector.push_back(recElIP_123456);
    
    string recLeadElfBrem_name = "recLeadElfBrem";
    recLeadElfBrem_name+=_RecoCutFlags[1].c_str();  
@@ -452,6 +448,86 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    recSecElfBrem_name+=_RecoCutFlags[6].c_str();  
    recSecElfBrem_123456 = new TH1D(recSecElfBrem_name.c_str(), "Reconstructed Second electron fBrem", 100, 0, 2);
    _histoVector.push_back(recSecElfBrem_123456);
+   
+   string recLeadElConvMissHit_name = "recLeadElConvMissHit";
+   recLeadElConvMissHit_name+=_RecoCutFlags[1].c_str();
+   recLeadElConvMissHit_1 = new TH1D(recLeadElConvMissHit_name.c_str(), "Reconstructed Leading Electron Missing Hits", 7, 0, 7);
+   _histoVector.push_back(recLeadElConvMissHit_1);
+   recLeadElConvMissHit_name+=_RecoCutFlags[2].c_str();
+   recLeadElConvMissHit_12 = new TH1D(recLeadElConvMissHit_name.c_str(), "Reconstructed Leading Electron Missing Hits", 7, 0, 7);
+   _histoVector.push_back(recLeadElConvMissHit_12);
+   recLeadElConvMissHit_name+=_RecoCutFlags[3].c_str();
+   recLeadElConvMissHit_123 = new TH1D(recLeadElConvMissHit_name.c_str(), "Reconstructed Leading Electron Missing Hits", 7, 0, 7);
+   _histoVector.push_back(recLeadElConvMissHit_123);
+   recLeadElConvMissHit_name+=_RecoCutFlags[4].c_str();
+   recLeadElConvMissHit_1234 = new TH1D(recLeadElConvMissHit_name.c_str(), "Reconstructed Leading Electron Missing Hits", 7, 0, 7);
+   _histoVector.push_back(recLeadElConvMissHit_1234);
+   recLeadElConvMissHit_name+=_RecoCutFlags[5].c_str();
+   recLeadElConvMissHit_12345 = new TH1D(recLeadElConvMissHit_name.c_str(), "Reconstructed Leading Electron Missing Hits", 7, 0, 7);
+   _histoVector.push_back(recLeadElConvMissHit_12345);
+   recLeadElConvMissHit_name+=_RecoCutFlags[6].c_str();
+   recLeadElConvMissHit_123456 = new TH1D(recLeadElConvMissHit_name.c_str(), "Reconstructed Leading Electron Missing Hits", 7, 0, 7);
+   _histoVector.push_back(recLeadElConvMissHit_123456);
+   
+   string recSecElConvMissHit_name = "recSecElConvMissHit";
+   recSecElConvMissHit_name+=_RecoCutFlags[1].c_str();
+   recSecElConvMissHit_1 = new TH1D(recSecElConvMissHit_name.c_str(), "Reconstructed Second Electron Missing Hits", 7, 0, 7);
+   _histoVector.push_back(recSecElConvMissHit_1);
+   recSecElConvMissHit_name+=_RecoCutFlags[2].c_str();
+   recSecElConvMissHit_12 = new TH1D(recSecElConvMissHit_name.c_str(), "Reconstructed Second Electron Missing Hits", 7, 0, 7);
+   _histoVector.push_back(recSecElConvMissHit_12);
+   recSecElConvMissHit_name+=_RecoCutFlags[3].c_str();
+   recSecElConvMissHit_123 = new TH1D(recSecElConvMissHit_name.c_str(), "Reconstructed Second Electron Missing Hits", 7, 0, 7);
+   _histoVector.push_back(recSecElConvMissHit_123);
+   recSecElConvMissHit_name+=_RecoCutFlags[4].c_str();
+   recSecElConvMissHit_1234 = new TH1D(recSecElConvMissHit_name.c_str(), "Reconstructed Second Electron Missing Hits", 7, 0, 7);
+   _histoVector.push_back(recSecElConvMissHit_1234);
+   recSecElConvMissHit_name+=_RecoCutFlags[5].c_str();
+   recSecElConvMissHit_12345 = new TH1D(recSecElConvMissHit_name.c_str(), "Reconstructed Second Electron Missing Hits", 7, 0, 7);
+   _histoVector.push_back(recSecElConvMissHit_12345);
+   recSecElConvMissHit_name+=_RecoCutFlags[6].c_str();
+   recSecElConvMissHit_123456 = new TH1D(recSecElConvMissHit_name.c_str(), "Reconstructed Second Electron Missing Hits", 7, 0, 7);
+   _histoVector.push_back(recSecElConvMissHit_123456);
+   
+   string recLeadElConvCotDist_name = "recLeadElConvCotDist";
+   recLeadElConvCotDist_name+=_RecoCutFlags[1].c_str();
+   recLeadElConvCotDist_1 = new TH1D(recLeadElConvCotDist_name.c_str(), "Reco Leading Electron Conv Var - sqrt(Cot2+Dist2)", 100, 0., 0.2);
+   _histoVector.push_back(recLeadElConvCotDist_1);
+   recLeadElConvCotDist_name+=_RecoCutFlags[2].c_str();
+   recLeadElConvCotDist_12 = new TH1D(recLeadElConvCotDist_name.c_str(), "Reco Leading Electron Conv Var - sqrt(Cot2+Dist2)", 100, 0., 0.2);
+   _histoVector.push_back(recLeadElConvCotDist_12);
+   recLeadElConvCotDist_name+=_RecoCutFlags[3].c_str();
+   recLeadElConvCotDist_123 = new TH1D(recLeadElConvCotDist_name.c_str(), "Reco Leading Electron Conv Var - sqrt(Cot2+Dist2)", 100, 0., 0.2);
+   _histoVector.push_back(recLeadElConvCotDist_123);
+   recLeadElConvCotDist_name+=_RecoCutFlags[4].c_str();
+   recLeadElConvCotDist_1234 = new TH1D(recLeadElConvCotDist_name.c_str(), "Reco Leading Electron Conv Var - sqrt(Cot2+Dist2)", 100, 0., 0.2);
+   _histoVector.push_back(recLeadElConvCotDist_1234);
+   recLeadElConvCotDist_name+=_RecoCutFlags[5].c_str();
+   recLeadElConvCotDist_12345 = new TH1D(recLeadElConvCotDist_name.c_str(), "Reco Leading Electron Conv Var - sqrt(Cot2+Dist2)", 100, 0., 0.2);
+   _histoVector.push_back(recLeadElConvCotDist_12345);
+   recLeadElConvCotDist_name+=_RecoCutFlags[6].c_str();
+   recLeadElConvCotDist_123456 = new TH1D(recLeadElConvCotDist_name.c_str(), "Reco Leading Electron Conv Var - sqrt(Cot2+Dist2)", 100, 0., 0.2);
+   _histoVector.push_back(recLeadElConvCotDist_123456);
+   
+   string recSecElConvCotDist_name = "recSecElConvCotDist";
+   recSecElConvCotDist_name+=_RecoCutFlags[1].c_str();
+   recSecElConvCotDist_1 = new TH1D(recSecElConvCotDist_name.c_str(), "Reco Second Electron Conv Var - sqrt(Cot2+Dist2)", 100, 0., 0.2);
+   _histoVector.push_back(recSecElConvCotDist_1);
+   recSecElConvCotDist_name+=_RecoCutFlags[2].c_str();
+   recSecElConvCotDist_12 = new TH1D(recSecElConvCotDist_name.c_str(), "Reco Second Electron Conv Var - sqrt(Cot2+Dist2)", 100, 0., 0.2);
+   _histoVector.push_back(recSecElConvCotDist_12);
+   recSecElConvCotDist_name+=_RecoCutFlags[3].c_str();
+   recSecElConvCotDist_123 = new TH1D(recSecElConvCotDist_name.c_str(), "Reco Second Electron Conv Var - sqrt(Cot2+Dist2)", 100, 0., 0.2);
+   _histoVector.push_back(recSecElConvCotDist_123);
+   recSecElConvCotDist_name+=_RecoCutFlags[4].c_str();
+   recSecElConvCotDist_1234 = new TH1D(recSecElConvCotDist_name.c_str(), "Reco Second Electron Conv Var - sqrt(Cot2+Dist2)", 100, 0., 0.2);
+   _histoVector.push_back(recSecElConvCotDist_1234);
+   recSecElConvCotDist_name+=_RecoCutFlags[5].c_str();
+   recSecElConvCotDist_12345 = new TH1D(recSecElConvCotDist_name.c_str(), "Reco Second Electron Conv Var - sqrt(Cot2+Dist2)", 100, 0., 0.2);
+   _histoVector.push_back(recSecElConvCotDist_12345);
+   recSecElConvCotDist_name+=_RecoCutFlags[6].c_str();
+   recSecElConvCotDist_123456 = new TH1D(recSecElConvCotDist_name.c_str(), "Reco Second Electron Conv Var - sqrt(Cot2+Dist2)", 100, 0., 0.2);
+   _histoVector.push_back(recSecElConvCotDist_123456);
    
    //Z Electron variables - SC   
    SC_dir->cd();
@@ -619,23 +695,23 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    //Electron identification variable
    _Eldir->cd();
    
-   HoverE_PreEiD = new TH1D("HoverE_PreEiD", "Electron Hcal Over Ecal", 100, 0, 0.1);
-   _histoVector.push_back(HoverE_PreEiD);
-   DeltaEtaIn_PreEiD = new TH1D("DeltaEtaIn_PreEiD", "Electron Delta Eta In", 100, -0.1, 0.1);
-   _histoVector.push_back(DeltaEtaIn_PreEiD);
-   DeltaPhiIn_PreEiD = new TH1D("DeltaPhiIn_PreEiD", "Electron Delta Phi In", 100, -0.4, 0.4);
-   _histoVector.push_back(DeltaPhiIn_PreEiD);
-   SigmaIEtaIEta_PreEiD= new TH1D("SigmaIEtaIEta_PreEiD", "Electron SigmaIEtaIEta", 100, 0, 0.1);
-   _histoVector.push_back(SigmaIEtaIEta_PreEiD);
+   HoverE_Barrel_PreEiD = new TH1D("HoverE_Barrel_PreEiD", "Electron Hcal Over Ecal - Barrel", 100, 0, 0.1);
+   _histoVector.push_back(HoverE_Barrel_PreEiD);
+   DeltaEtaIn_Barrel_PreEiD = new TH1D("DeltaEtaIn_Barrel_PreEiD", "Electron Delta Eta In - Barrel", 100, -0.1, 0.1);
+   _histoVector.push_back(DeltaEtaIn_Barrel_PreEiD);
+   DeltaPhiIn_Barrel_PreEiD = new TH1D("DeltaPhiIn_Barrel_PreEiD", "Electron Delta Phi In - Barrel", 100, -0.4, 0.4);
+   _histoVector.push_back(DeltaPhiIn_Barrel_PreEiD);
+   SigmaIEtaIEta_Barrel_PreEiD= new TH1D("SigmaIEtaIEta_Barrel_PreEiD", "Electron SigmaIEtaIEta - Barrel", 100, 0, 0.1);
+   _histoVector.push_back(SigmaIEtaIEta_Barrel_PreEiD);
    
-   HoverE_EiD = new TH1D("HoverE_EiD", "Electron Hcal Over Ecal", 100, 0, 0.1);
-   _histoVector.push_back(HoverE_EiD);
-   DeltaEtaIn_EiD = new TH1D("DeltaEtaIn_EiD", "Electron Delta Eta In", 100, -0.1, 0.1);
-   _histoVector.push_back(DeltaEtaIn_EiD);
-   DeltaPhiIn_EiD = new TH1D("DeltaPhiIn_EiD", "Electron Delta Phi In", 100, -0.4, 0.4);
-   _histoVector.push_back(DeltaPhiIn_EiD);
-   SigmaIEtaIEta_EiD= new TH1D("SigmaIEtaIEta_EiD", "Electron SigmaIEtaIEta", 100, 0, 0.1);
-   _histoVector.push_back(SigmaIEtaIEta_EiD);
+   HoverE_Endcap_PreEiD = new TH1D("HoverE_Endcap_PreEiD", "Electron Hcal Over Ecal - Endcap", 100, 0, 0.1);
+   _histoVector.push_back(HoverE_Endcap_PreEiD);
+   DeltaEtaIn_Endcap_PreEiD = new TH1D("DeltaEtaIn_Endcap_PreEiD", "Electron Delta Eta In - Endcap", 100, -0.1, 0.1);
+   _histoVector.push_back(DeltaEtaIn_Endcap_PreEiD);
+   DeltaPhiIn_Endcap_PreEiD = new TH1D("DeltaPhiIn_Endcap_PreEiD", "Electron Delta Phi In - Endcap", 100, -0.4, 0.4);
+   _histoVector.push_back(DeltaPhiIn_Endcap_PreEiD);
+   SigmaIEtaIEta_Endcap_PreEiD= new TH1D("SigmaIEtaIEta_Endcap_PreEiD", "Electron SigmaIEtaIEta - Endcap", 100, 0, 0.1);
+   _histoVector.push_back(SigmaIEtaIEta_Endcap_PreEiD);
    
    //Z Electrons Isolation variables
    _Eldir->cd();
@@ -646,16 +722,19 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _histoVector.push_back(recEcalIsoLead_PreIso);
    recHcalIsoLead_PreIso  = new TH1D("recHcalIsoLead_PreIso", "Lead HCAL Isolation SumPt", 3000, 0, 30);
    _histoVector.push_back(recHcalIsoLead_PreIso);
-   recRelIsoLead_PreIso   = new TH1D("recRelIsoLead_PreIso", "Lead Comb Relative Isolation", 3000, 0, 30);
-   _histoVector.push_back(recRelIsoLead_PreIso);
    recTrackIsoSec_PreIso = new TH1D("recTrackIsoSec_PreIso", "Sec Track Isolation SumPt", 3000, 0, 30);
    _histoVector.push_back(recTrackIsoSec_PreIso);
    recEcalIsoSec_PreIso  = new TH1D("recEcalIsoSec_PreIso", "Sec ECAL Isolation SumPt", 3000, 0, 30);
    _histoVector.push_back(recEcalIsoSec_PreIso);
    recHcalIsoSec_PreIso  = new TH1D("recHcalIsoSec_PreIso", "Sec HCAL Isolation SumPt", 3000, 0, 30); 
    _histoVector.push_back(recHcalIsoSec_PreIso);
-   recRelIsoSec_PreIso   = new TH1D("recRelIsoSec_PreIso", "Sec Comb Relative Isolation", 3000, 0, 30);
-   _histoVector.push_back(recRelIsoSec_PreIso);
+   
+   
+   recRelIso_Barrel_PreIso   = new TH1D("recRelIso_Barrel_PreIso", "Comb Relative Isolation - Barrel", 3000, 0, 30);
+   _histoVector.push_back(recRelIso_Barrel_PreIso);
+   recRelIso_Endcap_PreIso   = new TH1D("recRelIso_Endcap_PreIso", "Comb Relative Isolation - Endcap", 3000, 0, 30);
+   _histoVector.push_back(recRelIso_Endcap_PreIso);
+   
    
    //Jet variables
    _Jetdir = _dir->mkdir("recJet_Plots");
@@ -1250,10 +1329,20 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      recSecElEta_1->Fill(dau1->eta());
      recLeadElPt_1->Fill(dau0->pt());
      recSecElPt_1->Fill(dau1->pt());
-     recLeadElIP_1->Fill(dau0->dB());
-     recSecElIP_1->Fill(dau1->dB());
+     recElIP_1->Fill(dau0->dB());
+     recElIP_1->Fill(dau1->dB());
      recLeadElfBrem_1->Fill(dau0->fbrem());
      recSecElfBrem_1->Fill(dau1->fbrem());
+     recLeadElConvCotDist_1->Fill(sqrt(pow(dau0->convDcot(),2)+pow(dau0->convDist(),2)));
+     recSecElConvCotDist_1->Fill(sqrt(pow(dau1->convDcot(),2)+pow(dau1->convDist(),2)));
+     
+     const reco::Track *track0 = (const reco::Track*)(dau0->gsfTrack().get()); 
+     const reco::Track *track1 = (const reco::Track*)(dau1->gsfTrack().get());      
+     const reco::HitPattern& p0_inner = track0->trackerExpectedHitsInner(); 
+     const reco::HitPattern& p1_inner = track1->trackerExpectedHitsInner();
+     
+     recLeadElConvMissHit_1->Fill(p0_inner.numberOfHits());
+     recSecElConvMissHit_1->Fill(p1_inner.numberOfHits()); 
         
      //Jet variables
      IsoJetCounter_1->Fill(isorecjets.size());
@@ -1273,10 +1362,20 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      recSecElEta_12->Fill(dau1->eta());
      recLeadElPt_12->Fill(dau0->pt());
      recSecElPt_12->Fill(dau1->pt());
-     recLeadElIP_12->Fill(dau0->dB());
-     recSecElIP_12->Fill(dau1->dB());
+     recElIP_12->Fill(dau0->dB());
+     recElIP_12->Fill(dau1->dB());
      recLeadElfBrem_12->Fill(dau0->fbrem());
      recSecElfBrem_12->Fill(dau1->fbrem());
+     recLeadElConvCotDist_12->Fill(sqrt(pow(dau0->convDcot(),2)+pow(dau0->convDist(),2)));
+     recSecElConvCotDist_12->Fill(sqrt(pow(dau1->convDcot(),2)+pow(dau1->convDist(),2)));
+     
+     const reco::Track *track0 = (const reco::Track*)(dau0->gsfTrack().get()); 
+     const reco::Track *track1 = (const reco::Track*)(dau1->gsfTrack().get());      
+     const reco::HitPattern& p0_inner = track0->trackerExpectedHitsInner(); 
+     const reco::HitPattern& p1_inner = track1->trackerExpectedHitsInner();
+     
+     recLeadElConvMissHit_12->Fill(p0_inner.numberOfHits());
+     recSecElConvMissHit_12->Fill(p1_inner.numberOfHits()); 
         
      //Jet variables
      IsoJetCounter_12->Fill(isorecjets.size());
@@ -1296,10 +1395,20 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      recSecElEta_123->Fill(dau1->eta());
      recLeadElPt_123->Fill(dau0->pt());
      recSecElPt_123->Fill(dau1->pt());
-     recLeadElIP_123->Fill(dau0->dB());
-     recSecElIP_123->Fill(dau1->dB());
+     recElIP_123->Fill(dau0->dB());
+     recElIP_123->Fill(dau1->dB());
      recLeadElfBrem_123->Fill(dau0->fbrem());
      recSecElfBrem_123->Fill(dau1->fbrem());
+     recLeadElConvCotDist_123->Fill(sqrt(pow(dau0->convDcot(),2)+pow(dau0->convDist(),2)));
+     recSecElConvCotDist_123->Fill(sqrt(pow(dau1->convDcot(),2)+pow(dau1->convDist(),2)));
+     
+     const reco::Track *track0 = (const reco::Track*)(dau0->gsfTrack().get()); 
+     const reco::Track *track1 = (const reco::Track*)(dau1->gsfTrack().get());      
+     const reco::HitPattern& p0_inner = track0->trackerExpectedHitsInner(); 
+     const reco::HitPattern& p1_inner = track1->trackerExpectedHitsInner();
+     
+     recLeadElConvMissHit_123->Fill(p0_inner.numberOfHits());
+     recSecElConvMissHit_123->Fill(p1_inner.numberOfHits()); 
          
      //Jet variables
      IsoJetCounter_123->Fill(isorecjets.size());
@@ -1319,10 +1428,20 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      recSecElEta_1234->Fill(dau1->eta());
      recLeadElPt_1234->Fill(dau0->pt());
      recSecElPt_1234->Fill(dau1->pt());
-     recLeadElIP_1234->Fill(dau0->dB());
-     recSecElIP_1234->Fill(dau1->dB());
+     recElIP_1234->Fill(dau0->dB());
+     recElIP_1234->Fill(dau1->dB());
      recLeadElfBrem_1234->Fill(dau0->fbrem());
      recSecElfBrem_1234->Fill(dau1->fbrem());
+     recLeadElConvCotDist_1234->Fill(sqrt(pow(dau0->convDcot(),2)+pow(dau0->convDist(),2)));
+     recSecElConvCotDist_1234->Fill(sqrt(pow(dau1->convDcot(),2)+pow(dau1->convDist(),2)));
+     
+     const reco::Track *track0 = (const reco::Track*)(dau0->gsfTrack().get()); 
+     const reco::Track *track1 = (const reco::Track*)(dau1->gsfTrack().get());      
+     const reco::HitPattern& p0_inner = track0->trackerExpectedHitsInner(); 
+     const reco::HitPattern& p1_inner = track1->trackerExpectedHitsInner();
+     
+     recLeadElConvMissHit_1234->Fill(p0_inner.numberOfHits());
+     recSecElConvMissHit_1234->Fill(p1_inner.numberOfHits()); 
          
      //Jet variables
      IsoJetCounter_1234->Fill(isorecjets.size());
@@ -1342,10 +1461,20 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
       recSecElEta_12345->Fill(dau1->eta());
       recLeadElPt_12345->Fill(dau0->pt());
       recSecElPt_12345->Fill(dau1->pt());
-      recLeadElIP_12345->Fill(dau0->dB());
-      recSecElIP_12345->Fill(dau1->dB());
+      recElIP_12345->Fill(dau0->dB());
+      recElIP_12345->Fill(dau1->dB());
       recLeadElfBrem_12345->Fill(dau0->fbrem());
       recSecElfBrem_12345->Fill(dau1->fbrem());
+      recLeadElConvCotDist_12345->Fill(sqrt(pow(dau0->convDcot(),2)+pow(dau0->convDist(),2)));
+      recSecElConvCotDist_12345->Fill(sqrt(pow(dau1->convDcot(),2)+pow(dau1->convDist(),2)));
+     
+      const reco::Track *track0 = (const reco::Track*)(dau0->gsfTrack().get()); 
+      const reco::Track *track1 = (const reco::Track*)(dau1->gsfTrack().get());      
+      const reco::HitPattern& p0_inner = track0->trackerExpectedHitsInner(); 
+      const reco::HitPattern& p1_inner = track1->trackerExpectedHitsInner();
+     
+      recLeadElConvMissHit_12345->Fill(p0_inner.numberOfHits());
+      recSecElConvMissHit_12345->Fill(p1_inner.numberOfHits()); 
            
       //Jet variables     
       IsoJetCounter_12345->Fill(isorecjets.size());
@@ -1365,10 +1494,20 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
       recSecElEta_123456->Fill(dau1->eta());
       recLeadElPt_123456->Fill(dau0->pt());
       recSecElPt_123456->Fill(dau1->pt());
-      recLeadElIP_123456->Fill(dau0->dB());
-      recSecElIP_123456->Fill(dau1->dB());
+      recElIP_123456->Fill(dau0->dB());
+      recElIP_123456->Fill(dau1->dB());
       recLeadElfBrem_123456->Fill(dau0->fbrem());
       recSecElfBrem_123456->Fill(dau1->fbrem());
+      recLeadElConvCotDist_123456->Fill(sqrt(pow(dau0->convDcot(),2)+pow(dau0->convDist(),2)));
+      recSecElConvCotDist_123456->Fill(sqrt(pow(dau1->convDcot(),2)+pow(dau1->convDist(),2)));
+     
+      const reco::Track *track0 = (const reco::Track*)(dau0->gsfTrack().get()); 
+      const reco::Track *track1 = (const reco::Track*)(dau1->gsfTrack().get());      
+      const reco::HitPattern& p0_inner = track0->trackerExpectedHitsInner(); 
+      const reco::HitPattern& p1_inner = track1->trackerExpectedHitsInner();
+     
+      recLeadElConvMissHit_123456->Fill(p0_inner.numberOfHits());
+      recSecElConvMissHit_123456->Fill(p1_inner.numberOfHits()); 
            
       //Jet variables     
       JetCounter_123456->Fill(recjets.size());
@@ -1491,11 +1630,19 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      recTrackIsoLead_PreIso->Fill(dau0->trackIso());
      recEcalIsoLead_PreIso->Fill(dau0->ecalIso());
      recHcalIsoLead_PreIso->Fill(dau0->hcalIso());
-     recRelIsoLead_PreIso->Fill( (dau0->trackIso() + dau0->ecalIso() + dau0->hcalIso()) / dau0->pt());
+     
      recTrackIsoSec_PreIso->Fill(dau1->trackIso());
      recEcalIsoSec_PreIso->Fill(dau1->ecalIso());
      recHcalIsoSec_PreIso->Fill(dau1->hcalIso());
-     recRelIsoSec_PreIso->Fill( (dau1->trackIso() + dau1->ecalIso() + dau1->hcalIso()) / dau1->pt());     
+     
+     
+     //Barrel
+     if(fabs(dau0->eta())<eta_el_excl_down)recRelIso_Barrel_PreIso->Fill( (dau0->trackIso() + dau0->ecalIso() + dau0->hcalIso()) / dau0->pt());
+     if(fabs(dau1->eta())<eta_el_excl_down)recRelIso_Barrel_PreIso->Fill( (dau1->trackIso() + dau1->ecalIso() + dau1->hcalIso()) / dau1->pt());
+     
+     //Endcap
+     if(fabs(dau0->eta())>eta_el_excl_up && fabs(dau0->eta()) < etaelcut)recRelIso_Endcap_PreIso->Fill( (dau0->trackIso() + dau0->ecalIso() + dau0->hcalIso()) / dau0->pt());
+     if(fabs(dau1->eta())>eta_el_excl_up && fabs(dau1->eta()) < etaelcut)recRelIso_Endcap_PreIso->Fill( (dau1->trackIso() + dau1->ecalIso() + dau1->hcalIso()) / dau1->pt());     
      }
      
      }
@@ -1513,28 +1660,31 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
    }
    } 
    
-   if(PreEiD){     
-     HoverE_PreEiD->Fill(dau0->hcalOverEcal());
-     HoverE_PreEiD->Fill(dau1->hcalOverEcal());
-     DeltaEtaIn_PreEiD->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
-     DeltaEtaIn_PreEiD->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());
-     DeltaPhiIn_PreEiD->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
-     DeltaPhiIn_PreEiD->Fill(dau1->deltaPhiSuperClusterTrackAtVtx());
-     SigmaIEtaIEta_PreEiD->Fill(dau0->sigmaIetaIeta());
-     SigmaIEtaIEta_PreEiD->Fill(dau1->sigmaIetaIeta());     
-     }
+   if(PreEiD){  
+     //Barrel
+     if(fabs(dau0->eta())<eta_el_excl_down){
+     HoverE_Barrel_PreEiD->Fill(dau0->hcalOverEcal());
+     DeltaEtaIn_Barrel_PreEiD->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
+     DeltaPhiIn_Barrel_PreEiD->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
+     SigmaIEtaIEta_Barrel_PreEiD->Fill(dau0->sigmaIetaIeta());}   
+     if(fabs(dau1->eta())<eta_el_excl_down){
+     HoverE_Barrel_PreEiD->Fill(dau1->hcalOverEcal());    
+     DeltaEtaIn_Barrel_PreEiD->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());    
+     DeltaPhiIn_Barrel_PreEiD->Fill(dau1->deltaPhiSuperClusterTrackAtVtx());   
+     SigmaIEtaIEta_Barrel_PreEiD->Fill(dau1->sigmaIetaIeta());}
+     //Endcap
+     if(fabs(dau0->eta())>eta_el_excl_up && fabs(dau0->eta()) < etaelcut){
+     HoverE_Endcap_PreEiD->Fill(dau0->hcalOverEcal());
+     DeltaEtaIn_Endcap_PreEiD->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
+     DeltaPhiIn_Endcap_PreEiD->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
+     SigmaIEtaIEta_Endcap_PreEiD->Fill(dau0->sigmaIetaIeta());}
+     if(fabs(dau1->eta())>eta_el_excl_up && fabs(dau1->eta()) < etaelcut){   
+     HoverE_Endcap_PreEiD->Fill(dau1->hcalOverEcal());    
+     DeltaEtaIn_Endcap_PreEiD->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());    
+     DeltaPhiIn_Endcap_PreEiD->Fill(dau1->deltaPhiSuperClusterTrackAtVtx());    
+     SigmaIEtaIEta_Endcap_PreEiD->Fill(dau1->sigmaIetaIeta());}  
      
-   if(PreEiD && RecSelected(_RecoCutFlags[fcount+1].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
-     HoverE_EiD->Fill(dau0->hcalOverEcal());
-     HoverE_EiD->Fill(dau1->hcalOverEcal());
-     DeltaEtaIn_EiD->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
-     DeltaEtaIn_EiD->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());
-     DeltaPhiIn_EiD->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
-     DeltaPhiIn_EiD->Fill(dau1->deltaPhiSuperClusterTrackAtVtx());
-     SigmaIEtaIEta_EiD->Fill(dau0->sigmaIetaIeta());
-     SigmaIEtaIEta_EiD->Fill(dau1->sigmaIetaIeta());
-     }
-      
+     }   
    }
    }
 

@@ -33,23 +33,24 @@ void TPPlots(string multiplicity, string selections){
         gROOT->SetStyle("Plain");
         
         //MonteCarlo Signal file used to evaluate the Rel. MC Rel Eff. and the TP Eff. w/o background
-        TFile *signal_MC_file = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/MC_Winter10_399/Signal/JetPt15/Z_Madgraph_Z2_JetPt15_2.root");
+        TFile *signal_MC_file = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/MC_Winter10/Signal/JetPt30/Z_Madgraph_Z2_JetPt30.root");
         
         //TP files (outputs of TagAndProbeAnalyzer) whit the mass fits
-        TFile *tp_123 = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Incl_Global.root");
-        TFile *tp_1234 = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Incl_Global.root");
-        TFile *tp_12345 = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Incl_Global.root");
-        TFile *tp_123456 = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Incl_Global.root");
-        TFile *tp_global = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt15/TPAnalyzer/DATA_JetPt15_Incl_Global.root");
+        TFile *tp_12 = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/New_Analyzer/JetPt30/Z2/DATA_JetPt30_Incl_Global.root");
+        TFile *tp_123 = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/New_Analyzer/JetPt30/Z2/DATA_JetPt30_Incl_Global.root");
+        TFile *tp_1234 = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/New_Analyzer/JetPt30/Z2/DATA_JetPt30_Incl_Global.root");
+        TFile *tp_12345 = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/New_Analyzer/JetPt30/Z2/DATA_JetPt30_Incl_Global.root");
+        TFile *tp_123456 = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/New_Analyzer/JetPt30/Z2/DATA_JetPt30_Incl_Global.root");
+        TFile *tp_global = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/New_Analyzer/JetPt30/Z2/DATA_JetPt30_Incl_Global.root");
         
         //Output
-        string out = "TPStudy_JetPt15_Incl_Global_5bin";
+        string out = "TPStudy_JetPt30_Incl_Global";
         string output = out;
         output+=".root";
         TFile* outplots = new TFile(output.c_str(), "RECREATE");
         
         ofstream tpr;
-	string outtpr="TPReport_JetPt15_Incl_Global_5bin.txt";
+	string outtpr="TPReport_JetPt30_Incl_Global.txt";
 	tpr.open(outtpr.c_str());
 	tpr<<endl;
         
@@ -390,6 +391,7 @@ TP_global = TP->mkdir("Tag&Probe_Global");
         
         //Get TP with background double eff.
         
+        TGraphAsymmErrors* tp_eff_12 = (TGraphAsymmErrors*) tp_12->Get("FitDoubleTag&Probe");
         TGraphAsymmErrors* tp_eff_123 = (TGraphAsymmErrors*) tp_123->Get("FitDoubleTag&Probe");
         TGraphAsymmErrors* tp_eff_1234 = (TGraphAsymmErrors*) tp_1234->Get("FitDoubleTag&Probe");
         TGraphAsymmErrors* tp_eff_12345 = (TGraphAsymmErrors*) tp_12345->Get("FitDoubleTag&Probe");
@@ -558,6 +560,7 @@ TP_global = TP->mkdir("Tag&Probe_Global");
         Eff_TP_Single_12.Write();
         Eff_TP_Single1_12.Write();
         Eff_TP_Double_12.Write();
+        tp_eff_12->Write("TP_Data-Eff_12");
         TCanvas *EffTP_12 = new TCanvas;
         Eff_TP_Double_12.SetLineColor(2);
         Eff_TP_Double_12.SetLineWidth(2);
@@ -567,6 +570,11 @@ TP_global = TP->mkdir("Tag&Probe_Global");
 	Eff_TP_Double_12.SetTitle("Cut eff: MC Rel Eff (black), MC TP w/o back (red), Data (blue)");
 	Eff_TP_Double_12.GetXaxis()->SetRangeUser(xmin,xmax);
 	Eff_TP_Double_12.GetYaxis()->SetRangeUser(0.3,1.05); 
+	tp_eff_12->SetLineColor(4);
+	tp_eff_12->SetLineWidth(2);
+	tp_eff_12->SetMarkerStyle(23);
+	tp_eff_12->SetMarkerColor(4);
+	tp_eff_12->DrawClone("PSAME");	
         Eff_MC_Rel12.SetLineColor(1);
         Eff_MC_Rel12.SetLineWidth(2);
 	Eff_MC_Rel12.SetMarkerStyle(20);
@@ -578,6 +586,20 @@ TP_global = TP->mkdir("Tag&Probe_Global");
         EffTP_12_name+=".root";
 	EffTP_12->Write(EffTP_12_name.c_str());
 	EffTP_12->Close();
+	
+	tpr<<"Relative efficiency vs "<<multiplicity<<" jet multiplicity"<<endl;
+	
+	tpr<<endl<<"Selection: "<<_RecoCutFlags[2]<<endl<<endl;
+	for(int i=0; i<4; i++){
+	double xMCeff = 0., yMCeff = 0.;
+	double xMCSigTp = 0., yMCSigTp = 0.;
+	double xDATA = 0., yDATA = 0.;
+	Eff_MC_Rel12.GetPoint(i,xMCeff,yMCeff);
+	Eff_TP_Double_12.GetPoint(i,xMCSigTp,yMCSigTp);
+	tp_eff_12->GetPoint(i,xDATA,yDATA);
+	tpr<<multiplicity<<" Mult. = "<<i<<"	MC eff. =	"<<((float)((int)(yMCeff*cut_decimal)))/cut_decimal<<"	Error High = "<<((float)((int)(Eff_MC_Rel12.GetErrorYhigh(i)*cut_decimal)))/cut_decimal<<"	Error Low = "<<((float)((int)(Eff_MC_Rel12.GetErrorYlow(i)*cut_decimal)))/cut_decimal<<endl;
+	tpr<<"		MC Sig TP =	"<<((float)((int)(yMCSigTp*cut_decimal)))/cut_decimal<<"	Error High = "<<((float)((int)(Eff_TP_Double_12.GetErrorYhigh(i)*cut_decimal)))/cut_decimal<<"	Error Low = "<<((float)((int)(Eff_TP_Double_12.GetErrorYlow(i)*cut_decimal)))/cut_decimal<<endl;
+	tpr<<"		DATA TP =	"<<((float)((int)(yDATA*cut_decimal)))/cut_decimal<<"	Error High = "<<((float)((int)(tp_eff_12->GetErrorYhigh(i)*cut_decimal)))/cut_decimal<<"	Error Low = "<<((float)((int)(tp_eff_12->GetErrorYlow(i)*cut_decimal)))/cut_decimal<<endl<<endl;}
 	
 	TP_123->cd();
         Eff_TP_Single_123.Write();
@@ -610,8 +632,6 @@ TP_global = TP->mkdir("Tag&Probe_Global");
         EffTP_123_name+=".root";
 	EffTP_123->Write(EffTP_123_name.c_str());
 	EffTP_123->Close();
-	
-	tpr<<"Relative efficiency vs "<<multiplicity<<" jet multiplicity"<<endl;
 	
 	tpr<<endl<<"Selection: "<<_RecoCutFlags[3]<<endl<<endl;
 	for(int i=0; i<4; i++){
@@ -807,6 +827,59 @@ TP_global = TP->mkdir("Tag&Probe_Global");
         ////////////////////////////////////////////////////////////////////////////////////
 
         //Tag&Probe residuals
+        
+        TVectorD res1vx_12(n_12);
+        TVectorD res1vy_12(n_12);
+        TVectorD res1vexl_12(n_12);
+        TVectorD res1vexh_12(n_12);
+        TVectorD res1veyl_12(n_12);
+        TVectorD res1veyh_12(n_12);
+        TVectorD res2vx_12(n_12);
+        TVectorD res2vy_12(n_12);
+        TVectorD res2vexl_12(n_12);
+        TVectorD res2vexh_12(n_12);
+        TVectorD res2veyl_12(n_12);
+        TVectorD res2veyh_12(n_12);
+        
+        for ( int i = 0; i < n_12; ++i ){
+        double x0 = 0., y0 = 0., x1 = 0., y1 = 0., x2 = 0., y2 = 0.;
+        Eff_MC_Rel12.GetPoint(i, x0, y0);
+        Eff_TP_Double_12.GetPoint(i, x1, y1);
+        tp_eff_12->GetPoint(i, x2, y2);
+        res1vx_12(i)   = i;
+        res1vexl_12(i) = Eff_MC_Rel12.GetErrorXlow(i);
+        res1vexh_12(i) = Eff_MC_Rel12.GetErrorXhigh(i);
+        res1vy_12(i)   = y1-y0;
+        res1veyl_12(i) = TMath::Sqrt(pow(Eff_MC_Rel12.GetErrorYlow(i),2)+pow(Eff_TP_Double_12.GetErrorYlow(i),2));
+        res1veyh_12(i) = TMath::Sqrt(pow(Eff_MC_Rel12.GetErrorYhigh(i),2)+pow(Eff_TP_Double_12.GetErrorYhigh(i),2));
+        res2vx_12(i)   = i;
+        res2vexl_12(i) = Eff_MC_Rel12.GetErrorXlow(i);
+        res2vexh_12(i) = Eff_MC_Rel12.GetErrorXhigh(i);
+        res2vy_12(i)   = y2-y0;
+        res2veyl_12(i) = TMath::Sqrt(pow(Eff_MC_Rel12.GetErrorYlow(i),2)+pow(tp_eff_12->GetErrorYlow(i),2));
+        res2veyh_12(i) = TMath::Sqrt(pow(Eff_MC_Rel12.GetErrorYhigh(i),2)+pow(tp_eff_12->GetErrorYhigh(i),2));
+        }
+              
+        TP_12->cd();
+        TGraphAsymmErrors TP_Res1_12(res1vx_12, res1vy_12, res1vexl_12, res1vexh_12, res1veyl_12, res1veyh_12);
+        TGraphAsymmErrors TP_Res2_12(res2vx_12, res2vy_12, res2vexl_12, res2vexh_12, res2veyl_12, res2veyh_12);
+        TCanvas *ResTP_12 = new TCanvas;
+        ResTP_12->SetGrid();
+        TP_Res1_12.SetLineColor(2);
+	TP_Res1_12.SetMarkerStyle(21);
+	TP_Res1_12.SetLineWidth(2);
+	TP_Res1_12.SetMarkerColor(2);
+	TP_Res1_12.Draw("AP");
+	TP_Res2_12.SetLineColor(4);
+	TP_Res2_12.SetMarkerStyle(23);
+	TP_Res2_12.SetLineWidth(2);
+	TP_Res2_12.SetMarkerColor(4);
+	TP_Res2_12.Draw("PSAME");
+	TP_Res1_12.SetTitle("TP residuals from MC Rel Eff: MC TP w/o back (red), Data (blue)");
+	TP_Res1_12.GetXaxis()->SetRangeUser(xmin,xmax);
+	TP_Res1_12.GetYaxis()->SetRangeUser(-0.3,0.3);
+	ResTP_12->Write("ResTP_Trg.root");
+	ResTP_12->Close();
 
         TVectorD res1vx_123(n_123);
         TVectorD res1vy_123(n_123);

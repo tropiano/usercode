@@ -38,7 +38,6 @@ _training_background(training_background),
 _mass("mass", "mass", 60., 120.),
 _bin("bin", "bin", 0, 10),
 _probe("probe", "probe", -1, 2),
-//_passprobe("passprobe", "passprobe", 0, 1),
 _weight("weight", "weight", 0., 100.),
 _passprobe_cat("passprobe", "passprobe")
 {
@@ -209,29 +208,31 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzerElectron::fit(RooAbsDat
 
   TH1* hmass = data->createHistogram("mass", 100);
   
-  RooRealVar el_pass("el_pass", "average_pass", 91.,  80., 100.); 
+  RooRealVar el_pass("el_pass", "el_pass", 91.,  80., 100.); 
   RooRealVar sigma_pass("sigma_pass", "sigma_pass", hmass->GetRMS(), 2, 100);
   RooRealVar a_pass("a_pass", "a_pass", 10, 0, 100);
   RooRealVar n_pass("n_pass", "n_pass", 5, 0, 100);
   
-  RooRealVar el_pass2("el_pass2", "average_pass2", 91., 80., 100.);
+  RooRealVar d_pass("d_pass","d_pass", 10., -10., 20.);
+  RooFormulaVar el_pass2("el_pass2","el_pass+d_pass", RooArgList(el_pass,d_pass));
   RooRealVar g_pass("g_pass", "g_pass", 10, 5, 50);
   
   RooRealVar fraction_pass("fraction_pass", "fraction_pass", 0.9, 0., 1.);
 
-  RooRealVar el_fail("el_fail", "average_fail", 91., 80., 100.); 
+  RooRealVar el_fail("el_fail", "el_fail", 91., 80., 100.); 
   RooRealVar sigma_fail("sigma_fail", "sigma_fail", hmass->GetRMS(), 2, 100);
   RooRealVar a_fail("a_fail", "a_fail", 10, 0, 100);
   RooRealVar n_fail("n_fail", "n_fail", 5, 0, 100);
-
-  RooRealVar el_fail2("el_fail2", "average_fail2", 91., 80., 100.);
+  
+  RooRealVar d_fail("d_fail","d_fail", 10., -10., 20.);
+  RooFormulaVar el_fail2("el_fail2","el_fail+d_fail", RooArgList(el_fail,d_fail));
   RooRealVar g_fail("g_fail", "g_fail", 10, 5, 50);
   
   RooRealVar fraction_fail("fraction_fail", "fraction_fail", 0.9, 0., 1.);
 
 
   RooCBShape crystal_pass("crystalball_pass", "crystalball_pass", _mass, el_pass, sigma_pass, a_pass, n_pass);
-  RooBreitWigner breitwig_pass("breitwig_pass", "breitwig_pass", _mass, el_pass2, g_pass); //try not to force the same el_pass
+  RooBreitWigner breitwig_pass("breitwig_pass", "breitwig_pass", _mass, el_pass2, g_pass);
   
   RooAddPdf signal_pass("signal_pass", "signal_pass", crystal_pass, breitwig_pass, fraction_pass);
 
@@ -252,9 +253,9 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzerElectron::fit(RooAbsDat
         if (parname == "el_pass"){
           el_pass.setVal(par->getVal());
           //el_pass.setConstant();
-        } else if (parname == "el_pass2"){
-          el_pass2.setVal(par->getVal());
-          //el_pass2.setConstant();
+        } else if (parname == "d_pass"){
+          d_pass.setVal(par->getVal());
+          d_pass.setConstant();
         } else if (parname == "sigma_pass"){
           sigma_pass.setVal(par->getVal());
           sigma_pass.setConstant();
@@ -273,9 +274,9 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzerElectron::fit(RooAbsDat
         } else if (parname == "el_fail"){
           el_fail.setVal(par->getVal());
           //el_fail.setConstant();
-        } else if (parname == "el_fail2"){
-          el_fail2.setVal(par->getVal());
-          //el_fail2.setConstant();
+        } else if (parname == "d_fail"){
+          d_fail.setVal(par->getVal());
+          d_fail.setConstant();
         } else if (parname == "sigma_fail"){
           sigma_fail.setVal(par->getVal());
           sigma_fail.setConstant();
@@ -336,9 +337,6 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzerElectron::fit(RooAbsDat
   RooRealVar efficiency("efficiency", "efficiency", 0.9, 0., 0.999);
   RooRealVar b_pass("b_pass", "background yield pass", 50, 0, 100000);
   RooRealVar b_fail("b_fail", "background yield fail", 50, 0, 100000);
-
-  //RooFormulaVar s_fail("s_fail","s*efficiency*(1.0 - efficiency)", RooArgList(s, efficiency) );
-  //RooFormulaVar s_pass("s_pass","s*efficiency*efficiency", RooArgList(s, efficiency) );
   
   RooFormulaVar s_fail("s_fail","s*(1.0 - efficiency)", RooArgList(s, efficiency) );
   RooFormulaVar s_pass("s_pass","s*efficiency", RooArgList(s, efficiency) );
@@ -381,8 +379,6 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzerElectron::fit(RooAbsDat
   total_fit.addPdf(sumpass, _passprobe_cat.getLabel());
   _passprobe_cat.setLabel("fail");
   total_fit.addPdf(sumfail, _passprobe_cat.getLabel());
-
- // RooFitResult* fitresult = total_fit.fitTo(*data, RooFit::Save(true), RooFit::Strategy(2), RooFit::NumCPU(8), RooFit::Extended(kTRUE), RooFit::SumW2Error(true));
   
   RooFitResult* fitresult = total_fit.fitTo(*((RooDataSet*) data), RooFit::Minos(RooArgSet(efficiency)), RooFit::Save(true),  RooFit::PrintLevel(3), RooFit::Strategy(1), RooFit::NumCPU(8), RooFit::Optimize(false), RooFit::Extended(kTRUE), RooFit::SumW2Error(true));
     
@@ -446,7 +442,7 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzerElectron::fit(RooAbsDat
   TPaveText* tboxpass = new TPaveText(0.57, 0.70, 0.89, 0.87, "BRNDC"); 
   tboxpass->AddText(spass.str().c_str());
   tboxpass->AddText(bpass.str().c_str());
-  //tboxpass->AddText(eff.str().c_str());
+  tboxpass->AddText(eff.str().c_str());
   mass_pass->addObject(tboxpass);
   
   data->statOn(mass_pass, RooFit::Cut("passprobe==passprobe::pass"), RooFit::DataError(RooAbsData::SumW2));

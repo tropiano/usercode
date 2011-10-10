@@ -27,11 +27,9 @@
 
 using namespace std;
 
-void Ntuple_Plots(int JetPtMin, string tune){
+//JetPtMin in GeV; Tune Z2 or D6T; jecUnc: "0" = NotApplied, "+" = Added, "-" = Subtracted 
 
-string Analysis_Note = "False";
-if (Analysis_Note == "False") gROOT->SetStyle("Plain");
-gStyle->SetOptStat(0);
+void Ntuple_Plots(int JetPtMin, string tune, string jecUnc){ 
 
 string log_scale = "True";
 
@@ -41,15 +39,21 @@ string path = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin";
 string JetPtCut;
 if(JetPtMin==15)JetPtCut="JetPt15";
 if(JetPtMin==30)JetPtCut="JetPt30";
+
+//JEC Uncertainty
+string JEC="";
+if(jecUnc=="0")JEC="";
+if(jecUnc=="+")JEC="_jecUncPlus";
+if(jecUnc=="-")JEC="_jecUncMinus";
 	
 	//Signal MC
-	TFile *Z_TF = TFile::Open((path+"/MC_Winter10/Signal/"+JetPtCut+"/Z_Madgraph_"+tune+"_"+JetPtCut+".root").c_str());
+	TFile *Z_TF = TFile::Open((path+"/MC_Winter10/Signal/"+JetPtCut+"/Z_Madgraph_"+tune+"_"+JetPtCut+JEC+".root").c_str());
 	
 	//Data
 	TFile *Data_TF = TFile::Open((path+"/Data_Dec22ReReco/"+JetPtCut+"/Data_RUN2010A-B_"+JetPtCut+".root").c_str());
 	
 	//Output
-	string out = "NtuplePlots_";
+	string out = "NtuplePlots"+JEC+"_";
 	out+=JetPtCut;     
 	string output = out;
 	output+=".root";
@@ -126,7 +130,6 @@ if(JetPtMin==30)JetPtCut="JetPt30";
 	
 	Matrix->cd();	
 	TH2D* UnfoldingPlot_Scat_PFL1 = new TH2D("UnfoldingPlot_Scat_PFL1","Response Matrix - Gen Jet vs PFL1 Jet",5,-0.5,4.5,5,-0.5,4.5);
-	TH2D* UnfoldingPlot_Scat_PF = new TH2D("UnfoldingPlot_Scat_PF","Response Matrix - Gen Jet vs PF Jet",5,-0.5,4.5,5,-0.5,4.5);
 	CorrFact->cd();
 	TH1D* GENJet_ExclMult = new TH1D("GENJet_ExclMult","Gen Jet Excl Mult.",5,-0.5,4.5);
         TH1D* RECOJet_ExclMult = new TH1D("RECOJet_ExclMult","Reco Jet Excl Mult.",5,-0.5,4.5);
@@ -210,26 +213,34 @@ if(JetPtMin==30)JetPtCut="JetPt30";
 	Matrix->cd();	
 	
 	TCanvas *unf_pfl1 = new TCanvas;
-	Z_tree->Draw("acc_gennjetsele:genacc_npfl1jetsele >> UnfoldingPlot_Scat_PFL1","acc_gennjetsele>-1");	
+	Z_tree->Draw("genacc_npfl1jetsele:acc_gennjetsele >> UnfoldingPlot_Scat_PFL1","acc_gennjetsele>-1");	
 	UnfoldingPlot_Scat_PFL1->GetXaxis()->SetNdivisions(5);
-	UnfoldingPlot_Scat_PFL1->GetXaxis()->SetTitle("RECO Jets Number");
+	UnfoldingPlot_Scat_PFL1->GetXaxis()->SetTitle("RECO Jets");
 	UnfoldingPlot_Scat_PFL1->GetYaxis()->SetNdivisions(5);
-	UnfoldingPlot_Scat_PFL1->GetYaxis()->SetTitle("GEN Jets Number");
-	UnfoldingPlot_Scat_PFL1->SetLineWidth(2);
+	UnfoldingPlot_Scat_PFL1->GetYaxis()->SetTitle("GEN Jets");
+	UnfoldingPlot_Scat_PFL1->SetLineWidth(2);	
 	UnfoldingPlot_Scat_PFL1->Draw("box");
 	unf_pfl1->Write("UnfoldingPlot_Box_PFL1.root");
 	unf_pfl1->Close();
 	
-	TCanvas *unf_pf = new TCanvas;
-	Z_tree->Draw("acc_gennjetsele:genacc_npfjetsele >> UnfoldingPlot_Scat_PF","acc_gennjetsele>-1");	
-	UnfoldingPlot_Scat_PF->GetXaxis()->SetNdivisions(5);
-	UnfoldingPlot_Scat_PF->GetXaxis()->SetTitle("RECO Jets Number");
-	UnfoldingPlot_Scat_PF->GetYaxis()->SetNdivisions(5);
-	UnfoldingPlot_Scat_PF->GetYaxis()->SetTitle("GEN Jets Number");
-	UnfoldingPlot_Scat_PF->SetLineWidth(2);
-	UnfoldingPlot_Scat_PF->Draw("box");
-	unf_pf->Write("UnfoldingPlot_Box_PF.root");
-	unf_pf->Close();
+	TH1D *projY = UnfoldingPlot_Scat_PFL1->ProjectionY();
+	TH2D* Norm_UnfoldingPlot_Scat_PFL1 = new TH2D("Norm_UnfoldingPlot_Scat_PFL1","Response Matrix - Gen Jet vs PFL1 Jet",5,-0.5,4.5,5,-0.5,4.5);
+	int BinNorm=0;
+	for(int i=1;i<6;i++){
+	BinNorm = projY->GetBinContent(i);
+	for(int j=1;j<6;j++){
+	Norm_UnfoldingPlot_Scat_PFL1->SetBinContent(j,i,UnfoldingPlot_Scat_PFL1->GetBinContent(j,i)/BinNorm);
+	}}
+	
+	TCanvas *normunf_pfl1 = new TCanvas;
+	Norm_UnfoldingPlot_Scat_PFL1->GetXaxis()->SetNdivisions(5);
+	Norm_UnfoldingPlot_Scat_PFL1->GetXaxis()->SetTitle("RECO Jets");
+	Norm_UnfoldingPlot_Scat_PFL1->GetYaxis()->SetNdivisions(5);
+	Norm_UnfoldingPlot_Scat_PFL1->GetYaxis()->SetTitle("GEN Jets");
+	Norm_UnfoldingPlot_Scat_PFL1->SetLineWidth(2);	
+	Norm_UnfoldingPlot_Scat_PFL1->Draw("textcolz");
+	normunf_pfl1->Write("Norm_UnfoldingPlot_Box_PFL1.root");
+	normunf_pfl1->Close();
        
         //Make Multiplicity histograms
         

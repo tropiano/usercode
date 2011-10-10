@@ -18,14 +18,16 @@ void phdGrid(bool gridOn) {
   phdStyle->SetPadGridY(gridOn);
 }
 
-// fixOverlay: Redraws the axis
-
-/*void fixOverlay() {
-  gPad->RedrawAxis();
-}*/
 
 void setPhDStyle() {
+
   phdStyle = new TStyle("phdStyle","Style for P-phd");
+  
+  gROOT->SetStyle("Plain");
+  
+//For the matrix plots
+phdStyle->SetPaintTextFormat("5.3f"); 
+phdStyle->SetPalette(1,0);   
 
 // For the canvas:
   phdStyle->SetCanvasBorderMode(0);
@@ -54,21 +56,6 @@ void setPhDStyle() {
   phdStyle->SetFrameLineStyle(1);
   phdStyle->SetFrameLineWidth(1);
 
-// For the histo:
-  // phdStyle->SetHistFillColor(1);
-  // phdStyle->SetHistFillStyle(0);
-  phdStyle->SetHistLineColor(1);
-  phdStyle->SetHistLineStyle(0);
-  phdStyle->SetHistLineWidth(1);
-  // phdStyle->SetLegoInnerR(Float_t rad = 0.5);
-  // phdStyle->SetNumberContours(Int_t number = 20);
-
-  phdStyle->SetEndErrorSize(2);
-  //phdStyle->SetErrorMarker(20);
-  //phdStyle->SetErrorX(0.);
-  
-  phdStyle->SetMarkerStyle(20);
-
 //For the fit/function:
   phdStyle->SetOptFit(1);
   phdStyle->SetFitFormat("5.4g");
@@ -78,10 +65,8 @@ void setPhDStyle() {
 
 //For the date:
   phdStyle->SetOptDate(0);
-  // phdStyle->SetDateX(Float_t x = 0.01);
-  // phdStyle->SetDateY(Float_t y = 0.01);
-
-// For the statistics box:
+ 
+//For the statistics box:
   phdStyle->SetOptFile(0);
   phdStyle->SetOptStat(0); // To display the mean and RMS:   SetOptStat("mr");
   phdStyle->SetStatColor(kWhite);
@@ -92,9 +77,6 @@ void setPhDStyle() {
   phdStyle->SetStatBorderSize(1);
   phdStyle->SetStatH(0.1);
   phdStyle->SetStatW(0.15);
-  // phdStyle->SetStatStyle(Style_t style = 1001);
-  // phdStyle->SetStatX(Float_t x = 0);
-  // phdStyle->SetStatY(Float_t y = 0);
 
 // Margins:
   phdStyle->SetPadTopMargin(0.05);
@@ -103,40 +85,27 @@ void setPhDStyle() {
   phdStyle->SetPadRightMargin(0.02);
 
 // For the Global title:
-
   phdStyle->SetOptTitle(0);
   phdStyle->SetTitleFont(42);
   phdStyle->SetTitleColor(1);
   phdStyle->SetTitleTextColor(1);
   phdStyle->SetTitleFillColor(10);
   phdStyle->SetTitleFontSize(0.05);
-  // phdStyle->SetTitleH(0); // Set the height of the title box
-  // phdStyle->SetTitleW(0); // Set the width of the title box
-  // phdStyle->SetTitleX(0); // Set the position of the title box
-  // phdStyle->SetTitleY(0.985); // Set the position of the title box
-  // phdStyle->SetTitleStyle(Style_t style = 1001);
-  // phdStyle->SetTitleBorderSize(2);
 
 // For the axis titles:
-
   phdStyle->SetTitleColor(1, "XYZ");
   phdStyle->SetTitleFont(42, "XYZ");
   phdStyle->SetTitleSize(0.06, "XYZ");
-  // phdStyle->SetTitleXSize(Float_t size = 0.02); // Another way to set the size?
-  // phdStyle->SetTitleYSize(Float_t size = 0.02);
   phdStyle->SetTitleXOffset(0.9);
   phdStyle->SetTitleYOffset(1.25);
-  // phdStyle->SetTitleOffset(1.1, "Y"); // Another way to set the Offset
 
 // For the axis labels:
-
   phdStyle->SetLabelColor(1, "XYZ");
   phdStyle->SetLabelFont(42, "XYZ");
   phdStyle->SetLabelOffset(0.007, "XYZ");
   phdStyle->SetLabelSize(0.05, "XYZ");
 
 // For the axis:
-
   phdStyle->SetAxisColor(1, "XYZ");
   phdStyle->SetStripDecimals(kTRUE);
   phdStyle->SetTickLength(0.03, "XYZ");
@@ -151,6 +120,7 @@ void setPhDStyle() {
 
 // Postscript options:
   phdStyle->SetPaperSize(20.,20.);
+  
   // phdStyle->SetLineScalePS(Float_t scale = 3);
   // phdStyle->SetLineStyleString(Int_t i, const char* text);
   // phdStyle->SetHeaderPS(const char* header);

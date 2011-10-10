@@ -207,6 +207,9 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    zeetree->Branch("elenhits1",&elenhits1,"elenhits1/I");
    zeetree->Branch("eledB1",&eledB1,"eledB1/F");
    zeetree->Branch("elefbrem1",&elefbrem1,"elefbrem1/F");
+   zeetree->Branch("eleconvcot1",&eleconvcot1,"eleconvcot1/F");
+   zeetree->Branch("eleconvdist1",&eleconvdist1,"eleconvdist1/F");
+   zeetree->Branch("eleconvmhit1",&eleconvmhit1,"eleconvmhit1/F");
    zeetree->Branch("eledeltaeta1",&eledeltaeta1,"eledeltaeta1/F");
    zeetree->Branch("eledeltaphi1",&eledeltaphi1,"eledeltaphi1/F");
    zeetree->Branch("eleHovE1",&eleHovE1,"eleHovE1/F");
@@ -232,6 +235,9 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    zeetree->Branch("elenhits2",&elenhits2,"elenhits2/I");
    zeetree->Branch("eledB2",&eledB2,"eledB2/F");
    zeetree->Branch("elefbrem2",&elefbrem2,"elefbrem2/F");
+   zeetree->Branch("eleconvcot2",&eleconvcot2,"eleconvcot2/F");
+   zeetree->Branch("eleconvdist2",&eleconvdist2,"eleconvdist2/F");
+   zeetree->Branch("eleconvmhit2",&eleconvmhit2,"eleconvmhit2/F");
    zeetree->Branch("eledeltaeta2",&eledeltaeta2,"eledeltaeta2/F");
    zeetree->Branch("eledeltaphi2",&eledeltaphi2,"eledeltaphi2/F");
    zeetree->Branch("eleHovE2",&eleHovE2,"eleHovE2/F");
@@ -420,6 +426,9 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    elenhits1=-1;
    eledB1 = -99.;
    elefbrem1=-99.;
+   eleconvcot1=-99.;
+   eleconvdist1=-99.;
+   eleconvmhit1=-99.; 
    eledeltaeta1=-99.;
    eledeltaphi1=-99.;
    eleHovE1=-99.;
@@ -444,6 +453,9 @@ void RecoElectronNtuple::begin(TFile* out, const edm::ParameterSet& iConfig){
    elenhits2=-1;
    eledB2 = -99.;
    elefbrem2=-99.;
+   eleconvcot2=-99.;
+   eleconvdist2=-99.;
+   eleconvmhit2=-99.;
    eledeltaeta2=-99.;
    eledeltaphi2=-99.;
    eleHovE2=-99.;
@@ -765,6 +777,13 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
       elechisq1=track0->normalizedChi2();
       eledB1=recdau0->dB();
       elefbrem1=recdau0->fbrem();
+      eleconvcot1=recdau0->convDcot();
+      eleconvdist1=recdau0->convDist();
+      
+      const reco::HitPattern& p0_inner = track0->trackerExpectedHitsInner(); 
+      
+      eleconvmhit1=p0_inner.numberOfHits();
+      
       eledeltaeta1=recdau0->deltaEtaSuperClusterTrackAtVtx();
       eledeltaphi1=recdau0->deltaPhiSuperClusterTrackAtVtx();
       eleHovE1=recdau0->hadronicOverEm();
@@ -795,6 +814,13 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
       elenhits2=track1->numberOfValidHits();
       elechisq2=track1->normalizedChi2();
       elefbrem2=recdau1->fbrem();
+      eleconvcot2=recdau1->convDcot();
+      eleconvdist2=recdau1->convDist();
+      
+      const reco::HitPattern& p1_inner = track1->trackerExpectedHitsInner(); 
+      
+      eleconvmhit2=p1_inner.numberOfHits();
+      
       eledeltaeta2=recdau1->deltaEtaSuperClusterTrackAtVtx();
       eledeltaphi2=recdau1->deltaPhiSuperClusterTrackAtVtx();
       eleHovE2=recdau1->hadronicOverEm();

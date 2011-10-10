@@ -28,7 +28,7 @@ using namespace std;
 
 //JetPtMin in GeV; Tune Z2 or D6T; jecUnc: "0" = NotApplied, "+" = Added, "-" = Subtracted 
 
-void XSec(int JetPtMin, string tune, string jecUnc){
+void XSecATC(int JetPtMin, string tune, string jecUnc){
 
 gROOT->SetStyle("Plain");
 gStyle->SetOptStat(0);
@@ -65,16 +65,16 @@ gStyle->SetPalette(1,0);
         out+=JEC;
         out+=JetPtCut;
         string output = out;
-        output+=".root";
+        output+="_AllTuneCh.root";
         TFile* outplots = new TFile(output.c_str(), "RECREATE");
         
         //Report files
         ofstream multrep;
-	multrep.open(("MultReport_"+JEC+JetPtCut+".txt").c_str());
+	multrep.open(("MultReport_"+JEC+JetPtCut+"_AllTuneCh.txt").c_str());
 	multrep<<endl;
 
         ofstream xsec;
-	xsec.open(("XSecReport_"+JEC+JetPtCut+".txt").c_str());
+	xsec.open(("XSecReport_"+JEC+JetPtCut+"_AllTuneCh.txt").c_str());
 	xsec<<endl;
 	
 	////////////////////////// Directories /////////////////////////////////////////////
@@ -97,27 +97,27 @@ gStyle->SetPalette(1,0);
         
         //DATA: Signal and Background Yields from TP fits
         // -> DATA_Excl_Double file in TPAnalyzer        
-        TFile *SB_Yields_excl = TFile::Open((path+"/TagProbe/New_Analyzer/"+JetPtCut+"/Z2/DATA_"+JetPtCut+"_Excl_Double.root").c_str());
+        TFile *SB_Yields_excl = TFile::Open((path+"/TagProbe/New_Analyzer/"+JetPtCut+"/"+tune+"/DATA_"+JetPtCut+"_Excl_Double.root").c_str());
         
         //DATA: Tag&Probe Efficiencies
         // -> TPStudy_Excl_Global file in Efficiency_TP
-        TFile *TPEff_excl = TFile::Open((path+"/Efficiency_TP/New_Analyzer/"+JetPtCut+"/Z2/TPStudy_"+JetPtCut+"_Excl_Global.root").c_str());
+        TFile *TPEff_excl = TFile::Open((path+"/Efficiency_TP/New_Analyzer/"+JetPtCut+"/"+tune+"/TPStudy_"+JetPtCut+"_Excl_Global.root").c_str());
         
         ////////////////////////// GET FILES - Inclusive quantities
         
         //DATA: Signal and Background Yields from TP fits
         // -> DATA_Incl_Double file in TPAnalyzer
-        TFile *SB_Yields_incl = TFile::Open((path+"/TagProbe/New_Analyzer/"+JetPtCut+"/Z2/DATA_"+JetPtCut+"_Incl_Double.root").c_str());
+        TFile *SB_Yields_incl = TFile::Open((path+"/TagProbe/New_Analyzer/"+JetPtCut+"/"+tune+"/DATA_"+JetPtCut+"_Incl_Double.root").c_str());
         
         //DATA: Tag&Probe Efficiencies
         // -> TPStudy_Incl_Global file in Efficiency_TP
-        TFile *TPEff_incl = TFile::Open((path+"/Efficiency_TP/New_Analyzer/"+JetPtCut+"/Z2/TPStudy_"+JetPtCut+"_Incl_Global.root").c_str());
+        TFile *TPEff_incl = TFile::Open((path+"/Efficiency_TP/New_Analyzer/"+JetPtCut+"/"+tune+"/TPStudy_"+JetPtCut+"_Incl_Global.root").c_str());
         
         ////////////////////////// GET FILES - MC 
         
         //MC: Efficiency and Acceptance
         // -> SignalStudy_ZMadgraph file in Efficiency_MC
-        TFile *MCEff = TFile::Open((path+"/Efficiency_MC/"+JetPtCut+"/Z2/SignalStudy_ZMadgraph_Z2_"+JetPtCut+".root").c_str());
+        TFile *MCEff = TFile::Open((path+"/Efficiency_MC/"+JetPtCut+"/"+tune+"/SignalStudy_ZMadgraph_"+tune+"_"+JetPtCut+".root").c_str());
         
         //MC: Unfolding and Correction Factors
         // -> NtuplePlots file
@@ -443,7 +443,7 @@ gStyle->SetPalette(1,0);
         
         multrep<<"Corrected Incl. Multiplcity = "<<BinCorrMult_incl<<" (+) "<<BinCorrMult_incl_errh<<" (-) "<<BinCorrMult_incl_errl<<endl<<endl;
         
-        multrep<<"STATISTICAL RELATIVE unc. (Nsig) = 	"<<ys_excl_err/(ys_excl-BinWZ_ZZ_excl)<<endl<<endl;
+        multrep<<"STATISTICAL RELATIVE unc. (Nsig) = 	"<<ys_incl_err/(ys_incl-BinWZ_ZZ_incl)<<endl<<endl;
         
         multrep<<"SYSTEMATIC RELATIVE uncertainties:"<<endl;
         multrep<<"WZ-ZZ background =			"<<BinWZ_ZZ_incl_err/(ys_incl-BinWZ_ZZ_incl)<<endl;

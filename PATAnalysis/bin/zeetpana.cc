@@ -13,18 +13,23 @@ using namespace std;
 
 int main() {
 
-  //Input files
-  string training_sign = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt30/D6T/TPFiles/Z_Madgraph_D6T_JetPt30.root";
-  string training_back = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt30/D6T/TPFiles/Background_All_NoZDiBos_JetPt30.root";
-  string total = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt30/D6T/TPFiles/Data_RUN2010A-B_JetPt30.root";
+  //Input files - Z2
+  string training_sign = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/JetPt30/Z2/Z_Madgraph_Z2_JetPt30.root";
+  string training_back = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/JetPt30/Z2/Background_All_NoZDiBos_JetPt30.root";
+  string total = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/JetPt30/Z2/Data_RUN2010A-B_JetPt30.root"; 
+
+/*  //Input files - D6T
+  string training_sign = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/JetPt30/D6T/Z_Madgraph_D6T_JetPt30.root";
+  string training_back = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/JetPt30/D6T/Background_All_NoZDiBos_JetPt30.root";
+  string total = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/JetPt30/D6T/Data_RUN2010A-B_JetPt30.root";  */
   
   //Output files
   string output_train_sign =  
-"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt30/D6T/TPAnalyzer/TrainSig_JetPt30_Excl_Global.root";
+"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/New_Analyzer/JetPt30/Z2/TrainSig_JetPt30_Excl_Global.root";
   string output_train_back =  
-"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt30/D6T/TPAnalyzer/TrainBack_JetPt30_Excl_Global.root";
+"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/New_Analyzer/JetPt30/Z2/TrainBack_JetPt30_Excl_Global.root";
   string output_total =  
-"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/JetPt30/D6T/TPAnalyzer/DATA_JetPt30_Excl_Global.root";
+"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/New_Analyzer/JetPt30/Z2/DATA_JetPt30_Excl_Global.root";
 
   //Selections used
   string selections = "ASYM";

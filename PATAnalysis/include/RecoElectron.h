@@ -42,12 +42,26 @@ public :
    *recLeadElPt_12345, *recSecElPt_12345, *recLeadElEta_12345, *recSecElEta_12345,
    *recLeadElPt_123456, *recSecElPt_123456, *recLeadElEta_123456, *recSecElEta_123456;
    
-   TH1D *recLeadElIP_1, *recSecElIP_1, *recLeadElfBrem_1, *recSecElfBrem_1,
-   *recLeadElIP_12, *recSecElIP_12, *recLeadElfBrem_12, *recSecElfBrem_12,
-   *recLeadElIP_123, *recSecElIP_123, *recLeadElfBrem_123, *recSecElfBrem_123,
-   *recLeadElIP_1234, *recSecElIP_1234, *recLeadElfBrem_1234, *recSecElfBrem_1234,
-   *recLeadElIP_12345, *recSecElIP_12345, *recLeadElfBrem_12345, *recSecElfBrem_12345,
-   *recLeadElIP_123456, *recSecElIP_123456, *recLeadElfBrem_123456, *recSecElfBrem_123456;
+   TH1D *recElIP_1, *recLeadElfBrem_1, *recSecElfBrem_1,
+   *recElIP_12, *recLeadElfBrem_12, *recSecElfBrem_12,
+   *recElIP_123, *recLeadElfBrem_123, *recSecElfBrem_123,
+   *recElIP_1234, *recLeadElfBrem_1234, *recSecElfBrem_1234,
+   *recElIP_12345, *recLeadElfBrem_12345, *recSecElfBrem_12345,
+   *recElIP_123456, *recLeadElfBrem_123456, *recSecElfBrem_123456;
+   
+   TH1D *recLeadElConvMissHit_1, *recLeadElConvCotDist_1,
+   *recLeadElConvMissHit_12, *recLeadElConvCotDist_12, 
+   *recLeadElConvMissHit_123, *recLeadElConvCotDist_123, 
+   *recLeadElConvMissHit_1234, *recLeadElConvCotDist_1234, 
+   *recLeadElConvMissHit_12345, *recLeadElConvCotDist_12345, 
+   *recLeadElConvMissHit_123456, *recLeadElConvCotDist_123456;
+   
+   TH1D *recSecElConvMissHit_1, *recSecElConvCotDist_1,
+   *recSecElConvMissHit_12, *recSecElConvCotDist_12, 
+   *recSecElConvMissHit_123, *recSecElConvCotDist_123, 
+   *recSecElConvMissHit_1234, *recSecElConvCotDist_1234, 
+   *recSecElConvMissHit_12345, *recSecElConvCotDist_12345,
+   *recSecElConvMissHit_123456, *recSecElConvCotDist_123456;
    
    TH1D *recZNumSC, *recZNumIndexSC,
    *recPtZSC_1, *recEtaZSC_1, *recMassZSC_1,
@@ -71,9 +85,12 @@ public :
    *recLeadElIPSC_12345, *recSecElIPSC_12345, *recLeadElfBremSC_12345, *recSecElfBremSC_12345,
    *recLeadElIPSC_123456, *recSecElIPSC_123456, *recLeadElfBremSC_123456, *recSecElfBremSC_123456;
    
-   TH1D *recTrackIsoLead_PreIso, *recEcalIsoLead_PreIso, *recHcalIsoLead_PreIso, *recRelIsoLead_PreIso, *recTrackIsoSec_PreIso, *recEcalIsoSec_PreIso, *recHcalIsoSec_PreIso, *recRelIsoSec_PreIso;
+   TH1D *recTrackIsoLead_PreIso, *recEcalIsoLead_PreIso, *recHcalIsoLead_PreIso, *recTrackIsoSec_PreIso, *recEcalIsoSec_PreIso, *recHcalIsoSec_PreIso;
    
-   TH1D *HoverE_PreEiD, *DeltaEtaIn_PreEiD, *DeltaPhiIn_PreEiD, *SigmaIEtaIEta_PreEiD, *HoverE_EiD, *DeltaEtaIn_EiD, *DeltaPhiIn_EiD, *SigmaIEtaIEta_EiD;
+   TH1D *recRelIso_Barrel_PreIso, *recRelIso_Endcap_PreIso;
+   
+   TH1D *HoverE_Barrel_PreEiD, *DeltaEtaIn_Barrel_PreEiD, *DeltaPhiIn_Barrel_PreEiD, *SigmaIEtaIEta_Barrel_PreEiD;
+   TH1D *HoverE_Endcap_PreEiD, *DeltaEtaIn_Endcap_PreEiD, *DeltaPhiIn_Endcap_PreEiD, *SigmaIEtaIEta_Endcap_PreEiD;
    
    TH1D *RecoIsoJetPt_123456, *RecoJetPt_123456, *recLeadIsoJetPt_123456, *recLeadIsoJetEta_123456;
    

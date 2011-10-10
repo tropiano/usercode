@@ -81,7 +81,7 @@ static double dxycut = 0.02;     //cm
 
 //Jets
 static bool JetIDReq = false;
-static double ptjetmin = 30.;   //Gev/c
+static double ptjetmin = 15.;   //Gev/c
 static double etajetmax = 2.5;
 static double isojetcut = 0.3; //Isolation jet - Z electron
 
