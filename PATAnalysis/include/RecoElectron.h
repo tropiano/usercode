@@ -87,10 +87,26 @@ public :
    
    TH1D *recTrackIsoLead_PreIso, *recEcalIsoLead_PreIso, *recHcalIsoLead_PreIso, *recTrackIsoSec_PreIso, *recEcalIsoSec_PreIso, *recHcalIsoSec_PreIso;
    
-   TH1D *recRelIso_Barrel_PreIso, *recRelIso_Endcap_PreIso;
+   TH1D *recRelIso_Barrel_1, *recRelIso_Endcap_1,
+   *recRelIso_Barrel_12, *recRelIso_Endcap_12,
+   *recRelIso_Barrel_123, *recRelIso_Endcap_123,
+   *recRelIso_Barrel_1234, *recRelIso_Endcap_1234,
+   *recRelIso_Barrel_12345, *recRelIso_Endcap_12345,
+   *recRelIso_Barrel_123456, *recRelIso_Endcap_123456;
    
-   TH1D *HoverE_Barrel_PreEiD, *DeltaEtaIn_Barrel_PreEiD, *DeltaPhiIn_Barrel_PreEiD, *SigmaIEtaIEta_Barrel_PreEiD;
-   TH1D *HoverE_Endcap_PreEiD, *DeltaEtaIn_Endcap_PreEiD, *DeltaPhiIn_Endcap_PreEiD, *SigmaIEtaIEta_Endcap_PreEiD;
+   TH1D *HoverE_Barrel_1, *DeltaEtaIn_Barrel_1, *DeltaPhiIn_Barrel_1, *SigmaIEtaIEta_Barrel_1,
+   *HoverE_Barrel_12, *DeltaEtaIn_Barrel_12, *DeltaPhiIn_Barrel_12, *SigmaIEtaIEta_Barrel_12,
+   *HoverE_Barrel_123, *DeltaEtaIn_Barrel_123, *DeltaPhiIn_Barrel_123, *SigmaIEtaIEta_Barrel_123,
+   *HoverE_Barrel_1234, *DeltaEtaIn_Barrel_1234, *DeltaPhiIn_Barrel_1234, *SigmaIEtaIEta_Barrel_1234,
+   *HoverE_Barrel_12345, *DeltaEtaIn_Barrel_12345, *DeltaPhiIn_Barrel_12345, *SigmaIEtaIEta_Barrel_12345,
+   *HoverE_Barrel_123456, *DeltaEtaIn_Barrel_123456, *DeltaPhiIn_Barrel_123456, *SigmaIEtaIEta_Barrel_123456;
+   
+    TH1D *HoverE_Endcap_1, *DeltaEtaIn_Endcap_1, *DeltaPhiIn_Endcap_1, *SigmaIEtaIEta_Endcap_1,
+   *HoverE_Endcap_12, *DeltaEtaIn_Endcap_12, *DeltaPhiIn_Endcap_12, *SigmaIEtaIEta_Endcap_12,
+   *HoverE_Endcap_123, *DeltaEtaIn_Endcap_123, *DeltaPhiIn_Endcap_123, *SigmaIEtaIEta_Endcap_123,
+   *HoverE_Endcap_1234, *DeltaEtaIn_Endcap_1234, *DeltaPhiIn_Endcap_1234, *SigmaIEtaIEta_Endcap_1234,
+   *HoverE_Endcap_12345, *DeltaEtaIn_Endcap_12345, *DeltaPhiIn_Endcap_12345, *SigmaIEtaIEta_Endcap_12345,
+   *HoverE_Endcap_123456, *DeltaEtaIn_Endcap_123456, *DeltaPhiIn_Endcap_123456, *SigmaIEtaIEta_Endcap_123456;
    
    TH1D *RecoIsoJetPt_123456, *RecoJetPt_123456, *recLeadIsoJetPt_123456, *recLeadIsoJetEta_123456;
    

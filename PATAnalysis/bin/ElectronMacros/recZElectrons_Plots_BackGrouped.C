@@ -23,14 +23,33 @@
 #include "TGraphAsymmErrors.h"
 #include "TMath.h"
 
+//n. 1 "recLeadElPt"
+//n. 2 "recLeadElEta"
+//n. 3 "recLeadElfBrem"
+//n. 4 "recLeadElConvCotDist"
+//n. 5 "recLeadElConvMissHit
+//n. 6 "recSecElPt"
+//n. 7 "recSecElEta"
+//n. 8 "recSecElfBrem"
+//n. 9 "recSecElConvCotDist"
+//n. 10 "recSecElConvMissHit"
+//n. 11 "recElIP"
+//n. 12 "DeltaEtaIn_Barrel"
+//n. 13 "DeltaPhiIn_Barrel"
+//n. 14 "HoverE_Barrel"
+//n. 15 "SigmaIEtaIEta_Barrel"
+//n. 16 "recRelIso_Barrel"
+//n. 17 "DeltaEtaIn_Endcap"
+//n. 18 "DeltaPhiIn_Endcap"
+//n. 19 "HoverE_Endcap"
+//n. 20 "SigmaIEtaIEta_Endcap"
+//n. 21 "recRelIso_Endcap"
+
 using namespace std;
 
 //Selections: "SYM" = Symmetric selections; "ASYM" = Asymmetric selections
 
 void recZElectrons_Plots(string selections){
-
-gROOT->SetStyle("Plain");
-gStyle->SetOptStat(0);
 
 string log_scale = "True";
 string Tab_cut = "True";
@@ -44,32 +63,58 @@ int b_end = 21;
 	int _Acc  = 1;
 	int _Trg  = 2;
 	int _Imp  = 3;
-	int _Conv = 6;
-	int _Iso  = 4;
-	int _EiD  = 5;        
+	int _Conv = 4;
+	int _Iso  = 5;
+	int _EiD  = 6;        
                 
 	//Background MC
-	TFile* QCD_TF = TFile::Open("/data/sfrosali/Zjets/AnalisiSelezioni/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/MC_Winter10_123645/Background/QCD_All.root");
-	TFile* EWK_TF = TFile::Open("/data/sfrosali/Zjets/AnalisiSelezioni/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/MC_Winter10_123645/Background/EWK_All.root");
-	TFile* TTbar_TF = TFile::Open("/data/sfrosali/Zjets/AnalisiSelezioni/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/MC_Winter10_123645/Background/TT_Pythia.root");
+	TFile* QCD_TF = TFile::Open("Files/QCD_All_JetPt15.root");
+	TFile* EWK_TF = TFile::Open("Files/EWK_All_JetPt15.root");
+	TFile* TTbar_TF = TFile::Open("Files/TT_Pythia.root");
 	
 	//Signal MC
-	TFile *Z_TF = TFile::Open("/data/sfrosali/Zjets/AnalisiSelezioni/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/MC_Winter10_123645/Signal/Z_Madgraph_Z2.root");
+	TFile *Z_TF = TFile::Open("Files/Z_Madgraph_Z2_JetPt15.root");
 	
 	//Data
-	TFile *Data_TF = TFile::Open("/data/sfrosali/Zjets/AnalisiSelezioni/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/Data_123645/Data_RUN2010A-B.root");
+	TFile *Data_TF = TFile::Open("Files/Data_RUN2010A-B_JetPt15.root");
 	
 	//Output
-	string out = "recZElectrons_123645";        
+	string out = "recZElectrons_SigmaIEtaIEta_Barrel";        
 	string output = out;
 	output+=".root";
 	TFile* outplots = new TFile(output.c_str(), "RECREATE");
 	
 	//Normalization factor
 	double iniLumi = 50.; //pb-1
-	double targetLumi = 36.176; //pb-1
+	double targetLumi = 36.162; //pb-1
 	double scale = 1.;
 	if(iniLumi!=0)scale = targetLumi/iniLumi;
+    
+	//BOX
+	bool DrawBox_1 = false;
+	bool DrawBox_2 = false;
+    
+    //Leading
+	double x_begin_11 = 0.01;
+	double y_begin_11 = 0.;
+	double x_end_11 = 0.07;
+	double y_end_11 = 11000.;
+	
+	double x_begin_12 = 0.01;
+	double y_begin_12 = 0.;
+	double x_end_12 = 0.07;
+	double y_end_12 = 11000.;
+	
+	//Second
+	double x_begin_21 = -1;
+	double y_begin_21 = 0.;
+	double x_end_21 = -0.8;
+	double y_end_21 = 20000.;
+	
+	double x_begin_22 = 0.8;
+	double y_begin_22 = 0.;
+	double x_end_22 = 1;
+	double y_end_22 = 20000.;
 
 	//rebin
 	//Leading Electron
@@ -210,12 +255,12 @@ int b_end = 21;
 	double nminX_RelIso_Barrel = 0.0; 
 	double nmaxX_RelIso_Barrel = 0.5;
 	double nminY_RelIso_Barrel = 0.1; 
-	double nmaxY_RelIso_Barrel = 2700.0;
+	double nmaxY_RelIso_Barrel = 20000.0;
 	//CombRelIso - Endcap
 	double nminX_RelIso_Endcap = 0.0; 
 	double nmaxX_RelIso_Endcap = 0.5;
 	double nminY_RelIso_Endcap = 0.1; 
-	double nmaxY_RelIso_Endcap = 2700.0;
+	double nmaxY_RelIso_Endcap = 20000.0;
 	
 	//Legenda
 	string Leg_QCD = "QCD";
@@ -331,16 +376,16 @@ string grafico_name_Cartella2a_recSecElfBrem = "recSecElfBrem";
 string grafico_name_Cartella2a_recSecElConvCotDist = "recSecElConvCotDist";
 string grafico_name_Cartella2a_recSecElConvMissHit = "recSecElConvMissHit";
 string grafico_name_Cartella2a_recElIP = "recElIP";
-string grafico_name_Cartella2a_DeltaEtaIn_Barrel_PreEiD = "DeltaEtaIn_Barrel_PreEiD";
-string grafico_name_Cartella2a_DeltaPhiIn_Barrel_PreEiD = "DeltaPhiIn_Barrel_PreEiD";
-string grafico_name_Cartella2a_HoverE_Barrel_PreEiD = "HoverE_Barrel_PreEiD";
-string grafico_name_Cartella2a_SigmaIEtaIEta_Barrel_PreEiD = "SigmaIEtaIEta_Barrel_PreEiD";
-string grafico_name_Cartella2a_RelIso_Barrel_PreIso = "recRelIso_Barrel_PreIso";
-string grafico_name_Cartella2a_DeltaEtaIn_Endcap_PreEiD = "DeltaEtaIn_Endcap_PreEiD";
-string grafico_name_Cartella2a_DeltaPhiIn_Endcap_PreEiD = "DeltaPhiIn_Endcap_PreEiD";
-string grafico_name_Cartella2a_HoverE_Endcap_PreEiD = "HoverE_Endcap_PreEiD";
-string grafico_name_Cartella2a_SigmaIEtaIEta_Endcap_PreEiD = "SigmaIEtaIEta_Endcap_PreEiD";
-string grafico_name_Cartella2a_RelIso_Endcap_PreIso = "recRelIso_Endcap_PreIso";
+string grafico_name_Cartella2a_DeltaEtaIn_Barrel = "DeltaEtaIn_Barrel";
+string grafico_name_Cartella2a_DeltaPhiIn_Barrel = "DeltaPhiIn_Barrel";
+string grafico_name_Cartella2a_HoverE_Barrel = "HoverE_Barrel";
+string grafico_name_Cartella2a_SigmaIEtaIEta_Barrel = "SigmaIEtaIEta_Barrel";
+string grafico_name_Cartella2a_RelIso_Barrel = "recRelIso_Barrel";
+string grafico_name_Cartella2a_DeltaEtaIn_Endcap = "DeltaEtaIn_Endcap";
+string grafico_name_Cartella2a_DeltaPhiIn_Endcap = "DeltaPhiIn_Endcap";
+string grafico_name_Cartella2a_HoverE_Endcap = "HoverE_Endcap";
+string grafico_name_Cartella2a_SigmaIEtaIEta_Endcap = "SigmaIEtaIEta_Endcap";
+string grafico_name_Cartella2a_RelIso_Endcap = "recRelIso_Endcap";
 
 string asseX_name;
 string asseY_name;
@@ -366,32 +411,31 @@ string asseX_name_Cartella2a_recSecElConvMissHit = "Reconstructed Second Electro
 string asseY_name_Cartella2a_recSecElConvMissHit = Form("Events/(%.1f)",1.0*rebin_recSecElConvMissHit); //bins da 1
 string asseX_name_Cartella2a_recElIP = "Reconstructed Electron IP (cm)";
 string asseY_name_Cartella2a_recElIP = Form("Events/(%.3f)", 0.001*rebin_recElIP); //bins da 0.001
-string asseX_name_Cartella2a_DeltaEtaIn_Barrel_PreEiD = "Reconstructed Electron Delta Eta Barrel - Pre EiD cut";
-string asseY_name_Cartella2a_DeltaEtaIn_Barrel_PreEiD = Form("Events/(%.3f)", 0.002*rebin_DeltaEtaIn_Barrel); //bins da 0.002
-string asseX_name_Cartella2a_DeltaPhiIn_Barrel_PreEiD = "Reconstructed Electron Delta Phi Barrel - Pre EiD cut";
-string asseY_name_Cartella2a_DeltaPhiIn_Barrel_PreEiD = Form("Events/(%.3f)", 0.008*rebin_DeltaPhiIn_Barrel); //bins da 0.008
-string asseX_name_Cartella2a_HoverE_Barrel_PreEiD = "Reconstructed Electron H over E Barrel - Pre EiD cut";
-string asseY_name_Cartella2a_HoverE_Barrel_PreEiD = Form("Events/(%.3f)", 0.001*rebin_HoverE_Barrel); //bins da 0.001
-string asseX_name_Cartella2a_SigmaIEtaIEta_Barrel_PreEiD = "Reconstructed Electron SigmaIEtaIEta Barrel - Pre EiD cut";
-string asseY_name_Cartella2a_SigmaIEtaIEta_Barrel_PreEiD = Form("Events/(%.3f)", 0.001*rebin_SigmaIEtaIEta_Barrel); //bins da 0.001
-string asseX_name_Cartella2a_RelIso_Barrel_PreIso = "Reconstructed Electron Rel. Isolation Barrel - Pre Iso cut";
-string asseY_name_Cartella2a_RelIso_Barrel_PreIso = Form("Events/(%.2f)", 0.01*rebin_RelIso_Barrel); //bins da 0.01
-string asseX_name_Cartella2a_DeltaEtaIn_Endcap_PreEiD = "Reconstructed Electron Delta Eta Endcap - Pre EiD cut";
-string asseY_name_Cartella2a_DeltaEtaIn_Endcap_PreEiD = Form("Events/(%.3f)", 0.002*rebin_DeltaEtaIn_Endcap); //bins da 0.002
-string asseX_name_Cartella2a_DeltaPhiIn_Endcap_PreEiD = "Reconstructed Electron Delta Phi Endcap - Pre EiD cut";
-string asseY_name_Cartella2a_DeltaPhiIn_Endcap_PreEiD = Form("Events/(%.3f)", 0.008*rebin_DeltaPhiIn_Endcap); //bins da 0.008
-string asseX_name_Cartella2a_HoverE_Endcap_PreEiD = "Reconstructed Electron H over E Endcap - Pre EiD cut";
-string asseY_name_Cartella2a_HoverE_Endcap_PreEiD = Form("Events/(%.3f)", 0.001*rebin_HoverE_Endcap); //bins da 0.001
-string asseX_name_Cartella2a_SigmaIEtaIEta_Endcap_PreEiD = "Reconstructed Electron SigmaIEtaIEta Endcap - Pre EiD cut";
-string asseY_name_Cartella2a_SigmaIEtaIEta_Endcap_PreEiD = Form("Events/(%.3f)", 0.001*rebin_SigmaIEtaIEta_Endcap); //bins da 0.001
-string asseX_name_Cartella2a_RelIso_Endcap_PreIso = "Reconstructed Electron Rel. Isolation Endcap - Pre Iso cut";
-string asseY_name_Cartella2a_RelIso_Endcap_PreIso = Form("Events/(%.2f)", 0.01*rebin_RelIso_Endcap); //bins da 0.01
+string asseX_name_Cartella2a_DeltaEtaIn_Barrel = "Reconstructed Electron Delta Eta Barrel - Pre EiD cut";
+string asseY_name_Cartella2a_DeltaEtaIn_Barrel = Form("Events/(%.3f)", 0.002*rebin_DeltaEtaIn_Barrel); //bins da 0.002
+string asseX_name_Cartella2a_DeltaPhiIn_Barrel = "Reconstructed Electron Delta Phi Barrel - Pre EiD cut";
+string asseY_name_Cartella2a_DeltaPhiIn_Barrel = Form("Events/(%.3f)", 0.008*rebin_DeltaPhiIn_Barrel); //bins da 0.008
+string asseX_name_Cartella2a_HoverE_Barrel = "Reconstructed Electron H over E Barrel - Pre EiD cut";
+string asseY_name_Cartella2a_HoverE_Barrel = Form("Events/(%.3f)", 0.001*rebin_HoverE_Barrel); //bins da 0.001
+string asseX_name_Cartella2a_SigmaIEtaIEta_Barrel = "Reconstructed Electron SigmaIEtaIEta Barrel - Pre EiD cut";
+string asseY_name_Cartella2a_SigmaIEtaIEta_Barrel = Form("Events/(%.3f)", 0.001*rebin_SigmaIEtaIEta_Barrel); //bins da 0.001
+string asseX_name_Cartella2a_RelIso_Barrel = "Reconstructed Electron Rel. Isolation Barrel - Pre Iso cut";
+string asseY_name_Cartella2a_RelIso_Barrel = Form("Events/(%.2f)", 0.01*rebin_RelIso_Barrel); //bins da 0.01
+string asseX_name_Cartella2a_DeltaEtaIn_Endcap = "Reconstructed Electron Delta Eta Endcap - Pre EiD cut";
+string asseY_name_Cartella2a_DeltaEtaIn_Endcap = Form("Events/(%.3f)", 0.002*rebin_DeltaEtaIn_Endcap); //bins da 0.002
+string asseX_name_Cartella2a_DeltaPhiIn_Endcap = "Reconstructed Electron Delta Phi Endcap - Pre EiD cut";
+string asseY_name_Cartella2a_DeltaPhiIn_Endcap = Form("Events/(%.3f)", 0.008*rebin_DeltaPhiIn_Endcap); //bins da 0.008
+string asseX_name_Cartella2a_HoverE_Endcap = "Reconstructed Electron H over E Endcap - Pre EiD cut";
+string asseY_name_Cartella2a_HoverE_Endcap = Form("Events/(%.3f)", 0.001*rebin_HoverE_Endcap); //bins da 0.001
+string asseX_name_Cartella2a_SigmaIEtaIEta_Endcap = "Reconstructed Electron SigmaIEtaIEta Endcap - Pre EiD cut";
+string asseY_name_Cartella2a_SigmaIEtaIEta_Endcap = Form("Events/(%.3f)", 0.001*rebin_SigmaIEtaIEta_Endcap); //bins da 0.001
+string asseX_name_Cartella2a_RelIso_Endcap = "Reconstructed Electron Rel. Isolation Endcap - Pre Iso cut";
+string asseY_name_Cartella2a_RelIso_Endcap = Form("Events/(%.2f)", 0.01*rebin_RelIso_Endcap); //bins da 0.01
 
 
 TDirectory *Dir_1;
 Dir_1 = outplots->mkdir(cartella1.c_str());
 Dir_1->cd();
-
 
 //--------------------------------------- directory recZElectrons_Plots
 
@@ -437,16 +481,6 @@ else if(b==2){cartellaplot = grafico_name_Cartella2a_recLeadElEta;
 	      nmaxX = nmaxX_recLeadElEta;
 	      nminY = nminY_recLeadElEta;
 	      nmaxY = nmaxY_recLeadElEta;}
-
-else if(b==3){cartellaplot = grafico_name_Cartella2a_recElIP;
-	      grafico_name = grafico_name_Cartella2a_recElIP;
-	      asseX_name = asseX_name_Cartella2a_recElIP; 
-	      asseY_name = asseY_name_Cartella2a_recElIP;
-	      rebin = rebin_recElIP;
-	      nminX = nminX_recElIP;
-	      nmaxX = nmaxX_recElIP;
-	      nminY = nminY_recElIP;
-	      nmaxY = nmaxY_recElIP;}
 
 else if(b==4){cartellaplot = grafico_name_Cartella2a_recLeadElfBrem;
 	      grafico_name = grafico_name_Cartella2a_recLeadElfBrem;
@@ -527,101 +561,111 @@ else if(b==11){cartellaplot = grafico_name_Cartella2a_recSecElConvMissHit;
 	      nmaxX = nmaxX_recSecElConvMissHit;
 	      nminY = nminY_recSecElConvMissHit;
 	      nmaxY = nmaxY_recSecElConvMissHit;}
+    
+else if(b==3){cartellaplot = grafico_name_Cartella2a_recElIP;
+    grafico_name = grafico_name_Cartella2a_recElIP;
+    asseX_name = asseX_name_Cartella2a_recElIP; 
+    asseY_name = asseY_name_Cartella2a_recElIP;
+    rebin = rebin_recElIP;
+    nminX = nminX_recElIP;
+    nmaxX = nmaxX_recElIP;
+    nminY = nminY_recElIP;
+    nmaxY = nmaxY_recElIP;}
 
-else if(b==12){cartellaplot = grafico_name_Cartella2a_DeltaEtaIn_Barrel_PreEiD;
-	grafico_name = grafico_name_Cartella2a_DeltaEtaIn_Barrel_PreEiD;
- 	asseX_name = asseX_name_Cartella2a_DeltaEtaIn_Barrel_PreEiD; 
-	asseY_name = asseY_name_Cartella2a_DeltaEtaIn_Barrel_PreEiD;
+else if(b==12){cartellaplot = grafico_name_Cartella2a_DeltaEtaIn_Barrel;
+	grafico_name = grafico_name_Cartella2a_DeltaEtaIn_Barrel;
+ 	asseX_name = asseX_name_Cartella2a_DeltaEtaIn_Barrel; 
+	asseY_name = asseY_name_Cartella2a_DeltaEtaIn_Barrel;
 	rebin = rebin_DeltaEtaIn_Barrel;
 	nminX = nminX_DeltaEtaIn_Barrel;
 	nmaxX = nmaxX_DeltaEtaIn_Barrel;
 	nminY = nminY_DeltaEtaIn_Barrel;
 	nmaxY = nmaxY_DeltaEtaIn_Barrel;}
 	
-else if(b==13){cartellaplot = grafico_name_Cartella2a_DeltaPhiIn_Barrel_PreEiD;
-	grafico_name = grafico_name_Cartella2a_DeltaPhiIn_Barrel_PreEiD;
-	asseX_name = asseX_name_Cartella2a_DeltaPhiIn_Barrel_PreEiD; 
-	asseY_name = asseY_name_Cartella2a_DeltaPhiIn_Barrel_PreEiD;
+else if(b==13){cartellaplot = grafico_name_Cartella2a_DeltaPhiIn_Barrel;
+	grafico_name = grafico_name_Cartella2a_DeltaPhiIn_Barrel;
+	asseX_name = asseX_name_Cartella2a_DeltaPhiIn_Barrel; 
+	asseY_name = asseY_name_Cartella2a_DeltaPhiIn_Barrel;
 	rebin = rebin_DeltaPhiIn_Barrel;
 	nminX = nminX_DeltaPhiIn_Barrel;
 	nmaxX = nmaxX_DeltaPhiIn_Barrel;
 	nminY = nminY_DeltaPhiIn_Barrel;
 	nmaxY = nmaxY_DeltaPhiIn_Barrel;}
 	
-else if(b==14){cartellaplot = grafico_name_Cartella2a_HoverE_Barrel_PreEiD;
-	grafico_name = grafico_name_Cartella2a_HoverE_Barrel_PreEiD;
-	asseX_name = asseX_name_Cartella2a_HoverE_Barrel_PreEiD; 
-	asseY_name = asseY_name_Cartella2a_HoverE_Barrel_PreEiD;
+else if(b==14){cartellaplot = grafico_name_Cartella2a_HoverE_Barrel;
+	grafico_name = grafico_name_Cartella2a_HoverE_Barrel;
+	asseX_name = asseX_name_Cartella2a_HoverE_Barrel; 
+	asseY_name = asseY_name_Cartella2a_HoverE_Barrel;
 	rebin = rebin_HoverE_Barrel;
 	nminX = nminX_HoverE_Barrel;
 	nmaxX = nmaxX_HoverE_Barrel;
 	nminY = nminY_HoverE_Barrel;
 	nmaxY = nmaxY_HoverE_Barrel;}
 	
-else if(b==15){cartellaplot = grafico_name_Cartella2a_SigmaIEtaIEta_Barrel_PreEiD;
-	grafico_name = grafico_name_Cartella2a_SigmaIEtaIEta_Barrel_PreEiD;
-	asseX_name = asseX_name_Cartella2a_SigmaIEtaIEta_Barrel_PreEiD; 
-	asseY_name = asseY_name_Cartella2a_SigmaIEtaIEta_Barrel_PreEiD;
+else if(b==15){cartellaplot = grafico_name_Cartella2a_SigmaIEtaIEta_Barrel;
+	grafico_name = grafico_name_Cartella2a_SigmaIEtaIEta_Barrel;
+	asseX_name = asseX_name_Cartella2a_SigmaIEtaIEta_Barrel; 
+	asseY_name = asseY_name_Cartella2a_SigmaIEtaIEta_Barrel;
 	rebin = rebin_SigmaIEtaIEta_Barrel;
 	nminX = nminX_SigmaIEtaIEta_Barrel;
 	nmaxX = nmaxX_SigmaIEtaIEta_Barrel;
 	nminY = nminY_SigmaIEtaIEta_Barrel;
 	nmaxY = nmaxY_SigmaIEtaIEta_Barrel;}
-	
-else if(b==16){cartellaplot = grafico_name_Cartella2a_DeltaEtaIn_Endcap_PreEiD;
-	grafico_name = grafico_name_Cartella2a_DeltaEtaIn_Endcap_PreEiD;
-	asseX_name = asseX_name_Cartella2a_DeltaEtaIn_Endcap_PreEiD; 
-	asseY_name = asseY_name_Cartella2a_DeltaEtaIn_Endcap_PreEiD;
-	rebin = rebin_DeltaEtaIn_Endcap;
-	nminX = nminX_DeltaEtaIn_Endcap;
-	nmaxX = nmaxX_DeltaEtaIn_Endcap;
-	nminY = nminY_DeltaEtaIn_Endcap;
-	nmaxY = nmaxY_DeltaEtaIn_Endcap;}
-	
-else if(b==17){cartellaplot = grafico_name_Cartella2a_DeltaPhiIn_Endcap_PreEiD;
-	grafico_name = grafico_name_Cartella2a_DeltaPhiIn_Endcap_PreEiD;
-	asseX_name = asseX_name_Cartella2a_DeltaPhiIn_Endcap_PreEiD; 
-	asseY_name = asseY_name_Cartella2a_DeltaPhiIn_Endcap_PreEiD;
-	rebin = rebin_DeltaPhiIn_Endcap;
-	nminX = nminX_DeltaPhiIn_Endcap;
-	nmaxX = nmaxX_DeltaPhiIn_Endcap;
-	nminY = nminY_DeltaPhiIn_Endcap;
-	nmaxY = nmaxY_DeltaPhiIn_Endcap;}
-	
-else if(b==18){cartellaplot = grafico_name_Cartella2a_HoverE_Endcap_PreEiD;
-	grafico_name = grafico_name_Cartella2a_HoverE_Endcap_PreEiD;
-	asseX_name = asseX_name_Cartella2a_HoverE_Endcap_PreEiD; 
-	asseY_name = asseY_name_Cartella2a_HoverE_Endcap_PreEiD;
-	rebin = rebin_HoverE_Endcap;
-	nminX = nminX_HoverE_Endcap;
-	nmaxX = nmaxX_HoverE_Endcap;
-	nminY = nminY_HoverE_Endcap;
-	nmaxY = nmaxY_HoverE_Endcap;}
-	
-else if(b==19){cartellaplot = grafico_name_Cartella2a_SigmaIEtaIEta_Endcap_PreEiD;
-	grafico_name = grafico_name_Cartella2a_SigmaIEtaIEta_Endcap_PreEiD;
-	asseX_name = asseX_name_Cartella2a_SigmaIEtaIEta_Endcap_PreEiD; 
-	asseY_name = asseY_name_Cartella2a_SigmaIEtaIEta_Endcap_PreEiD;
-	rebin = rebin_SigmaIEtaIEta_Endcap;
-	nminX = nminX_SigmaIEtaIEta_Endcap;
-	nmaxX = nmaxX_SigmaIEtaIEta_Endcap;
-	nminY = nminY_SigmaIEtaIEta_Endcap;
-	nmaxY = nmaxY_SigmaIEtaIEta_Endcap;}
-	
-else if(b==20){cartellaplot = grafico_name_Cartella2a_RelIso_Barrel_PreIso;
-	grafico_name = grafico_name_Cartella2a_RelIso_Barrel_PreIso;
-	asseX_name = asseX_name_Cartella2a_RelIso_Barrel_PreIso; 
-	asseY_name = asseY_name_Cartella2a_RelIso_Barrel_PreIso;
+    
+else if(b==20){cartellaplot = grafico_name_Cartella2a_RelIso_Barrel;
+	grafico_name = grafico_name_Cartella2a_RelIso_Barrel;
+	asseX_name = asseX_name_Cartella2a_RelIso_Barrel; 
+	asseY_name = asseY_name_Cartella2a_RelIso_Barrel;
 	rebin = rebin_RelIso_Barrel;
 	nminX = nminX_RelIso_Barrel;
 	nmaxX = nmaxX_RelIso_Barrel;
 	nminY = nminY_RelIso_Barrel;
 	nmaxY = nmaxY_RelIso_Barrel;}
 	
-else if(b==21){cartellaplot = grafico_name_Cartella2a_RelIso_Endcap_PreIso;
-	grafico_name = grafico_name_Cartella2a_RelIso_Endcap_PreIso;
-	asseX_name = asseX_name_Cartella2a_RelIso_Endcap_PreIso; 
-	asseY_name = asseY_name_Cartella2a_RelIso_Endcap_PreIso;
+else if(b==16){cartellaplot = grafico_name_Cartella2a_DeltaEtaIn_Endcap;
+	grafico_name = grafico_name_Cartella2a_DeltaEtaIn_Endcap;
+	asseX_name = asseX_name_Cartella2a_DeltaEtaIn_Endcap; 
+	asseY_name = asseY_name_Cartella2a_DeltaEtaIn_Endcap;
+	rebin = rebin_DeltaEtaIn_Endcap;
+	nminX = nminX_DeltaEtaIn_Endcap;
+	nmaxX = nmaxX_DeltaEtaIn_Endcap;
+	nminY = nminY_DeltaEtaIn_Endcap;
+	nmaxY = nmaxY_DeltaEtaIn_Endcap;}
+	
+else if(b==17){cartellaplot = grafico_name_Cartella2a_DeltaPhiIn_Endcap;
+	grafico_name = grafico_name_Cartella2a_DeltaPhiIn_Endcap;
+	asseX_name = asseX_name_Cartella2a_DeltaPhiIn_Endcap; 
+	asseY_name = asseY_name_Cartella2a_DeltaPhiIn_Endcap;
+	rebin = rebin_DeltaPhiIn_Endcap;
+	nminX = nminX_DeltaPhiIn_Endcap;
+	nmaxX = nmaxX_DeltaPhiIn_Endcap;
+	nminY = nminY_DeltaPhiIn_Endcap;
+	nmaxY = nmaxY_DeltaPhiIn_Endcap;}
+	
+else if(b==18){cartellaplot = grafico_name_Cartella2a_HoverE_Endcap;
+	grafico_name = grafico_name_Cartella2a_HoverE_Endcap;
+	asseX_name = asseX_name_Cartella2a_HoverE_Endcap; 
+	asseY_name = asseY_name_Cartella2a_HoverE_Endcap;
+	rebin = rebin_HoverE_Endcap;
+	nminX = nminX_HoverE_Endcap;
+	nmaxX = nmaxX_HoverE_Endcap;
+	nminY = nminY_HoverE_Endcap;
+	nmaxY = nmaxY_HoverE_Endcap;}
+	
+else if(b==19){cartellaplot = grafico_name_Cartella2a_SigmaIEtaIEta_Endcap;
+	grafico_name = grafico_name_Cartella2a_SigmaIEtaIEta_Endcap;
+	asseX_name = asseX_name_Cartella2a_SigmaIEtaIEta_Endcap; 
+	asseY_name = asseY_name_Cartella2a_SigmaIEtaIEta_Endcap;
+	rebin = rebin_SigmaIEtaIEta_Endcap;
+	nminX = nminX_SigmaIEtaIEta_Endcap;
+	nmaxX = nmaxX_SigmaIEtaIEta_Endcap;
+	nminY = nminY_SigmaIEtaIEta_Endcap;
+	nmaxY = nmaxY_SigmaIEtaIEta_Endcap;}
+	
+else if(b==21){cartellaplot = grafico_name_Cartella2a_RelIso_Endcap;
+	grafico_name = grafico_name_Cartella2a_RelIso_Endcap;
+	asseX_name = asseX_name_Cartella2a_RelIso_Endcap; 
+	asseY_name = asseY_name_Cartella2a_RelIso_Endcap;
 	rebin = rebin_RelIso_Endcap;
 	nminX = nminX_RelIso_Endcap;
 	nmaxX = nmaxX_RelIso_Endcap;
@@ -639,11 +683,6 @@ Dir_3->cd();
 	TH1D* histoQCD_12345;
 	TH1D* histoQCD_123456;
 	string QCD_name = grafico_name.c_str();
-	if(b>11){
-	histoQCD_1 = (TH1D*) Cartella1_QCD_Cartella2a->Get(QCD_name.c_str());
-	histoQCD_1->Scale(scale);
-	histoQCD_1->Rebin(rebin);
-	}else{
 	QCD_name+=_RecoCutFlags[1].c_str();
 	histoQCD_1 = (TH1D*) Cartella1_QCD_Cartella2a->Get(QCD_name.c_str());
 	histoQCD_1->Scale(scale);
@@ -668,8 +707,7 @@ Dir_3->cd();
 	histoQCD_123456 = (TH1D*) Cartella1_QCD_Cartella2a->Get(QCD_name.c_str());
 	histoQCD_123456->Scale(scale);
 	histoQCD_123456->Rebin(rebin);
-	}
-	
+
 	TH1D* histoTTbar_1;
 	TH1D* histoTTbar_12;
 	TH1D* histoTTbar_123;
@@ -677,11 +715,6 @@ Dir_3->cd();
 	TH1D* histoTTbar_12345;
 	TH1D* histoTTbar_123456;
 	string TTbar_name = grafico_name.c_str();
-	if(b>11){
-	histoTTbar_1 = (TH1D*) Cartella1_TTbar_Cartella2a->Get(TTbar_name.c_str());
-	histoTTbar_1->Scale(scale);
-	histoTTbar_1->Rebin(rebin);
-	}else{
 	TTbar_name+=_RecoCutFlags[1].c_str();
 	histoTTbar_1 = (TH1D*) Cartella1_TTbar_Cartella2a->Get(TTbar_name.c_str());
 	histoTTbar_1->Scale(scale);
@@ -706,7 +739,6 @@ Dir_3->cd();
 	histoTTbar_123456 = (TH1D*) Cartella1_TTbar_Cartella2a->Get(TTbar_name.c_str());
 	histoTTbar_123456->Scale(scale);
 	histoTTbar_123456->Rebin(rebin);
-	}
     
 	TH1D* histoEWK_1;
 	TH1D* histoEWK_12;
@@ -715,36 +747,30 @@ Dir_3->cd();
 	TH1D* histoEWK_12345;
 	TH1D* histoEWK_123456;
 	string EWK_name = grafico_name.c_str();
-	if(b>11){
-		histoEWK_1 = (TH1D*) Cartella1_EWK_Cartella2a->Get(EWK_name.c_str());
-		histoEWK_1->Scale(scale);
-		histoEWK_1->Rebin(rebin);
-	}else{
-	    EWK_name+=_RecoCutFlags[1].c_str();
-		histoEWK_1 = (TH1D*) Cartella1_EWK_Cartella2a->Get(EWK_name.c_str());
-		histoEWK_1->Scale(scale);
-		histoEWK_1->Rebin(rebin);
-		EWK_name+=_RecoCutFlags[2].c_str();
-		histoEWK_12 = (TH1D*) Cartella1_EWK_Cartella2a->Get(EWK_name.c_str());
-		histoEWK_12->Scale(scale);
-		histoEWK_12->Rebin(rebin);
-		EWK_name+=_RecoCutFlags[3].c_str();
-		histoEWK_123 = (TH1D*) Cartella1_EWK_Cartella2a->Get(EWK_name.c_str());
-		histoEWK_123->Scale(scale);
-		histoEWK_123->Rebin(rebin);
-		EWK_name+=_RecoCutFlags[4].c_str();
-		histoEWK_1234 = (TH1D*) Cartella1_EWK_Cartella2a->Get(EWK_name.c_str());
-		histoEWK_1234->Scale(scale);
-		histoEWK_1234->Rebin(rebin);
-		EWK_name+=_RecoCutFlags[5].c_str();
-		histoEWK_12345 = (TH1D*) Cartella1_EWK_Cartella2a->Get(EWK_name.c_str());
-		histoEWK_12345->Scale(scale);
-		histoEWK_12345->Rebin(rebin);
-		EWK_name+=_RecoCutFlags[6].c_str();
-		histoEWK_123456 = (TH1D*) Cartella1_EWK_Cartella2a->Get(EWK_name.c_str());
-		histoEWK_123456->Scale(scale);
-		histoEWK_123456->Rebin(rebin);
-	}
+	EWK_name+=_RecoCutFlags[1].c_str();
+	histoEWK_1 = (TH1D*) Cartella1_EWK_Cartella2a->Get(EWK_name.c_str());
+	histoEWK_1->Scale(scale);
+	histoEWK_1->Rebin(rebin);
+	EWK_name+=_RecoCutFlags[2].c_str();
+	histoEWK_12 = (TH1D*) Cartella1_EWK_Cartella2a->Get(EWK_name.c_str());
+	histoEWK_12->Scale(scale);
+	histoEWK_12->Rebin(rebin);
+	EWK_name+=_RecoCutFlags[3].c_str();
+	histoEWK_123 = (TH1D*) Cartella1_EWK_Cartella2a->Get(EWK_name.c_str());
+	histoEWK_123->Scale(scale);
+	histoEWK_123->Rebin(rebin);
+	EWK_name+=_RecoCutFlags[4].c_str();
+	histoEWK_1234 = (TH1D*) Cartella1_EWK_Cartella2a->Get(EWK_name.c_str());
+	histoEWK_1234->Scale(scale);
+	histoEWK_1234->Rebin(rebin);
+	EWK_name+=_RecoCutFlags[5].c_str();
+	histoEWK_12345 = (TH1D*) Cartella1_EWK_Cartella2a->Get(EWK_name.c_str());
+	histoEWK_12345->Scale(scale);
+	histoEWK_12345->Rebin(rebin);
+	EWK_name+=_RecoCutFlags[6].c_str();
+	histoEWK_123456 = (TH1D*) Cartella1_EWK_Cartella2a->Get(EWK_name.c_str());
+	histoEWK_123456->Scale(scale);
+	histoEWK_123456->Rebin(rebin);
 	
 	TH1D* histoZ_1;
 	TH1D* histoZ_12;
@@ -753,11 +779,6 @@ Dir_3->cd();
 	TH1D* histoZ_12345;
 	TH1D* histoZ_123456;
  	string Z_name = grafico_name.c_str();
-	if(b>11){
-	histoZ_1 = (TH1D*) Cartella1_Z_Cartella2a->Get(Z_name.c_str());
-	histoZ_1->Scale(scale);
-	histoZ_1->Rebin(rebin);
-	}else{
 	Z_name+=_RecoCutFlags[1].c_str();
 	histoZ_1 = (TH1D*) Cartella1_Z_Cartella2a->Get(Z_name.c_str());
 	histoZ_1->Scale(scale);
@@ -782,24 +803,19 @@ Dir_3->cd();
 	histoZ_123456 = (TH1D*) Cartella1_Z_Cartella2a->Get(Z_name.c_str());
 	histoZ_123456->Scale(scale);
 	histoZ_123456->Rebin(rebin);
-	}
 
 	if(!histoZ_123456){
 	cout<<"Error! Cut sequence wrong!"<<endl;
 	return;
 	}
 
-    TH1D* histoData_1;
+        TH1D* histoData_1;
 	TH1D* histoData_12;
 	TH1D* histoData_123;
 	TH1D* histoData_1234;
 	TH1D* histoData_12345;
 	TH1D* histoData_123456;
 	string Data_name = grafico_name.c_str();
-	if(b>11){
-	histoData_1 = (TH1D*) Cartella1_Data_Cartella2a->Get(Data_name.c_str());
-	histoData_1->Rebin(rebin);
-	}else{
 	Data_name+=_RecoCutFlags[1].c_str();
 	histoData_1 = (TH1D*) Cartella1_Data_Cartella2a->Get(Data_name.c_str());
 	histoData_1->Rebin(rebin);	
@@ -818,7 +834,6 @@ Dir_3->cd();
 	Data_name+=_RecoCutFlags[6].c_str();
 	histoData_123456 = (TH1D*) Cartella1_Data_Cartella2a->Get(Data_name.c_str());
 	histoData_123456->Rebin(rebin);
-	}
 	
 TDirectory *Dir_4a;
 Dir_4a = Dir_3->mkdir("Separated_Plots");
@@ -829,7 +844,7 @@ Dir_4a->cd();
 	if (log_scale == "True") {c_1->SetLogy();}
 	
 	string c_name = grafico_name.c_str();	
-	if(b<12)c_name+=_RecoCutFlags[1].c_str();
+	c_name+=_RecoCutFlags[1].c_str();
 	
 	histoQCD_1->SetLineColor(col_QCD);
 	histoQCD_1->SetLineWidth(2);
@@ -898,10 +913,7 @@ Dir_4a->cd();
 		cut<<Tabcut_Data_Int_err.c_str()<<((float)((int)(err_Data_1*cut_decimal)))/cut_decimal<<endl;
 		cut<<endl<<Tabcut_end.c_str()<<endl;
 	}
-	
-	
-	if(b<12){
-	
+
 	if(_RecoCutFlags[2] != "_1"){
 		
 		TCanvas *c_12 = new TCanvas();
@@ -1292,14 +1304,33 @@ Dir_4a->cd();
 		}
 		
 	}
-		
-	}
 
 	Dir_3->cd();
 	
 	TDirectory *Dir_4b;
 	Dir_4b = Dir_3->mkdir("Stacked_Plots");
 	Dir_4b->cd();
+    
+    
+	TBox* box_11 = new TBox(x_begin_11,y_begin_11,x_end_11,y_end_11);
+	box_11->SetFillStyle(3005);
+	box_11->SetFillColor(1);
+	box_11->SetLineColor(1);
+	
+	TBox* box_12 = new TBox(x_begin_12,y_begin_12,x_end_12,y_end_12);
+	box_12->SetFillStyle(3005);
+	box_12->SetFillColor(1);
+	box_12->SetLineColor(1);
+	
+	TBox* box_21 = new TBox(x_begin_21,y_begin_21,x_end_21,y_end_21);
+	box_21->SetFillStyle(3004);
+	box_21->SetFillColor(2);
+	box_21->SetLineColor(2);
+	
+	TBox* box_22 = new TBox(x_begin_22,y_begin_22,x_end_22,y_end_22);
+	box_22->SetFillStyle(3004);
+	box_22->SetFillColor(2);
+	box_22->SetLineColor(2);
 	
 	TCanvas *d_1 = new TCanvas();
 	
@@ -1310,7 +1341,7 @@ Dir_4a->cd();
 	string Stack = "Stack_";
 	string Stackd_name = (Stack + grafico_name).c_str();	
 	
-	if(b<12)Stackd_name+=_RecoCutFlags[1].c_str();
+	Stackd_name+=_RecoCutFlags[1].c_str();
 	
 	Stackd_1->Add(histoQCD_1);
 	Stackd_1->Add(histoTTbar_1);
@@ -1328,7 +1359,7 @@ Dir_4a->cd();
 	Stackd_1->GetXaxis()->SetTitle(asseX_name.c_str());
 	Stackd_1->GetYaxis()->SetTitle(asseY_name.c_str());
 	
-	histoData_1->Draw("same");			
+	histoData_1->Draw("same");	
 	
 	TLegend *StackLeg_1 = new TLegend(0.51,0.67,0.88,0.88);
 	StackLeg_1->SetFillColor(0);
@@ -1343,9 +1374,7 @@ Dir_4a->cd();
 	
 	d_1->Write(Stackd_name.c_str());
 	d_1->Close();
-	
-	if(b<12){
-	
+
 	if(_RecoCutFlags[2] != "_1"){
 		
 		TCanvas *d_12 = new TCanvas();
@@ -1501,7 +1530,11 @@ Dir_4a->cd();
 		Stackd_12345->GetXaxis()->SetTitle(asseX_name.c_str());
 		Stackd_12345->GetYaxis()->SetTitle(asseY_name.c_str());
 		
-        histoData_12345->Draw("same");			
+        histoData_12345->Draw("same");	
+		if(DrawBox_1)box_11->Draw("same");
+        if(DrawBox_1)box_12->Draw("same");
+        if(DrawBox_2)box_21->Draw("same");
+        if(DrawBox_2)box_22->Draw("same");
 		
 		TLegend *StackLeg_12345 = new TLegend(0.51,0.67,0.88,0.88);
 		StackLeg_12345->SetFillColor(0);
@@ -1544,7 +1577,11 @@ Dir_4a->cd();
 		Stackd_123456->GetXaxis()->SetTitle(asseX_name.c_str());
 		Stackd_123456->GetYaxis()->SetTitle(asseY_name.c_str());
 		
-        histoData_123456->Draw("same");			
+        histoData_123456->Draw("same");		
+        if(DrawBox_1)box_11->Draw("same");
+        if(DrawBox_1)box_12->Draw("same");
+        if(DrawBox_2)box_21->Draw("same");
+        if(DrawBox_2)box_22->Draw("same");
 		
 		TLegend *StackLeg_123456 = new TLegend(0.51,0.67,0.88,0.88);
 		StackLeg_123456->SetFillColor(0);
@@ -1559,8 +1596,6 @@ Dir_4a->cd();
 		
 		d_123456->Write(Stackd_name.c_str());
 		d_123456->Close();
-	}
-		
 	}
 	
 	Dir_3->cd();

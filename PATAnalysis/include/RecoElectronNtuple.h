@@ -116,6 +116,8 @@ private:
   
   std::string _elTrigVector[10];
   
+  std::string _JetType;
+  
   bool _Norm;
   
   TDirectory* _dir;

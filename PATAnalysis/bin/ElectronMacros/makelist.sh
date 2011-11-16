@@ -2,9 +2,9 @@
 
 FLAG_POOLSOURCE=0;
 
-LIST=WJETSLNU_Winter10_START39_V9.list
-TMPLIST=tmp.txt
-DIR=/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/Reduction/test/Electrons/MC_Winter10/WLNUMadgraph/crab_0_110811_164213/res/
+LIST=RUN2010B_new.list
+TMPLIST=tmp
+DIR=/data/sfrosali/Zjets/NEW_PATtuple/RUN2010B/
 
 ls -l $DIR | grep root > $TMPLIST
 

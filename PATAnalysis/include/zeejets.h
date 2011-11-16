@@ -14,10 +14,10 @@ using namespace std;
 
 /*
 -1. Unknown
-0.  Data_RUN2010A (skimmed)
-1.  Data_RUN2010B (skimmed)
-2.  Z_Madgraph_D6T (not skimmed)
-3.  Z_Madgraph_Z2 (not skimmed)
+0.  NEW Data_RUN2010A (skimmed)
+1.  NEW Data_RUN2010B (skimmed)
+2.  NEW Z_Madgraph_D6T (not skimmed)
+3.  NEW Z_Madgraph_Z2 (not skimmed)
 4.  TT_Pythia (skimmed)
 5.  Wlnu_Madgraph (skimmed)
 6.  WWEE_Pythia (skimmed)
@@ -83,14 +83,14 @@ case(2):
 Par->_xsec=3048.0;
 Par->_EventFilter=1.;
 Par->_EventsPerFile=0;
-Par->_EventNumber=0;
+Par->_EventNumber=2537632.0;
 break;
 case(3):
 //Z_Madgraph_Z2
 Par->_xsec=3048.0;
 Par->_EventFilter=1.;
 Par->_EventsPerFile=0;
-Par->_EventNumber=0;
+Par->_EventNumber=5057046.0;
 break;
 case(4):
 //TT_Pythia (skimmed)
@@ -290,6 +290,7 @@ cfg<<"type        = cms.string(\"RecoElectronNtuple\"),"<<std::endl;
 cfg<<"Name        = cms.string(\"RecoElectronNtuple\"),"<<std::endl;
 cfg<<"sourceFileList = cms.string(\""<<Source.c_str()<<"\"),"<<std::endl;
 cfg<<"Selections = cms.string(\""<<selections.c_str()<<"\"),"<<std::endl;
+cfg<<"JetType = cms.string(\""<<JetType.c_str()<<"\"),"<<std::endl;
 cfg<<"Sample = cms.string(\""<<sample.c_str()<<"\"),"<<std::endl;
 cfg<<"Acc = cms.int32("<<Acc<<"),"<<std::endl;
 cfg<<"Trg = cms.int32("<<Trg<<"),"<<std::endl;

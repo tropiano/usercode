@@ -29,11 +29,6 @@ using namespace std;
 //JetPtMin in GeV; Tune Z2 or D6T; jecUnc: "0" = NotApplied, "+" = Added, "-" = Subtracted 
 
 void XSec(int JetPtMin, string tune, string jecUnc){
-
-gROOT->SetStyle("Plain");
-gStyle->SetOptStat(0);
-gStyle->SetPaintTextFormat("5.3f");
-gStyle->SetPalette(1,0);
         
         double Luminosity = 36.; //pb-1
         double LuminosityErr = 1.4; //pb-1

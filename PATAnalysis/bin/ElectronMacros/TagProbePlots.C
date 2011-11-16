@@ -29,8 +29,6 @@ using namespace std;
 //Selections: "SYM" = V+jets selections (old); "ASYM" = Vector Boson Task Force (new)
 
 void TPPlots(string multiplicity, string selections){
-
-        gROOT->SetStyle("Plain");
         
         //MonteCarlo Signal file used to evaluate the Rel. MC Rel Eff. and the TP Eff. w/o background
         TFile *signal_MC_file = TFile::Open("/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/MC_Winter10/Signal/JetPt30/Z_Madgraph_Z2_JetPt30.root");

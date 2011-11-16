@@ -29,15 +29,10 @@ using namespace std;
 
 void recZ_Plots(string selections){
 
-string Analysis_Note = "False";
-if (Analysis_Note == "False") gROOT->SetStyle("Plain");
-gStyle->SetOptStat(0);
-
 string log_scale = "True";
 
 string Tab_cut = "True";
         
-                
 	//Background MC
 	TFile* QCD_TF = TFile::Open("MC_Fall10_387/JetPt30/QCD_ALL.root");
 	TFile* EWK_TF = TFile::Open("MC_Fall10_387/JetPt30/EWK_ALL.root");

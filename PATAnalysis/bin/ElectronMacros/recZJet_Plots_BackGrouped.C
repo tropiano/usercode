@@ -29,12 +29,6 @@ using namespace std;
 
 void recZJet_Plots(string selections){
 
-
-string Analysis_Note = "False";
-if (Analysis_Note == "False") gROOT->SetStyle("Plain");
-gStyle->SetOptStat(0);
-gStyle->SetOptTitle(0);
-
 string log_scale = "True";
 
 string Tab_cut = "True";    

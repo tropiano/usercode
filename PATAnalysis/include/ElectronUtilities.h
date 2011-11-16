@@ -80,10 +80,10 @@ static double eta_el_excl_down = 1.4442;           //Excluded Eta region
 static double dxycut = 0.02;     //cm
 
 //Jets
-static bool JetIDReq = false;
-static double ptjetmin = 15.;   //Gev/c
+static bool JetIDReq = true;
+static double ptjetmin = 30.;   //Gev/c
 static double etajetmax = 2.5;
-static double isojetcut = 0.3; //Isolation jet - Z electron
+static double isojetcut = 0.5; //Isolation jet - Z electron
 
 //SYM cuts
 static double ptelcut = 20.;    //Gev/c
@@ -126,18 +126,18 @@ static double ASYM0_TAG_eta_el_excl_up = 1.566;               //Excluded Eta reg
 static double ASYM0_TAG_eta_el_excl_down = 1.4442;           //Excluded Eta region
 static double ASYM0_TAG_minnhit = 0.;
 static double ASYM0_TAG_maxchi2 = 9999.;
-static double ASYM0_TAG_dxycut = 0.1;     //cm
-static double ASYM0_TAG_isocut = 0.05;                        //CombRelIso
+static double ASYM0_TAG_dxycut = 0.05;     //cm
+static double ASYM0_TAG_isocut = 0.1;                        //CombRelIso
 static string ASYM0_TagEiD = ""; //if "" no EiD cut applied
 
 // ASYM1 Tag cuts (for hard electron probe)
-static double ASYM1_TAG_ptelcut = 10.;    //Gev/c
+static double ASYM1_TAG_ptelcut = 20.;    //Gev/c
 static double ASYM1_TAG_etaelcut = 2.5;
 static double ASYM1_TAG_eta_el_excl_up = 1.566;               //Excluded Eta region
 static double ASYM1_TAG_eta_el_excl_down = 1.4442;            //Excluded Eta region
 static double ASYM1_TAG_minnhit = 0.;
 static double ASYM1_TAG_maxchi2 = 9999.;
-static double ASYM1_TAG_dxycut = 0.1;     //cm
+static double ASYM1_TAG_dxycut = 0.05;     //cm
 static double ASYM1_TAG_isocut = 0.1;                        //CombRelIso
 static string ASYM1_TagEiD = ""; //if "" no EiD cut applied
 

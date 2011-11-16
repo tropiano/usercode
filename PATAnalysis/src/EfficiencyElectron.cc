@@ -814,8 +814,10 @@ void  EfficiencyElectron::process(const fwlite::Event& iEvent){
    electronHandle.getByLabel(iEvent, "selectedElectrons");
   
    fwlite::Handle<std::vector<pat::Jet> > jetrecHandle;
-   if(_JetType=="PF")jetrecHandle.getByLabel(iEvent, "selectedJets");
-   if(_JetType=="PFL1CORR")jetrecHandle.getByLabel(iEvent, "selectedJetsL1Corrected");
+   if(_JetType=="PFold")jetrecHandle.getByLabel(iEvent, "selectedJets");
+   if(_JetType=="PFL1CORRold")jetrecHandle.getByLabel(iEvent, "selectedJetsL1Corrected");
+   if(_JetType=="PFnew")jetrecHandle.getByLabel(iEvent, "selectedJetsNoL1");
+   if(_JetType=="PFL1CORRnew")jetrecHandle.getByLabel(iEvent, "selectedJetsL1Corrected");
    
    fwlite::Handle<std::vector<reco::GenJet> > jetgenHandle;
    jetgenHandle.getByLabel(iEvent, "selectedGenJets");
