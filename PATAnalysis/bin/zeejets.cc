@@ -23,8 +23,8 @@ using namespace std;
 -1. Unknown
 0.  NEW Data_RUN2010A (skimmed)
 1.  NEW Data_RUN2010B (skimmed)
-2.  NEW Z_Madgraph_D6T (skimmed)
-3.  NEW Z_Madgraph_Z2 (skimmed)
+2.  NEW Z_Madgraph_D6T (not skimmed)
+3.  NEW Z_Madgraph_Z2 (not skimmed)
 4.  TT_Pythia (skimmed)
 5.  Wlnu_Madgraph (skimmed)
 6.  WWEE_Pythia (skimmed)
@@ -38,7 +38,7 @@ using namespace std;
 14. QCD_EMEnriched_Pythia_Pt80to170 (skimmed)
 */
 
-//argc>=0: single sample; argc=-1: all samples; argc=-2: only data and MC signal samples; argc=-3: only MC background samples
+//argc>=0: single sample; argc=-1: all samples; argc=-2: all DATA samples; argc=-3 all MC samples; argc=-4 only MC signal samples; argc=-5: only MC background samples; 
 //argv: number of events to be processed
 
 int main(int argc, char *argv[]) {
@@ -75,7 +75,7 @@ int PreDefName, ProcEvents;
   string em_80170 = "SourceFilesElectrons/QCDEM80_Winter10_START39_V9.list";
   
   //Path of PATAnalysis dir - DO NOT FORGET THE SLASH AT THE END OF THE PATH
-  string path="/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/";
+  string path="/data/sfrosali/Zjets/NEW_CMSSW_3_9_7/CMSSW_3_9_7/src/Firenze/PATAnalysis/bin/";
 
   //Sample: Data -> "data"; MC -> "mc"
   sample = "mc";
@@ -104,7 +104,7 @@ int PreDefName, ProcEvents;
   string JetType = "PFL1CORRnew";
   //JEC Uncertainty applied to RecoElectronNtuple: 0 = NotApplied, 1 = Added, -1 = Subtracted
   int JECUnc = 0; //default value = 0
-  string JECUncFilePath = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/JECUncertainty/Jec10V1_Uncertainty_AK5PF.txt";
+  string JECUncFilePath = "/data/sfrosali/Zjets/NEW_CMSSW_3_9_7/CMSSW_3_9_7/src/Firenze/PATAnalysis/bin/JECUncertainty/Jec10V1_Uncertainty_AK5PF.txt";
   
   //Normalization
   string Norm = "True";
@@ -198,6 +198,10 @@ int PreDefName, ProcEvents;
   EventNumber=ParStruct._EventNumber;
   makeCfg("data", selections, "PFL1CORRnew", false, RECO, EFF, NTUPLE, Acc, Trg, Conv, Imp, Iso, EiD, path.c_str(), Data_RUN2010B.c_str(), "Data_RUN2010B", "False", EventsPerFile, EventNumber, -1, xsec*EventFilter, targetLumi, "False", NtupleFill, JECUnc, JECUncFilePath);
   
+  }
+  
+  if(PreDefName==-1 || PreDefName==-3 || PreDefName==-4){
+  
   Parameters(2, &ParStruct);
   xsec=ParStruct._xsec;
   EventFilter=ParStruct._EventFilter;
@@ -214,7 +218,7 @@ int PreDefName, ProcEvents;
   
   }
   
-  if(PreDefName==-1 || PreDefName==-3){
+  if(PreDefName==-1 || PreDefName==-3 || PreDefName==-5){
   
   Parameters(4, &ParStruct);
   xsec=ParStruct._xsec;
@@ -337,6 +341,11 @@ int PreDefName, ProcEvents;
   p->Process(SignalDS_1, "FWLiteTSelector","",-1);
   p->ClearInput();
   delete SignalDS_1;
+  
+  }
+  
+  if(PreDefName==-1 || PreDefName==-3 || PreDefName==-4){
+  
   string cfgPath_2=path+"Z_Madgraph_D6T.py";
   TDSet* SignalDS_2 = getDS(Zpj_D6T.c_str());
   TNamed* configsignal_2 = new TNamed("ConfigFile", cfgPath_2.c_str());
@@ -354,7 +363,7 @@ int PreDefName, ProcEvents;
   
   }
   
-  if(PreDefName==-1 || PreDefName==-3){
+  if(PreDefName==-1 || PreDefName==-3 || PreDefName==-5){
   
   string cfgPath_4=path+"TT_Pythia.py";
   TDSet* SignalDS_4 = getDS(TT.c_str());

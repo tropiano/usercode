@@ -83,14 +83,14 @@ case(2):
 Par->_xsec=3048.0;
 Par->_EventFilter=1.;
 Par->_EventsPerFile=0;
-Par->_EventNumber=2537632.0;
+Par->_EventNumber=0;
 break;
 case(3):
 //Z_Madgraph_Z2
 Par->_xsec=3048.0;
 Par->_EventFilter=1.;
 Par->_EventsPerFile=0;
-Par->_EventNumber=5057046.0;
+Par->_EventNumber=0;
 break;
 case(4):
 //TT_Pythia (skimmed)

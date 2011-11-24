@@ -27,7 +27,7 @@
 
 using namespace std;
 
-//JetPtMin in GeV; Tune Z2 or D6T; jecUnc: "0" = NotApplied, "+" = Added, "-" = Subtracted 
+//JetPtMin in GeV; Tune Z2 or D6T; jecUnc: "0" = NotApplied & Not Norm, "0N" = NotApplied & Norm, "+" = Added, "-" = Subtracted 
 
 void Ntuple_Plots(int JetPtMin, string tune, string jecUnc){ 
 
@@ -35,14 +35,15 @@ string log_scale = "True";
 
 string Tab_cut = "True";
 
-string path = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin";
+string path = "/data/sfrosali/Zjets/NEW_CMSSW_3_9_7/CMSSW_3_9_7/src/Firenze/PATAnalysis/bin";
 string JetPtCut;
 if(JetPtMin==15)JetPtCut="JetPt15";
 if(JetPtMin==30)JetPtCut="JetPt30";
 
 //JEC Uncertainty
 string JEC="";
-if(jecUnc=="0")JEC="";
+if(jecUnc=="0N")JEC="";
+if(jecUnc=="0")JEC="_NotNorm";
 if(jecUnc=="+")JEC="_jecUncPlus";
 if(jecUnc=="-")JEC="_jecUncMinus";
 	
@@ -53,15 +54,28 @@ if(jecUnc=="-")JEC="_jecUncMinus";
 	TFile *Data_TF = TFile::Open((path+"/Data_Dec22ReReco/"+JetPtCut+"/Data_RUN2010A-B_"+JetPtCut+".root").c_str());
 	
 	//Output
-	string out = "NtuplePlots"+JEC+"_";
+	string JECout;
+	if(jecUnc=="0") JECout="";
+	if(jecUnc=="+") JECout="_jecUncPlus";
+        if(jecUnc=="-") JECout="_jecUncMinus";
+        
+	string out = "NtuplePlots"+JECout+"_";
 	out+=JetPtCut;     
 	string output = out;
 	output+=".root";
 	TFile* outplots = new TFile(output.c_str(), "RECREATE");
 	
+	//Report files
+        ofstream ntuplerep;
+	ntuplerep.open(("NtupleReport_"+JetPtCut+JECout+".txt").c_str());
+	ntuplerep<<endl;
+	
 	//Normalization factor
-	double iniLumi = 50.; //pb-1
-	double targetLumi = 36.176; //pb-1
+	double iniLumi;
+	if(jecUnc=="0" && tune=="Z2") iniLumi = 1593.52; //pb-1 Z2
+	if(jecUnc=="0" && tune=="D6T") iniLumi = 492.126; //pb-1 D6T
+	if(jecUnc=="0N") iniLumi = 50.; //pb-1
+	double targetLumi = 36.162; //pb-1
 	double scale = 1.;
 	if(iniLumi!=0)scale = targetLumi/iniLumi;
 	
@@ -74,9 +88,9 @@ if(jecUnc=="-")JEC="_jecUncMinus";
 	TTree* Z_tree      = (TTree*) Z_TF->Get("RecoElectronNtuple/ZeeTree");
 
 	//rebin
-	int rebin_recMassZ = 5;
-	int rebin_recPtZ = 2;
-	int rebin_recEtaZ = 5;
+	int rebin_recMassZ = 1;
+	int rebin_recPtZ = 3;
+	int rebin_recEtaZ = 2;
 		
 	//colors	
 	int col_Z = 800;
@@ -93,7 +107,7 @@ if(jecUnc=="-")JEC="_jecUncMinus";
 	TDirectory *ZEta, *ZMass, *ZoJet_Pt, *JetRes, *Unfolding, *Matrix, *CorrFact;
 	ZEta = outplots->mkdir("ZEta_0-1Jets");
 	ZMass = outplots->mkdir("ZMass_Barrel-Endcap");
-	ZoJet_Pt = outplots->mkdir("ZoverJetPt_1Jet");
+	ZoJet_Pt = outplots->mkdir("JetOverZPt_1Jet");
 	JetRes = outplots->mkdir("JetResolution");
 	Unfolding = outplots->mkdir("Unfolding");
 	Matrix = Unfolding->mkdir("ResponseMatrix");
@@ -101,22 +115,22 @@ if(jecUnc=="-")JEC="_jecUncMinus";
 	
 	//Define Histograms
 	ZEta->cd();
-	TH1D* ZEta0Jet_Data = new TH1D("ZEta0Jet_Data","Z Eta Data - 0 Jet",20,-10,10);
-	TH1D* ZEta0Jet_MC = new TH1D("ZEta0Jet_MC","Z Eta MC - 0 Jet",20,-10,10);
-	TH1D* ZEta1Jet_Data = new TH1D("ZEta1Jet_Data","Z Eta Data - 1 Jet",20,-10,10);
-	TH1D* ZEta1Jet_MC = new TH1D("ZEta1Jet_MC","Z Eta MC - 1 Jet",20,-10,10);
+	TH1D* ZEta0Jet_Data = new TH1D("ZEta0Jet_Data","Z Eta Data - 0 Jet",200,-10,10);
+	TH1D* ZEta0Jet_MC = new TH1D("ZEta0Jet_MC","Z Eta MC - 0 Jet",200,-10,10);
+	TH1D* ZEta1Jet_Data = new TH1D("ZEta1Jet_Data","Z Eta Data - 1 Jet",200,-10,10);
+	TH1D* ZEta1Jet_MC = new TH1D("ZEta1Jet_MC","Z Eta MC - 1 Jet",200,-10,10);
 	
 	ZoJet_Pt->cd();
-	TH1D* PtJetoverPtZ_1PFJet_Data = new TH1D("PtJetoverPtZ_1PFJet_Data","PtJetoverPtZ 1PFJet Data",24,0,3);
-	TH1D* PtJetoverPtZ_1PFJet_MC = new TH1D("PtJetoverPtZ_1PFJet_MC","PtJetoverPtZ 1PFJet MC",24,0,3);
-	TH1D* PtJetoverPtZ_1PFLICORRJet_Data = new TH1D("PtJetoverPtZ_1PFLICORRJet_Data","PtJetoverPtZ 1PFLICORRJet Data",24,0,3);
-	TH1D* PtJetoverPtZ_1PFLICORRJet_MC = new TH1D("PtJetoverPtZ_1PFLICORRJet_MC","PtJetoverPtZ 1PFLICORRJet MC",24,0,3);
+	TH1D* PtJetOverPtZ_1PFJet_Data = new TH1D("PtJetOverPtZ_1PFJet_Data","PtJetOverPtZ 1PFJet Data",300,0,3);
+	TH1D* PtJetOverPtZ_1PFJet_MC = new TH1D("PtJetOverPtZ_1PFJet_MC","PtJetOverPtZ 1PFJet MC",300,0,3);
+	TH1D* PtJetOverPtZ_1PFL1CORRJet_Data = new TH1D("PtJetOverPtZ_1PFL1CORRJet_Data","PtJetOverPtZ 1PFL1CORRJet Data",300,0,3);
+	TH1D* PtJetOverPtZ_1PFL1CORRJet_MC = new TH1D("PtJetOverPtZ_1PFL1CORRJet_MC","PtJetOverPtZ 1PFL1CORRJet MC",300,0,3);
 	
 	JetRes->cd();
 	TH2D* ResJetPt_PF_MC = new TH2D("ResJetPt_PF_MC","Resolution of PF Jet Pt - MC",140,10,150,200,-1,1);
-	TH2D* ResJetPt_PFLICORR_MC = new TH2D("ResJetPt_PFLICORR_MC","Resolution of PFLICORR Jet Pt - MC",140,10,150,200,-1,1);
+	TH2D* ResJetPt_PFL1CORR_MC = new TH2D("ResJetPt_PFL1CORR_MC","Resolution of PFL1CORR Jet Pt - MC",140,10,150,200,-1,1);
 	TH1D* ResJetPt_PF_MC_1D = new TH1D("ResJetPt_PF_MC_1D","Resolution of PF Jet Pt - MC",80,-1,1);
-	TH1D* ResJetPt_PFLICORR_MC_1D = new TH1D("ResJetPt_PFLICORR_MC_1D","Resolution of PF Jet Pt - MC",80,-1,1);
+	TH1D* ResJetPt_PFL1CORR_MC_1D = new TH1D("ResJetPt_PFL1CORR_MC_1D","Resolution of PF Jet Pt - MC",80,-1,1);
 	
 	TH1D* DeltaPhiZJet =  new TH1D("DeltaPhiZJet","Delta Phi separation from Z and jet in 1 jet events",80,-7,7);
 	
@@ -148,18 +162,18 @@ if(jecUnc=="-")JEC="_jecUncMinus";
 	
 	ZoJet_Pt->cd();
 	TCanvas *tmp2 = new TCanvas;
-	data_tree->Draw("pfjetpt1/zpt >> PtJetoverPtZ_1PFJet_Data","zmass_AllCuts>0 && npfjetsele==1 && pfjetpt1>15 && pfjeteta1<2.5");
-	data_tree->Draw("pfl1jetpt1/zpt >> PtJetoverPtZ_1PFLICORRJet_Data","zmass_AllCuts>0 && npfl1jetsele==1 && pfl1jetpt1>30 && pfl1jeteta1<3");
-	Z_tree->Draw("pfjetpt1/zpt >> PtJetoverPtZ_1PFJet_MC","(zmass_AllCuts>0 && npfjetsele==1 && pfjetpt1>15 && pfjeteta1<2.5)*weight");
-	Z_tree->Draw("pfl1jetpt1/zpt >> PtJetoverPtZ_1PFLICORRJet_MC","(zmass_AllCuts>0 && npfl1jetsele==1 && pfl1jetpt1>30 && pfl1jeteta1<3)*weight");
+	data_tree->Draw("pfjetpt1/zpt >> PtJetOverPtZ_1PFJet_Data","zmass_AllCuts>0 && npfjetsele==1");
+	data_tree->Draw("pfl1jetpt1/zpt >> PtJetOverPtZ_1PFL1CORRJet_Data","zmass_AllCuts>0 && npfl1jetsele==1");
+	Z_tree->Draw("pfjetpt1/zpt >> PtJetOverPtZ_1PFJet_MC","(zmass_AllCuts>0 && npfjetsele==1)*weight");
+	Z_tree->Draw("pfl1jetpt1/zpt >> PtJetOverPtZ_1PFL1CORRJet_MC","(zmass_AllCuts>0 && npfl1jetsele==1)*weight");
 	tmp2->Close();
 	
 	JetRes->cd();
 	TCanvas *tmp3 = new TCanvas;
 	Z_tree->Draw("(pfjetpt1-acc_jetgenpt1)/acc_jetgenpt1:acc_jetgenpt1 >> ResJetPt_PF_MC","npfjetsele>0 && acc_gennjetsele>0 && (((acc_jetgeneta1-pfjeteta1)^2+(acc_jetgenphi1-pfjetphi1)^2)<0.0625)");
-	Z_tree->Draw("(pfl1jetpt1-acc_jetgenpt1)/acc_jetgenpt1:acc_jetgenpt1 >> ResJetPt_PFLICORR_MC","npfl1jetsele>0 && acc_gennjetsele>0 && (((acc_jetgeneta1-pfl1jeteta1)^2+(acc_jetgenphi1-pfl1jetphi1)^2)<0.0625)");
+	Z_tree->Draw("(pfl1jetpt1-acc_jetgenpt1)/acc_jetgenpt1:acc_jetgenpt1 >> ResJetPt_PFL1CORR_MC","npfl1jetsele>0 && acc_gennjetsele>0 && (((acc_jetgeneta1-pfl1jeteta1)^2+(acc_jetgenphi1-pfl1jetphi1)^2)<0.0625)");
 	Z_tree->Draw("(pfjetpt1-acc_jetgenpt1)/acc_jetgenpt1 >> ResJetPt_PF_MC_1D","(npfjetsele>0 && acc_gennjetsele>0 && (((acc_jetgeneta1-pfjeteta1)^2+(acc_jetgenphi1-pfjetphi1)^2)<0.0625))*weight");
-	Z_tree->Draw("(pfl1jetpt1-acc_jetgenpt1)/acc_jetgenpt1 >> ResJetPt_PFLICORR_MC_1D","(npfl1jetsele>0 && acc_gennjetsele>0 && (((acc_jetgeneta1-pfl1jeteta1)^2+(acc_jetgenphi1-pfl1jetphi1)^2)<0.0625))*weight");
+	Z_tree->Draw("(pfl1jetpt1-acc_jetgenpt1)/acc_jetgenpt1 >> ResJetPt_PFL1CORR_MC_1D","(npfl1jetsele>0 && acc_gennjetsele>0 && (((acc_jetgeneta1-pfl1jeteta1)^2+(acc_jetgenphi1-pfl1jetphi1)^2)<0.0625))*weight");
 	Z_tree->Draw("pfjetphi1-zphi >> DeltaPhiZJet","(zmass_AllCuts>0 && npfjetsele==1)*weight");
 	tmp3->Close();
 	
@@ -178,24 +192,24 @@ if(jecUnc=="-")JEC="_jecUncMinus";
 	ResJetPt_PF_MC->GetXaxis()->SetTitle("p_{T,Jet}^{gen}");
 	ResJetPt_PF_MC->GetYaxis()->SetTitle("(p_{T,Jet}^{reco}-p_{T,Jet}^{gen})/p_{T,Jet}^{gen}");
 	ResJetPt_PF_MC->GetYaxis()->SetTitleOffset(1.15);
-	ResJetPt_PFLICORR_MC->SetMarkerStyle(7);
-	ResJetPt_PFLICORR_MC->GetXaxis()->SetTitle("p_{T,Jet}^{gen}");
-	ResJetPt_PFLICORR_MC->GetYaxis()->SetTitle("(p_{T,Jet}^{reco}-p_{T,Jet}^{gen})/p_{T,Jet}^{gen}");
-	ResJetPt_PFLICORR_MC->GetYaxis()->SetTitleOffset(1.15);
+	ResJetPt_PFL1CORR_MC->SetMarkerStyle(7);
+	ResJetPt_PFL1CORR_MC->GetXaxis()->SetTitle("p_{T,Jet}^{gen}");
+	ResJetPt_PFL1CORR_MC->GetYaxis()->SetTitle("(p_{T,Jet}^{reco}-p_{T,Jet}^{gen})/p_{T,Jet}^{gen}");
+	ResJetPt_PFL1CORR_MC->GetYaxis()->SetTitleOffset(1.15);
 	ResJetPt_PF_MC_1D->SetLineWidth(2);
 	ResJetPt_PF_MC_1D->GetXaxis()->SetTitle("(p_{T,Jet}^{reco}-p_{T,Jet}^{gen})/p_{T,Jet}^{gen}");
-	ResJetPt_PFLICORR_MC_1D->SetLineWidth(2);
-	ResJetPt_PFLICORR_MC_1D->GetXaxis()->SetTitle("(p_{T,Jet}^{reco}-p_{T,Jet}^{gen})/p_{T,Jet}^{gen}");
+	ResJetPt_PFL1CORR_MC_1D->SetLineWidth(2);
+	ResJetPt_PFL1CORR_MC_1D->GetXaxis()->SetTitle("(p_{T,Jet}^{reco}-p_{T,Jet}^{gen})/p_{T,Jet}^{gen}");
 	
 	//Normalization - Comparison Data/MC
 	ZEta0Jet_Data->Sumw2();
 	ZEta0Jet_MC->Scale(scale);
 	ZEta1Jet_Data->Sumw2();
 	ZEta1Jet_MC->Scale(scale);
-	PtJetoverPtZ_1PFJet_Data->Sumw2();
-	PtJetoverPtZ_1PFJet_MC->Scale(scale);
-	PtJetoverPtZ_1PFLICORRJet_Data->Sumw2();
-	PtJetoverPtZ_1PFLICORRJet_MC->Scale(scale);
+	PtJetOverPtZ_1PFJet_Data->Sumw2();
+	PtJetOverPtZ_1PFJet_MC->Scale(scale);
+	PtJetOverPtZ_1PFL1CORRJet_Data->Sumw2();
+	PtJetOverPtZ_1PFL1CORRJet_MC->Scale(scale);
 	
 	//ZMass_Data->Sumw2();
 	ZMass_MC->Scale(scale);
@@ -213,7 +227,7 @@ if(jecUnc=="-")JEC="_jecUncMinus";
 	Matrix->cd();	
 	
 	TCanvas *unf_pfl1 = new TCanvas;
-	Z_tree->Draw("genacc_npfl1jetsele:acc_gennjetsele >> UnfoldingPlot_Scat_PFL1","acc_gennjetsele>-1");	
+	Z_tree->Draw("acc_gennjetsele:genacc_npfl1jetsele >> UnfoldingPlot_Scat_PFL1","acc_gennjetsele>-1");	
 	UnfoldingPlot_Scat_PFL1->GetXaxis()->SetNdivisions(5);
 	UnfoldingPlot_Scat_PFL1->GetXaxis()->SetTitle("RECO Jets");
 	UnfoldingPlot_Scat_PFL1->GetYaxis()->SetNdivisions(5);
@@ -237,6 +251,7 @@ if(jecUnc=="-")JEC="_jecUncMinus";
 	Norm_UnfoldingPlot_Scat_PFL1->GetXaxis()->SetTitle("RECO Jets");
 	Norm_UnfoldingPlot_Scat_PFL1->GetYaxis()->SetNdivisions(5);
 	Norm_UnfoldingPlot_Scat_PFL1->GetYaxis()->SetTitle("GEN Jets");
+	Norm_UnfoldingPlot_Scat_PFL1->SetMarkerSize(1.5);
 	Norm_UnfoldingPlot_Scat_PFL1->SetLineWidth(2);	
 	Norm_UnfoldingPlot_Scat_PFL1->Draw("textcolz");
 	normunf_pfl1->Write("Norm_UnfoldingPlot_Box_PFL1.root");
@@ -323,7 +338,6 @@ if(jecUnc=="-")JEC="_jecUncMinus";
 	GENJet_InclMult->GetYaxis()->SetTitle("Correction Factors");
 	GENJet_InclMult->GetYaxis()->SetRangeUser(0.4,1.3);
 
-
 	//Plots
 	ZEta->cd();
 	TCanvas *tree_eta0jet = new TCanvas;
@@ -333,9 +347,11 @@ if(jecUnc=="-")JEC="_jecUncMinus";
 	ZEta0Jet_MC->SetFillStyle(style);
 	ZEta0Jet_MC->SetMarkerColor(col_Z);
 	ZEta0Jet_MC->GetXaxis()->SetTitle("#eta");
+	ZEta0Jet_MC->Rebin(rebin_recEtaZ);
 	ZEta0Jet_MC->Draw("hist");
 	ZEta0Jet_Data->SetLineWidth(2);
 	ZEta0Jet_Data->SetMarkerStyle(20);
+	ZEta0Jet_Data->Rebin(rebin_recEtaZ);
 	ZEta0Jet_Data->Draw("same");
 	tree_eta0jet->Write("Conf_ZEta0Jet.root");
 	tree_eta0jet->Close();
@@ -347,41 +363,53 @@ if(jecUnc=="-")JEC="_jecUncMinus";
 	ZEta1Jet_MC->SetFillStyle(style);
 	ZEta1Jet_MC->SetMarkerColor(col_Z);
 	ZEta1Jet_MC->GetXaxis()->SetTitle("#eta");
+	ZEta1Jet_MC->Rebin(rebin_recEtaZ);
 	ZEta1Jet_MC->Draw("hist");
 	ZEta1Jet_Data->SetLineWidth(2);
 	ZEta1Jet_Data->SetMarkerStyle(20);
+	ZEta1Jet_Data->Rebin(rebin_recEtaZ);
 	ZEta1Jet_Data->Draw("same");
 	tree_eta1jet->Write("Conf_ZEta1Jet.root");
 	tree_eta1jet->Close();
 		
 	ZoJet_Pt->cd();
 	TCanvas *tree_pfptratio = new TCanvas;
-	PtJetoverPtZ_1PFJet_MC->SetLineColor(col_Z);
-	PtJetoverPtZ_1PFJet_MC->SetLineWidth(2);
-	PtJetoverPtZ_1PFJet_MC->SetFillColor(col_Z);
-	PtJetoverPtZ_1PFJet_MC->SetFillStyle(style);
-	PtJetoverPtZ_1PFJet_MC->SetMarkerColor(col_Z);
-	PtJetoverPtZ_1PFJet_MC->GetXaxis()->SetTitle("p_{T,Jet}/p_{T,Z}");
-	PtJetoverPtZ_1PFJet_MC->Draw("hist");
-	PtJetoverPtZ_1PFJet_Data->SetLineWidth(2);
-	PtJetoverPtZ_1PFJet_Data->SetMarkerStyle(20);
-	PtJetoverPtZ_1PFJet_Data->Draw("same");
-	tree_pfptratio->Write("PtJetoverPtZ_1PFJet.root");
+	PtJetOverPtZ_1PFJet_MC->SetLineColor(col_Z);
+	PtJetOverPtZ_1PFJet_MC->SetLineWidth(2);
+	PtJetOverPtZ_1PFJet_MC->SetFillColor(col_Z);
+	PtJetOverPtZ_1PFJet_MC->SetFillStyle(style);
+	PtJetOverPtZ_1PFJet_MC->SetMarkerColor(col_Z);
+	PtJetOverPtZ_1PFJet_MC->GetXaxis()->SetTitle("p_{T,Jet}/p_{T,Z}");
+	PtJetOverPtZ_1PFJet_MC->Rebin(rebin_recPtZ);
+	PtJetOverPtZ_1PFJet_MC->Draw("hist");
+	PtJetOverPtZ_1PFJet_Data->SetLineWidth(2);
+	PtJetOverPtZ_1PFJet_Data->SetMarkerStyle(20);
+	PtJetOverPtZ_1PFJet_Data->Rebin(rebin_recPtZ);
+	PtJetOverPtZ_1PFJet_Data->Draw("same");
+	tree_pfptratio->Write("PtJetOverPtZ_1PFJet.root");
 	tree_pfptratio->Close();
 	
+	ntuplerep<<"PtJet/PtZ - L2L3 - MC Mean = "<<PtJetOverPtZ_1PFJet_MC->GetMean()<<" +/- "<<PtJetOverPtZ_1PFJet_MC->GetMeanError()<<endl;
+	ntuplerep<<"PtJet/PtZ - L2L3 - DATA Mean = "<<PtJetOverPtZ_1PFJet_Data->GetMean()<<" +/- "<<PtJetOverPtZ_1PFJet_Data->GetMeanError()<<endl<<endl;
+	
 	TCanvas *tree_pfl1ptratio = new TCanvas;
-	PtJetoverPtZ_1PFLICORRJet_MC->SetLineColor(col_Z);
-	PtJetoverPtZ_1PFLICORRJet_MC->SetLineWidth(2);
-	PtJetoverPtZPtJetoverPtZ_1PFLICORRJet_MC->SetFillColor(col_Z);
-	PtJetoverPtZ_1PFLICORRJet_MC->SetFillStyle(style);
-	PtJetoverPtZ_1PFLICORRJet_MC->SetMarkerColor(col_Z);
-	PtJetoverPtZ_1PFLICORRJet_MC->GetXaxis()->SetTitle("p_{T,Jet}/p_{T,Z}");
-	PtJetoverPtZ_1PFLICORRJet_MC->Draw("hist");
-	PtJetoverPtZ_1PFLICORRJet_Data->SetLineWidth(2);
-	PtJetoverPtZ_1PFLICORRJet_Data->SetMarkerStyle(20);
-	PtJetoverPtZ_1PFLICORRJet_Data->Draw("same");
-	tree_pfl1ptratio->Write("PtJetoverPtZ_1PFLICORRJet.root");
+	PtJetOverPtZ_1PFL1CORRJet_MC->SetLineColor(col_Z);
+	PtJetOverPtZ_1PFL1CORRJet_MC->SetLineWidth(2);
+	PtJetOverPtZ_1PFL1CORRJet_MC->SetFillColor(col_Z);
+	PtJetOverPtZ_1PFL1CORRJet_MC->SetFillStyle(style);
+	PtJetOverPtZ_1PFL1CORRJet_MC->SetMarkerColor(col_Z);
+	PtJetOverPtZ_1PFL1CORRJet_MC->GetXaxis()->SetTitle("p_{T,Jet}/p_{T,Z}");
+	PtJetOverPtZ_1PFL1CORRJet_MC->Rebin(rebin_recPtZ);
+	PtJetOverPtZ_1PFL1CORRJet_MC->Draw("hist");
+	PtJetOverPtZ_1PFL1CORRJet_Data->SetLineWidth(2);
+	PtJetOverPtZ_1PFL1CORRJet_Data->SetMarkerStyle(20);
+	PtJetOverPtZ_1PFL1CORRJet_Data->Rebin(rebin_recPtZ);
+	PtJetOverPtZ_1PFL1CORRJet_Data->Draw("same");
+	tree_pfl1ptratio->Write("PtJetOverPtZ_1PFL1CORRJet.root");
 	tree_pfl1ptratio->Close();
+	
+	ntuplerep<<"PtJet/PtZ - L1L2L3 - MC Mean = "<<PtJetOverPtZ_1PFL1CORRJet_MC->GetMean()<<" +/- "<<PtJetOverPtZ_1PFL1CORRJet_MC->GetMeanError()<<endl;
+	ntuplerep<<"PtJet/PtZ - L1L2L3 - DATA Mean = "<<PtJetOverPtZ_1PFL1CORRJet_Data->GetMean()<<" +/- "<<PtJetOverPtZ_1PFL1CORRJet_Data->GetMeanError()<<endl<<endl;
 	
 	ZMass->cd();
 	TCanvas *tree_zmass = new TCanvas;
@@ -422,6 +450,8 @@ if(jecUnc=="-")JEC="_jecUncMinus";
 	ZMass_Data_Endcap->Draw("same");
 	tree_zmass_endcap->Write("ZMass_Data-MC_Endcap.root");
 	tree_zmass_endcap->Close();
+	
+	ntuplerep.close();
 		
   outplots->Write();
   outplots->Close();

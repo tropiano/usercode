@@ -14,35 +14,30 @@ using namespace std;
 int main() {
 
   //Input files - Z2
-  string training_sign = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/JetPt15/Z_Madgraph_Z2_JetPt15.root";
-  string training_back = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/JetPt15/Background_No-WZ-ZZ_JetPt15.root";
-  string total = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/JetPt15/Data_RUN2010A-B_JetPt15.root"; 
-
- /* //Input files - D6T
-  string training_sign = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe_JetID_OneTag/TPFiles/JetPt15/D6T/Z_Madgraph_D6T_JetPt15.root";
-  string training_back = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe_JetID_OneTag/TPFiles/JetPt15/D6T/Background_All_NoDiBos_JetPt15.root";
-  string total = "/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe_JetID_OneTag/TPFiles/JetPt15/D6T/Data_RUN2010A-B_JetPt15.root";*/
+  string training_sign = "/data/sfrosali/Zjets/NEW_CMSSW_3_9_7/CMSSW_3_9_7/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/JetPt15/Z_Madgraph_Z2_JetPt15.root";
+  string training_back = "/data/sfrosali/Zjets/NEW_CMSSW_3_9_7/CMSSW_3_9_7/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/JetPt15/Background_No-WZ-ZZ_JetPt15.root";
+  string total = "/data/sfrosali/Zjets/NEW_CMSSW_3_9_7/CMSSW_3_9_7/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/JetPt15/Data_RUN2010A-B_JetPt15.root"; 
   
   //Output files
   string output_train_sign =  
-"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPAnalyzer/JetPt15/Z2/TrainSig_JetPt15_Incl_Double.root";
+"/data/sfrosali/Zjets/NEW_CMSSW_3_9_7/CMSSW_3_9_7/src/Firenze/PATAnalysis/bin/TagProbe/TPAnalyzer/JetPt15/Z2/TrainSig_JetPt15_Incl_Global.root";
   string output_train_back =  
-"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPAnalyzer/JetPt15/Z2/TrainBack_JetPt15_Incl_Double.root";
+"/data/sfrosali/Zjets/NEW_CMSSW_3_9_7/CMSSW_3_9_7/src/Firenze/PATAnalysis/bin/TagProbe/TPAnalyzer/JetPt15/Z2/TrainBack_JetPt15_Incl_Global.root";
   string output_total =  
-"/data/sfrosali/Zjets/CMSSW_3_9_9/src/Firenze/PATAnalysis/bin/TagProbe/TPAnalyzer/JetPt15/Z2/DATA_JetPt15_Incl_Double.root";
+"/data/sfrosali/Zjets/NEW_CMSSW_3_9_7/CMSSW_3_9_7/src/Firenze/PATAnalysis/bin/TagProbe/TPAnalyzer/JetPt15/Z2/DATA_JetPt15_Incl_Global_TestPlot.root";
 
   //Selections used
   string selections = "ASYM";
   
   //Cut to evaluate
-  string cut = "Double";
+  string cut = "Global";
   
   //Multiplicity - "excl" = Exclusive; "incl" = Inclusive
   string mult = "incl";
   
   //Analyzer steps
-  bool tr_sig = true;
-  bool tr_back = true;
+  bool tr_sig = false;
+  bool tr_back = false;
   bool total_an = true;
   
   //Mass bin

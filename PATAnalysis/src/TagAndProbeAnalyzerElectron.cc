@@ -335,11 +335,20 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzerElectron::fit(RooAbsDat
  
   RooRealVar s("s", "signal yield", data->sumEntries(), 1, 300000);
   RooRealVar efficiency("efficiency", "efficiency", 0.9, 0., 0.999);
-  RooRealVar b_pass("b_pass", "background yield pass", 50, 0, 100000);
-  RooRealVar b_fail("b_fail", "background yield fail", 50, 0, 100000);
+  RooRealVar b_pass("b_pass", "background yield pass", 5, 0, 10000);
+  RooRealVar b_fail("b_fail", "background yield fail", 5, 0, 10000);
   
   RooFormulaVar s_fail("s_fail","s*(1.0 - efficiency)", RooArgList(s, efficiency) );
   RooFormulaVar s_pass("s_pass","s*efficiency", RooArgList(s, efficiency) );
+  
+  /*RooRealVar s1("s1", "signal1 yield", data->sumEntries(), 1, 300000);
+  RooRealVar s2("s2", "signal2 yield", data->sumEntries(), 1, 300000);
+  RooRealVar efficiency("efficiency", "efficiency", 0.9, 0., 0.999);
+  RooRealVar b_pass("b_pass", "background yield pass", 5, 0, 10000);
+  RooRealVar b_fail("b_fail", "background yield fail", 5, 0, 10000);
+  
+  RooFormulaVar s_fail("s_fail","s1", RooArgList(s1, efficiency) );
+  RooFormulaVar s_pass("s_pass","s2", RooArgList(s2, efficiency) );*/
 
   RooArgList components_pass;//(signal_pass);
   RooArgList coefficients_pass;//(s_pass);
@@ -447,8 +456,7 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzerElectron::fit(RooAbsDat
   
   data->statOn(mass_pass, RooFit::Cut("passprobe==passprobe::pass"), RooFit::DataError(RooAbsData::SumW2));
   
-  total_fit.getPdf(_passprobe_cat.getLabel())->plotOn(mass_pass, Components(background_pass), LineStyle(kDashed), "F", FillStyle(1001), FillColor(kGreen));
-  //mass_pass->getAttFill()->SetFillColor(kGreen);
+  total_fit.getPdf(_passprobe_cat.getLabel())->plotOn(mass_pass, Components(background_pass), LineStyle(kDashed));
     
   mass_pass->Write();
 
@@ -477,7 +485,7 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzerElectron::fit(RooAbsDat
   
   data->statOn(mass_pass, RooFit::Cut("passprobe==passprobe::fail"));
   
-  //total_fit.getPdf(_passprobe_cat.getLabel())->plotOn(mass_fail, Components(background_fail), LineStyle(kDashed));
+  total_fit.getPdf(_passprobe_cat.getLabel())->plotOn(mass_fail, Components(background_fail), LineStyle(kDashed));
   
   mass_fail->Write();
   

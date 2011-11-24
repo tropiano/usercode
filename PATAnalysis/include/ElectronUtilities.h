@@ -81,7 +81,7 @@ static double dxycut = 0.02;     //cm
 
 //Jets
 static bool JetIDReq = true;
-static double ptjetmin = 30.;   //Gev/c
+static double ptjetmin = 15.;   //Gev/c
 static double etajetmax = 2.5;
 static double isojetcut = 0.5; //Isolation jet - Z electron
 
@@ -550,6 +550,7 @@ template<class JET> std::vector<const JET*> GetJets(const std::vector<JET>& jets
   }
   
   if (jets[i].pt() > ptjetmin && fabs(jets[i].eta()) < etajetmax && jetIDflag) selectedjets.push_back(&jets[i]);
+  //if (fabs(jets[i].eta()) < etajetmax && jetIDflag) selectedjets.push_back(&jets[i]);
   
   }
   
