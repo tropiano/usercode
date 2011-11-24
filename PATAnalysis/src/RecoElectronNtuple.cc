@@ -774,7 +774,12 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
       elehcaliso1=recdau0->hcalIso();
       eleecaliso1=recdau0->ecalIso();
       eletrackiso1=recdau0->trackIso();
-      elereliso1=(recdau0->trackIso() + recdau0->ecalIso() + recdau0->hcalIso()) / recdau0->pt();
+      
+      if(fabs(recdau0->eta())<eta_el_excl_down){
+      elereliso1=(recdau0->dr03TkSumPt()+max(0.,recdau0->dr03EcalRecHitSumEt() - 1.)+recdau0->dr03HcalTowerSumEt())/recdau0->p4().Pt();}
+      if(fabs(recdau0->eta())>eta_el_excl_up && fabs(recdau0->eta()) < etaelcut){
+      elereliso1=(recdau0->dr03TkSumPt()+recdau0->dr03EcalRecHitSumEt()+recdau0->dr03HcalTowerSumEt())/recdau0->p4().Pt();}
+      
       elenhits1=track0->numberOfValidHits();
       elechisq1=track0->normalizedChi2();
       eledB1=recdau0->dB();
@@ -810,8 +815,13 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
       elecharge2=recdau1->charge();
       elehcaliso2=recdau1->hcalIso();
       eleecaliso2=recdau1->ecalIso();
-      eletrackiso2=recdau1->trackIso();    
-      elereliso2=(recdau1->trackIso() + recdau1->ecalIso() + recdau1->hcalIso()) / recdau1->pt();
+      eletrackiso2=recdau1->trackIso(); 
+        
+      if(fabs(recdau1->eta())<eta_el_excl_down){
+      elereliso2=(recdau1->dr03TkSumPt()+max(0.,recdau1->dr03EcalRecHitSumEt() - 1.)+recdau1->dr03HcalTowerSumEt())/recdau1->p4().Pt();}
+      if(fabs(recdau1->eta())>eta_el_excl_up && fabs(recdau1->eta()) < etaelcut){
+      elereliso2=(recdau1->dr03TkSumPt()+recdau1->dr03EcalRecHitSumEt()+recdau1->dr03HcalTowerSumEt())/recdau1->p4().Pt();}     
+      
       eledB2=recdau1->dB();
       elenhits2=track1->numberOfValidHits();
       elechisq2=track1->normalizedChi2();
