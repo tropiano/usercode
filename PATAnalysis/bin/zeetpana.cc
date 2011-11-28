@@ -24,7 +24,7 @@ int main() {
   string output_train_back =  
 "/data/sfrosali/Zjets/NEW_CMSSW_3_9_7/CMSSW_3_9_7/src/Firenze/PATAnalysis/bin/TagProbe/TPAnalyzer/JetPt15/Z2/TrainBack_JetPt15_Incl_Global.root";
   string output_total =  
-"/data/sfrosali/Zjets/NEW_CMSSW_3_9_7/CMSSW_3_9_7/src/Firenze/PATAnalysis/bin/TagProbe/TPAnalyzer/JetPt15/Z2/DATA_JetPt15_Incl_Global_TestPlot.root";
+"/data/sfrosali/Zjets/NEW_CMSSW_3_9_7/CMSSW_3_9_7/src/Firenze/PATAnalysis/bin/TagProbe/TPAnalyzer/JetPt15/Z2/TESTPlot_DATA_JetPt15_Incl_Global.root";
 
   //Selections used
   string selections = "ASYM";

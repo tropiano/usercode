@@ -550,7 +550,6 @@ template<class JET> std::vector<const JET*> GetJets(const std::vector<JET>& jets
   }
   
   if (jets[i].pt() > ptjetmin && fabs(jets[i].eta()) < etajetmax && jetIDflag) selectedjets.push_back(&jets[i]);
-  //if (fabs(jets[i].eta()) < etajetmax && jetIDflag) selectedjets.push_back(&jets[i]);
   
   }
   

@@ -754,22 +754,22 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    
    string DeltaPhiIn_Barrel_name = "DeltaPhiIn_Barrel";
    DeltaPhiIn_Barrel_name+=_RecoCutFlags[1].c_str();
-   DeltaPhiIn_Barrel_1 = new TH1D(DeltaPhiIn_Barrel_name.c_str(), "Electron Delta Phi In - Barrel", 400, -0.4, 0.4);
+   DeltaPhiIn_Barrel_1 = new TH1D(DeltaPhiIn_Barrel_name.c_str(), "Leading Electron Delta Phi In - Barrel", 400, -0.4, 0.4);
    _histoVector.push_back(DeltaPhiIn_Barrel_1);
    DeltaPhiIn_Barrel_name+=_RecoCutFlags[2].c_str();
-   DeltaPhiIn_Barrel_12 = new TH1D(DeltaPhiIn_Barrel_name.c_str(), "Electron Delta Phi In - Barrel", 400, -0.4, 0.4);
+   DeltaPhiIn_Barrel_12 = new TH1D(DeltaPhiIn_Barrel_name.c_str(), "Leading Electron Delta Phi In - Barrel", 400, -0.4, 0.4);
    _histoVector.push_back(DeltaPhiIn_Barrel_12);
    DeltaPhiIn_Barrel_name+=_RecoCutFlags[3].c_str();
-   DeltaPhiIn_Barrel_123 = new TH1D(DeltaPhiIn_Barrel_name.c_str(), "Electron Delta Phi In - Barrel", 400, -0.4, 0.4);
+   DeltaPhiIn_Barrel_123 = new TH1D(DeltaPhiIn_Barrel_name.c_str(), "Leading Electron Delta Phi In - Barrel", 400, -0.4, 0.4);
    _histoVector.push_back(DeltaPhiIn_Barrel_123);
    DeltaPhiIn_Barrel_name+=_RecoCutFlags[4].c_str();
-   DeltaPhiIn_Barrel_1234 = new TH1D(DeltaPhiIn_Barrel_name.c_str(), "Electron Delta Phi In - Barrel", 400, -0.4, 0.4);
+   DeltaPhiIn_Barrel_1234 = new TH1D(DeltaPhiIn_Barrel_name.c_str(), "Leading Electron Delta Phi In - Barrel", 400, -0.4, 0.4);
    _histoVector.push_back(DeltaPhiIn_Barrel_1234);
    DeltaPhiIn_Barrel_name+=_RecoCutFlags[5].c_str();
-   DeltaPhiIn_Barrel_12345 = new TH1D(DeltaPhiIn_Barrel_name.c_str(), "Electron Delta Phi In - Barrel", 400, -0.4, 0.4);
+   DeltaPhiIn_Barrel_12345 = new TH1D(DeltaPhiIn_Barrel_name.c_str(), "Leading Electron Delta Phi In - Barrel", 400, -0.4, 0.4);
    _histoVector.push_back(DeltaPhiIn_Barrel_12345);
    DeltaPhiIn_Barrel_name+=_RecoCutFlags[6].c_str();
-   DeltaPhiIn_Barrel_123456 = new TH1D(DeltaPhiIn_Barrel_name.c_str(), "Electron Delta Phi In - Barrel", 400, -0.4, 0.4);
+   DeltaPhiIn_Barrel_123456 = new TH1D(DeltaPhiIn_Barrel_name.c_str(), "Leading Electron Delta Phi In - Barrel", 400, -0.4, 0.4);
    _histoVector.push_back(DeltaPhiIn_Barrel_123456);
    
    string SigmaIEtaIEta_Barrel_name = "SigmaIEtaIEta_Barrel";
@@ -835,22 +835,22 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    
    string DeltaPhiIn_Endcap_name = "DeltaPhiIn_Endcap";
    DeltaPhiIn_Endcap_name+=_RecoCutFlags[1].c_str();
-   DeltaPhiIn_Endcap_1 = new TH1D(DeltaPhiIn_Endcap_name.c_str(), "Electron Delta Phi In - Endcap", 400, -0.4, 0.4);
+   DeltaPhiIn_Endcap_1 = new TH1D(DeltaPhiIn_Endcap_name.c_str(), "Leading Electron Delta Phi In - Endcap", 400, -0.4, 0.4);
    _histoVector.push_back(DeltaPhiIn_Endcap_1);
    DeltaPhiIn_Endcap_name+=_RecoCutFlags[2].c_str();
-   DeltaPhiIn_Endcap_12 = new TH1D(DeltaPhiIn_Endcap_name.c_str(), "Electron Delta Phi In - Endcap", 400, -0.4, 0.4);
+   DeltaPhiIn_Endcap_12 = new TH1D(DeltaPhiIn_Endcap_name.c_str(), "Leading Electron Delta Phi In - Endcap", 400, -0.4, 0.4);
    _histoVector.push_back(DeltaPhiIn_Endcap_12);
    DeltaPhiIn_Endcap_name+=_RecoCutFlags[3].c_str();
-   DeltaPhiIn_Endcap_123 = new TH1D(DeltaPhiIn_Endcap_name.c_str(), "Electron Delta Phi In - Endcap", 400, -0.4, 0.4);
+   DeltaPhiIn_Endcap_123 = new TH1D(DeltaPhiIn_Endcap_name.c_str(), "Leading Electron Delta Phi In - Endcap", 400, -0.4, 0.4);
    _histoVector.push_back(DeltaPhiIn_Endcap_123);
    DeltaPhiIn_Endcap_name+=_RecoCutFlags[4].c_str();
-   DeltaPhiIn_Endcap_1234 = new TH1D(DeltaPhiIn_Endcap_name.c_str(), "Electron Delta Phi In - Endcap", 400, -0.4, 0.4);
+   DeltaPhiIn_Endcap_1234 = new TH1D(DeltaPhiIn_Endcap_name.c_str(), "Leading Electron Delta Phi In - Endcap", 400, -0.4, 0.4);
    _histoVector.push_back(DeltaPhiIn_Endcap_1234);
    DeltaPhiIn_Endcap_name+=_RecoCutFlags[5].c_str();
-   DeltaPhiIn_Endcap_12345 = new TH1D(DeltaPhiIn_Endcap_name.c_str(), "Electron Delta Phi In - Endcap", 400, -0.4, 0.4);
+   DeltaPhiIn_Endcap_12345 = new TH1D(DeltaPhiIn_Endcap_name.c_str(), "Leading Electron Delta Phi In - Endcap", 400, -0.4, 0.4);
    _histoVector.push_back(DeltaPhiIn_Endcap_12345);
    DeltaPhiIn_Endcap_name+=_RecoCutFlags[6].c_str();
-   DeltaPhiIn_Endcap_123456 = new TH1D(DeltaPhiIn_Endcap_name.c_str(), "Electron Delta Phi In - Endcap", 400, -0.4, 0.4);
+   DeltaPhiIn_Endcap_123456 = new TH1D(DeltaPhiIn_Endcap_name.c_str(), "Leading Electron Delta Phi In - Endcap", 400, -0.4, 0.4);
    _histoVector.push_back(DeltaPhiIn_Endcap_123456);
    
    string SigmaIEtaIEta_Endcap_name = "SigmaIEtaIEta_Endcap";
@@ -1550,7 +1550,6 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      if(fabs(dau1->eta())<eta_el_excl_down){
      HoverE_Barrel_1->Fill(dau1->hcalOverEcal());    
      DeltaEtaIn_Barrel_1->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());    
-     DeltaPhiIn_Barrel_1->Fill(dau1->deltaPhiSuperClusterTrackAtVtx());   
      SigmaIEtaIEta_Barrel_1->Fill(dau1->sigmaIetaIeta());
      recRelIso_Barrel_1->Fill((dau1->dr03TkSumPt()+max(0.,dau1->dr03EcalRecHitSumEt() - 1.)+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
      //Endcap
@@ -1562,8 +1561,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      recRelIso_Endcap_1->Fill((dau0->dr03TkSumPt()+dau0->dr03EcalRecHitSumEt()+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}
      if(fabs(dau1->eta())>eta_el_excl_up && fabs(dau1->eta()) < etaelcut){   
      HoverE_Endcap_1->Fill(dau1->hcalOverEcal());    
-     DeltaEtaIn_Endcap_1->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());    
-     DeltaPhiIn_Endcap_1->Fill(dau1->deltaPhiSuperClusterTrackAtVtx());    
+     DeltaEtaIn_Endcap_1->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());      
      SigmaIEtaIEta_Endcap_1->Fill(dau1->sigmaIetaIeta());
      recRelIso_Endcap_1->Fill((dau1->dr03TkSumPt()+dau1->dr03EcalRecHitSumEt()+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
         
@@ -1610,7 +1608,6 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      if(fabs(dau1->eta())<eta_el_excl_down){
      HoverE_Barrel_12->Fill(dau1->hcalOverEcal());    
      DeltaEtaIn_Barrel_12->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());    
-     DeltaPhiIn_Barrel_12->Fill(dau1->deltaPhiSuperClusterTrackAtVtx());   
      SigmaIEtaIEta_Barrel_12->Fill(dau1->sigmaIetaIeta());
      recRelIso_Barrel_12->Fill((dau1->dr03TkSumPt()+max(0.,dau1->dr03EcalRecHitSumEt() - 1.)+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
      //Endcap
@@ -1623,7 +1620,6 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      if(fabs(dau1->eta())>eta_el_excl_up && fabs(dau1->eta()) < etaelcut){   
      HoverE_Endcap_12->Fill(dau1->hcalOverEcal());    
      DeltaEtaIn_Endcap_12->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());    
-     DeltaPhiIn_Endcap_12->Fill(dau1->deltaPhiSuperClusterTrackAtVtx());    
      SigmaIEtaIEta_Endcap_12->Fill(dau1->sigmaIetaIeta());
      recRelIso_Endcap_12->Fill((dau1->dr03TkSumPt()+dau1->dr03EcalRecHitSumEt()+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
         
@@ -1669,8 +1665,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      recRelIso_Barrel_123->Fill((dau0->dr03TkSumPt()+max(0.,dau0->dr03EcalRecHitSumEt() - 1.)+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}   
      if(fabs(dau1->eta())<eta_el_excl_down){
      HoverE_Barrel_123->Fill(dau1->hcalOverEcal());    
-     DeltaEtaIn_Barrel_123->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());    
-     DeltaPhiIn_Barrel_123->Fill(dau1->deltaPhiSuperClusterTrackAtVtx());   
+     DeltaEtaIn_Barrel_123->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());      
      SigmaIEtaIEta_Barrel_123->Fill(dau1->sigmaIetaIeta());
      recRelIso_Barrel_123->Fill((dau1->dr03TkSumPt()+max(0.,dau1->dr03EcalRecHitSumEt() - 1.)+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
      //Endcap
@@ -1682,8 +1677,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      recRelIso_Endcap_123->Fill((dau0->dr03TkSumPt()+dau0->dr03EcalRecHitSumEt()+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}
      if(fabs(dau1->eta())>eta_el_excl_up && fabs(dau1->eta()) < etaelcut){   
      HoverE_Endcap_123->Fill(dau1->hcalOverEcal());    
-     DeltaEtaIn_Endcap_123->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());    
-     DeltaPhiIn_Endcap_123->Fill(dau1->deltaPhiSuperClusterTrackAtVtx());    
+     DeltaEtaIn_Endcap_123->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());     
      SigmaIEtaIEta_Endcap_123->Fill(dau1->sigmaIetaIeta());
      recRelIso_Endcap_123->Fill((dau1->dr03TkSumPt()+dau1->dr03EcalRecHitSumEt()+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
          
@@ -1729,8 +1723,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      recRelIso_Barrel_1234->Fill((dau0->dr03TkSumPt()+max(0.,dau0->dr03EcalRecHitSumEt() - 1.)+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}   
      if(fabs(dau1->eta())<eta_el_excl_down){
      HoverE_Barrel_1234->Fill(dau1->hcalOverEcal());    
-     DeltaEtaIn_Barrel_1234->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());    
-     DeltaPhiIn_Barrel_1234->Fill(dau1->deltaPhiSuperClusterTrackAtVtx());   
+     DeltaEtaIn_Barrel_1234->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());      
      SigmaIEtaIEta_Barrel_1234->Fill(dau1->sigmaIetaIeta());
      recRelIso_Barrel_1234->Fill((dau1->dr03TkSumPt()+max(0.,dau1->dr03EcalRecHitSumEt() - 1.)+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
      //Endcap
@@ -1743,7 +1736,6 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      if(fabs(dau1->eta())>eta_el_excl_up && fabs(dau1->eta()) < etaelcut){   
      HoverE_Endcap_1234->Fill(dau1->hcalOverEcal());    
      DeltaEtaIn_Endcap_1234->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());    
-     DeltaPhiIn_Endcap_1234->Fill(dau1->deltaPhiSuperClusterTrackAtVtx());    
      SigmaIEtaIEta_Endcap_1234->Fill(dau1->sigmaIetaIeta());
      recRelIso_Endcap_1234->Fill((dau1->dr03TkSumPt()+dau1->dr03EcalRecHitSumEt()+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
          
@@ -1789,8 +1781,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      recRelIso_Barrel_12345->Fill((dau0->dr03TkSumPt()+max(0.,dau0->dr03EcalRecHitSumEt() - 1.)+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}   
      if(fabs(dau1->eta())<eta_el_excl_down){
      HoverE_Barrel_12345->Fill(dau1->hcalOverEcal());    
-     DeltaEtaIn_Barrel_12345->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());    
-     DeltaPhiIn_Barrel_12345->Fill(dau1->deltaPhiSuperClusterTrackAtVtx());   
+     DeltaEtaIn_Barrel_12345->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());      
      SigmaIEtaIEta_Barrel_12345->Fill(dau1->sigmaIetaIeta());
      recRelIso_Barrel_12345->Fill((dau1->dr03TkSumPt()+max(0.,dau1->dr03EcalRecHitSumEt() - 1.)+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
      //Endcap
@@ -1802,8 +1793,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      recRelIso_Endcap_12345->Fill((dau0->dr03TkSumPt()+dau0->dr03EcalRecHitSumEt()+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}
      if(fabs(dau1->eta())>eta_el_excl_up && fabs(dau1->eta()) < etaelcut){   
      HoverE_Endcap_12345->Fill(dau1->hcalOverEcal());    
-     DeltaEtaIn_Endcap_12345->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());    
-     DeltaPhiIn_Endcap_12345->Fill(dau1->deltaPhiSuperClusterTrackAtVtx());    
+     DeltaEtaIn_Endcap_12345->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());        
      SigmaIEtaIEta_Endcap_12345->Fill(dau1->sigmaIetaIeta());
      recRelIso_Endcap_12345->Fill((dau1->dr03TkSumPt()+dau1->dr03EcalRecHitSumEt()+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
            
@@ -1849,8 +1839,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      recRelIso_Barrel_123456->Fill((dau0->dr03TkSumPt()+max(0.,dau0->dr03EcalRecHitSumEt() - 1.)+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}   
      if(fabs(dau1->eta())<eta_el_excl_down){
      HoverE_Barrel_123456->Fill(dau1->hcalOverEcal());    
-     DeltaEtaIn_Barrel_123456->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());    
-     DeltaPhiIn_Barrel_123456->Fill(dau1->deltaPhiSuperClusterTrackAtVtx());   
+     DeltaEtaIn_Barrel_123456->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());       
      SigmaIEtaIEta_Barrel_123456->Fill(dau1->sigmaIetaIeta());
      recRelIso_Barrel_123456->Fill((dau1->dr03TkSumPt()+max(0.,dau1->dr03EcalRecHitSumEt() - 1.)+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
      //Endcap
@@ -1862,8 +1851,7 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
      recRelIso_Endcap_123456->Fill((dau0->dr03TkSumPt()+dau0->dr03EcalRecHitSumEt()+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}
      if(fabs(dau1->eta())>eta_el_excl_up && fabs(dau1->eta()) < etaelcut){   
      HoverE_Endcap_123456->Fill(dau1->hcalOverEcal());    
-     DeltaEtaIn_Endcap_123456->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());    
-     DeltaPhiIn_Endcap_123456->Fill(dau1->deltaPhiSuperClusterTrackAtVtx());    
+     DeltaEtaIn_Endcap_123456->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());       
      SigmaIEtaIEta_Endcap_123456->Fill(dau1->sigmaIetaIeta());
      recRelIso_Endcap_123456->Fill((dau1->dr03TkSumPt()+dau1->dr03EcalRecHitSumEt()+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
            

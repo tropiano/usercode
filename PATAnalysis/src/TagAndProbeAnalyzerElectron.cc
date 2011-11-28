@@ -397,9 +397,9 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzerElectron::fit(RooAbsDat
   
   stringstream eff;
   eff << "Efficiency = ";
-  eff << efficiency.getVal();
+  eff << ((float)(round(efficiency.getVal()*10000)))/10000;
   eff << " +/- ";
-  eff << efficiency.getPropagatedError(*fitresult);
+  eff << ((float)(round(efficiency.getPropagatedError(*fitresult)*10000)))/10000;
 
   stringstream name_pass;
   name_pass << name << "PassProbe";
@@ -408,14 +408,21 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzerElectron::fit(RooAbsDat
   
   RooPlot * mass_pass = _mass.frame() ;
   mass_pass->SetNameTitle(name_pass.str().c_str(), name_pass.str().c_str());
-  data->plotOn(mass_pass, RooFit::Cut("passprobe==passprobe::pass"), RooFit::DataError(RooAbsData::SumW2)) ;
+  data->plotOn(mass_pass, RooFit::Cut("passprobe==passprobe::pass"), RooFit::DataError(RooAbsData::SumW2));
+  mass_pass->GetXaxis()->SetLabelFont(42);
+  mass_pass->GetXaxis()->SetTitleFont(42);
+  mass_pass->GetXaxis()->SetTitleSize(0.06);
+  mass_pass->GetYaxis()->SetLabelFont(42);
+  mass_pass->GetYaxis()->SetTitleFont(42);
+  mass_pass->GetYaxis()->SetTitleSize(0.06);
+  
   total_fit.plotOn(mass_pass, RooFit::Slice(_passprobe_cat, "pass"), RooFit::ProjWData(_passprobe_cat,*data));
  
   stringstream spass;
   spass << "Signal = ";
-  spass << s_pass.getVal();
+  spass << ((float)(round(s_pass.getVal()*10)))/10;
   spass << " +/- ";
-  spass << s_pass.getPropagatedError(*fitresult);
+  spass << ((float)(round(s_pass.getPropagatedError(*fitresult)*10)))/10;
   
   string type_pass = "";
   type_pass+=name[strlen(name)-1];
@@ -433,9 +440,9 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzerElectron::fit(RooAbsDat
   
   stringstream bpass;
   bpass << "Background = ";
-  bpass << b_pass.getVal();
+  bpass << ((float)(round(b_pass.getVal()*10)))/10;
   bpass << " +/- ";
-  bpass << b_pass.getPropagatedError(*fitresult);
+  bpass << ((float)(round(b_pass.getPropagatedError(*fitresult)*10)))/10;
   
   if(type_pass=="0"){
   _BackgroundYield_0->SetPoint(bin, bin, b_pass.getVal());
@@ -448,44 +455,57 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzerElectron::fit(RooAbsDat
   _BackgroundYield_1->SetPointEYlow(bin,b_pass.getPropagatedError(*fitresult));
   }
   
-  TPaveText* tboxpass = new TPaveText(0.57, 0.70, 0.89, 0.87, "BRNDC"); 
+  TPaveText* tboxpass = new TPaveText(0.647651, 0.695804, 0.949664, 0.917832, "BRNDC");
+  tboxpass->SetFillColor(0);
+  tboxpass->SetShadowColor(0);
   tboxpass->AddText(spass.str().c_str());
   tboxpass->AddText(bpass.str().c_str());
   tboxpass->AddText(eff.str().c_str());
   mass_pass->addObject(tboxpass);
   
-  data->statOn(mass_pass, RooFit::Cut("passprobe==passprobe::pass"), RooFit::DataError(RooAbsData::SumW2));
+  //data->statOn(mass_pass, RooFit::Cut("passprobe==passprobe::pass"), RooFit::DataError(RooAbsData::SumW2));
   
-  total_fit.getPdf(_passprobe_cat.getLabel())->plotOn(mass_pass, Components(background_pass), LineStyle(kDashed));
+  total_fit.plotOn(mass_pass, Components(background_pass), RooFit::Slice(_passprobe_cat,"pass"), RooFit::ProjWData(_passprobe_cat,*data), LineStyle(kDashed));
+  //total_fit.plotOn(mass_pass, Components(signal_pass), RooFit::Slice(_passprobe_cat,"pass"), RooFit::ProjWData(_passprobe_cat,*data), LineStyle(kDashed));
     
   mass_pass->Write();
 
   RooPlot * mass_fail = _mass.frame() ;
   mass_fail->SetNameTitle(name_fail.str().c_str(), name_fail.str().c_str());
-  data->plotOn(mass_fail, RooFit::Cut("passprobe==passprobe::fail"),  RooFit::DataError(RooAbsData::SumW2)) ;
+  data->plotOn(mass_fail, RooFit::Cut("passprobe==passprobe::fail"),  RooFit::DataError(RooAbsData::SumW2));
+  mass_fail->GetXaxis()->SetLabelFont(42);
+  mass_fail->GetXaxis()->SetTitleFont(42);
+  mass_fail->GetXaxis()->SetTitleSize(0.06);
+  mass_fail->GetYaxis()->SetLabelFont(42);
+  mass_fail->GetYaxis()->SetTitleFont(42);
+  mass_fail->GetYaxis()->SetTitleSize(0.06);
+  
   total_fit.plotOn(mass_fail, RooFit::Slice(_passprobe_cat, "fail"), RooFit::ProjWData(_passprobe_cat,*data));
   
   stringstream sfail;
   sfail << "Signal = ";
-  sfail << s_fail.getVal();
+  sfail << ((float)(round(s_fail.getVal()*10)))/10;
   sfail << " +/- ";
-  sfail << s_fail.getPropagatedError(*fitresult);
+  sfail << ((float)(round(s_fail.getPropagatedError(*fitresult)*10)))/10;
   
   stringstream bfail;
   bfail << "Background = ";
-  bfail << b_fail.getVal();
+  bfail << ((float)(round(b_fail.getVal()*10)))/10;
   bfail << " +/- ";
-  bfail << b_fail.getPropagatedError(*fitresult);
+  bfail << ((float)(round(b_fail.getPropagatedError(*fitresult)*10)))/10;
   
-  TPaveText* tboxfail = new TPaveText(0.57, 0.70, 0.89, 0.87, "BRNDC"); 
+  TPaveText* tboxfail = new TPaveText(0.647651, 0.695804, 0.949664, 0.917832, "BRNDC");
+  tboxfail->SetFillColor(0);
+  tboxfail->SetShadowColor(0);
   tboxfail->AddText(sfail.str().c_str());
   tboxfail->AddText(bfail.str().c_str());
   tboxfail->AddText(eff.str().c_str());
   mass_fail->addObject(tboxfail);
   
-  data->statOn(mass_pass, RooFit::Cut("passprobe==passprobe::fail"));
+  //data->statOn(mass_fail, RooFit::Cut("passprobe==passprobe::fail"), RooFit::DataError(RooAbsData::SumW2));
   
-  total_fit.getPdf(_passprobe_cat.getLabel())->plotOn(mass_fail, Components(background_fail), LineStyle(kDashed));
+  total_fit.plotOn(mass_fail, Components(background_fail), RooFit::Slice(_passprobe_cat,"fail"), RooFit::ProjWData(_passprobe_cat,*data), LineStyle(kDashed));
+  //total_fit.plotOn(mass_fail, Components(signal_fail), RooFit::Slice(_passprobe_cat,"fail"), RooFit::ProjWData(_passprobe_cat,*data), LineStyle(kDashed));
   
   mass_fail->Write();
   

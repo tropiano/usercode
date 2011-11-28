@@ -26,14 +26,14 @@
 //n. 1 "recLeadElPt"
 //n. 2 "recLeadElEta"
 //n. 3 "recLeadElfBrem"
-//n. 4 "recLeadElConvCotDist"
-//n. 5 "recLeadElConvMissHit
-//n. 6 "recSecElPt"
-//n. 7 "recSecElEta"
-//n. 8 "recSecElfBrem"
-//n. 9 "recSecElConvCotDist"
-//n. 10 "recSecElConvMissHit"
-//n. 11 "recElIP"
+//n. 4 "recSecElPt"
+//n. 5 "recSecElEta"
+//n. 6 "recSecElfBrem"
+//n. 7 "recElIP"
+//n. 8 "recLeadElConvCotDist"
+//n. 9 "recLeadElConvMissHit
+//n. 10 "recSecElConvCotDist"
+//n. 11 "recSecElConvMissHit"
 //n. 12 "DeltaEtaIn_Barrel"
 //n. 13 "DeltaPhiIn_Barrel"
 //n. 14 "HoverE_Barrel"
@@ -48,16 +48,15 @@
 using namespace std;
 
 //Selections: "SYM" = Symmetric selections; "ASYM" = Asymmetric selections
+//End max. = 21
 
-void recZElectrons_Plots(string selections){
+void recZElectrons_Plots(string selections, int ini, int end){
 
 string log_scale = "True";
 string Tab_cut = "True";
 
-//Start histo (default = 1)
-int b_ini = 1;
-//End histo (max. = 21)
-int b_end = 21; 
+int b_ini = ini;
+int b_end = end; 
 
         //Selections
 	int _Acc  = 1;
@@ -68,18 +67,18 @@ int b_end = 21;
 	int _EiD  = 6;        
                 
 	//Background MC
-	TFile* QCD_TF = TFile::Open("Files/QCD_All_JetPt15.root");
-	TFile* EWK_TF = TFile::Open("Files/EWK_All_JetPt15.root");
-	TFile* TTbar_TF = TFile::Open("Files/TT_Pythia.root");
+	TFile* QCD_TF = TFile::Open("JetPt15/QCD_All_123456.root");
+	TFile* EWK_TF = TFile::Open("JetPt15/EWK_All_123456.root");
+	TFile* TTbar_TF = TFile::Open("JetPt15/TT_Pythia_123456.root");
 	
 	//Signal MC
-	TFile *Z_TF = TFile::Open("Files/Z_Madgraph_Z2_JetPt15.root");
+	TFile *Z_TF = TFile::Open("JetPt15/Z_Madgraph_Z2_123456.root");
 	
 	//Data
-	TFile *Data_TF = TFile::Open("Files/Data_RUN2010A-B_JetPt15.root");
+	TFile *Data_TF = TFile::Open("JetPt15/Data_RUN2010A-B_123456.root");
 	
 	//Output
-	string out = "recZElectrons_SigmaIEtaIEta_Barrel";        
+	string out = "recZElectrons_SigmaIEtaIEta_Endcap";        
 	string output = out;
 	output+=".root";
 	TFile* outplots = new TFile(output.c_str(), "RECREATE");
@@ -91,56 +90,56 @@ int b_end = 21;
 	if(iniLumi!=0)scale = targetLumi/iniLumi;
     
 	//BOX
-	bool DrawBox_1 = false;
+	bool DrawBox_1 = true;
 	bool DrawBox_2 = false;
     
     //Leading
-	double x_begin_11 = 0.01;
+	double x_begin_11 = 0.03;
 	double y_begin_11 = 0.;
 	double x_end_11 = 0.07;
-	double y_end_11 = 11000.;
+	double y_end_11 = 20000.;
 	
-	double x_begin_12 = 0.01;
-	double y_begin_12 = 0.;
+	double x_begin_12 = 0.03;
+	double y_begin_12= 0.;
 	double x_end_12 = 0.07;
-	double y_end_12 = 11000.;
+	double y_end_12 = 20000.;
 	
 	//Second
-	double x_begin_21 = -1;
+	double x_begin_21 = -0.04;
 	double y_begin_21 = 0.;
-	double x_end_21 = -0.8;
+	double x_end_21 = -0.01;
 	double y_end_21 = 20000.;
 	
-	double x_begin_22 = 0.8;
+	double x_begin_22 = 0.01;
 	double y_begin_22 = 0.;
-	double x_end_22 = 1;
+	double x_end_22 = 0.04;
 	double y_end_22 = 20000.;
 
 	//rebin
 	//Leading Electron
-	int rebin_recLeadElPt = 2;	
-	int rebin_recLeadElEta = 2; 
-	int rebin_recLeadElfBrem = 2; 
+	int rebin_recLeadElPt = 1;	
+	int rebin_recLeadElEta = 1; 
+	int rebin_recLeadElfBrem = 1; 
 	int rebin_recLeadElConvCotDist = 2;
 	int rebin_recLeadElConvMissHit = 1;
 	//Second Electron
-	int rebin_recSecElPt = 2;	
-	int rebin_recSecElEta = 2;  
-	int rebin_recSecElfBrem = 2; 
+	int rebin_recSecElPt = 1;	
+	int rebin_recSecElEta = 1;  
+	int rebin_recSecElfBrem = 1; 
 	int rebin_recSecElConvCotDist = 2;
 	int rebin_recSecElConvMissHit = 1;
 	//IP
 	int rebin_recElIP = 1;
 	//EiD variables - Barrel
-	int rebin_DeltaEtaIn_Barrel = 1;	
-	int rebin_DeltaPhiIn_Barrel = 1;
-	int rebin_HoverE_Barrel = 1;
-	int rebin_SigmaIEtaIEta_Barrel = 1;
+	int rebin_DeltaEtaIn_Barrel = 2;	
+	int rebin_DeltaPhiIn_Barrel = 2;
+	int rebin_HoverE_Barrel = 2;
+	int rebin_SigmaIEtaIEta_Barrel = 2;
 	//EiD variables - Endcap
-	int rebin_DeltaEtaIn_Endcap = 1;	
-	int rebin_DeltaPhiIn_Endcap = 1;
-	int rebin_HoverE_Endcap = 1;
-	int rebin_SigmaIEtaIEta_Endcap = 1;
+	int rebin_DeltaEtaIn_Endcap = 2;	
+	int rebin_DeltaPhiIn_Endcap = 2;
+	int rebin_HoverE_Endcap = 2;
+	int rebin_SigmaIEtaIEta_Endcap = 2;
 	//Iso variables
 	int rebin_RelIso_Barrel = 1;	
 	int rebin_RelIso_Endcap = 1;
@@ -212,43 +211,43 @@ int b_end = 21;
 	double nminY_recElIP = 0.1; 
 	double nmaxY_recElIP = 25000.0;
 	//DeltaEtaIn - Barrel
-	double nminX_DeltaEtaIn_Barrel = -0.1; 
-	double nmaxX_DeltaEtaIn_Barrel = 0.1;
+	double nminX_DeltaEtaIn_Barrel = -0.04; 
+	double nmaxX_DeltaEtaIn_Barrel = 0.04;
 	double nminY_DeltaEtaIn_Barrel = 0.1; 
 	double nmaxY_DeltaEtaIn_Barrel = 10000.0;
 	//DeltaPhiIn -Barrel
-	double nminX_DeltaPhiIn_Barrel = -0.30; 
-	double nmaxX_DeltaPhiIn_Barrel = 0.30;
+	double nminX_DeltaPhiIn_Barrel = -0.4; 
+	double nmaxX_DeltaPhiIn_Barrel = 0.4;
 	double nminY_DeltaPhiIn_Barrel = 0.1; 
 	double nmaxY_DeltaPhiIn_Barrel = 10000.0;
 	//HoverE -Barrel
 	double nminX_HoverE_Barrel = 0.0; 
-	double nmaxX_HoverE_Barrel = 0.1;
+	double nmaxX_HoverE_Barrel = 0.3;
 	double nminY_HoverE_Barrel = 0.1; 
 	double nmaxY_HoverE_Barrel = 25000.0;
 	//SigmaIEtaIEta - Barrel
 	double nminX_SigmaIEtaIEta_Barrel = 0.0; 
-	double nmaxX_SigmaIEtaIEta_Barrel = 0.035;
+	double nmaxX_SigmaIEtaIEta_Barrel = 0.04;
 	double nminY_SigmaIEtaIEta_Barrel = 0.1; 
 	double nmaxY_SigmaIEtaIEta_Barrel = 10000.0;	
 	//DeltaEtaIn - Endcap
-	double nminX_DeltaEtaIn_Endcap = -0.1; 
-	double nmaxX_DeltaEtaIn_Endcap = 0.1;
+	double nminX_DeltaEtaIn_Endcap = -0.04; 
+	double nmaxX_DeltaEtaIn_Endcap = 0.04;
 	double nminY_DeltaEtaIn_Endcap = 0.1; 
 	double nmaxY_DeltaEtaIn_Endcap = 10000.0;
 	//DeltaPhiIn -Endcap
-	double nminX_DeltaPhiIn_Endcap = -0.30; 
-	double nmaxX_DeltaPhiIn_Endcap = 0.30;
+	double nminX_DeltaPhiIn_Endcap = -0.4; 
+	double nmaxX_DeltaPhiIn_Endcap = 0.4;
 	double nminY_DeltaPhiIn_Endcap = 0.1; 
 	double nmaxY_DeltaPhiIn_Endcap = 10000.0;
 	//HoverE -Endcap
 	double nminX_HoverE_Endcap = 0.0; 
-	double nmaxX_HoverE_Endcap = 0.1;
+	double nmaxX_HoverE_Endcap = 0.3;
 	double nminY_HoverE_Endcap = 0.1; 
 	double nmaxY_HoverE_Endcap = 25000.0;
 	//SigmaIEtaIEta - Endcap
 	double nminX_SigmaIEtaIEta_Endcap = 0.0; 
-	double nmaxX_SigmaIEtaIEta_Endcap = 0.035;
+	double nmaxX_SigmaIEtaIEta_Endcap = 0.07;
 	double nminY_SigmaIEtaIEta_Endcap = 0.1; 
 	double nmaxY_SigmaIEtaIEta_Endcap = 10000.0;		
 	//CombRelIso - Barrel
@@ -412,23 +411,23 @@ string asseY_name_Cartella2a_recSecElConvMissHit = Form("Events/(%.1f)",1.0*rebi
 string asseX_name_Cartella2a_recElIP = "Reconstructed Electron IP (cm)";
 string asseY_name_Cartella2a_recElIP = Form("Events/(%.3f)", 0.001*rebin_recElIP); //bins da 0.001
 string asseX_name_Cartella2a_DeltaEtaIn_Barrel = "Reconstructed Electron Delta Eta Barrel - Pre EiD cut";
-string asseY_name_Cartella2a_DeltaEtaIn_Barrel = Form("Events/(%.3f)", 0.002*rebin_DeltaEtaIn_Barrel); //bins da 0.002
+string asseY_name_Cartella2a_DeltaEtaIn_Barrel = Form("Events/(%.4f)", 0.0002*rebin_DeltaEtaIn_Barrel); //bins da 0.002
 string asseX_name_Cartella2a_DeltaPhiIn_Barrel = "Reconstructed Electron Delta Phi Barrel - Pre EiD cut";
-string asseY_name_Cartella2a_DeltaPhiIn_Barrel = Form("Events/(%.3f)", 0.008*rebin_DeltaPhiIn_Barrel); //bins da 0.008
+string asseY_name_Cartella2a_DeltaPhiIn_Barrel = Form("Events/(%.3f)", 0.002*rebin_DeltaPhiIn_Barrel); //bins da 0.008
 string asseX_name_Cartella2a_HoverE_Barrel = "Reconstructed Electron H over E Barrel - Pre EiD cut";
 string asseY_name_Cartella2a_HoverE_Barrel = Form("Events/(%.3f)", 0.001*rebin_HoverE_Barrel); //bins da 0.001
 string asseX_name_Cartella2a_SigmaIEtaIEta_Barrel = "Reconstructed Electron SigmaIEtaIEta Barrel - Pre EiD cut";
-string asseY_name_Cartella2a_SigmaIEtaIEta_Barrel = Form("Events/(%.3f)", 0.001*rebin_SigmaIEtaIEta_Barrel); //bins da 0.001
+string asseY_name_Cartella2a_SigmaIEtaIEta_Barrel = Form("Events/(%.4f)", 0.0001*rebin_SigmaIEtaIEta_Barrel); //bins da 0.001
 string asseX_name_Cartella2a_RelIso_Barrel = "Reconstructed Electron Rel. Isolation Barrel - Pre Iso cut";
 string asseY_name_Cartella2a_RelIso_Barrel = Form("Events/(%.2f)", 0.01*rebin_RelIso_Barrel); //bins da 0.01
 string asseX_name_Cartella2a_DeltaEtaIn_Endcap = "Reconstructed Electron Delta Eta Endcap - Pre EiD cut";
-string asseY_name_Cartella2a_DeltaEtaIn_Endcap = Form("Events/(%.3f)", 0.002*rebin_DeltaEtaIn_Endcap); //bins da 0.002
+string asseY_name_Cartella2a_DeltaEtaIn_Endcap = Form("Events/(%.4f)", 0.0002*rebin_DeltaEtaIn_Endcap); //bins da 0.002
 string asseX_name_Cartella2a_DeltaPhiIn_Endcap = "Reconstructed Electron Delta Phi Endcap - Pre EiD cut";
-string asseY_name_Cartella2a_DeltaPhiIn_Endcap = Form("Events/(%.3f)", 0.008*rebin_DeltaPhiIn_Endcap); //bins da 0.008
+string asseY_name_Cartella2a_DeltaPhiIn_Endcap = Form("Events/(%.3f)", 0.002*rebin_DeltaPhiIn_Endcap); //bins da 0.008
 string asseX_name_Cartella2a_HoverE_Endcap = "Reconstructed Electron H over E Endcap - Pre EiD cut";
 string asseY_name_Cartella2a_HoverE_Endcap = Form("Events/(%.3f)", 0.001*rebin_HoverE_Endcap); //bins da 0.001
 string asseX_name_Cartella2a_SigmaIEtaIEta_Endcap = "Reconstructed Electron SigmaIEtaIEta Endcap - Pre EiD cut";
-string asseY_name_Cartella2a_SigmaIEtaIEta_Endcap = Form("Events/(%.3f)", 0.001*rebin_SigmaIEtaIEta_Endcap); //bins da 0.001
+string asseY_name_Cartella2a_SigmaIEtaIEta_Endcap = Form("Events/(%.4f)", 0.0001*rebin_SigmaIEtaIEta_Endcap); //bins da 0.001
 string asseX_name_Cartella2a_RelIso_Endcap = "Reconstructed Electron Rel. Isolation Endcap - Pre Iso cut";
 string asseY_name_Cartella2a_RelIso_Endcap = Form("Events/(%.2f)", 0.01*rebin_RelIso_Endcap); //bins da 0.01
 
@@ -460,8 +459,8 @@ Dir_1->cd();
 
 //----------------------------------------- Grafici cartella recZElectrons_Plots
 
-for(int b=b_ini; b<b_end+1; b++){
-	
+for(int b=b_ini; b<(b_end+1); b++){
+ 	
 if(b==1){cartellaplot = grafico_name_Cartella2a_recLeadElPt;
 	 grafico_name = grafico_name_Cartella2a_recLeadElPt;
 	 asseX_name = asseX_name_Cartella2a_recLeadElPt; 
@@ -482,7 +481,7 @@ else if(b==2){cartellaplot = grafico_name_Cartella2a_recLeadElEta;
 	      nminY = nminY_recLeadElEta;
 	      nmaxY = nmaxY_recLeadElEta;}
 
-else if(b==4){cartellaplot = grafico_name_Cartella2a_recLeadElfBrem;
+else if(b==3){cartellaplot = grafico_name_Cartella2a_recLeadElfBrem;
 	      grafico_name = grafico_name_Cartella2a_recLeadElfBrem;
 	      asseX_name = asseX_name_Cartella2a_recLeadElfBrem; 
 	      asseY_name = asseY_name_Cartella2a_recLeadElfBrem;
@@ -491,8 +490,48 @@ else if(b==4){cartellaplot = grafico_name_Cartella2a_recLeadElfBrem;
 	      nmaxX = nmaxX_recLeadElfBrem;
 	      nminY = nminY_recLeadElfBrem;
 	      nmaxY = nmaxY_recLeadElfBrem;}
+    
+else if(b==4){cartellaplot = grafico_name_Cartella2a_recSecElPt;
+    grafico_name = grafico_name_Cartella2a_recSecElPt;
+    asseX_name = asseX_name_Cartella2a_recSecElPt; 
+    asseY_name = asseY_name_Cartella2a_recSecElPt;
+    rebin = rebin_recSecElPt;
+    nminX = nminX_recSecElPt;
+    nmaxX = nmaxX_recSecElPt;
+    nminY = nminY_recSecElPt;
+    nmaxY = nmaxY_recSecElPt;}
+    
+else if(b==5){cartellaplot = grafico_name_Cartella2a_recSecElEta;
+    grafico_name = grafico_name_Cartella2a_recSecElEta;
+    asseX_name = asseX_name_Cartella2a_recSecElEta; 
+    asseY_name = asseY_name_Cartella2a_recSecElEta;
+    rebin = rebin_recSecElEta;
+    nminX = nminX_recSecElEta;
+    nmaxX = nmaxX_recSecElEta;
+    nminY = nminY_recSecElEta;
+    nmaxY = nmaxY_recSecElEta;}
+    
+else if(b==6){cartellaplot = grafico_name_Cartella2a_recSecElfBrem;
+    grafico_name = grafico_name_Cartella2a_recSecElfBrem;
+    asseX_name = asseX_name_Cartella2a_recSecElfBrem; 
+    asseY_name = asseY_name_Cartella2a_recSecElfBrem;
+    rebin = rebin_recSecElfBrem;
+    nminX = nminX_recSecElfBrem;
+    nmaxX = nmaxX_recSecElfBrem;
+    nminY = nminY_recSecElfBrem;
+    nmaxY = nmaxY_recSecElfBrem;}
+    
+else if(b==7){cartellaplot = grafico_name_Cartella2a_recElIP;
+    grafico_name = grafico_name_Cartella2a_recElIP;
+    asseX_name = asseX_name_Cartella2a_recElIP; 
+    asseY_name = asseY_name_Cartella2a_recElIP;
+    rebin = rebin_recElIP;
+    nminX = nminX_recElIP;
+    nmaxX = nmaxX_recElIP;
+    nminY = nminY_recElIP;
+    nmaxY = nmaxY_recElIP;}
 	      
-else if(b==5){cartellaplot = grafico_name_Cartella2a_recLeadElConvCotDist;
+else if(b==8){cartellaplot = grafico_name_Cartella2a_recLeadElConvCotDist;
 	      grafico_name = grafico_name_Cartella2a_recLeadElConvCotDist;
 	      asseX_name = asseX_name_Cartella2a_recLeadElConvCotDist; 
 	      asseY_name = asseY_name_Cartella2a_recLeadElConvCotDist;
@@ -502,7 +541,7 @@ else if(b==5){cartellaplot = grafico_name_Cartella2a_recLeadElConvCotDist;
 	      nminY = nminY_recLeadElConvCotDist;
 	      nmaxY = nmaxY_recLeadElConvCotDist;}
 	     
-else if(b==6){cartellaplot = grafico_name_Cartella2a_recLeadElConvMissHit;
+else if(b==9){cartellaplot = grafico_name_Cartella2a_recLeadElConvMissHit;
 	      grafico_name = grafico_name_Cartella2a_recLeadElConvMissHit;
 	      asseX_name = asseX_name_Cartella2a_recLeadElConvMissHit; 
 	      asseY_name = asseY_name_Cartella2a_recLeadElConvMissHit;
@@ -511,36 +550,6 @@ else if(b==6){cartellaplot = grafico_name_Cartella2a_recLeadElConvMissHit;
 	      nmaxX = nmaxX_recLeadElConvMissHit;
 	      nminY = nminY_recLeadElConvMissHit;
 	      nmaxY = nmaxY_recLeadElConvMissHit;}
-	      
-else if(b==7){cartellaplot = grafico_name_Cartella2a_recSecElPt;
-	      grafico_name = grafico_name_Cartella2a_recSecElPt;
-	      asseX_name = asseX_name_Cartella2a_recSecElPt; 
-	      asseY_name = asseY_name_Cartella2a_recSecElPt;
-	      rebin = rebin_recSecElPt;
-	      nminX = nminX_recSecElPt;
-	      nmaxX = nmaxX_recSecElPt;
-	      nminY = nminY_recSecElPt;
-	      nmaxY = nmaxY_recSecElPt;}
-
-else if(b==8){cartellaplot = grafico_name_Cartella2a_recSecElEta;
-	      grafico_name = grafico_name_Cartella2a_recSecElEta;
-	      asseX_name = asseX_name_Cartella2a_recSecElEta; 
-	      asseY_name = asseY_name_Cartella2a_recSecElEta;
-	      rebin = rebin_recSecElEta;
-	      nminX = nminX_recSecElEta;
-	      nmaxX = nmaxX_recSecElEta;
-	      nminY = nminY_recSecElEta;
-	      nmaxY = nmaxY_recSecElEta;}
-
-else if(b==9){cartellaplot = grafico_name_Cartella2a_recSecElfBrem;
-	      grafico_name = grafico_name_Cartella2a_recSecElfBrem;
-	      asseX_name = asseX_name_Cartella2a_recSecElfBrem; 
-	      asseY_name = asseY_name_Cartella2a_recSecElfBrem;
-	      rebin = rebin_recSecElfBrem;
-	      nminX = nminX_recSecElfBrem;
-	      nmaxX = nmaxX_recSecElfBrem;
-	      nminY = nminY_recSecElfBrem;
-	      nmaxY = nmaxY_recSecElfBrem;}
 	      
 else if(b==10){cartellaplot = grafico_name_Cartella2a_recSecElConvCotDist;
 	      grafico_name = grafico_name_Cartella2a_recSecElConvCotDist;
@@ -561,16 +570,6 @@ else if(b==11){cartellaplot = grafico_name_Cartella2a_recSecElConvMissHit;
 	      nmaxX = nmaxX_recSecElConvMissHit;
 	      nminY = nminY_recSecElConvMissHit;
 	      nmaxY = nmaxY_recSecElConvMissHit;}
-    
-else if(b==3){cartellaplot = grafico_name_Cartella2a_recElIP;
-    grafico_name = grafico_name_Cartella2a_recElIP;
-    asseX_name = asseX_name_Cartella2a_recElIP; 
-    asseY_name = asseY_name_Cartella2a_recElIP;
-    rebin = rebin_recElIP;
-    nminX = nminX_recElIP;
-    nmaxX = nmaxX_recElIP;
-    nminY = nminY_recElIP;
-    nmaxY = nmaxY_recElIP;}
 
 else if(b==12){cartellaplot = grafico_name_Cartella2a_DeltaEtaIn_Barrel;
 	grafico_name = grafico_name_Cartella2a_DeltaEtaIn_Barrel;
@@ -612,7 +611,7 @@ else if(b==15){cartellaplot = grafico_name_Cartella2a_SigmaIEtaIEta_Barrel;
 	nminY = nminY_SigmaIEtaIEta_Barrel;
 	nmaxY = nmaxY_SigmaIEtaIEta_Barrel;}
     
-else if(b==20){cartellaplot = grafico_name_Cartella2a_RelIso_Barrel;
+else if(b==16){cartellaplot = grafico_name_Cartella2a_RelIso_Barrel;
 	grafico_name = grafico_name_Cartella2a_RelIso_Barrel;
 	asseX_name = asseX_name_Cartella2a_RelIso_Barrel; 
 	asseY_name = asseY_name_Cartella2a_RelIso_Barrel;
@@ -622,7 +621,7 @@ else if(b==20){cartellaplot = grafico_name_Cartella2a_RelIso_Barrel;
 	nminY = nminY_RelIso_Barrel;
 	nmaxY = nmaxY_RelIso_Barrel;}
 	
-else if(b==16){cartellaplot = grafico_name_Cartella2a_DeltaEtaIn_Endcap;
+else if(b==17){cartellaplot = grafico_name_Cartella2a_DeltaEtaIn_Endcap;
 	grafico_name = grafico_name_Cartella2a_DeltaEtaIn_Endcap;
 	asseX_name = asseX_name_Cartella2a_DeltaEtaIn_Endcap; 
 	asseY_name = asseY_name_Cartella2a_DeltaEtaIn_Endcap;
@@ -632,7 +631,7 @@ else if(b==16){cartellaplot = grafico_name_Cartella2a_DeltaEtaIn_Endcap;
 	nminY = nminY_DeltaEtaIn_Endcap;
 	nmaxY = nmaxY_DeltaEtaIn_Endcap;}
 	
-else if(b==17){cartellaplot = grafico_name_Cartella2a_DeltaPhiIn_Endcap;
+else if(b==18){cartellaplot = grafico_name_Cartella2a_DeltaPhiIn_Endcap;
 	grafico_name = grafico_name_Cartella2a_DeltaPhiIn_Endcap;
 	asseX_name = asseX_name_Cartella2a_DeltaPhiIn_Endcap; 
 	asseY_name = asseY_name_Cartella2a_DeltaPhiIn_Endcap;
@@ -642,7 +641,7 @@ else if(b==17){cartellaplot = grafico_name_Cartella2a_DeltaPhiIn_Endcap;
 	nminY = nminY_DeltaPhiIn_Endcap;
 	nmaxY = nmaxY_DeltaPhiIn_Endcap;}
 	
-else if(b==18){cartellaplot = grafico_name_Cartella2a_HoverE_Endcap;
+else if(b==19){cartellaplot = grafico_name_Cartella2a_HoverE_Endcap;
 	grafico_name = grafico_name_Cartella2a_HoverE_Endcap;
 	asseX_name = asseX_name_Cartella2a_HoverE_Endcap; 
 	asseY_name = asseY_name_Cartella2a_HoverE_Endcap;
@@ -652,7 +651,7 @@ else if(b==18){cartellaplot = grafico_name_Cartella2a_HoverE_Endcap;
 	nminY = nminY_HoverE_Endcap;
 	nmaxY = nmaxY_HoverE_Endcap;}
 	
-else if(b==19){cartellaplot = grafico_name_Cartella2a_SigmaIEtaIEta_Endcap;
+else if(b==20){cartellaplot = grafico_name_Cartella2a_SigmaIEtaIEta_Endcap;
 	grafico_name = grafico_name_Cartella2a_SigmaIEtaIEta_Endcap;
 	asseX_name = asseX_name_Cartella2a_SigmaIEtaIEta_Endcap; 
 	asseY_name = asseY_name_Cartella2a_SigmaIEtaIEta_Endcap;
@@ -1360,8 +1359,12 @@ Dir_4a->cd();
 	Stackd_1->GetYaxis()->SetTitle(asseY_name.c_str());
 	
 	histoData_1->Draw("same");	
-	
-	TLegend *StackLeg_1 = new TLegend(0.51,0.67,0.88,0.88);
+    if(DrawBox_1)box_11->Draw("same");
+    if(DrawBox_1)box_12->Draw("same");
+    if(DrawBox_2)box_21->Draw("same");
+    if(DrawBox_2)box_22->Draw("same");
+    
+    TLegend *StackLeg_1 = new TLegend(0.704698,0.708042,0.947987,0.917832);
 	StackLeg_1->SetFillColor(0);
 	StackLeg_1->SetBorderSize(0);
 	StackLeg_1->AddEntry(histoQCD_1,Leg_QCD.c_str());
@@ -1402,8 +1405,12 @@ Dir_4a->cd();
 		Stackd_12->GetYaxis()->SetTitle(asseY_name.c_str());
 		
         histoData_12->Draw("same");			
-		
-		TLegend *StackLeg_12 = new TLegend(0.51,0.67,0.88,0.88);
+        if(DrawBox_1)box_11->Draw("same");
+        if(DrawBox_1)box_12->Draw("same");
+        if(DrawBox_2)box_21->Draw("same");
+        if(DrawBox_2)box_22->Draw("same");
+
+		TLegend *StackLeg_12 = new TLegend(0.704698,0.708042,0.947987,0.917832);
 		StackLeg_12->SetFillColor(0);
 		StackLeg_12->SetBorderSize(0);
 		StackLeg_12->AddEntry(histoQCD_12,Leg_QCD.c_str());
@@ -1445,8 +1452,12 @@ Dir_4a->cd();
 		Stackd_123->GetYaxis()->SetTitle(asseY_name.c_str());
 		
         histoData_123->Draw("same");			
+        if(DrawBox_1)box_11->Draw("same");
+        if(DrawBox_1)box_12->Draw("same");
+        if(DrawBox_2)box_21->Draw("same");
+        if(DrawBox_2)box_22->Draw("same");
 		
-		TLegend *StackLeg_123 = new TLegend(0.51,0.67,0.88,0.88);
+		TLegend *StackLeg_123 = new TLegend(0.704698,0.708042,0.947987,0.917832);
 		StackLeg_123->SetFillColor(0);
 		StackLeg_123->SetBorderSize(0);
 		StackLeg_123->AddEntry(histoQCD_123,Leg_QCD.c_str());
@@ -1488,8 +1499,12 @@ Dir_4a->cd();
 		Stackd_1234->GetYaxis()->SetTitle(asseY_name.c_str());
 		
         histoData_1234->Draw("same");			
+        if(DrawBox_1)box_11->Draw("same");
+        if(DrawBox_1)box_12->Draw("same");
+        if(DrawBox_2)box_21->Draw("same");
+        if(DrawBox_2)box_22->Draw("same");
 		
-		TLegend *StackLeg_1234 = new TLegend(0.51,0.67,0.88,0.88);
+		TLegend *StackLeg_1234 = new TLegend(0.704698,0.708042,0.947987,0.917832);
 		StackLeg_1234->SetFillColor(0);
 		StackLeg_1234->SetBorderSize(0);
 		StackLeg_1234->AddEntry(histoQCD_1234,Leg_QCD.c_str());
@@ -1536,7 +1551,7 @@ Dir_4a->cd();
         if(DrawBox_2)box_21->Draw("same");
         if(DrawBox_2)box_22->Draw("same");
 		
-		TLegend *StackLeg_12345 = new TLegend(0.51,0.67,0.88,0.88);
+		TLegend *StackLeg_12345 = new TLegend(0.704698,0.708042,0.947987,0.917832);
 		StackLeg_12345->SetFillColor(0);
 		StackLeg_12345->SetBorderSize(0);
 		StackLeg_12345->AddEntry(histoQCD_12345,Leg_QCD.c_str());
@@ -1583,7 +1598,7 @@ Dir_4a->cd();
         if(DrawBox_2)box_21->Draw("same");
         if(DrawBox_2)box_22->Draw("same");
 		
-		TLegend *StackLeg_123456 = new TLegend(0.51,0.67,0.88,0.88);
+		TLegend *StackLeg_123456 = new TLegend(0.704698,0.708042,0.947987,0.917832);
 		StackLeg_123456->SetFillColor(0);
 		StackLeg_123456->SetBorderSize(0);
 		StackLeg_123456->AddEntry(histoQCD_123456,Leg_QCD.c_str());

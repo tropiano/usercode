@@ -35,25 +35,25 @@ string Tab_cut = "True";
 string Tab_jetm = "True";                
 
 	//Background MC
-	TFile* QCD_TF = TFile::Open("MC_Fall10_387/JetPt30/QCD_ALL.root");
-	TFile* EWK_TF = TFile::Open("MC_Fall10_387/JetPt30/EWK_ALL.root");
-	TFile* TTbar_TF = TFile::Open("MC_Fall10_387/JetPt30/TT_Pythia.root");
+	TFile* QCD_TF = TFile::Open("JetPt30/QCD_All_123456.root");
+	TFile* EWK_TF = TFile::Open("JetPt30/EWK_All_123456.root");
+	TFile* TTbar_TF = TFile::Open("JetPt30/TT_Pythia_123456.root");
 	
 	//Signal MC
-	TFile *Z_TF = TFile::Open("MC_Winter10_399/Z_Madgraph_L1FastJet_JetPt30_EffCorr.root");
+	TFile *Z_TF = TFile::Open("JetPt30/Z_Madgraph_Z2_123456.root");
 	
 	//Data
-	TFile *Data_TF = TFile::Open("DATA_Dec22ReReco/JetPt30/Data_RUN2010A-B_L1FastJet_399.root");
+	TFile *Data_TF = TFile::Open("JetPt30/Data_RUN2010A-B_123456.root");
 	
 	//Output
-	string out = "recZJetPlots_L1FastJet_JetPt15_BackGrouped";  
+	string out = "recZJets_JetPt30";        
 	string output = out;
 	output+=".root";
 	TFile* outplots = new TFile(output.c_str(), "RECREATE");
 	
 	//Normalization factor
 	double iniLumi = 50.; //pb-1
-	double targetLumi = 36.176; //pb-1
+	double targetLumi = 36.162; //pb-1
 	double scale = 1.;
 	if(iniLumi!=0)scale = targetLumi/iniLumi;
 	
@@ -88,7 +88,7 @@ string Tab_jetm = "True";
 	double nminX_jeteta = -3.0; 
 	double nmaxX_jeteta = 3.0;
 	double nminY_jeteta = 0.1; 
-	double nmaxY_jeteta = 200.0;
+	double nmaxY_jeteta = 10000.0;
 	
 	//rebin
 	
@@ -238,13 +238,13 @@ grafico_name_Cartella2a_JetEta+=_RecoCutFlags[i].c_str();}
 
 string asseX_name;
 string asseY_name;
-string asseX_name_Cartella2a_JetExclRate = "Exclusive jet multiplicity";
+string asseX_name_Cartella2a_JetExclRate = "exclusive multiplicity";
 string asseY_name_Cartella2a_JetExclRate = Form("Events");
-string asseX_name_Cartella2a_JetInclRate = "Inclusive jet multiplicity";
+string asseX_name_Cartella2a_JetInclRate = "inclusive multiplicity";
 string asseY_name_Cartella2a_JetInclRate = Form("Events");
-string asseX_name_Cartella2a_JetPt = "Reconstructed Leading Jet P_{T} (GeV/c))";
-string asseY_name_Cartella2a_JetPt = Form("Events/(%.0f GeV/c)", 1.0*rebin_jetpt); //bins da 1 GeV/c
-string asseX_name_Cartella2a_JetEta = "Reconstructed Leading Jet #eta"; 
+string asseX_name_Cartella2a_JetPt = "leading jet p_{T} (GeV)";
+string asseY_name_Cartella2a_JetPt = Form("Events/(%.0f GeV)", 1.0*rebin_jetpt); //bins da 1 GeV/c
+string asseX_name_Cartella2a_JetEta = "leading jet #eta"; 
 string asseY_name_Cartella2a_JetEta = Form("Events/(%.1f)", 0.1*rebin_jeteta); //bins da 0.1
 
 TDirectory *Dir_1;
@@ -1258,7 +1258,7 @@ Dir_5b->cd();
 	
 	histoData_1->Draw("same");			
 	
-	TLegend *StackLeg_1 = new TLegend(0.51,0.67,0.88,0.88);
+	TLegend *StackLeg_1 = new TLegend(0.704698,0.708042,0.947987,0.917832);
 	StackLeg_1->SetFillColor(0);
 	StackLeg_1->SetBorderSize(0);
 	StackLeg_1->AddEntry(histoQCD_1,Leg_QCD.c_str());
@@ -1302,7 +1302,7 @@ Dir_5b->cd();
 		
         histoData_12->Draw("same");			
 		
-		TLegend *StackLeg_12 = new TLegend(0.51,0.67,0.88,0.88);
+		TLegend *StackLeg_12 = new TLegend(0.704698,0.708042,0.947987,0.917832);
 		StackLeg_12->SetFillColor(0);
 		StackLeg_12->SetBorderSize(0);
 		StackLeg_12->AddEntry(histoQCD_12,Leg_QCD.c_str());
@@ -1345,7 +1345,7 @@ Dir_5b->cd();
 		
         histoData_123->Draw("same");			
 		
-		TLegend *StackLeg_123 = new TLegend(0.51,0.67,0.88,0.88);
+		TLegend *StackLeg_123 = new TLegend(0.704698,0.708042,0.947987,0.917832);
 		StackLeg_123->SetFillColor(0);
 		StackLeg_123->SetBorderSize(0);
 		StackLeg_123->AddEntry(histoQCD_123,Leg_QCD.c_str());
@@ -1388,7 +1388,7 @@ Dir_5b->cd();
 		
         histoData_1234->Draw("same");			
 		
-		TLegend *StackLeg_1234 = new TLegend(0.51,0.67,0.88,0.88);
+		TLegend *StackLeg_1234 = new TLegend(0.704698,0.708042,0.947987,0.917832);
 		StackLeg_1234->SetFillColor(0);
 		StackLeg_1234->SetBorderSize(0);
 		StackLeg_1234->AddEntry(histoQCD_1234,Leg_QCD.c_str());
@@ -1431,7 +1431,7 @@ Dir_5b->cd();
 		
         histoData_12345->Draw("same");			
 		
-		TLegend *StackLeg_12345 = new TLegend(0.51,0.67,0.88,0.88);
+		TLegend *StackLeg_12345 = new TLegend(0.704698,0.708042,0.947987,0.917832);
 		StackLeg_12345->SetFillColor(0);
 		StackLeg_12345->SetBorderSize(0);
 		StackLeg_12345->AddEntry(histoQCD_12345,Leg_QCD.c_str());
@@ -1474,7 +1474,7 @@ Dir_5b->cd();
 		
         histoData_123456->Draw("same");			
 		
-		TLegend *StackLeg_123456 = new TLegend(0.51,0.67,0.88,0.88);
+		TLegend *StackLeg_123456 = new TLegend(0.704698,0.708042,0.947987,0.917832);
 		StackLeg_123456->SetFillColor(0);
 		StackLeg_123456->SetBorderSize(0);
 		StackLeg_123456->AddEntry(histoQCD_123456,Leg_QCD.c_str());

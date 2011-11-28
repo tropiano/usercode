@@ -52,10 +52,11 @@ void TPPlots(string multiplicity, string selections){
 	tpr.open(outtpr.c_str());
 	tpr<<endl;
         
+        double bin=5;
         double xmin, xmax;
         
         xmin=-0.5;
-        xmax=4.5;
+        xmax=bin-0.5;
         
         int cut_decimal = 10000;
 	
@@ -588,7 +589,7 @@ TP_global = TP->mkdir("Tag&Probe_Global");
 	tpr<<"Relative efficiency vs "<<multiplicity<<" jet multiplicity"<<endl;
 	
 	tpr<<endl<<"Selection: "<<_RecoCutFlags[2]<<endl<<endl;
-	for(int i=0; i<4; i++){
+	for(int i=0; i<bin; i++){
 	double xMCeff = 0., yMCeff = 0.;
 	double xMCSigTp = 0., yMCSigTp = 0.;
 	double xDATA = 0., yDATA = 0.;
@@ -632,7 +633,7 @@ TP_global = TP->mkdir("Tag&Probe_Global");
 	EffTP_123->Close();
 	
 	tpr<<endl<<"Selection: "<<_RecoCutFlags[3]<<endl<<endl;
-	for(int i=0; i<4; i++){
+	for(int i=0; i<bin; i++){
 	double xMCeff = 0., yMCeff = 0.;
 	double xMCSigTp = 0., yMCSigTp = 0.;
 	double xDATA = 0., yDATA = 0.;
@@ -677,7 +678,7 @@ TP_global = TP->mkdir("Tag&Probe_Global");
 	EffTP_1234->Close();
 	
 	tpr<<endl<<endl<<"Selection: "<<_RecoCutFlags[4]<<endl<<endl;
-	for(int i=0; i<4; i++){
+	for(int i=0; i<bin; i++){
 	double xMCeff = 0., yMCeff = 0.;
 	double xMCSigTp = 0., yMCSigTp = 0.;
 	double xDATA = 0., yDATA = 0.;
@@ -723,7 +724,7 @@ TP_global = TP->mkdir("Tag&Probe_Global");
 	EffTP_12345->Close();
 	
 	tpr<<endl<<endl<<"Selection: "<<_RecoCutFlags[5]<<endl<<endl;
-	for(int i=0; i<4; i++){
+	for(int i=0; i<bin; i++){
 	double xMCeff = 0., yMCeff = 0.;
 	double xMCSigTp = 0., yMCSigTp = 0.;
 	double xDATA = 0., yDATA = 0.;
@@ -770,7 +771,7 @@ TP_global = TP->mkdir("Tag&Probe_Global");
 	EffTP_123456->Close();
 	
 	tpr<<endl<<endl<<"Selection: "<<_RecoCutFlags[6]<<endl<<endl;
-	for(int i=0; i<4; i++){
+	for(int i=0; i<bin; i++){
 	double xMCeff = 0., yMCeff = 0.;
 	double xMCSigTp = 0., yMCSigTp = 0.;
 	double xDATA = 0., yDATA = 0.;
@@ -811,7 +812,7 @@ TP_global = TP->mkdir("Tag&Probe_Global");
 	EffTP_global->Close();
 	
 	tpr<<endl<<endl<<"Selection: Global"<<endl<<endl;
-	for(int i=0; i<4; i++){
+	for(int i=0; i<bin; i++){
 	double xMCeff = 0., yMCeff = 0.;
 	double xMCSigTp = 0., yMCSigTp = 0.;
 	double xDATA = 0., yDATA = 0.;
