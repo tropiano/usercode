@@ -64,16 +64,16 @@ void XSec(int JetPtMin, string tune, string jecUnc){
         out+=JEC;
         out+=JetPtCut;
         string output = out;
-        output+=".root";
+        output+="_AllTuneCh.root";
         TFile* outplots = new TFile(output.c_str(), "RECREATE");
         
         //Report files
         ofstream multrep;
-	multrep.open(("InclMultReport_"+JEC+JetPtCut+".txt").c_str());
+	multrep.open(("InclMultReport_"+JEC+JetPtCut+"_AllTuneCh.txt").c_str());
 	multrep<<endl;
 
         ofstream xsec;
-	xsec.open(("InclXSecReport_"+JEC+JetPtCut+".txt").c_str());
+	xsec.open(("InclXSecReport_"+JEC+JetPtCut+"_AllTuneCh.txt").c_str());
 	xsec<<endl;
 	
 	////////////////////////// Directories /////////////////////////////////////////////
@@ -95,17 +95,17 @@ void XSec(int JetPtMin, string tune, string jecUnc){
         
         //DATA: Signal and Background Yields from TP fits
         // -> DATA_Incl_Double file in TPAnalyzer
-        TFile *SB_Yields_incl = TFile::Open((path+"/TagProbe/TPAnalyzer/"+JetPtCut+"/Z2/DATA_"+JetPtCut+"_Incl_Double.root").c_str());
+        TFile *SB_Yields_incl = TFile::Open((path+"/TagProbe/TPAnalyzer/"+JetPtCut+"/"+tune+"/DATA_"+JetPtCut+"_Incl_Double.root").c_str());
         
         //DATA: Tag&Probe Efficiencies
         // -> TPStudy_Incl_Global file in Efficiency_TP
-        TFile *TPEff_incl = TFile::Open((path+"/Efficiency_TP/"+JetPtCut+"/Z2/TPStudy_"+JetPtCut+"_Incl_Global.root").c_str());
+        TFile *TPEff_incl = TFile::Open((path+"/Efficiency_TP/"+JetPtCut+"/"+tune+"/TPStudy_"+JetPtCut+"_Incl_Global.root").c_str());
         
         ////////////////////////// GET FILES - MC 
         
         //MC: Efficiency and Acceptance
         // -> SignalStudy_ZMadgraph file in Efficiency_MC
-        TFile *MCEff = TFile::Open((path+"/Efficiency_MC/"+JetPtCut+"/Z2/SignalStudy_ZMadgraph_Z2_"+JetPtCut+".root").c_str());
+        TFile *MCEff = TFile::Open((path+"/Efficiency_MC/"+JetPtCut+"/"+tune+"/SignalStudy_ZMadgraph_"+tune+"_"+JetPtCut+".root").c_str());
         
         //MC: Unfolding and Correction Factors
         // -> NtuplePlots file
