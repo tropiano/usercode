@@ -89,6 +89,7 @@ private:
   double _isotk1;
   unsigned int _njets;
   double _ptjetsum;
+  double _rho;
 
 };
 #endif

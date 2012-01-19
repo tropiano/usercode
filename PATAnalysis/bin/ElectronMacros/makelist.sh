@@ -2,9 +2,9 @@
 
 FLAG_POOLSOURCE=0;
 
-LIST=RUN2010B_new.list
+LIST=PATsignal.list
 TMPLIST=tmp
-DIR=/data/sfrosali/Zjets/NEW_PATtuple/RUN2010B/
+DIR=/data/sandro/Analisi/rel_CMSSW_4_2_4/CMSSW_4_2_4/src/Firenze/Reduction/test/crab_0_120104_190703/res/
 
 ls -l $DIR | grep root > $TMPLIST
 

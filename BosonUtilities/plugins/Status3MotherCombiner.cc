@@ -87,9 +87,10 @@ void Status3MotherCombiner::produce (edm::Event &evt, const edm::EventSetup &evt
     mother.setPdgId(_pdgId);
     mother.setRoles(roles);
     //cout << "final momentum " << mother.momentum() << endl;
+    //cout << "mother charge " << mother.charge() << endl;
     output->push_back(mother);
     assert(mother.charge()==_charge);
-  }
+    }
 
   evt.put(output);
 }

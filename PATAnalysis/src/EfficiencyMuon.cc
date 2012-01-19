@@ -177,7 +177,7 @@ void EfficiencyMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
   passprobe_cuts.push_back(leadingMu_PtEta);
   passprobe_cuts.push_back(singleMu_QualityCuts);
   passprobe_cuts.push_back(singleMu_DXY);
-  passprobe_cuts.push_back(singleMu_Isolation);
+ //da aggiustare!!! passprobe_cuts.push_back(singleMu_Isolation);
   _tp_offline = new TagAndProbeFiller(dir, string("Offline"), _nbin, _xmin, _xmax, tag_cuts, probe_cuts, passprobe_cuts, "", true);
 
   tag_cuts.clear();
@@ -225,6 +225,10 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
       zGenHandle.getByLabel(iEvent, "zmumugenfull");
    }
 
+   fwlite::Handle<double> Rho;
+   Rho.getByLabel(iEvent, "kt6PFJets", "rho");
+
+
    //get Z candidate
    std::vector<const pat::Muon*> muonsfromZ;
    const pat::Muon* dau0 = 0;
@@ -260,13 +264,16 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
      if ((*muonHandle)[j].pt()>10.) allHardMuons.push_back(&(*muonHandle)[j]);
    }
 
-   //bool recselected = RecSelectedMuonWithTrigger(*zHandle, *triggerHandle, _isocut); //TEMP FOR OFFSET STUDY
-   bool recselected = RecSelectedMuon(*zHandle, _isocut);
+   double Rhox = 6.0;
 
+   //bool recselected = RecSelectedMuonWithTrigger(*zHandle, *triggerHandle, _isocut); //TEMP FOR OFFSET STUDY
+  
+   bool recselected = RecSelectedMuon(*zHandle, _isocut, Rhox);
+ 
    //if this is a good Z event remove Z candidates from jet collection
    std::vector<pat::Jet> cleanedJets;
    //CleanJets(*jetHandle, muonsfromZ, cleanedJets, 0.5);
-   CleanJets(*jetHandle, allHardMuons, cleanedJets, 0.5);
+   CleanJets(*jetHandle, allHardMuons, cleanedJets);
    std::vector<const pat::Jet*> jets = GetJets<pat::Jet>(cleanedJets, _ptjetmin, _etajetmax);
    double leadpT, secondpT,thirdpT;
    leadpT = jets.size() > 0 ? jets[0]->pt() : 0;
@@ -333,7 +340,7 @@ void EfficiencyMuon::process(const fwlite::Event& iEvent){
    bool recselectedTM_OC_Mass = zHandle->size()>0 && RecSelected_MuonMass(*zHandle) && RecSelected_GlobalMuons(muonsfromZ, 2).first;
    bool recselectedTM_MuT_OC_M_QualityCuts = RecSelected_QualityCuts(muonsfromZ, 1).first && recselectedTM_MuT_OC_Mass;
    bool recselectedTM_MuT_OC_M_QC_DXY = RecSelected_DXY(muonsfromZ, 2).first && recselectedTM_MuT_OC_M_QualityCuts;
-   bool recselectedTM_MuT_OC_M_QC_DXY_Iso = (muonsfromZ.size() > 0) ? singleMu_Isolation(*muonsfromZ.front()) && recselectedTM_MuT_OC_M_QC_DXY : false;
+   bool recselectedTM_MuT_OC_M_QC_DXY_Iso = (muonsfromZ.size() > 0) ? singleMu_Isolation(*muonsfromZ.front(), Rhox) && recselectedTM_MuT_OC_M_QC_DXY : false;
                                             //RecSelected_Isolation(muonsfromZ, _isocut, 1).first && recselectedTM_MuT_OC_M_QC_DXY;
 
    bool recselectedTM_MuJetTriggered = recselectedTwoMuons && isMuTriggered && isJTriggered;

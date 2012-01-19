@@ -108,14 +108,19 @@ SlaveBegin(TTree *iTree) {
     if (!currentConfig.exists("type")) continue;
     std::string modtype = currentConfig.getParameter<std::string>("type");
     std::cout << "Configuring module " << modname << " of type " << modtype << std::endl;
-    
+  // std::cout << "Controllo 1" << std::endl;  
     //AnalysisBuilders::iterator ab = abs.find(iConfig->second.front());
     AnalysisBuilders::iterator ab = abs.find(modtype);
+  // std::cout << "Controllo 2" << std::endl;
     if (ab != abs.end()){
       //_fwLiteTreeAnalyser =  new BackgroundWorker(_fProofFile);
+  // std::cout << "Controllo 3" << std::endl;
       _workers.push_back(boost::shared_ptr<MyPatAnalysis>(ab->second()) ) ;
+  // std::cout << "Controllo 4" << std::endl;
       //_workers.back()->begin(unique, fInput);
+  // std::cout << "Controllo 5" << std::endl;
       _workers.back()->begin(unique, currentConfig);
+  // std::cout << "Controllo 6" << std::endl;
     } /*else {
       std::cout << "Cannot load symbol GenMuon" << std::endl;
       assert(0);

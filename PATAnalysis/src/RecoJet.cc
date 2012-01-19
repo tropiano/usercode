@@ -81,6 +81,7 @@ void  RecoJet::process(const fwlite::Event& iEvent)
    for (ijet = jetbeg; ijet != jetend; ++ijet){
      if ( (fabs(ijet->rapidity()) < _etamax) && (ijet->pt() > _ptcut) ){
       if (ijet->isCaloJet()){
+             // loose (pure09) Calo Jet ID
         if (ijet->pt() > _ptcut && fabs(ijet->eta()) < _etamax  &&
             ijet->emEnergyFraction() > 0.01 &&
             ijet->jetID().fHPD < 0.98 &&
@@ -89,7 +90,22 @@ void  RecoJet::process(const fwlite::Event& iEvent)
             countJet++;
         }
       } else if (ijet->isPFJet()) {
-        //tight PFJetId
+              // tight PF Jet Id
+              int   chm = ijet->chargedHadronMultiplicity();
+              int   npr = ijet->chargedMultiplicity() + ijet->neutralMultiplicity();
+              float nhf = (ijet->neutralHadronEnergy() + ijet->HFHadronEnergy())/ijet->energy();
+              float phf = ijet->photonEnergyFraction();
+              float chf = ijet->chargedHadronEnergyFraction();
+              //float elf = ijet->electronEnergyFraction(); 
+              bool id = (npr>1 && phf<0.99 && nhf<0.99 && ((fabs(ijet->eta())<=2.4 && nhf<0.9 && phf<0.9 && //elf<0.99 &&
+ chf>0 && chm>0) || fabs(ijet->eta())>2.4));
+              if (id){
+              _jetplots.fill(*ijet);
+              countJet++;
+              }
+        }
+        /*
+        //tight PFJetId old
         if ((ijet->chargedHadronEnergyFraction() > 0.  || fabs(ijet->eta()>2.4)) &&
             ijet->neutralHadronEnergyFraction() < 0.9 &&
             (ijet->chargedMultiplicity()         > 0.  || fabs(ijet->eta()>2.4)) &&
@@ -98,7 +114,9 @@ void  RecoJet::process(const fwlite::Event& iEvent)
             _jetplots.fill(*ijet);
             countJet++;
         }
-      } else {
+      }
+        */
+        else {
         throw cms::Exception("RapGapPlots") << " not a Calo or PF jet " << std::endl;
       }
      } 

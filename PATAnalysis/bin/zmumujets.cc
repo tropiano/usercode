@@ -33,7 +33,7 @@ TDSet* getDS(const char* filename){
 
 int main(){
 
-  gEnv->SetValue("Proof.Sandbox", "/raid/lenzip/Zjets/CMSSW_3_8_7/src/Firenze/PATAnalysis/bin/proof");
+  gEnv->SetValue("Proof.Sandbox", "/data/sandro/.proof");
 
   TProof * p = TProof::Open("");
   //p->SetParallel(4);
@@ -47,11 +47,12 @@ int main(){
   gSystem->Load("libFirenzePATAnalysis");
 
 
-  p->Exec( ".x /raid/lenzip/Zjets/CMSSW_3_8_7/src/Firenze/PATAnalysis/bin/remote.C" );
+  p->Exec( ".x /data/sandro/Analisi/rel_CMSSW_4_2_4/CMSSW_4_2_4/src/Firenze/PATAnalysis/bin/remote.C" );
   
   //TProofLog *pl = TProof::Mgr("")->GetSessionLogs();
   //pl->Save("*","/data01/lenzip/Zjets/localCMSSW/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/Log.txt");
-  TDSet* dataDS = getDS("/raid/lenzip/Zjets/CMSSW_3_8_7/src/Firenze/PATAnalysis/bin/data.txt");
+/*
+  TDSet* dataDS = getDS("/data/sandro/Analisi/rel_CMSSW_4_2_4/CMSSW_4_2_4/src/Firenze/PATAnalysis/bin/SourceFilesMuons/data.txt");
   TNamed* configdata = new TNamed("ConfigFile", (pwd+"/config_data_zmumu.py").c_str());
   p->AddInput(configdata);
   p->Process(dataDS, "FWLiteTSelector");
@@ -60,21 +61,26 @@ int main(){
   p->AddInput(configdataoffset);
   p->Process(dataDS, "FWLiteTSelector");
   delete dataDS;
-  
-/*
-  TDSet* signalDS = getDS("/raid/lenzip/Zjets/CMSSW_3_8_7/src/Firenze/PATAnalysis/bin/signal.txt");
+*/  
+
+//  TDSet* signalDS = getDS("/data/sandro/Analisi/rel_CMSSW_4_2_4/CMSSW_4_2_4/src/Firenze/PATAnalysis/bin/SourceFilesMuons/signal.txt");
+  TDSet* signalDS = getDS("/data/sandro/Analisi/rel_CMSSW_4_2_4/CMSSW_4_2_4/src/Firenze/PATAnalysis/bin/SourceFilesMuons/signal.txt");
   TNamed* configsignal = new TNamed("ConfigFile", (pwd+"/config_signal.py").c_str());
   p->AddInput(configsignal);
   p->Process(signalDS, "FWLiteTSelector");
   delete signalDS;
-*/  
+
 /*
   TDSet* signalMadnoPUDS = getDS("/raid/lenzip/Zjets/CMSSW_3_8_7/src/Firenze/PATAnalysis/bin/signal_Madgraph_noPU.txt");
   TNamed* configMadnoPU = new TNamed("ConfigFile", (pwd+"/config_signal_Madgraph_nopu.py").c_str());
   p->AddInput(configMadnoPU);
   p->Process(signalMadnoPUDS, "FWLiteTSelector");
   delete signalMadnoPUDS; 
-*/
+
+  TDSet* signalMadDS = getDS("/raid/lenzip/Zjets/CMSSW_3_8_7/src/Firenze/PATAnalysis/bin/signal_Madgraph.txt");
+  TNamed* configMadOffUnf = new TNamed("ConfigFile", (pwd+"/config_signal_Madgraph_offset_unfolding.py").c_str());
+  p->AddInput(configMadOffUnf);
+  p->Process(signalMadDS, "FWLiteTSelector"); 
 
   TDSet* signalMadDS = getDS("/raid/lenzip/Zjets/CMSSW_3_8_7/src/Firenze/PATAnalysis/bin/signal_Madgraph.txt");
   TNamed* configMad = new TNamed("ConfigFile", (pwd+"/config_signal_Madgraph.py").c_str());
@@ -131,7 +137,22 @@ int main(){
   p->AddInput(configtau);
   p->Process(tauDS, "FWLiteTSelector");
   delete tauDS;
-  
+*/  
+/*
+  TDSet* MinBiasnoPUDS = getDS("/data/sandro/releases/rel_CMSSW_3_8_7/CMSSW_3_8_7/src/Firenze/PATAnalysis/bin/MinBiasnoPU.txt");
+  TNamed* configMinBiasnoPU = new TNamed("ConfigFile", (pwd+"/config_MinBiasnoPU.py").c_str());
+  p->AddInput(configMinBiasnoPU);
+  p->Process(MinBiasnoPUDS, "FWLiteTSelector");
+  delete MinBiasnoPUDS;
+*/
+/*
+  TDSet* qcd_pt15to30noPUDS = getDS("/data/sandro/releases/rel_CMSSW_3_8_7/CMSSW_3_8_7/src/Firenze/PATAnalysis/bin/qcd_pt15to30noPU.txt");
+  TNamed* configqcd_pt15to30noPU = new TNamed("ConfigFile", (pwd+"/config_background_qcd_pt15to30noPU.py").c_str());
+  p->AddInput(configqcd_pt15to30noPU);
+  p->Process(qcd_pt15to30noPUDS, "FWLiteTSelector");
+  delete qcd_pt15to30noPUDS;
+*/
+
 /*  
   TDSet* signalDWDS = getDS("/data01/lenzip/Zjets/localCMSSW/CMSSW_3_6_3/src/Firenze/PATAnalysis/bin/signal_DW.txt");
   TNamed* configDW = new TNamed("ConfigFile", (pwd+"/config_signal_DW.py").c_str());

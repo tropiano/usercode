@@ -106,6 +106,7 @@ void RecoMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
    _summaryPass->Branch("_isotk1", &_isotk1, "_isotk1/D");
    _summaryPass->Branch("_njets", &_njets, "_njets/I");
    _summaryPass->Branch("_ptjetsum", &_ptjetsum, "_ptjetsum/D");
+   _summaryPass->Branch("_rho", &_rho, "_rho/D" );
 
    std::vector<TH1D*>::const_iterator ibeg = _histoVector.begin();
    std::vector<TH1D*>::const_iterator iend = _histoVector.end();
@@ -145,6 +146,8 @@ void  RecoMuon::process(const fwlite::Event& iEvent)
    fwlite::Handle<pat::TriggerEvent> triggerHandle; 
    triggerHandle.getByLabel(iEvent, "patTriggerEvent");
 
+   fwlite::Handle<double> Rho;
+   Rho.getByLabel(iEvent, "kt6PFJets", "rho");
    
    //we need to add the piece of code that select the Z candidate in case of multiple candidates
    //if (zHandle->size() > 1) return; 
@@ -179,7 +182,15 @@ void  RecoMuon::process(const fwlite::Event& iEvent)
   }
   std::sort(muonsfromZ.begin(), muonsfromZ.end(), sortByPt<pat::Muon>); 
 
-  if (RecSelectedMuonWithTrigger(*zHandle, *triggerHandle, _isocut, dau0, dau1)){
+
+  if (RecSelectedMuonWithTrigger(*zHandle, *triggerHandle, _isocut, *Rho, dau0, dau1)){
+
+      std::vector<pat::Jet> cleanJets;
+      CleanJets(*jetHandle, muonsfromZ, cleanJets);
+      std::vector<const pat::Jet*> recjets = GetJets<pat::Jet>(cleanJets, _ptjetmin, _etajetmax);
+   
+   if (recjets.size() >= 1){ 
+
    //if (RecSelectedMuon(*zHandle, _isocut, dau0, dau1)){ //TEMP FOR OFFSET STUDY
       //cout << "PASSED!" << endl;
       _runnumber  = iEvent.id().run();
@@ -195,6 +206,7 @@ void  RecoMuon::process(const fwlite::Event& iEvent)
       _isorel1 = (iso03_1.hadEt + iso03_1.emEt + iso03_1.sumPt)/(*zHandle)[0].daughter(1)->pt();
       _isotk0 = iso03_0.sumPt;  
       _isotk1 = iso03_1.sumPt;  
+      _rho = *Rho;
 
       recPtZ->Fill((*zHandle)[0].pt(), _norm);
       recEtaZ->Fill((*zHandle)[0].eta(), _norm);
@@ -203,12 +215,8 @@ void  RecoMuon::process(const fwlite::Event& iEvent)
       recLeadMuEta->Fill((*zHandle)[0].daughter(0)->eta(), _norm);
       recSecMuPt->Fill((*zHandle)[0].daughter(1)->pt(), _norm);
       recSecMuEta->Fill((*zHandle)[0].daughter(1)->eta(), _norm);
-   
+   }  
   
-      std::vector<pat::Jet> cleanJets;
-      CleanJets(*jetHandle, muonsfromZ, cleanJets, 0.5);
-      std::vector<const pat::Jet*> recjets = GetJets<pat::Jet>(cleanJets, _ptjetmin, _etajetmax);
-
       _dir->cd();
       addHistosVsMulti(recjets.size(), "recJetPtIncl", " reconstructed jet p_{T} spectrum", 200, 0, 200, recJetPtVsInclMulti);
       addHistosVsMulti(recjets.size(), "recJetEtaIncl", " reconstructed jet #eta spectrum", 100, -5., 5., recJetEtaVsInclMulti);
