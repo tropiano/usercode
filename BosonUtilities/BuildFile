@@ -1,7 +1,0 @@
-<use name=DataFormats/Candidate>
-<use name=FWCore/ParameterSet>
-<export>
-  <use name=DataFormats/Candidate>
-  <use name=FWCore/ParameterSet>
-  <lib name=FirenzeBosonUtilities>
-</export>
