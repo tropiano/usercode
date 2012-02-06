@@ -33,10 +33,16 @@ selectedMuons = selectedPatMuons.clone()
 selectedMuons.src = cms.InputTag("patMuons")
 selectedMuons.cut = cms.string("pt > 15. & abs(eta) < 3. ")
 
+#selectedMuons1 = cms.EDFilter("LargestPtCandViewSelector",
+#    src = cms.InputTag("selectedMuons"),
+#    maxNumber = cms.uint32(2)
+#  )
 
+selectedMuons1 = selectedMuons.clone()
+ 
 #Z candidate combiner
 zmumurec = cms.EDProducer('CandViewCombiner',
-  decay = cms.string('selectedMuons@+ selectedMuons@-'),
+  decay = cms.string('selectedMuons1@+ selectedMuons1@-'),
   cut   = cms.string('30 < mass < 150'),
   name  = cms.string('Zmumu'),
   roles = cms.vstring('mu1', 'mu2')
@@ -44,13 +50,13 @@ zmumurec = cms.EDProducer('CandViewCombiner',
 
 zmumurecSameCharge = cms.EDProducer('CandViewCombiner',
 #both ++ and -- in the same colelction
-  decay = cms.string('selectedMuons@+ selectedMuons@+'),
+  decay = cms.string('selectedMuons1@+ selectedMuons1@+'),
   cut   = cms.string('30 < mass < 150'),
   name  = cms.string('Zmumu_samecharge'),
   roles = cms.vstring('mu1', 'mu2')
 )
 
-zmumurecSequence = cms.Sequence(selectedMuons*(zmumurec + zmumurecSameCharge))
+zmumurecSequence = cms.Sequence(selectedMuons*(selectedMuons1*(zmumurec + zmumurecSameCharge)))
 
 zmumurecEventContent = [
   'keep *_selectedMuons_*_*',

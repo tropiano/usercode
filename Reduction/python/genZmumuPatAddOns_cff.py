@@ -44,7 +44,7 @@ genMuPlusSelector = cms.EDFilter('CandViewSelector',
    src = cms.InputTag('genParticles'),
    cut = cms.string('status == 1 & pdgId == -13 & pt > 0 & abs(eta) < 100.')
 )
-## Z mumu wothout QED FS photons
+## Z mumu without QED FS photons
 #zmumugen = cms.EDFilter('CandViewShallowCloneCombiner',
 zmumugen = cms.EDProducer('CandViewCombiner',
    decay = cms.string('genMuPlusSelector@+ genMuMinusSelector@-'),

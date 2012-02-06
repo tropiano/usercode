@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 import PhysicsTools.PatAlgos.selectionLayer1.jetSelector_cfi
 selectedJets = PhysicsTools.PatAlgos.selectionLayer1.jetSelector_cfi.selectedPatJets.clone()
 selectedJets.src = cms.InputTag("patJets")
-selectedJets.cut = cms.string('pt > 10. & abs(eta) < 10. & nConstituents > 0')
+selectedJets.cut = cms.string('pt > 15. & abs(eta) < 10. & nConstituents > 0')
 
 #pfjets
 #from Firenze.JetUtilities.pfAK5Jets_cff import *
