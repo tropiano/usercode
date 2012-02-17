@@ -1,1 +1,1 @@
-/data/sandro/Analisi/rel_CMSSW_4_2_4/CMSSW_4_2_4/src/Firenze/Reduction/test/output_Summer11.root
+/data/sandro/Analisi/rel_CMSSW_4_2_5/CMSSW_4_2_5/src/Firenze/Reduction/test/Full_mod_output_DYtoMuMu_M20_Fall11.root

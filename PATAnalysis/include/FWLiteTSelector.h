@@ -34,7 +34,6 @@
 //#include "DataFormats/FWLite/interface/ChainEvent.h"
 #include "DataFormats/FWLite/interface/Event.h"
 #include "RegisteredAnalyses.h"
-#include "Utilities.h"
 
 // forward declarations
 class TFile;

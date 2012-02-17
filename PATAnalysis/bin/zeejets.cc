@@ -84,9 +84,9 @@ int PreDefName, ProcEvents;
   
   //Modules
   bool GEN = true;
-  bool RECO = true;
-  bool EFF = true;
-  bool NTUPLE = true;
+  bool RECO = false;
+  bool EFF = false;
+  bool NTUPLE = false;
   
   //Ntuple - "zcand" = saves only z candidates; "acc" = save only events with Z in the acceptance; "all" = saves all the events  
   string NtupleFill = "all";
@@ -117,7 +117,7 @@ int PreDefName, ProcEvents;
   string GenParticleMatch = "False";
   
   //Number of CPUs
-  int CPU = 5;
+  int CPU = 1;
   
   //Log
   bool Log = false;

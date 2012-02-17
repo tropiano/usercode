@@ -1,5 +1,5 @@
-#ifndef TagAndProbeAnalyzer_h
-#define TagAndProbeAnalyzer_h
+#ifndef TagAndProbeAnalyzerMuon_h
+#define TagAndProbeAnalyzerMuon_h
 
 #include "TDirectory.h"
 #include "TFile.h"
@@ -16,12 +16,12 @@
 //#include "Utilities.h"
 
 
-class TagAndProbeAnalyzer {
+class TagAndProbeAnalyzerMuon {
 public :
 
-    TagAndProbeAnalyzer(TDirectory* input, TFile* output, TDirectory* sec_input, std::string name, bool performfits=true, TFile* training_signal=0, TFile* training_background=0);
+    TagAndProbeAnalyzerMuon(TDirectory* input, TFile* output, TDirectory* sec_input, std::string name, bool performfits=true, TFile* training_signal=0, TFile* training_background=0);
 
-    ~TagAndProbeAnalyzer();
+    ~TagAndProbeAnalyzerMuon();
 
     void analyze(unsigned int nbins, std::string option="signal");
     

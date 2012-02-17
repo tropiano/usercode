@@ -23,8 +23,8 @@ class EfficiencyAnalyzerMuon {
 
     TDirectory* _dir;
     TDirectory* _dir1;
-    TFile* _output;
     TFile* _sec_input;
+    TFile* _output;    
 };
 
 

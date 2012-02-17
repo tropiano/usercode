@@ -1,5 +1,5 @@
 #include "Firenze/PATAnalysis/include/EfficiencyAnalyzerMuon.h"
-#include "Firenze/PATAnalysis/include/TagAndProbeAnalyzer.h"
+#include "Firenze/PATAnalysis/include/TagAndProbeAnalyzerMuon.h"
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -173,7 +173,7 @@ void EfficiencyAnalyzerMuon::analyze(std::string summaryfile, double scale){
 
     stream.close();
   }
-  TagAndProbeAnalyzer tpana(_dir, _output, 0, "Offline");
+  TagAndProbeAnalyzerMuon tpana(_dir, _output, 0, "Offline");
   tpana.analyze(3);
  
 }

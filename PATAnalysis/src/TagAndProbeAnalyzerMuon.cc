@@ -1,5 +1,5 @@
 
-#include "Firenze/PATAnalysis/include/TagAndProbeAnalyzer.h"
+#include "Firenze/PATAnalysis/include/TagAndProbeAnalyzerMuon.h"
 
 #include <iostream>
 #include <sstream>
@@ -23,7 +23,7 @@
 using namespace std;
 using namespace RooFit;
 
-TagAndProbeAnalyzer::TagAndProbeAnalyzer(TDirectory* input, TFile* output, TDirectory* sec_input, std::string name, bool performfits, TFile* training_signal, TFile* training_background):
+TagAndProbeAnalyzerMuon::TagAndProbeAnalyzerMuon(TDirectory* input, TFile* output, TDirectory* sec_input, std::string name, bool performfits, TFile* training_signal, TFile* training_background):
 _initialized(false),
 _input(input),
 _sec_input(sec_input),
@@ -49,14 +49,14 @@ _passprobe_cat("passprobe", "passprobe")
 
   tree = (TTree*) _input->Get("dataset");
   if (!tree){
-    std::cout << "Error in TagAndProbeAnalyzer::TagAndProbeAnalyzer : could not find tree named dataset in input file " << std::endl;
+    std::cout << "Error in TagAndProbeAnalyzerMuon::TagAndProbeAnalyzerMuon : could not find tree named dataset in input file " << std::endl;
     return;
   }
   
   if(_sec_input){
   tree1 = (TTree*) _sec_input->Get("dataset");
   if (!tree1){
-    std::cout << "Error in TagAndProbeAnalyzer::TagAndProbeAnalyzer : could not find tree1 named dataset in input file " << std::endl;
+    std::cout << "Error in TagAndProbeAnalyzerMuon::TagAndProbeAnalyzerMuon : could not find tree1 named dataset in input file " << std::endl;
     return;
   }
   }
@@ -72,14 +72,14 @@ _passprobe_cat("passprobe", "passprobe")
   
 }
 
-TagAndProbeAnalyzer::~TagAndProbeAnalyzer(){
+TagAndProbeAnalyzerMuon::~TagAndProbeAnalyzerMuon(){
   delete _argset;
 }
 
-void TagAndProbeAnalyzer::analyze(unsigned int nbins, std::string option )
+void TagAndProbeAnalyzerMuon::analyze(unsigned int nbins, std::string option )
 {
    if (!_initialized) {
-      std::cout << "Error in TagAndProbeAnalyzer::Analyze, unable to initialize the RooDataSet. Are you sure that the TagAndProbeFiller has been run?" << std::endl;
+      std::cout << "Error in TagAndProbeAnalyzerMuon::Analyze, unable to initialize the RooDataSet. Are you sure that the TagAndProbeFiller has been run?" << std::endl;
       return;  
    }
  
@@ -178,7 +178,7 @@ void TagAndProbeAnalyzer::analyze(unsigned int nbins, std::string option )
   }
 }
 
-std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data, const char* name, std::string option) {
+std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzerMuon::fit(RooAbsData* data, const char* name, std::string option) {
 
   string dirname(_input->GetName());
 
@@ -403,7 +403,7 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
     components_fail.add(background_fail);
     coefficients_fail.add(b_fail);
   } else {
-    std::cout << "Error in TagAndProbeAnalyzer::fit : Unknown option " << option << std::endl;
+    std::cout << "Error in TagAndProbeAnalyzerMuon::fit : Unknown option " << option << std::endl;
     return make_pair((RooFitResult*) 0, (RooRealVar*) 0);;   
   }
 
@@ -456,7 +456,7 @@ std::pair<RooFitResult*, RooRealVar*> TagAndProbeAnalyzer::fit(RooAbsData* data,
 }
 
 
-TGraphAsymmErrors TagAndProbeAnalyzer::createDoubleEfficiency(const TGraphAsymmErrors& single) const {
+TGraphAsymmErrors TagAndProbeAnalyzerMuon::createDoubleEfficiency(const TGraphAsymmErrors& single) const {
   int n = single.GetN();
   TVectorD vx(n);
   TVectorD vy(n);
@@ -480,7 +480,7 @@ TGraphAsymmErrors TagAndProbeAnalyzer::createDoubleEfficiency(const TGraphAsymmE
   return doubleEff;
 }
 
-TGraphAsymmErrors TagAndProbeAnalyzer::createAsymmCutEfficiency(const TGraphAsymmErrors& single0, const TGraphAsymmErrors& single1) const {
+TGraphAsymmErrors TagAndProbeAnalyzerMuon::createAsymmCutEfficiency(const TGraphAsymmErrors& single0, const TGraphAsymmErrors& single1) const {
 
   int n = single0.GetN();
   

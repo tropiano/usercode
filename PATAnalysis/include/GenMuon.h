@@ -2,14 +2,10 @@
 #define GenMuon_h
 
 #include "TFile.h"
-
-//#include "FWCore/TFWLiteSelector/interface/TFWLiteSelector.h"
-//#include "DataFormats/FWLite/interface/ChainEvent.h"
 #include "DataFormats/FWLite/interface/Event.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "TH1D.h"
 #include "TList.h"
-//#include "TProofOutputFile.h"
 #include "TFile.h"
 #include "MyPatAnalysis.h"
 
@@ -17,7 +13,7 @@
 
 class GenMuon : public MyPatAnalysis {
 public :
-   GenMuon(/*TFile* out, const TList* fInput*/);
+   GenMuon();
 
    virtual ~GenMuon();
 
@@ -25,15 +21,21 @@ public :
 
    virtual void begin(TFile* out, const edm::ParameterSet&);
 
-   //void  process(const fwlite::ChainEvent& iEvent);
    virtual void  process(const fwlite::Event& iEvent);
 
    virtual void finalize(); 
 
    //Histograms
-   TH1D *genPtZ, *genEtaZ, *genMulti, *genMassZ, *genLeadMuPt, *genSecMuPt, *genLeadMuEta, *genSecMuEta,
-        *genLeadJetPt, *genLeadJetEta, *genDeltayJfwdJbwd, *genRapZ;
-        //*genDjr0, *genDjr1, *genDjr2;
+   TH1D *genPtZ, *genEtaZ, *genMassZ, *genPtZ_Acc, *genEtaZ_Acc, *genMassZ_Acc;
+   
+   TH1D *GenIsoJetPt_Acc, *GenJetPt_Acc, *genLeadIsoJetPt_Acc, *genLeadIsoJetEta_Acc;
+   
+   TH1D *GenJetCounter, *GenJetCounter_Acc, *GenIsoJetCounter,  *GenIsoJetCounter_Acc;
+   
+   TH1D *genLeadMuPt, *genSecMuPt, *genLeadMuEta, *genSecMuEta, *genLeadMuPt_Acc, *genSecMuPt_Acc, *genLeadMuEta_Acc, *genSecMuEta_Acc;
+   
+   TH1D *JetMinDeltaRZDau_GEN;
+  
 
    std::vector<TH1D*> genJetPtVsInclMulti;
    std::vector<TH1D*> genJetEtaVsInclMulti;
@@ -61,11 +63,21 @@ private:
 
   double _etajetmax;
   
+  double _targetLumi;
+  
+  double _xsec;
+  
   double _norm;
+  
+  bool _Norm;
 
-  TFile* _file; 
+  int _entries, _EventsPerFile, _EventNumber, _ProcEvents;
 
-  TDirectory* _dir;
+  TFile* _file;  
+
+  TDirectory *_dir, *_Zdir, *_Mudir, *_Jetdir;
+  
+  std::string _selections;
 
   std::vector<TH1D*> _histovector;
 

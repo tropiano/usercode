@@ -1,17 +1,19 @@
-
 #include "Firenze/PATAnalysis/include/GenMuon.h"
-#include "Firenze/PATAnalysis/include/Utilities.h"
+#include "Firenze/PATAnalysis/include/MuonUtilities.h"
+
 #include <TH2.h>
 #include <TStyle.h>
 #include <math.h>
-//#include "Utilities.h"
+#include <iostream>
+#include <fstream>
 
 #include "TList.h"
 #include "TParameter.h"
 #include "TFile.h"
 #include "TProofOutputFile.h"
-
-#include <iostream>
+#include "TChain.h"
+#include "TGraphAsymmErrors.h"
+#include "TDirectory.h"
 
 //CMSSW headers
 #include "DataFormats/FWLite/interface/ChainEvent.h"
@@ -20,102 +22,139 @@
 #include "DataFormats/Candidate/interface/CompositeCandidate.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
 #include "DataFormats/FWLite/interface/ChainEvent.h"
+#include "FWCore/ParameterSet/interface/ProcessDesc.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 using namespace std;
 using namespace edm;
 
-GenMuon::GenMuon(/*TFile* proofFile, const TList* fInput*/):  
-genPtZ(0), genEtaZ(0), genMulti(0), genMassZ(0), genLeadMuPt(0), genSecMuPt(0), genLeadMuEta(0), genSecMuEta(0),
-genLeadJetPt(0), genLeadJetEta(0), genDeltayJfwdJbwd(0), genRapZ(0),
-//genDjr0(0), genDjr1(0), genDjr2(0),
-_ptjetmin(30.), _etajetmax(3.), _norm(1.),
-_file(0), _dir(0), _histovector()
-//_efficiency(out, "EfficienciesTotalVsRecMulti", 10, -0.5, 9.5, 0.3, false),
+GenMuon::GenMuon():  
+
+genPtZ(0), genEtaZ(0), genMassZ(0), 
+genPtZ_Acc(0), genEtaZ_Acc(0), genMassZ_Acc(0),
+
+GenIsoJetPt_Acc(0), GenJetPt_Acc(0), genLeadIsoJetPt_Acc(0), genLeadIsoJetEta_Acc(0),
+
+GenJetCounter(0), GenJetCounter_Acc(0), GenIsoJetCounter(0), GenIsoJetCounter_Acc(0),  
+
+genLeadMuPt(0), genSecMuPt(0), genLeadMuEta(0), genSecMuEta(0),
+genLeadMuPt_Acc(0), genSecMuPt_Acc(0), genLeadMuEta_Acc(0), genSecMuEta_Acc(0),
+
+JetMinDeltaRZDau_GEN(0),
+
+_ptjetmin(30.), _etajetmax(3.), _norm(1.), _Norm(false), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _file(0), _dir(0), _Zdir(0), _Mudir(0), _Jetdir(0), _selections("SYM"), _histovector()
 {   }
 
 void GenMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
    _file = out;
-/*
-   CmdLine cmd;
-   vector<Arg*> genArgs;
-   ValueArg<double> minpt("", "MinPtJet", )  
-   
-   TIter next(fInput);
-   bool factorSet = false;  
-   while (TObject* obj = next()){
-    const TParameter<double>* parDouble = dynamic_cast<const TParameter<double>* >(obj);
-    if (parDouble){
-      if (!strcmp(parDouble->GetName(), "MinPtJet")){
-        _ptjetmin = parDouble->GetVal();
-        cout << "set minimum pt for jets to: " << _ptjetmin << endl;
-      } else if (!strcmp(parDouble->GetName(), "MaxEtaJet")) {
-        _etajetmax = parDouble->GetVal();
-        cout << "set maximim eta for jets to: " << _etajetmax << endl;
-      } else if (!strcmp(parDouble->GetName(), "ScaleFactor")) {
-        _norm = parDouble->GetVal();
-        cout << "set scale factor to: " << _norm << endl;
-        factorSet = true;
-      }
-    }
-   }  
 
-   if (!factorSet) {
-     cout << "You did not set the scale factor! " << endl;
-     assert(factorSet);
-   }
-*/
-   std::string dirname = iConfig.getParameter<std::string>("Name"); 
-   _ptjetmin  = iConfig.getParameter<double>("MinPtJet");
-   _etajetmax = iConfig.getParameter<double>("MaxEtaJet");
-   _norm      = iConfig.getParameter<double>("ScaleFactor");
-   //_file = proofFile->OpenFile("UPDATE");
+   std::string dirname = iConfig.getParameter<std::string>("Name");
+   std::string sourceFileList = iConfig.getParameter<std::string>("sourceFileList");
+   _selections = iConfig.getParameter<std::string>("Selections");
+   _targetLumi= iConfig.getParameter<double>("targetLumi");
+   _xsec      = iConfig.getParameter<double>("CrossSection");
+   _Norm      = iConfig.getParameter<bool>("Norm");
+   _EventsPerFile      = iConfig.getParameter<int32_t>("EventsPerFile");
+   _EventNumber    = iConfig.getParameter<int32_t>("EventNumber");
+   _ProcEvents    = iConfig.getParameter<int32_t>("ProcEvents");
+
    cout << "GenMuon file name : " << _file->GetName() << endl;
    _file->cd();
    _dir = _file->mkdir(dirname.c_str(), dirname.c_str());
    _dir->cd();
    
+   //Z variables
+   _Zdir = _dir->mkdir("genZ_Plots");
+   _Zdir->cd();
+   
    genPtZ   = new TH1D("genPtZ", "Generated Z p_{T}", 200, 0, 200);
    _histovector.push_back(genPtZ);
    genEtaZ  = new TH1D("genEtaZ", "Generated Z #eta", 100, -10, 10);
    _histovector.push_back(genEtaZ);
-   genMulti = new TH1D("genMulti", "Generated jet multiplicity", 10, -0.5, 9.5);
-   _histovector.push_back(genMulti);
-   genMassZ = new TH1D("genMassZ", "Generated Z mass", 200, 50, 150);
+   genMassZ = new TH1D("genMassZ", "Generated Z mass", 100, 60, 120);
    _histovector.push_back(genMassZ);
-   genLeadMuPt = new TH1D("genLeadMuPt", "Generated Leading #mu p_{T}", 200, 0, 200);
+   genPtZ_Acc   = new TH1D("genPtZ_Acc", "Generated Z p_{T}, Selections: Acc", 200, 0, 200);
+   _histovector.push_back(genPtZ_Acc);
+   genEtaZ_Acc  = new TH1D("genEtaZ_Acc", "Generated Z #eta, Selections: Acc", 100, -10, 10);
+   _histovector.push_back(genEtaZ_Acc);
+   genMassZ_Acc = new TH1D("genMassZ_Acc", "Generated Z mass, Selections: Acc", 200, 50, 150);
+   _histovector.push_back(genMassZ_Acc);
+   
+   //Z Muons variables
+   _Mudir = _dir->mkdir("genZMuons_Plots");
+   _Mudir->cd();
+   
+   genLeadMuPt = new TH1D("genLeadMuPt", "Generated Leading muon p_{T}", 200, 0, 200);
    _histovector.push_back(genLeadMuPt);
-   genSecMuPt  = new TH1D("genSecMuPt", "Generated Second #mu p_{T}", 200, 0, 200);
+   genSecMuPt  = new TH1D("genSecMuPt", "Generated Second muon p_{T}", 200, 0, 200);
    _histovector.push_back(genSecMuPt);
-   genLeadMuEta = new TH1D("genLeadMuEta", "Generated Leading #mu #eta", 50, -2.5, 2.5);
+   genLeadMuEta = new TH1D("genLeadMuEta", "Generated Leading muon #eta", 100, -2.5, 2.5);
    _histovector.push_back(genLeadMuEta);
-   genSecMuEta  = new TH1D("genSecMuEta", "Generated Second #mu #eta", 50, 2.5, 2.5);
-   _histovector.push_back(genSecMuEta);
-   genLeadJetPt = new TH1D("genLeadJetPt", "Generated Leading Jet p_{T}", 200, 0, 200);
-   _histovector.push_back(genLeadJetPt);
-   genLeadJetEta = new TH1D("genLeadJetEta", "Generated Leading Jet #eta", 100, -5, 5);
-   _histovector.push_back(genLeadJetEta);
-   genDeltayJfwdJbwd = new TH1D("genDeltayJfwdJbwd", "Generated #Deltay fw jet - bwd jet", 100, 0, 10);
-   _histovector.push_back(genDeltayJfwdJbwd);
-   genRapZ = new TH1D("genRapZ", "Generated Z rapidity", 200, -10, 10);
-   _histovector.push_back(genRapZ);
-   std::vector<TH1D*>::const_iterator ibeg = _histovector.begin();
-   std::vector<TH1D*>::const_iterator iend = _histovector.end();
-   for (std::vector<TH1D*>::const_iterator i = ibeg; i != iend; ++i){
-    (*i)->Sumw2();
-   }
-   _dir->cd("-");
+   genSecMuEta  = new TH1D("genSecMuEta", "Generated Second muon #eta", 100, -2.5, 2.5);
+   _histovector.push_back(genSecMuEta);   
+   genLeadMuPt_Acc = new TH1D("genLeadMuPt_Acc", "Generated Leading muon p_{T}, Selection: Acc", 200, 0, 200);
+   _histovector.push_back(genLeadMuPt_Acc);
+   genSecMuPt_Acc  = new TH1D("genSecMuPt_Acc", "Generated Second muon p_{T}, Selection: Acc", 200, 0, 200);
+   _histovector.push_back(genSecMuPt_Acc);
+   genLeadMuEta_Acc = new TH1D("genLeadMuEta_Acc", "Generated Leading muon #eta, Selection: Acc", 100, -2.5, 2.5);
+   _histovector.push_back(genLeadMuEta_Acc);
+   genSecMuEta_Acc  = new TH1D("genSecMuEta_Acc", "Generated Second muon #eta, Selection: Acc", 100, -2.5, 2.5);
+   _histovector.push_back(genSecMuEta_Acc);
+   
+   //Jet variables
+   _Jetdir = _dir->mkdir("genJet_Plots");
+   _Jetdir->cd();
+   
+   GenIsoJetCounter = new TH1D("GenIsoJetCounter", "Number of Generated Iso Jet per event", 10, 0, 10);
+   _histovector.push_back(GenIsoJetCounter);
+   GenJetCounter = new TH1D("GenJetCounter", "Number of Generated Jet per event", 10, 0, 10);
+   _histovector.push_back(GenJetCounter);  
+   GenJetCounter_Acc = new TH1D("GenJetCounter_Acc", "Number of Generated Jet per event in Acc", 10, 0, 10);
+   _histovector.push_back(GenJetCounter_Acc);
+   GenIsoJetCounter_Acc = new TH1D("GenIsoJetCounter_Acc", "Number of Generated Iso Jet per event in Acc", 10, 0, 10);
+   _histovector.push_back(GenIsoJetCounter_Acc);
+   GenIsoJetPt_Acc = new TH1D("GenIsoJetPt_Acc", "Generated Iso Jet p_{T} in Acc", 250, 0, 250);
+   _histovector.push_back(GenIsoJetPt_Acc);
+   GenJetPt_Acc = new TH1D("GenJetPt_Acc", "Generated Jet p_{T} in Acc", 250, 0, 250);
+   _histovector.push_back(GenJetPt_Acc);
+   genLeadIsoJetPt_Acc = new TH1D("genLeadIsoJetPt_Acc", "Generated Leading Jet p_{T} in Acc", 200, 0, 200);
+   _histovector.push_back(genLeadIsoJetPt_Acc);
+   genLeadIsoJetEta_Acc = new TH1D("genLeadIsoJetEta_Acc", "Generated Leading Jet #eta in Acc", 100, -5, 5);
+   _histovector.push_back(genLeadIsoJetEta_Acc);
+   JetMinDeltaRZDau_GEN = new TH1D("JetMinDeltaRZDau_GEN", "Min Delta R Z Daughters All Gen Jets", 100, 0, 10);
+   _histovector.push_back(JetMinDeltaRZDau_GEN);
+   
+  int fileCounter = 0;
+   
+  TChain *ch = new TChain("Events");
+  ifstream infile;
+  infile.open(sourceFileList.c_str());
+  string datafile;
+  while(getline (infile, datafile)){
+    ch->Add(datafile.c_str());
+    fileCounter++;
+  }
+   
+  if(_EventNumber==0 && _EventsPerFile==0)_entries = ch->GetEntries();
+  
+  if(_EventNumber!=0 && _EventsPerFile==0)_entries = _EventNumber;
+ 
+  if(_EventNumber==0 && _EventsPerFile!=0)_entries = fileCounter*_EventsPerFile;
+  
+  if(_ProcEvents!=-1)_entries = _ProcEvents;
+  
+  cout<<"RecoMuon analyzing nr. file = "<<fileCounter<<endl;
+  cout<<"RecoMuon analyzing nr. event = "<<_entries<<endl;
+  
+  delete ch;
 
-   cout << "GenMuon Worker configured." << endl;   
+  cout << "GenMuon Worker configured." << endl;   
 }
 
 GenMuon::~GenMuon(){
   _file->ls();
-  //_file->Write();
-  //_file->Close();
 }
 
-//void  GenMuon::process(const fwlite::ChainEvent& iEvent)
 void  GenMuon::process(const fwlite::Event& iEvent)
 {
 
@@ -123,98 +162,151 @@ void  GenMuon::process(const fwlite::Event& iEvent)
 
    double weight = 1.;
 
-   fwlite::Handle<std::vector<reco::CompositeCandidate> > zHandle;
-   //zHandle.getByLabel(iEvent, "zmumugen");
-   zHandle.getByLabel(iEvent, "zmumugenfull");
+   fwlite::Handle<std::vector<reco::CompositeCandidate> > zgenHandle;
+   zgenHandle.getByLabel(iEvent, "zmumugenfull");
 
-   fwlite::Handle<std::vector<reco::GenJet> > jetHandle;
-   jetHandle.getByLabel(iEvent, "selectedGenJets");
+   fwlite::Handle<std::vector<reco::GenJet> > jetgenHandle;
+   jetgenHandle.getByLabel(iEvent, "selectedGenJets");
 
-   //cout << "collection taken" << endl;
-
-   /*if (muonHandle->size()){
-      recLeadMuPt->Fill((*muonHandle)[0].pt());
-      
-   }*/
-   //we need to add the piece of code that select the Z candidate in case of multiple candidates
-   //if (zHandle->size() > 1) return; 
-
-   //we just take the first element in the collection of Z candidates.
-   //That is the candidate in which the leading muon has the highest pt
-
-
-   if (GenSelectedMuon(*zHandle)){
-      genPtZ->Fill((*zHandle)[0].pt(), weight);
-      genEtaZ->Fill((*zHandle)[0].eta(), weight);
-      genRapZ->Fill((*zHandle)[0].rapidity(), weight);
-      genMassZ->Fill((*zHandle)[0].mass(), weight);
+   fwlite::Handle<std::vector<pat::Muon> > muonHandle;
+   muonHandle.getByLabel(iEvent, "selectedMuons");
+   
+   std::vector<const reco::Candidate*> zgendaughters;
+  
+   if(zgenHandle->size())zgendaughters = ZGENDaughters((*zgenHandle));
+  
+   std::vector<const reco::GenJet*> genjets = GetJets_GenJets<reco::GenJet>(*jetgenHandle);   
+   std::vector<const reco::GenJet*> isogenjets;
+  
+   if(zgendaughters.size()){
+   for(unsigned int i = 0; i < genjets.size(); i++){
+   if(IsoJet<reco::Candidate>(zgendaughters,*genjets[i]))isogenjets.push_back(genjets[i]);}
+   }else if(!zgendaughters.size()){
+   for(unsigned int i = 0; i < genjets.size(); i++)isogenjets.push_back(genjets[i]);}
+  
+   if(zgenHandle->size()){
+   
+   const reco::Candidate *dau0 = 0;
+   const reco::Candidate *dau1 = 0;
+   
+     if(zgendaughters.size() != 0){        
+     dau0 = zgendaughters[0];
+     dau1 = zgendaughters[1];
+     
+     
+     
+     }
+     
+   //Events with a selected GEN Zee - NO Acceptance cuts applied
+   if(GenSelected(*zgenHandle, _selections)&&zgendaughters.size()!=0){
+   
+      genPtZ->Fill((*zgenHandle)[0].pt(), weight);    
+      genEtaZ->Fill((*zgenHandle)[0].eta(), weight);
+      genMassZ->Fill((*zgenHandle)[0].mass(), weight);
+   
       double leadmupt, leadmueta, secondmupt, secondmueta;
-      double pt0  = (*zHandle)[0].daughter(0)->pt(); 
-      double pt1  = (*zHandle)[0].daughter(1)->pt();
-      double eta0 = (*zHandle)[0].daughter(0)->eta();
-      double eta1 = (*zHandle)[0].daughter(1)->eta();
       
-      if (pt0 > pt1) {
-        leadmupt    = pt0;
-        leadmueta   = eta0;
-        secondmupt  = pt1;
-        secondmueta = eta1;
-      } else {
-        leadmupt    = pt1;
-        leadmueta   = eta1;
-        secondmupt  = pt0;
-        secondmueta = eta0;
-      }
+      leadmupt  = dau0->pt(); 
+      secondmupt  = dau1->pt();
+      leadmueta = dau0->eta();
+      secondmueta = dau1->eta();
+      
+      if(secondmupt>leadmupt)throw cms::Exception("PATAnalysis:GenMuon_WrongMuonOrder") << "ERROR! Z muons are in wrong order!";
+      
       genLeadMuPt->Fill(leadmupt, weight);
       genLeadMuEta->Fill(leadmueta, weight);
       genSecMuPt->Fill(secondmupt, weight);
-      genSecMuEta->Fill(secondmueta, weight);  
+      genSecMuEta->Fill(secondmueta, weight); 
+      
+      GenJetCounter->Fill(genjets.size());
+      GenIsoJetCounter->Fill(isogenjets.size()); 
+   
+   }
 
-      std::vector<const reco::GenJet*> genjets = GetJets<reco::GenJet>(*jetHandle, _ptjetmin, _etajetmax);   
-
-      genMulti->Fill(genjets.size(), weight);
-      _dir->cd();
-      addHistosVsMulti(genjets.size(), "genJetPtIncl", " generated jet p_{T} spectrum", 200, 0, 200, genJetPtVsInclMulti);
-      addHistosVsMulti(genjets.size(), "genJetEtaIncl", " generated jet #eta spectrum", 100, -5., 5., genJetEtaVsInclMulti);
-      addHistosVsMulti(genjets.size(), "genZPtIncl", " generated Z p_{T} spectrum", 200, 0., 200., genZPtVsInclMulti);
-      addHistosVsMulti(genjets.size(), "genZEtaIncl", " generated Z #eta spectrum", 100, -5., 5., genZEtaVsInclMulti);
-      addHistosVsMulti(genjets.size(), "genZPtExcl", " generated Z p_{T} spectrum", 200, 0., 200., genZPtVsExclMulti);
-      addHistosVsMulti(genjets.size(), "genZEtaExcl", " generated Z #eta spectrum", 100, -5., 5., genZEtaVsExclMulti);
-      addHistosVsMulti(genjets.size(), "genMu1PtExcl", " generated lead #mu p_{T} spectrum", 200, 0., 200., genMu1PtVsExclMulti);
-      addHistosVsMulti(genjets.size(), "genMu1EtaExcl", " generated lead #mu #eta spectrum", 100, -5., 5., genMu1EtaVsExclMulti);
-      addHistosVsMulti(genjets.size(), "genMu2PtExcl", " generated sec #mu p_{T} spectrum", 200, 0., 200., genMu2PtVsExclMulti);
-      addHistosVsMulti(genjets.size(), "genMu2EtaExcl", " generated sec #mu #eta spectrum", 100, -5., 5., genMu2EtaVsExclMulti);
-      _dir->cd("-");
-
-      if (genjets.size()){
-        genLeadJetPt->Fill(genjets[0]->pt(), weight);
-        genLeadJetEta->Fill(genjets[0]->eta(), weight);
-        for (unsigned int i = 0; i < genjets.size(); ++i){
-          genJetPtVsInclMulti[i+1]->Fill(genjets[i]->pt(), weight);
-          genJetEtaVsInclMulti[i+1]->Fill(genjets[i]->eta(), weight);
-        }
+   //Events with a selected GEN Zee in Acceptance
+   if (GenSelectedInAcceptance(*zgenHandle, _selections)&&zgendaughters.size()!=0){
+   
+      genPtZ_Acc->Fill((*zgenHandle)[0].pt(), weight);
+      genEtaZ_Acc->Fill((*zgenHandle)[0].eta(), weight);
+      genMassZ_Acc->Fill((*zgenHandle)[0].mass(), weight);
+      
+      double leadmupt, leadmueta, secondmupt, secondmueta;
+      leadmupt  = dau0->pt(); 
+      secondmupt  = dau1->pt();
+      leadmueta = dau0->eta();
+      secondmueta = dau1->eta();
+      
+      if(secondmupt>leadmupt)throw cms::Exception("PATAnalysis:GenMuon_WrongMuonOrder") << "ERROR! Z muons are in wrong order!";
+      
+      genLeadMuPt_Acc->Fill(leadmupt, weight);
+      genLeadMuEta_Acc->Fill(leadmueta, weight);
+      genSecMuPt_Acc->Fill(secondmupt, weight);
+      genSecMuEta_Acc->Fill(secondmueta, weight);  
+      
+      GenJetCounter_Acc->Fill(genjets.size());
+      
+      GenIsoJetCounter_Acc->Fill(isogenjets.size());
+      
+      for(unsigned int i = 0; i < genjets.size(); i++){
+      GenJetPt_Acc->Fill(genjets[i]->pt());
+      JetMinDeltaRZDau_GEN->Fill(MinDeltaRZDau<reco::Candidate>(zgendaughters,*genjets[i]));
+      }
+      
+      for(unsigned int i = 0; i < isogenjets.size(); i++){
+      GenIsoJetPt_Acc->Fill(isogenjets[i]->pt());
+      }
+          
+      if(isogenjets.size()){
+      genLeadIsoJetPt_Acc->Fill(isogenjets[0]->pt(), weight);
+      genLeadIsoJetEta_Acc->Fill(isogenjets[0]->eta(), weight);   
       }
 
+      
+      _Jetdir->cd();
+      addHistosVsMulti(isogenjets.size(), "genJetPtIncl", " generated jet p_{T} spectrum", 200, 0, 200, genJetPtVsInclMulti);
+      addHistosVsMulti(isogenjets.size(), "genJetEtaIncl", " generated jet #eta spectrum", 100, -5., 5., genJetEtaVsInclMulti);
+      _Zdir->cd();
+      addHistosVsMulti(isogenjets.size(), "genZPtIncl", " generated Z p_{T} spectrum", 200, 0., 200., genZPtVsInclMulti);
+      addHistosVsMulti(isogenjets.size(), "genZEtaIncl", " generated Z #eta spectrum", 100, -5., 5., genZEtaVsInclMulti);
+      addHistosVsMulti(isogenjets.size(), "genZPtExcl", " generated Z p_{T} spectrum", 200, 0., 200., genZPtVsExclMulti);
+      addHistosVsMulti(isogenjets.size(), "genZEtaExcl", " generated Z #eta spectrum", 100, -5., 5., genZEtaVsExclMulti);
+      _Mudir->cd();
+      addHistosVsMulti(isogenjets.size(), "genMu1PtExcl", " generated lead muon p_{T} spectrum", 200, 0., 200., genMu1PtVsExclMulti);
+      addHistosVsMulti(isogenjets.size(), "genMu1EtaExcl", " generated lead muon #eta spectrum", 100, -5., 5., genMu1EtaVsExclMulti);
+      addHistosVsMulti(isogenjets.size(), "genMu2PtExcl", " generated sec muon p_{T} spectrum", 200, 0., 200., genMu2PtVsExclMulti);
+      addHistosVsMulti(isogenjets.size(), "genMu2EtaExcl", " generated sec muon #eta spectrum", 100, -5., 5., genMu2EtaVsExclMulti);    
+      addHistosVsMulti(isogenjets.size(), "genMu1PtIncl", " generated lead muon p_{T} spectrum", 200, 0., 200., genMu1PtVsInclMulti);
+      addHistosVsMulti(isogenjets.size(), "genMu1EtaIncl", " generated lead muon #eta spectrum", 100, -5., 5., genMu1EtaVsInclMulti);
+      addHistosVsMulti(isogenjets.size(), "genMu2PtIncl", " generated sec muon p_{T} spectrum", 200, 0., 200., genMu2PtVsInclMulti);
+      addHistosVsMulti(isogenjets.size(), "genMu2EtaIncl", " generated sec muon #eta spectrum", 100, -5., 5., genMu2EtaVsInclMulti);
+
+        for (unsigned int i = 0; i < isogenjets.size(); ++i){
+          genJetPtVsInclMulti[i+1]->Fill(isogenjets[i]->pt(), weight);
+          genJetEtaVsInclMulti[i+1]->Fill(isogenjets[i]->eta(), weight);
+        }
+      
+
       //fill inclusive quantities
-      for (unsigned int i = 0; i < genjets.size()+1; ++i){
-        genZPtVsInclMulti[i]->Fill((*zHandle)[0].pt(), weight);
-        genZEtaVsInclMulti[i]->Fill((*zHandle)[0].eta(), weight);
+      for (unsigned int i = 0; i < isogenjets.size()+1; ++i){
+        genZPtVsInclMulti[i]->Fill((*zgenHandle)[0].pt(), weight);
+        genZEtaVsInclMulti[i]->Fill((*zgenHandle)[0].eta(), weight);
+        genMu1PtVsInclMulti[i]->Fill(leadmupt, weight);
+        genMu2PtVsInclMulti[i]->Fill(secondmupt, weight);
+        genMu1EtaVsInclMulti[i]->Fill(leadmueta, weight);
+        genMu2EtaVsInclMulti[i]->Fill(secondmueta, weight);
       }
 
       //fill exclusive quantities
-      genZPtVsExclMulti[genjets.size()]->Fill((*zHandle)[0].pt(), weight);
-      genZEtaVsExclMulti[genjets.size()]->Fill((*zHandle)[0].eta(), weight);
-      genMu1PtVsExclMulti[genjets.size()]->Fill(leadmupt, weight);
-      genMu1EtaVsExclMulti[genjets.size()]->Fill(leadmueta, weight);
-      genMu2PtVsExclMulti[genjets.size()]->Fill(secondmupt, weight);
-      genMu2EtaVsExclMulti[genjets.size()]->Fill(secondmueta, weight);
+      genZPtVsExclMulti[isogenjets.size()]->Fill((*zgenHandle)[0].pt(), weight);
+      genZEtaVsExclMulti[isogenjets.size()]->Fill((*zgenHandle)[0].eta(), weight);
+      genMu1PtVsExclMulti[isogenjets.size()]->Fill(leadmupt, weight);
+      genMu1EtaVsExclMulti[isogenjets.size()]->Fill(leadmueta, weight);
+      genMu2PtVsExclMulti[isogenjets.size()]->Fill(secondmupt, weight);
+      genMu2EtaVsExclMulti[isogenjets.size()]->Fill(secondmueta, weight);
 
-
-      if (genjets.size()>1){
-         genDeltayJfwdJbwd->Fill(deltaYFwdBwd<reco::GenJet>(genjets), weight);
-      }
-
-   } 
+   }
+   
+   }
    
 }
 
@@ -240,14 +332,26 @@ void GenMuon::finalize(){
 
    _histovector.insert(_histovector.end(), genMu2PtVsExclMulti.begin(), genMu2PtVsExclMulti.end());
    _histovector.insert(_histovector.end(), genMu2EtaVsExclMulti.begin(), genMu2EtaVsExclMulti.end());
-    
+   
+   //Normalization
+   
    std::vector<TH1D*>::const_iterator ibeg = _histovector.begin();
    std::vector<TH1D*>::const_iterator iend = _histovector.end();
+   
+   double lumi = _entries/_xsec;
+
+   if(_Norm && lumi!=0){
+   _norm = _targetLumi/lumi;
+   }
+   
    for (std::vector<TH1D*>::const_iterator i = ibeg; i != iend; ++i){
-      //if (*i) cout << typeid(**i).name() << endl;      
+    (*i)->Sumw2();
+   }
+   
+   for (std::vector<TH1D*>::const_iterator i = ibeg; i != iend; ++i){     
      if (*i) (*i)->Scale(_norm);
    }
    
    _file->Write();
-   //_file->Close();
+
 }
