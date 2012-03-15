@@ -14,17 +14,17 @@ using namespace std;
 int main() {
 
   //Input files - Z2
-  string training_sign = "/data/sfrosali/Zjets/NEW_CMSSW_3_9_7/CMSSW_3_9_7/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/JetPt15/Z_Madgraph_Z2_JetPt15.root";
-  string training_back = "/data/sfrosali/Zjets/NEW_CMSSW_3_9_7/CMSSW_3_9_7/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/JetPt15/Background_No-WZ-ZZ_JetPt15.root";
-  string total = "/data/sfrosali/Zjets/NEW_CMSSW_3_9_7/CMSSW_3_9_7/src/Firenze/PATAnalysis/bin/TagProbe/TPFiles/JetPt15/Data_RUN2010A-B_JetPt15.root"; 
+  string training_sign = "/data/sfrosali/Zjets/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/MonteCarlo/Train/DYtoLL_Train.root";
+  string training_back = "/data/sfrosali/Zjets/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/MonteCarlo/Train/Background_Train.root";
+  string total = "/data/sfrosali/Zjets/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/MonteCarlo/Sample/MC-Data_Sample.root"; 
   
   //Output files
   string output_train_sign =  
-"/data/sfrosali/Zjets/NEW_CMSSW_3_9_7/CMSSW_3_9_7/src/Firenze/PATAnalysis/bin/TagProbe/TPAnalyzer/JetPt15/Z2/TrainSig_JetPt15_Incl_Global.root";
+"/data/sfrosali/Zjets/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/TagProbe/TrainSig_JetPt15_Incl_Global.root";
   string output_train_back =  
-"/data/sfrosali/Zjets/NEW_CMSSW_3_9_7/CMSSW_3_9_7/src/Firenze/PATAnalysis/bin/TagProbe/TPAnalyzer/JetPt15/Z2/TrainBack_JetPt15_Incl_Global.root";
+"/data/sfrosali/Zjets/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/TagProbe/TrainBack_JetPt15_Incl_Global.root";
   string output_total =  
-"/data/sfrosali/Zjets/NEW_CMSSW_3_9_7/CMSSW_3_9_7/src/Firenze/PATAnalysis/bin/TagProbe/TPAnalyzer/JetPt15/Z2/TESTPlot_DATA_JetPt15_Incl_Global.root";
+"/data/sfrosali/Zjets/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/TagProbe/TESTPlot_DATA_JetPt15_Incl_Global.root";
 
   //Selections used
   string selections = "ASYM";

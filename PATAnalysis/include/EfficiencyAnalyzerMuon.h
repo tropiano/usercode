@@ -3,28 +3,26 @@
 
 #include "TFile.h"
 #include <string> 
-#include "TGraphAsymmErrors.h"
-#include "TH1.h"
-#include <iostream>
 
 class EfficiencyAnalyzerMuon {
 
   public:
-    EfficiencyAnalyzerMuon(TFile* input, TFile* output, TFile* sec_input, std::string dir);
+    EfficiencyAnalyzerMuon(TFile* input=0, TFile* output=0, std::string dir="", std::string dir1="", std::string dataset="dataset", TFile* training_signal=0, TFile* training_background=0);
     
     ~EfficiencyAnalyzerMuon(){};
 
-    void analyze(std::string="", double scale=1.);
+    void analyze(int, std::string);
 
   private:
-    
-    TGraphAsymmErrors inclusiveEfficiency(TH1* num, TH1* den, const char* name, const char* title) const;
-    void print(const TGraphAsymmErrors& graph, std::ostream& os) const;
-
     TDirectory* _dir;
     TDirectory* _dir1;
-    TFile* _sec_input;
-    TFile* _output;    
+    std::string _dirname;
+    std::string _dirname1;
+    std::string _dataset;
+    TFile* _output;
+    TFile* _training_signal;
+    TFile* _training_background;
+    
 };
 
 

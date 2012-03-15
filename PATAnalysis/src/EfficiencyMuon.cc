@@ -817,7 +817,7 @@ void  EfficiencyMuon::process(const fwlite::Event& iEvent){
    jetrecHandle.getByLabel(iEvent, "selectedJetsL1Corrected");
    
    fwlite::Handle<std::vector<reco::GenJet> > jetgenHandle;
-   jetgenHandle.getByLabel(iEvent, "selectedGenJets");
+   jetgenHandle.getByLabel(iEvent, "selectedGenJetsOld");
 
    fwlite::Handle<pat::TriggerEvent> triggerHandle;
    triggerHandle.getByLabel(iEvent, "patTriggerEvent");
@@ -898,7 +898,7 @@ void  EfficiencyMuon::process(const fwlite::Event& iEvent){
      }
      
      //Generated jets
-     std::vector<const reco::GenJet*> genjets = GetJets_GenJets<reco::GenJet>(*jetgenHandle);   
+     std::vector<const reco::GenJet*> genjets = GetJets_noJetID<reco::GenJet>(*jetgenHandle);   
      std::vector<const reco::GenJet*> isogenjets;
      
      if(zgendaughters.size()){

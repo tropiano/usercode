@@ -48,7 +48,7 @@ static map<std::string, std::pair<int, int> > muTrigger() {
 
 typedef std::pair<int, int> rrange;
 
-rrange rr1, rr2, rr3, rr4, rr5, rr6, rr7;
+rrange rr1, rr2, rr3, rr4, rr5, rr6, rr7, rr8;
 rr1 = make_pair(136033, 139980);
 rr2 = make_pair(140058, 141882);
 rr3 = make_pair(141956, 144114);
@@ -56,6 +56,7 @@ rr4 = make_pair(146428, 147116);
 rr5 = make_pair(147196, 148058);
 rr6 = make_pair(148819, 149064);
 rr7 = make_pair(149181, 149442);
+rr8 = make_pair(149181, 149442);
 
 if(TrgRange == false){
 rr1 = make_pair(-1, 999999999);
@@ -65,6 +66,7 @@ rr4 = make_pair(-1, 999999999);
 rr5 = make_pair(-1, 999999999);
 rr6 = make_pair(-1, 999999999);
 rr7 = make_pair(-1, 999999999);
+rr8 = make_pair(-1, 999999999);
 }
 
 static map<std::string, rrange > TrgVector;
@@ -72,7 +74,11 @@ static map<std::string, rrange > TrgVector;
 TrgVector["HLT_DoubleMu6_v"] = rr1;
 TrgVector["HLT_DoubleMu7_v"] = rr2;
 TrgVector["HLT_Mu13_Mu8_v"] = rr3;
-TrgVector["HLT_Mu17_Mu8_v"] = rr4; 
+TrgVector["HLT_Mu17_Mu8_v"] = rr4;
+TrgVector["HLT_Mu5"] = rr5; 
+TrgVector["HLT_Mu8"] = rr6; 
+TrgVector["HLT_Mu12"] = rr7; 
+TrgVector["HLT_"] = rr8; //qualunque HLT
 
 return TrgVector;
 }
@@ -89,7 +95,7 @@ static double dxycut = 0.02;     //cm
 static bool JetIDReq = true;
 static double ptjetmin = 30.;   //Gev/c
 static double etajetmax = 2.5;
-static double isojetcut = 0.5; //Isolation jet - Z muon
+static double isojetcut = 0.4; //Isolation jet - Z muon
 
 //SYM cuts
 static double ptmucut = 20.;        //Gev/c
@@ -220,6 +226,8 @@ static string ASYM1_TAG_MuID = ""; //if "" no MuID cut applied
 
 // Z Daughters Methods
 
+template <class T> bool sortByPt(const T* j1, const T* j2){ return j1->pt() > j2->pt() ; }
+
 inline const pat::Muon* CloneCandidate(const reco::Candidate& Daughter){
 
 const pat::Muon* dau = dynamic_cast<const pat::Muon*>(&Daughter);
@@ -244,27 +252,27 @@ inline std::vector<const reco::Candidate*> ZGENDaughters(const std::vector<reco:
   const reco::Candidate* finaldau1 = 0; 
 
   if (dau0->numberOfDaughters()){
-    bool el0set = false;
+    bool mu0set = false;
     for (unsigned int i = 0; i < dau0->numberOfDaughters(); ++i ){
       if (fabs(dau0->daughter(i)->pdgId()) == 13){
-        if (el0set) {
+        if (mu0set) {
           std::cout << "something wrong in GenSelectedInAcceptance: a daughter muon was already found for dau0 " << std::endl; 
         }
         finaldau0 = dau0->daughter(i);
-        el0set = true;
+        mu0set = true;
       }
     }
   }
 
   if (dau1->numberOfDaughters()){
-    bool el1set = false;
+    bool mu1set = false;
     for (unsigned int i = 0; i < dau1->numberOfDaughters(); ++i ){
       if (fabs(dau1->daughter(i)->pdgId()) == 13){
-        if (el1set) {
+        if (mu1set) {
           std::cout << "something wrong in GenSelectedInAcceptance: a daughter muon was already found for dau1 " << std::endl;
         }
         finaldau1 = dau1->daughter(i);
-        el1set = true;
+        mu1set = true;
       }
     }
   }
@@ -351,6 +359,41 @@ inline bool GenSelectedInAcceptance(const std::vector<reco::CompositeCandidate>&
  
 }
 
+inline bool GenSelectedInAcceptanceStatus1(const std::vector<reco::CompositeCandidate>& ZGEN, string selections){
+
+  if (ZGEN.size() == 0) return false;
+  if (ZGEN.size() > 1){
+    std::cout << "ERROR! Multiple Gen Z candidates found, you have to choose one before arriving here! " << std::endl;
+    throw cms::Exception("PATAnalysis:RecSelectedTwoMuonsOppositeCharge_Mass") << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! ";
+    return false;
+  }
+  
+  const reco::Candidate* dau0 = ZGEN[0].daughter(0);
+  const reco::Candidate* dau1 = ZGEN[0].daughter(1);
+
+  const reco::Candidate* leading = dau0->pt() > dau1->pt() ? dau0 : dau1;
+  const reco::Candidate* second  = dau0->pt() > dau1->pt() ? dau1 : dau0;
+
+  if(selections=="SYM"){
+  return ZGEN.size()==1 
+         && ZGEN[0].mass() > zmassmin_sym && ZGEN[0].mass() < zmassmax_sym 
+         && leading->pt() > ptmucut && fabs(leading->eta()) < etamucut
+         && second->pt() > ptmucut && fabs(second->eta()) < etamucut
+         && (fabs(leading->eta())<eta_mu_excl_down || fabs(leading->eta())>eta_mu_excl_up) && 
+	    (fabs(second->eta())<eta_mu_excl_down || fabs(second->eta())>eta_mu_excl_up);
+ }else if(selections=="ASYM"){
+ return  ZGEN.size()==1 
+         && ZGEN[0].mass() > zmassmin_asym && ZGEN[0].mass() < zmassmax_asym 
+         && leading->pt() > ptmucut0 && fabs(leading->eta()) < etamucut
+         && second->pt() > ptmucut1 && fabs(second->eta()) < etamucut
+         && (fabs(leading->eta())<eta_mu_excl_down || fabs(leading->eta())>eta_mu_excl_up) && 
+	    (fabs(second->eta())<eta_mu_excl_down || fabs(second->eta())>eta_mu_excl_up);
+ }else{
+ return false;
+ }
+
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Trigger
@@ -420,16 +463,24 @@ inline bool isMuonTriggered(const pat::TriggerEvent& triggers, int run){
   return Triggered;
 }
 
-inline bool RecSelected_TrgMatch(const pat::Muon& Muon, int run){
+inline bool RecSelected_TrgMatch(const pat::Muon& Muon, const pat::TriggerEvent& triggers, int run){
 bool trigmatch = false;
+
+const pat::TriggerPathCollection * paths = triggers.paths(); 
+
 static map<std::string, std::pair<int, int> > TrgVector = muTrigger();
 static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;
+
 for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
-const TriggerObjectStandAloneCollection MatchMuon = Muon.triggerObjectMatchesByPath(TrgVectorIter->first.c_str(), true);
-if(run!=-1){
-if(MatchMuon.size() && (TrgVectorIter->second.first<=run && run<=TrgVectorIter->second.second) ) trigmatch = true;
+for(pat::TriggerPathCollection::const_iterator ipath = paths->begin(); ipath != paths->end(); ++ipath){ 
+if(in_quote(ipath->name(), TrgVectorIter->first.c_str())){
+const TriggerObjectStandAloneCollection MatchMuon = Muon.triggerObjectMatchesByPath(ipath->name().c_str(), true);
+if(TrgRange==true && run!=-1){
+if(MatchMuon.size() && (TrgVectorIter->second.first<=run && run<=TrgVectorIter->second.second))trigmatch = true;
 }else{
-if(MatchMuon.size()) trigmatch = true;}
+if(MatchMuon.size())trigmatch = true;
+}
+}}
 }
 return trigmatch;
 }
@@ -440,7 +491,12 @@ return trigmatch;
   
 inline bool RecSelected(string Flag, const std::vector<reco::CompositeCandidate>& ZREC, const pat::TriggerEvent& triggers, int run, double rho){
 
-  std::vector<const pat::Muon*> zdaughters = ZRECDaughters(ZREC);
+  std::vector<const pat::Muon*> zdaughters; 
+  
+  if(ZREC.size()!=0){
+  zdaughters = ZRECDaughters(ZREC);
+  }else{
+  return false;}
   
   if(!zdaughters.size()){
   return false;
@@ -475,7 +531,7 @@ inline bool RecSelected(string Flag, const std::vector<reco::CompositeCandidate>
   else if(Flag=="_Trg"){
   bool cutTrg = false;
   if(muTrgMatchReq==true){
-  if(isMuonTriggered(triggers, run)&&(RecSelected_TrgMatch(*dau0, run)))cutTrg=true;
+  if(isMuonTriggered(triggers, run)&&(RecSelected_TrgMatch(*dau0, triggers, run)))cutTrg=true;
   }else if(muTrgMatchReq==false){
   if(isMuonTriggered(triggers, run))cutTrg=true;
   }
@@ -687,7 +743,7 @@ template<class MUON> double MinDeltaRZDau(const std::vector<const MUON*>& muons,
 
 // Jet Methods
 
-template<class JET> std::vector<const JET*> GetJets_GenJets(const std::vector<JET>& jets){
+template<class JET> std::vector<const JET*> GetJets_noJetID(const std::vector<JET>& jets){
   std::vector<const JET*> selectedjets;
   for (unsigned int i = 0; i < jets.size();  ++i){
     if (jets[i].pt() > ptjetmin && fabs(jets[i].eta()) < etajetmax) selectedjets.push_back(&jets[i]);
@@ -696,8 +752,22 @@ template<class JET> std::vector<const JET*> GetJets_GenJets(const std::vector<JE
 }
 
 template<class JET> int jetID(const JET& jet){
+
    int jetID = -1;
-   if(jet->chargedEmEnergyFraction()<0.99 && jet->neutralHadronEnergyFraction()<0.99 && jet->neutralEmEnergyFraction()<0.99 && jet->chargedHadronEnergyFraction()>0 && jet->chargedMultiplicity()>0) jetID = 1;
+   
+   if (jet->isPFJet()) {
+             
+   int   chm = jet->chargedHadronMultiplicity();
+   int   npr = jet->chargedMultiplicity() + jet->neutralMultiplicity();
+   float nhf = (jet->neutralHadronEnergy() + jet->HFHadronEnergy())/jet->energy();
+   float phf = jet->photonEnergyFraction();
+   float chf = jet->chargedHadronEnergyFraction();
+   float elf = (jet->electronEnergy())/(jet->energy());
+   
+   if(npr>1 && phf<0.99 && nhf<0.99 && ((fabs(jet->eta())<=2.4 && nhf<0.9 && phf<0.9 && elf<0.99 && chf>0 && chm>0) || fabs(jet->eta())>2.4)) jetID = 1;
+             
+   }
+
    return jetID;
 }
 
@@ -960,13 +1030,14 @@ inline bool singleMu_Probe_Acc_SYM(const reco::Candidate& cand, int run, double 
 
 inline bool singleMu_Probe_Trg_SYM(const reco::Candidate& cand, int run, double rho){
   
-  const pat::Muon* el0 = CloneCandidate(cand);
+  const pat::Muon* mu0 = CloneCandidate(cand);
   bool TPTrgMatch=true;
   
   if(muTrgMatchReq){
   TPTrgMatch=false;
-  if(el0){
-  if(RecSelected_TrgMatch(*el0, run))TPTrgMatch=true;
+  if(mu0){
+  //if(RecSelected_TrgMatch(*mu0,  run))
+  TPTrgMatch=true;
   }else{
   TPTrgMatch=false;}
   }
@@ -1054,39 +1125,40 @@ inline bool singleMu_Probe_MuID_SYM(const reco::Candidate& cand, int run, double
 //Probe cuts ASYM
 inline bool singleMu_Probe_Acc_ASYM0(const reco::Candidate& cand, int run, double rho){
 
-  const pat::Muon* el0 = CloneCandidate(cand);
+  const pat::Muon* mu0 = CloneCandidate(cand);
   
-  if(el0){
+  if(mu0){
   return (          
-          el0->pt() > ptmucut0
-          && fabs(el0->eta()) < etamucut 
-          && (fabs(el0->eta())<eta_mu_excl_down || fabs(el0->eta())>eta_mu_excl_up));
+          mu0->pt() > ptmucut0
+          && fabs(mu0->eta()) < etamucut 
+          && (fabs(mu0->eta())<eta_mu_excl_down || fabs(mu0->eta())>eta_mu_excl_up));
   }else{
   return false;}
   }
   
 inline bool singleMu_Probe_Acc_ASYM1(const reco::Candidate& cand, int run, double rho){
 
-  const pat::Muon* el1 = CloneCandidate(cand);
+  const pat::Muon* mu1 = CloneCandidate(cand);
   
-  if(el1){
+  if(mu1){
   return (          
-          el1->pt() > ptmucut1
-          && fabs(el1->eta()) < etamucut 
-          && (fabs(el1->eta())<eta_mu_excl_down || fabs(el1->eta())>eta_mu_excl_up));
+          mu1->pt() > ptmucut1
+          && fabs(mu1->eta()) < etamucut 
+          && (fabs(mu1->eta())<eta_mu_excl_down || fabs(mu1->eta())>eta_mu_excl_up));
   }else{
   return false;}
   }
   
 inline bool singleMu_Probe_Trg_ASYM0(const reco::Candidate& cand, int run, double rho){
 
-  const pat::Muon* el0 = CloneCandidate(cand);
+  const pat::Muon* mu0 = CloneCandidate(cand);
   bool TPTrgMatch=true;
   
   if(muTrgMatchReq){
   TPTrgMatch=false;
-  if(el0){
-  if(RecSelected_TrgMatch(*el0, run))TPTrgMatch=true;
+  if(mu0){
+  //if(RecSelected_TrgMatch(*mu0, run))
+  TPTrgMatch=true;
   }else{
   TPTrgMatch=false;}
   }
@@ -1098,9 +1170,9 @@ inline bool singleMu_Probe_Trg_ASYM0(const reco::Candidate& cand, int run, doubl
 //Per il momento non applico il probe Trg al second muon
 inline bool singleMu_Probe_Trg_ASYM1(const reco::Candidate& cand, int run, double rho){
 
-  const pat::Muon* el1 = CloneCandidate(cand);
+  const pat::Muon* mu1 = CloneCandidate(cand);
   
-  if(el1){
+  if(mu1){
   return true;
   }else{
   return false;}
@@ -1216,28 +1288,28 @@ inline bool singleMu_Probe_Iso_ASYM1(const reco::Candidate& cand, int run, doubl
 
 inline bool singleMu_Probe_MuID_ASYM0(const reco::Candidate& cand, int run, double rho){
 
-  const pat::Muon* el0 = CloneCandidate(cand);
+  const pat::Muon* mu0 = CloneCandidate(cand);
   
-  if(el0){
-  bool el0_ID = false;
+  if(mu0){
+  bool mu0_ID = false;
    
-  if(el0->muonID(muID_ASYM0.c_str())==7.0 || el0->muonID(muID_ASYM0.c_str())==1.0 || el0->muonID(muID_ASYM0.c_str())==3.0 || el0->muonID(muID_ASYM0.c_str())==5.0)el0_ID = true;
+  if(mu0->muonID(muID_ASYM0.c_str())==7.0 || mu0->muonID(muID_ASYM0.c_str())==1.0 || mu0->muonID(muID_ASYM0.c_str())==3.0 || mu0->muonID(muID_ASYM0.c_str())==5.0)mu0_ID = true;
   
-  return el0_ID;
+  return mu0_ID;
   }else{
   return false;}
 }
 
 inline bool singleMu_Probe_MuID_ASYM1(const reco::Candidate& cand, int run, double rho){
 
-  const pat::Muon* el1 = CloneCandidate(cand);
+  const pat::Muon* mu1 = CloneCandidate(cand);
   
-  if(el1){
-  bool el1_ID = false;
+  if(mu1){
+  bool mu1_ID = false;
   
-  if(el1->muonID(muID_ASYM1.c_str())==7.0 || el1->muonID(muID_ASYM1.c_str())==1.0 || el1->muonID(muID_ASYM1.c_str())==3.0 || el1->muonID(muID_ASYM1.c_str())==5.0)el1_ID = true;
+  if(mu1->muonID(muID_ASYM1.c_str())==7.0 || mu1->muonID(muID_ASYM1.c_str())==1.0 || mu1->muonID(muID_ASYM1.c_str())==3.0 || mu1->muonID(muID_ASYM1.c_str())==5.0)mu1_ID = true;
   
-  return el1_ID;
+  return mu1_ID;
   }else{
   return false;}
 }

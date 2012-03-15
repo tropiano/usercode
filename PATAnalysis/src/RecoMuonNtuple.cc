@@ -478,7 +478,7 @@ void  RecoMuonNtuple::process(const fwlite::Event& iEvent)
    zgenHandle.getByLabel(iEvent, "zmumugenfull");
 
    fwlite::Handle<std::vector<reco::GenJet> > jetgenHandle;
-   jetgenHandle.getByLabel(iEvent, "selectedGenJets");
+   jetgenHandle.getByLabel(iEvent, "selectedGenJetsOld");
    
    std::vector<const reco::GenJet*> isogenjets;
    
@@ -489,7 +489,7 @@ void  RecoMuonNtuple::process(const fwlite::Event& iEvent)
    const reco::Candidate *gendau1 = 0;
   
    zgendaughters = ZGENDaughters(*zgenHandle);
-   std::vector<const reco::GenJet*> genjets = GetJets_GenJets<reco::GenJet>(*jetgenHandle);
+   std::vector<const reco::GenJet*> genjets = GetJets_noJetID<reco::GenJet>(*jetgenHandle);
   
    if(zgendaughters.size()){
    gendau0 = zgendaughters[0];
@@ -657,7 +657,7 @@ void  RecoMuonNtuple::process(const fwlite::Event& iEvent)
    TrgBit=0;
    if(isMuonTriggered(*triggerHandle, run)){
    TrgBit=1;
-   if(RecSelected_TrgMatch(*recdau0, run)||RecSelected_TrgMatch(*recdau1, run))OneMuTrgMatch=1;
+   if(RecSelected_TrgMatch(*recdau0, *triggerHandle, run)||RecSelected_TrgMatch(*recdau1, *triggerHandle, run))OneMuTrgMatch=1;
    }
    }
    

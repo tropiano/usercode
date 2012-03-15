@@ -166,7 +166,7 @@ void  GenMuon::process(const fwlite::Event& iEvent)
    zgenHandle.getByLabel(iEvent, "zmumugenfull");
 
    fwlite::Handle<std::vector<reco::GenJet> > jetgenHandle;
-   jetgenHandle.getByLabel(iEvent, "selectedGenJets");
+   jetgenHandle.getByLabel(iEvent, "selectedGenJetsOld");
 
    fwlite::Handle<std::vector<pat::Muon> > muonHandle;
    muonHandle.getByLabel(iEvent, "selectedMuons");
@@ -175,7 +175,7 @@ void  GenMuon::process(const fwlite::Event& iEvent)
   
    if(zgenHandle->size())zgendaughters = ZGENDaughters((*zgenHandle));
   
-   std::vector<const reco::GenJet*> genjets = GetJets_GenJets<reco::GenJet>(*jetgenHandle);   
+   std::vector<const reco::GenJet*> genjets = GetJets_noJetID<reco::GenJet>(*jetgenHandle);   
    std::vector<const reco::GenJet*> isogenjets;
   
    if(zgendaughters.size()){

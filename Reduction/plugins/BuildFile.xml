@@ -1,0 +1,13 @@
+<export>
+</export>
+<library   name="FirenzeReduction_plugins" file="*.cc">
+  <use   name="FWCore/Framework"/>
+  <use   name="FWCore/ParameterSet"/>
+  <use   name="DataFormats/BTauReco"/>
+  <use   name="PhysicsTools/PatUtils"/>
+  <use   name="DataFormats/PatCandidates"/>
+  <use   name="PhysicsTools/UtilAlgos"/>
+  <use   name="CommonTools/UtilAlgos"/>
+  <use   name="root"/>
+  <flags   EDM_PLUGIN="1"/>
+</library>

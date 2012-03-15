@@ -13,31 +13,54 @@
 using namespace std;
 
 /*
--1. Unknown
-0.  Full_mod_output_dati2011 			(skimmed)
-1.  Full_mod_output_DYtoMuMu_M20_Fall11.root	(not skimmed)
+-9. TEST
+
+-1. All
+0.  dati2011 			(skimmed)
+1.  DYtoLL_All			(not skimmed)
+2.  TTJets_All			(skimmed)
+3.  WJetsToLNu_All		(skimmed)
+4.  WWJetsTo2L2Nu_All		(skimmed)
+5.  QCD_Pt20MuEnPt10_All	(skimmed)
+
+-2.  All Train
+11.  DYtoLL_Train		(not skimmed)
+12.  TTJets_Train		(skimmed)
+13.  WJetsToLNu_Train		(skimmed)
+14.  WWJetsTo2L2Nu_Train	(skimmed)
+15.  QCD_Pt20MuEnPt10_Train	(skimmed)
+
+-3.  All Sample
+21.  DYtoLL_Sample		(not skimmed)
+22.  TTJets_Sample		(skimmed)
+23.  WJetsToLNu_Sample		(skimmed)
+24.  WWJetsTo2L2Nu_Sample	(skimmed)
+25.  QCD_Pt20MuEnPt10_Sample	(skimmed)
 */
 
 static string SampleName;
 
 inline void name(int i){
-if(i==-1)SampleName="";
+if(i==-9)SampleName="Test";
 else if(i==0)SampleName="Data2011";
-else if(i==1)SampleName="DYtoMuMu_Fall11";
-/*else if(i==2)SampleName="Z_Madgraph_Z2";
-else if(i==3)SampleName="Z_Madgraph_D6T";
-else if(i==4)SampleName="Z_Pythia_Z2";
-else if(i==5)SampleName="TT_Pythia";
-else if(i==6)SampleName="Wlnu_Madgraph";
-else if(i==7)SampleName="WWEE_Pythia";
-else if(i==8)SampleName="ZZEE_Pythia";
-else if(i==9)SampleName="WZEE_Pythia";
-else if(i==10)SampleName="QCD_BCtoE_Pythia_Pt20to30";
-else if(i==11)SampleName="QCD_BCtoE_Pythia_Pt30to80";
-else if(i==12)SampleName="QCD_BCtoE_Pythia_Pt80to170";
-else if(i==13)SampleName="QCD_EMEnriched_Pythia_Pt20to30";
-else if(i==14)SampleName="QCD_EMEnriched_Pythia_Pt30to80";
-else if(i==15)SampleName="QCD_EMEnriched_Pythia_Pt80to170";*/
+else if(i==1)SampleName="DYtoLL_All";
+else if(i==2)SampleName="TTJets_All";
+else if(i==3)SampleName="WJetsToLNu_All";
+else if(i==4)SampleName="WWJetsTo2L2Nu_All";
+else if(i==5)SampleName="QCD_Pt20MuEnPt10_All";
+
+else if(i==11)SampleName="DYtoLL_Train";
+else if(i==12)SampleName="TTJets_Train";
+else if(i==13)SampleName="WJetsToLNu_Train";
+else if(i==14)SampleName="WWJetsTo2L2Nu_Train";
+else if(i==15)SampleName="QCD_Pt20MuEnPt10_Train";
+
+else if(i==21)SampleName="DYtoLL_Sample";
+else if(i==22)SampleName="TTJets_Sample";
+else if(i==23)SampleName="WJetsToLNu_Sample";
+else if(i==24)SampleName="WWJetsTo2L2Nu_Sample";
+else if(i==25)SampleName="QCD_Pt20MuEnPt10_Sample";
+
 else SampleName="";
 }
 
@@ -52,124 +75,131 @@ par ParStruct = {1., 1., 0, 0};
 
 void Parameters(int i, par* Par){
 switch(i){
+case(-9):
+//TEST
+Par->_xsec=1.;
+Par->_EventFilter=1.;
+Par->_EventsPerFile=0;
+Par->_EventNumber=0;
+break;
 case(0):
-//Data2011
+//Data2011 (skimmed)
 Par->_xsec=1.;
 Par->_EventFilter=1.;
 Par->_EventsPerFile=0;
 Par->_EventNumber=0;
 break;
 case(1):
-//DYtoMuMu_Fall11
-Par->_xsec=1667.;
+//DYtoLL (not skimmed) 24026288 events = 7883 pb-1
+Par->_xsec=3048.;
 Par->_EventFilter=1.;
 Par->_EventsPerFile=0;
 Par->_EventNumber=0;
 break;
-/*case(2):
-//Z_Madgraph_Z2
-Par->_xsec=3048.0;
-Par->_EventFilter=1.;
-Par->_EventsPerFile=0;
-Par->_EventNumber=0;
-break;
-case(3):
-//Z_Madgraph_D6T
-Par->_xsec=3048.0;
-Par->_EventFilter=1.;
-Par->_EventsPerFile=0;
-Par->_EventNumber=0;
-break;
-case(4):
-//Z_Pythia_Z2
-Par->_xsec=1666.0;
-Par->_EventFilter=1.;
-Par->_EventsPerFile=0;
-Par->_EventNumber=0;
-break;
-case(5):
-//TT_Pythia (skimmed)
+case(2):
+//TTJets (skimmed) 3401947 events = 21600 pb-1
 Par->_xsec=157.5;
 Par->_EventFilter=1.;
 Par->_EventsPerFile=0;
-Par->_EventNumber=1099550.0;
+Par->_EventNumber=3401947;
 break;
-case(6):
-//Wlnu_Madgraph (skimmed)
-Par->_xsec=31314.0;
+case(3):
+//WJetsToLNu (skimmed) 73092433 events = 2335 pb-1
+Par->_xsec=31314;
 Par->_EventFilter=1.;
 Par->_EventsPerFile=0;
-Par->_EventNumber=15161497.0;
+Par->_EventNumber=73092433;
 break;
-case(7):
-//WWEE_Pythia (skimmed)
-Par->_xsec=43.0; //(NLO xsec)
+case(4):
+//WWJetsTo2L2Nu (skimmed) 10956 events = 255 pb-1
+Par->_xsec=43.0;
 Par->_EventFilter=1.;
 Par->_EventsPerFile=0;
-Par->_EventNumber=2050240.0;
+Par->_EventNumber=10956;
 break;
-case(8):
-//ZZEE_Pythia (skimmed)
-Par->_xsec=5.9; //(NLO xsec)
-Par->_EventFilter=1.;
+case(5):
+//QCD_Pt20MuEnPt10 (skimmed) 8747418 events = 25 pb-1
+Par->_xsec=2.966E8;
+Par->_EventFilter=0.00118;
 Par->_EventsPerFile=0;
-Par->_EventNumber=2113368.0;
-break;
-case(9):
-//WZEE_Pythia (skimmed)
-Par->_xsec=18.2; //(NLO xsec)
-Par->_EventFilter=1.;
-Par->_EventsPerFile=0;
-Par->_EventNumber=2185664.0;
-break;
-case(10):
-//QCD_BCtoE_Pythia_Pt20to30 (skimmed)
-Par->_xsec=236000000.;
-Par->_EventFilter=0.00056;
-Par->_EventsPerFile=0;
-Par->_EventNumber=2243439.0; 
+Par->_EventNumber=8747418;
 break;
 case(11):
-//QCD_BCtoE_Pythia_Pt30to80 (skimmed)
-Par->_xsec=59500000.;
-Par->_EventFilter=0.0023;
+//DYtoLL Train (not skimmed)
+Par->_xsec=3048.;
+Par->_EventFilter=1.;
 Par->_EventsPerFile=0;
-Par->_EventNumber=1995502.0;
+Par->_EventNumber=0;
 break;
 case(12):
-//QCD_BCtoE_Pythia_Pt80to170 (skimmed)
-Par->_xsec=900000.;
-Par->_EventFilter=0.0104;
-Par->_EventsPerFile=0;
-Par->_EventNumber=1043390.0;
+//TTJets Train (skimmed)
+Par->_xsec=157.5;
+Par->_EventFilter=1.;
+Par->_EventsPerFile=47914;
+Par->_EventNumber=0;
 break;
 case(13):
-//QCD_EMEnriched_Pythia_Pt20to30  (skimmed)
-Par->_xsec=236000000.;
-Par->_EventFilter=0.0104;
-Par->_EventsPerFile=0;
-Par->_EventNumber=36375274.0;
+//WJetsToLNu Train (skimmed)
+Par->_xsec=31314;
+Par->_EventFilter=1.;
+Par->_EventsPerFile=49353;
+Par->_EventNumber=0;
 break;
 case(14):
-//QCD_EMEnriched_Pythia_Pt30to80  (skimmed)
-Par->_xsec=59500000.;
-Par->_EventFilter=0.065;
+//WWJetsTo2L2Nu Train (skimmed) 10956 events = 255 pb-1 (unico file)
+Par->_xsec=43.0;
+Par->_EventFilter=1.;
 Par->_EventsPerFile=0;
-Par->_EventNumber=71834019.0;
+Par->_EventNumber=10956;
 break;
 case(15):
-//QCD_EMEnriched_Pythia_Pt80to170  (skimmed)
-Par->_xsec=900000.;
-Par->_EventFilter=0.155;
+//QCD_Pt20MuEnPt10 Train (skimmed) 8747418 events = 25 pb-1
+Par->_xsec=2.966E8;
+Par->_EventFilter=0.00118;
+Par->_EventsPerFile=49142;
+Par->_EventNumber=0;
+break;
+case(21):
+//DYtoLL Sample (not skimmed)
+Par->_xsec=3048.;
+Par->_EventFilter=1.;
 Par->_EventsPerFile=0;
-Par->_EventNumber=8073559.0;
+Par->_EventNumber=0;
+break;
+case(22):
+//TTJets Train (skimmed)
+Par->_xsec=157.5;
+Par->_EventFilter=1.;
+Par->_EventsPerFile=47914;
+Par->_EventNumber=0;
+break;
+case(23):
+//WJetsToLNu Train (skimmed)
+Par->_xsec=31314;
+Par->_EventFilter=1.;
+Par->_EventsPerFile=49353;
+Par->_EventNumber=0;
+break;
+case(24):
+//WWJetsTo2L2Nu Train (skimmed) 10956 events = 255 pb-1 (unico file)
+Par->_xsec=43.0;
+Par->_EventFilter=1.;
+Par->_EventsPerFile=0;
+Par->_EventNumber=10956;
+break;
+case(25):
+//QCD_Pt20MuEnPt10 Train (skimmed) 8747418 events = 25 pb-1
+Par->_xsec=2.966E8;
+Par->_EventFilter=0.00118;
+Par->_EventsPerFile=49142;
+Par->_EventNumber=0;
 break;
 default:
 Par->_xsec=1.;
 Par->_EventFilter=1.;
 Par->_EventsPerFile=0;
 Par->_EventNumber=0;
-break;*/
+break;
 }
 
 }
@@ -185,7 +215,7 @@ TDSet* getDS(const char* filename){
   return out; 
 }
 
-void makeCfg(string sample, string selections, string JetType, bool GEN, bool RECO, bool EFF, bool NTUPLE, int Acc, int Trg, int Qual, int Imp, int Iso, int MuID, const char* path, const char* sourceList, const char *outFile, const char* Norm, int EventsPerFile, int EventNumber, int ProcEvents, double xsec, double targetLumi, string NtupleFill, int JECUnc, string JECUncFilePath){
+void makeCfg(string sample, string selections, string JetType, bool GEN, bool RECO, bool EFF, bool NTUPLE, bool DELTAR, int Acc, int Trg, int Qual, int Imp, int Iso, int MuID, const char* path, const char* sourceList, const char *outFile, const char* Norm, int EventsPerFile, int EventNumber, int ProcEvents, double xsec, double targetLumi, string NtupleFill, int JECUnc, string JECUncFilePath){
 
 //cfg
 string cfgPath = path;
@@ -304,6 +334,30 @@ cfg<<"ProcEvents  = cms.int32("<<ProcEvents<<")"<<std::endl;
 cfg<<")"<<std::endl<<std::endl;
 }
 
+if(DELTAR){
+cfg<<"process.zmumudeltar = cms.PSet ("<<std::endl;
+cfg<<"type        = cms.string(\"DeltaRAnalyzer\"),"<<std::endl;
+cfg<<"Name        = cms.string(\"DeltaRAnalyzer\"),"<<std::endl;
+cfg<<"sourceFileList = cms.string(\""<<Source.c_str()<<"\"),"<<std::endl;
+cfg<<"Selections = cms.string(\""<<selections.c_str()<<"\"),"<<std::endl;
+cfg<<"Sample = cms.string(\""<<sample.c_str()<<"\"),"<<std::endl;
+cfg<<"JetType = cms.string(\""<<JetType.c_str()<<"\"),"<<std::endl;
+cfg<<"ReportName        = cms.string(\""<<RepName.c_str()<<"\"),"<<std::endl;
+cfg<<"Acc = cms.int32("<<Acc<<"),"<<std::endl;
+cfg<<"Trg = cms.int32("<<Trg<<"),"<<std::endl;
+cfg<<"Qual = cms.int32("<<Qual<<"),"<<std::endl;
+cfg<<"Imp = cms.int32("<<Imp<<"),"<<std::endl;
+cfg<<"Iso = cms.int32("<<Iso<<"),"<<std::endl;
+cfg<<"MuID = cms.int32("<<MuID<<"),"<<std::endl;
+cfg<<"CrossSection = cms.double("<<xsec<<"),"<<std::endl;
+cfg<<"targetLumi  = cms.double("<<targetLumi<<"),"<<std::endl;
+cfg<<"Norm        = cms.bool("<<Norm<<"),"<<std::endl;
+cfg<<"JECUnc  = cms.int32("<<JECUnc<<"),"<<std::endl;
+cfg<<"EventsPerFile  = cms.int32("<<EventsPerFile<<"),"<<std::endl;
+cfg<<"EventNumber  = cms.int32("<<EventNumber<<"),"<<std::endl;
+cfg<<"ProcEvents  = cms.int32("<<ProcEvents<<")"<<std::endl;
+cfg<<")"<<std::endl<<std::endl;
+}
 
 cfg.close();
 

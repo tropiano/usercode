@@ -30,7 +30,7 @@ public :
     TGraphAsymmErrors createAsymmCutEfficiency(const TGraphAsymmErrors& single0, const TGraphAsymmErrors& single1) const;
 
 private:  
-  std::pair<RooFitResult*, RooRealVar*> fit(RooAbsData* data, const char* name, std::string option = "signal") ;
+  std::pair<RooFitResult*, RooRealVar*> fit(RooAbsData* data, const char* name, std::string option = "signal", unsigned int bin=0) ;
   bool _initialized;
   TDirectory* _input;
   TDirectory* _sec_input;
@@ -47,6 +47,8 @@ private:
   RooRealVar _probe, _weight;
   RooCategory _passprobe_cat;
   RooArgSet* _argset;
+  TDirectory *_YieldPlots;
+  TGraphAsymmErrors *_SignalYield_0, *_SignalYield_1, *_BackgroundYield_0, *_BackgroundYield_1;
   
 };
 
