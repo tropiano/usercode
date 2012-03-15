@@ -1,0 +1,33 @@
+<export>
+</export>
+<library   name="FirenzePATAnalysis_plugins" file="*.cc">
+  <flags   EDM_PLUGIN="1"/>
+  <use   name="root"/>
+  <use   name="rootcore"/>
+  <use   name="FWCore/Framework"/>
+  <use   name="FWCore/MessageLogger"/>
+  <use   name="FWCore/PluginManager"/>
+  <use   name="FWCore/ParameterSet"/>
+  <use   name="FWCore/ServiceRegistry"/>
+  <use   name="DataFormats/TrackReco"/>
+  <use   name="DataFormats/PatCandidates"/>
+  <use   name="DataFormats/EgammaReco"/>
+  <use   name="DataFormats/L1GlobalTrigger"/>
+  <use   name="DataFormats/MuonReco"/>
+  <use   name="DataFormats/Math"/>
+  <use   name="DataFormats/EgammaCandidates"/>
+  <use   name="RecoEcal/EgammaCoreTools"/>
+  <use   name="CommonTools/Utils"/>
+  <use   name="CommonTools/RecoAlgos"/>
+  <use   name="DataFormats/RecoCandidate"/>
+  <use   name="DataFormats/Candidate"/>
+  <use   name="DataFormats/Common"/>
+  <use   name="DataFormats/HLTReco"/>
+  <use   name="DataFormats/TrackCandidate"/>
+  <use   name="DataFormats/CaloRecHit"/>
+  <use   name="Geometry/CaloGeometry"/>
+  <use   name="Geometry/CaloTopology"/>
+  <use   name="RecoTracker/MeasurementDet"/>
+  <use   name="RecoTracker/CkfPattern"/>
+  <use   name="RecoTracker/TrackProducer"/>
+</library>
