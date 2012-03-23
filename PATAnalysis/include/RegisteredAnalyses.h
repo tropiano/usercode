@@ -10,7 +10,7 @@
 #include "RecoMuon.h"
 #include "EfficiencyMuon.h"
 #include "RecoMuonNtuple.h"
-#include "DeltaRAnalyzer.h"
+#include "DeltaRAnalyzerMuon.h"
 #include <map>
 
 typedef MyPatAnalysis* (*anabuilder_fn)();
@@ -27,7 +27,7 @@ inline AnalysisBuilders getAnalysisBuilders(){
   symbols["RecoMuon"] = RecoMuon::create;
   symbols["EfficiencyMuon"] = EfficiencyMuon::create;
   symbols["RecoMuonNtuple"] = RecoMuonNtuple::create;
-  symbols["DeltaRAnalyzer"] = DeltaRAnalyzer::create;
+  symbols["DeltaRAnalyzerMuon"] = DeltaRAnalyzerMuon::create;
 
   return symbols;
 }  

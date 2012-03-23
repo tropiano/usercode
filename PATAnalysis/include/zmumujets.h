@@ -336,8 +336,8 @@ cfg<<")"<<std::endl<<std::endl;
 
 if(DELTAR){
 cfg<<"process.zmumudeltar = cms.PSet ("<<std::endl;
-cfg<<"type        = cms.string(\"DeltaRAnalyzer\"),"<<std::endl;
-cfg<<"Name        = cms.string(\"DeltaRAnalyzer\"),"<<std::endl;
+cfg<<"type        = cms.string(\"DeltaRAnalyzerMuon\"),"<<std::endl;
+cfg<<"Name        = cms.string(\"DeltaRAnalyzerMuon\"),"<<std::endl;
 cfg<<"sourceFileList = cms.string(\""<<Source.c_str()<<"\"),"<<std::endl;
 cfg<<"Selections = cms.string(\""<<selections.c_str()<<"\"),"<<std::endl;
 cfg<<"Sample = cms.string(\""<<sample.c_str()<<"\"),"<<std::endl;

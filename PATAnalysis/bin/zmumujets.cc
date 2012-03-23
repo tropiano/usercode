@@ -64,8 +64,9 @@ int PreDefName, ProcEvents;
   //Number of events to be processed
   ProcEvents=atoi(argv[2]);
 
-  //List of Source Files  
- 
+  //List of Source Files   
+  string SourceFilesDir			= "/data/sandro/Analisi/rel_CMSSW_4_2_5_commit/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/SourceFilesMuons/";
+
   string Data2011 			= "SourceFilesMuons/data.list";
   string DYtoLL_All 			= "SourceFilesMuons/DYtoLL_All.list";  
   string TTJets_All			= "SourceFilesMuons/TTJets_All.list";
@@ -85,25 +86,25 @@ int PreDefName, ProcEvents;
   string WWJetsTo2L2Nu_Sample		= "SourceFilesMuons/WWJetsTo2L2Nu_Sample.list";
   string QCD_Pt20MuEnPt10_Sample	= "SourceFilesMuons/QCD_Pt20MuEnPt10_Sample.list";
   
-  string Test 		        	= "SourceFilesMuons/Sandro.list";
+  string Test 		        	= "Test.list";
   sample = "mc";
   
   //Path of PATAnalysis dir - DO NOT FORGET THE SLASH AT THE END OF THE PATH
-  string path="/data/sfrosali/Zjets/Commit/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/";
+  string path="/data/sandro/Analisi/rel_CMSSW_4_2_5_commit/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/PythonMuons/";
   
   //Modules
-  bool GEN    = true;
-  bool RECO   = true;
-  bool EFF    = true;
-  bool NTUPLE = true;
+  bool GEN    = false;
+  bool RECO   = false;
+  bool EFF    = false;
+  bool NTUPLE = false;
   bool DELTAR = true;
   
   //Ntuple - "zcand" = saves only z candidates; "acc" = save only events with Z in the acceptance; "all" = saves all the events  
   string NtupleFill = "all";
   
-  //Cuts
+  //Cuts: if number = 0, the cut doesn't affect the Z REC selection  
   int Acc     = 1;
-  int Trg     = 5;
+  int Trg     = 0;
   int Imp     = 2;
   int Qual    = 3;
   int Iso     = 4;
@@ -132,7 +133,7 @@ int PreDefName, ProcEvents;
   
   //Sample: Data -> "data"; MC -> "mc"
   
-  if(PreDefName==-9)sourceList = Test.c_str();  
+  if(PreDefName==-9)sourceList = (SourceFilesDir + Test).c_str();  
  
   if(PreDefName==0){
     sourceList = Data2011.c_str();  
@@ -336,7 +337,7 @@ int PreDefName, ProcEvents;
   
   }
 
-  gEnv->SetValue("Proof.Sandbox", "/data/sfrosali/.proof");
+  gEnv->SetValue("Proof.Sandbox", "/data/sandro/.proof");
 
   TProof * p = TProof::Open("");
   
@@ -346,7 +347,7 @@ int PreDefName, ProcEvents;
   AutoLibraryLoader::enable();
   gSystem->Load("libFirenzePATAnalysis");
 
-  p->Exec(".x remote.C");
+  p->Exec(".x /data/sandro/Analisi/rel_CMSSW_4_2_5_commit/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/remote.C");
 
   if(PreDefName>-1 || PreDefName==-9){
   TDSet* SignalDS = getDS(sourceList.c_str());

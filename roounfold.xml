@@ -1,7 +1,7 @@
   <tool name="roounfold" version="0.2.0">
     <lib name="RooUnfold"/>
     <client>
-      <environment name="ROOUNFOLD_BASE" default="/data/sfrosali/Zjets/RooUnfold/RooUnfold-0.2.0"/>
+      <environment name="ROOUNFOLD_BASE" default="/data/sandro/Analisi/RooUnfold-0.2.0"/>
       <environment name="LIBDIR" default="$ROOUNFOLD_BASE"/>
       <environment name="INCLUDE" default="$ROOUNFOLD_BASE/src"/>
     </client>

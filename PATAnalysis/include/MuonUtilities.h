@@ -16,6 +16,7 @@
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 #include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
+#include "DataFormats/Math/interface/deltaR.h"
 
 #include <vector>
 #include <map>
@@ -89,7 +90,7 @@ return TrgVector;
 static double etamucut = 2.4;
 static double eta_mu_excl_up = 1.499;             //Excluded Eta region
 static double eta_mu_excl_down = 1.501;           //Excluded Eta region
-static double dxycut = 0.02;     //cm
+static double dxycut = 0.2;     //cm
 
 //Jets
 static bool JetIDReq = true;
@@ -226,20 +227,25 @@ static string ASYM1_TAG_MuID = ""; //if "" no MuID cut applied
 
 // Z Daughters Methods
 
+
+// Class to sort two object by pt
 template <class T> bool sortByPt(const T* j1, const T* j2){ return j1->pt() > j2->pt() ; }
 
+
+// Clone Candidate: it returns the pat candidate casting a reco Candidate or its Shallow Clone 
 inline const pat::Muon* CloneCandidate(const reco::Candidate& Daughter){
 
-const pat::Muon* dau = dynamic_cast<const pat::Muon*>(&Daughter);
+	const pat::Muon* dau = dynamic_cast<const pat::Muon*>(&Daughter);
 
-if(!dau){
-const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (&Daughter);
-     if (scc && scc->hasMasterClone()){
-       dau = dynamic_cast<const pat::Muon*>(scc->masterClone().get()); 
-     }
-     }
-  return dau;
+	if(!dau){
+		const reco::ShallowCloneCandidate* scc = dynamic_cast<const reco::ShallowCloneCandidate*> (&Daughter);
+     		if (scc && scc->hasMasterClone()){
+       			dau = dynamic_cast<const pat::Muon*>(scc->masterClone().get()); 
+     		}
+     	}
+  	return dau;
 }
+
 
 inline std::vector<const reco::Candidate*> ZGENDaughters(const std::vector<reco::CompositeCandidate>& ZGEN){
 
@@ -293,9 +299,11 @@ inline std::vector<const reco::Candidate*> ZGENDaughters(const std::vector<reco:
   
 }
 
+
+// it returns a vector of 2 Muons from a REC Z sorted by pt
 inline std::vector<const pat::Muon*> ZRECDaughters(const std::vector<reco::CompositeCandidate>& ZREC){
   
- std::vector<const pat::Muon*> zdaughters;
+  std::vector<const pat::Muon*> zdaughters;
  
   const pat::Muon* dau0 = CloneCandidate(*(ZREC[0].daughter(0)));
   const pat::Muon* dau1 = CloneCandidate(*(ZREC[0].daughter(1)));
@@ -303,16 +311,15 @@ inline std::vector<const pat::Muon*> ZRECDaughters(const std::vector<reco::Compo
   const pat::Muon* leading = 0;
   const pat::Muon* second = 0;
   
- if(dau0 && dau1){ 
- leading = dau0->pt() > dau1->pt() ? dau0 : dau1;
- second  = dau0->pt() > dau1->pt() ? dau1 : dau0;
- }
+  if(dau0 && dau1){ 
+  	leading = dau0->pt() > dau1->pt() ? dau0 : dau1;
+  	second  = dau0->pt() > dau1->pt() ? dau1 : dau0;
+  }
 
  zdaughters.push_back(leading);
  zdaughters.push_back(second);
   
  return zdaughters;
-  
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -340,14 +347,14 @@ inline bool GenSelectedInAcceptance(const std::vector<reco::CompositeCandidate>&
   
   if(selections=="SYM"){
   return ZGEN[0].mass() > zmassmin_sym && ZGEN[0].mass() < zmassmax_sym 
-         && dau0->pt() > ptmucut && fabs(dau0->eta()) < etamucut
-         && dau1->pt() > ptmucut && fabs(dau1->eta()) < etamucut
+         && dau0->pt() >= ptmucut && fabs(dau0->eta()) <= etamucut
+         && dau1->pt() >= ptmucut && fabs(dau1->eta()) <= etamucut
          && (fabs(dau0->eta())<eta_mu_excl_down || fabs(dau0->eta())>eta_mu_excl_up) && 
 	    (fabs(dau1->eta())<eta_mu_excl_down || fabs(dau1->eta())>eta_mu_excl_up);
  }else if(selections=="ASYM"){
  return ZGEN[0].mass() > zmassmin_asym && ZGEN[0].mass() < zmassmax_asym 
-         && dau0->pt() > ptmucut0 && fabs(dau0->eta()) < etamucut
-         && dau1->pt() > ptmucut1 && fabs(dau1->eta()) < etamucut
+         && dau0->pt() >= ptmucut0 && fabs(dau0->eta()) <= etamucut
+         && dau1->pt() >= ptmucut1 && fabs(dau1->eta()) <= etamucut
          && (fabs(dau0->eta())<eta_mu_excl_down || fabs(dau0->eta())>eta_mu_excl_up) && 
 	    (fabs(dau1->eta())<eta_mu_excl_down || fabs(dau1->eta())>eta_mu_excl_up);
  }else{
@@ -359,6 +366,9 @@ inline bool GenSelectedInAcceptance(const std::vector<reco::CompositeCandidate>&
  
 }
 
+
+// GEN Z Candidate: it is true if there is 1 GEN Z with mass cut decaying in two Muons in the Acceptance (geometrical and kinematic) region.
+// The selection is optimized for Muons in status = 1. 
 inline bool GenSelectedInAcceptanceStatus1(const std::vector<reco::CompositeCandidate>& ZGEN, string selections){
 
   if (ZGEN.size() == 0) return false;
@@ -375,23 +385,24 @@ inline bool GenSelectedInAcceptanceStatus1(const std::vector<reco::CompositeCand
   const reco::Candidate* second  = dau0->pt() > dau1->pt() ? dau1 : dau0;
 
   if(selections=="SYM"){
-  return ZGEN.size()==1 
-         && ZGEN[0].mass() > zmassmin_sym && ZGEN[0].mass() < zmassmax_sym 
-         && leading->pt() > ptmucut && fabs(leading->eta()) < etamucut
-         && second->pt() > ptmucut && fabs(second->eta()) < etamucut
-         && (fabs(leading->eta())<eta_mu_excl_down || fabs(leading->eta())>eta_mu_excl_up) && 
-	    (fabs(second->eta())<eta_mu_excl_down || fabs(second->eta())>eta_mu_excl_up);
- }else if(selections=="ASYM"){
- return  ZGEN.size()==1 
-         && ZGEN[0].mass() > zmassmin_asym && ZGEN[0].mass() < zmassmax_asym 
-         && leading->pt() > ptmucut0 && fabs(leading->eta()) < etamucut
-         && second->pt() > ptmucut1 && fabs(second->eta()) < etamucut
-         && (fabs(leading->eta())<eta_mu_excl_down || fabs(leading->eta())>eta_mu_excl_up) && 
-	    (fabs(second->eta())<eta_mu_excl_down || fabs(second->eta())>eta_mu_excl_up);
- }else{
- return false;
- }
-
+  	return ZGEN.size()==1 &&
+               ZGEN[0].mass() > zmassmin_sym && ZGEN[0].mass() < zmassmax_sym &&
+               leading->pt() >= ptmucut && fabs(leading->eta()) <= etamucut &&
+               second->pt() >= ptmucut && fabs(second->eta()) <= etamucut &&
+               (fabs(leading->eta())<eta_mu_excl_down || fabs(leading->eta())>eta_mu_excl_up) && 
+	       (fabs(second->eta())<eta_mu_excl_down || fabs(second->eta())>eta_mu_excl_up);
+  }
+  else if(selections=="ASYM"){
+  	return ZGEN.size()==1 &&
+  	       ZGEN[0].mass() > zmassmin_asym && ZGEN[0].mass() < zmassmax_asym && 
+  	       leading->pt() >= ptmucut0 && fabs(leading->eta()) <= etamucut &&
+  	       second->pt() >= ptmucut1 && fabs(second->eta()) <= etamucut &&
+	       (fabs(leading->eta())<eta_mu_excl_down || fabs(leading->eta())>eta_mu_excl_up) && 
+  	       (fabs(second->eta())<eta_mu_excl_down || fabs(second->eta())>eta_mu_excl_up);
+  }
+  else{
+  	return false;
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -487,212 +498,235 @@ return trigmatch;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// REC SELECTION
-  
+// Z REC SELECTION
+
+//REC Z Candidate: it is true if there is 1 REC Z with Mass cut decaying in two Muons with these cuts: Acceptance (geometrical and kinematic), Quality, Impact Parameter, Isolation with rho.  
 inline bool RecSelected(string Flag, const std::vector<reco::CompositeCandidate>& ZREC, const pat::TriggerEvent& triggers, int run, double rho){
 
   std::vector<const pat::Muon*> zdaughters; 
   
   if(ZREC.size()!=0){
-  zdaughters = ZRECDaughters(ZREC);
-  }else{
-  return false;}
-  
-  if(!zdaughters.size()){
-  return false;
-  }else{
-  
-  const pat::Muon* dau0 = zdaughters[0];
-  const pat::Muon* dau1 = zdaughters[1];
- 
-  bool iso0 = false;	
-  bool iso1 = false;
-			
-  bool muon_ID0 = false;
-  bool muon_ID1 = false;
-  
-  bool qual0 = false;
-  bool qual1 = false;
-
-  if(Flag=="_AccSYM"){
-  return ZREC[0].mass()>zmassmin_sym && ZREC[0].mass()<zmassmax_sym
-         && dau0->pt() > ptmucut && fabs(dau0->eta()) < etamucut 
-         && dau1->pt() > ptmucut && fabs(dau1->eta()) < etamucut
-         && (fabs(dau0->eta())<eta_mu_excl_down || fabs(dau0->eta())>eta_mu_excl_up) &&
-            (fabs(dau1->eta())<eta_mu_excl_down || fabs(dau1->eta())>eta_mu_excl_up);
-         }
-  else if(Flag=="_AccASYM"){
-  return ZREC[0].mass()>zmassmin_asym && ZREC[0].mass()<zmassmax_asym
-         && dau0->pt() > ptmucut0 && fabs(dau0->eta()) < etamucut 
-         && dau1->pt() > ptmucut1 && fabs(dau1->eta()) < etamucut
-         && (fabs(dau0->eta())<eta_mu_excl_down || fabs(dau0->eta())>eta_mu_excl_up) &&
-            (fabs(dau1->eta())<eta_mu_excl_down || fabs(dau1->eta())>eta_mu_excl_up);
-         }
-  else if(Flag=="_Trg"){
-  bool cutTrg = false;
-  if(muTrgMatchReq==true){
-  if(isMuonTriggered(triggers, run)&&(RecSelected_TrgMatch(*dau0, triggers, run)))cutTrg=true;
-  }else if(muTrgMatchReq==false){
-  if(isMuonTriggered(triggers, run))cutTrg=true;
-  }
-  return cutTrg;
-  }
-  else if(Flag=="_QualSYM"){
-  
-  float ptRelErr0 = (dau0->userFloat("ptError"))/dau0->pt();
-  float ptRelErr1 = (dau1->userFloat("ptError"))/dau1->pt();
-  
-  if(muon::isGoodMuon(*dau0, muon::GlobalMuonPromptTight) &&   
-         dau0->isGlobalMuon() && 
-         dau0->userFloat("normChi2") < maxchi2_SYM &&         
-         dau0->userFloat("numberOfValidMuonHits") > minMuHit_SYM && 
-         dau0->userFloat("numberOfMatchedStations") > minMatSta_SYM && 
-         dau0->userFloat("numberOfValidPixelHitsTr") > minVaPiHitTr_SYM && 
-         dau0->userFloat("numberOfValidTrackerHits") > minVaTrHit_SYM && 
-         dau0->userFloat("numberOfValidHits") >= minVaHit_SYM && 
-         dau0->userFloat("numberOfValidPixelHitsInTr") >= minVaPiHitInTr_SYM && 
-         dau0->userFloat("numberOfMatches") >= minMat_SYM && 
-         ptRelErr0 <= maxPtRelErr_SYM)qual0 = true;
-         
-  if(muon::isGoodMuon(*dau1, muon::GlobalMuonPromptTight) && 
-         dau1->isGlobalMuon() && 
-         dau1->userFloat("normChi2") < maxchi2_SYM &&          
-         dau1->userFloat("numberOfValidMuonHits") > minMuHit_SYM && 
-         dau1->userFloat("numberOfMatchedStations") > minMatSta_SYM && 
-         dau1->userFloat("numberOfValidPixelHitsTr") > minVaPiHitTr_SYM &&
-         dau1->userFloat("numberOfValidTrackerHits") > minVaTrHit_SYM && 
-         dau1->userFloat("numberOfValidHits") >= minVaHit_SYM && 
-         dau1->userFloat("numberOfValidPixelHitsInTr") >= minVaPiHitInTr_SYM && 
-         dau1->userFloat("numberOfMatches") >= minMat_SYM && 
-         ptRelErr1 <= maxPtRelErr_SYM)qual1 = true;
-  
-  return qual0 && qual1;
-  } 
-  else if(Flag=="_QualASYM"){
-  
-  float ptRelErr0 = (dau0->userFloat("ptError"))/dau0->pt();
-  float ptRelErr1 = (dau1->userFloat("ptError"))/dau1->pt();
-  
-  if(muon::isGoodMuon(*dau0, muon::GlobalMuonPromptTight) &&    
-         dau0->isGlobalMuon() && 
-         dau0->userFloat("normChi2") < maxchi2_ASYM0 &&         
-         dau0->userFloat("numberOfValidMuonHits") > minMuHit_ASYM0 && 
-         dau0->userFloat("numberOfMatchedStations") > minMatSta_ASYM0 && 
-         dau0->userFloat("numberOfValidPixelHitsTr") > minVaPiHitTr_ASYM0 && 
-         dau0->userFloat("numberOfValidTrackerHits") > minVaTrHit_ASYM0 && 
-         dau0->userFloat("numberOfValidHits") >= minVaHit_ASYM0 && 
-         dau0->userFloat("numberOfValidPixelHitsInTr") >= minVaPiHitInTr_ASYM0 && 
-         dau0->userFloat("numberOfMatches") >= minMat_ASYM0 && 
-         ptRelErr0 <= maxPtRelErr_ASYM0)qual0 = true;
-         
-  if(muon::isGoodMuon(*dau1, muon::GlobalMuonPromptTight) &&    
-         dau1->isGlobalMuon() && 
-         dau1->userFloat("normChi2") < maxchi2_ASYM1 &&        
-         dau1->userFloat("numberOfValidMuonHits") > minMuHit_ASYM1 && 
-         dau1->userFloat("numberOfMatchedStations") > minMatSta_ASYM1 && 
-         dau1->userFloat("numberOfValidPixelHitsTr") > minVaPiHitTr_ASYM1 && 
-         dau1->userFloat("numberOfValidTrackerHits") > minVaTrHit_ASYM1 && 
-         dau1->userFloat("numberOfValidHits") >= minVaHit_ASYM1 && 
-         dau1->userFloat("numberOfValidPixelHitsInTr") >= minVaPiHitInTr_ASYM1 && 
-         dau1->userFloat("numberOfMatches") >= minMat_ASYM1 && 
-         ptRelErr1 <= maxPtRelErr_ASYM1)qual1 = true;
-  
-  return qual0 && qual1;
-  }  
-  else if(Flag=="_Imp"){
-  return dau0->dB() < dxycut && dau1->dB() < dxycut;
-         }
-  else if(Flag=="_IsoSYM"){
-  
-  const reco::MuonIsolation& iso03_0 = dau0->isolationR03(); 
-  const reco::MuonIsolation& iso03_1 = dau1->isolationR03();
-  
-  float muEta0 = dau0->eta(); 
-  float muEta1 = dau1->eta(); 
-  
-  float Aecal0 = cAecalEE_SYM;
-  float Ahcal0 = cAhcalHE_SYM;
-  float Aecal1 = cAecalEE_SYM;
-  float Ahcal1 = cAhcalHE_SYM;
-  
-  if (fabs(muEta0) < maxmuEta_SYM) {
-  Aecal0 = cAecalEB_SYM;
-  Ahcal0 = cAhcalEE_SYM;
-  }
-  
-  if (fabs(muEta1) < maxmuEta_SYM) {
-  Aecal1 = cAecalEB_SYM;
-  Ahcal1 = cAhcalEE_SYM;
-  }
-  
-  float muonIsoRho0 = (iso03_0.sumPt + max(0.,iso03_0.emEt-Aecal0*(rho)) + max(0.,iso03_0.hadEt-Ahcal0*(rho)))/dau0->pt();
-  
-  float muonIsoRho1 = (iso03_1.sumPt + max(0.,iso03_1.emEt-Aecal1*(rho)) + max(0.,iso03_1.hadEt-Ahcal1*(rho)))/dau1->pt();
-  
-  if(muonIsoRho0 <= muonIsoRhoCut_SYM)iso0 = true;
-  if(muonIsoRho1 <= muonIsoRhoCut_SYM)iso1 = true;
-         
-  return iso0 && iso1;       
-  
-  }
-  else if(Flag=="_IsoASYM"){
- 
-  const reco::MuonIsolation& iso03_0 = dau0->isolationR03(); 
-  const reco::MuonIsolation& iso03_1 = dau1->isolationR03();
-  
-  float muEta0 = dau0->eta();
-  float muEta1 = dau1->eta(); 
-  
-  float Aecal0 = cAecalEE_ASYM0;
-  float Ahcal0 = cAhcalHE_ASYM0;
-  float Aecal1 = cAecalEE_ASYM1;
-  float Ahcal1 = cAhcalHE_ASYM1;
-  
-  if (fabs(muEta0) < maxmuEta_ASYM0) {
-  Aecal0 = cAecalEB_ASYM0;
-  Ahcal0 = cAhcalEE_ASYM0;
-  }
-  
-  if (fabs(muEta1) < maxmuEta_ASYM1) {
-  Aecal1 = cAecalEB_ASYM1;
-  Ahcal1 = cAhcalEE_ASYM1;
-  }
-  
-  float muonIsoRho0 = (iso03_0.sumPt + max(0.,iso03_0.emEt-Aecal0*(rho)) + max(0.,iso03_0.hadEt-Ahcal0*(rho)))/dau0->pt();
-  
-  float muonIsoRho1 = (iso03_1.sumPt + max(0.,iso03_1.emEt-Aecal1*(rho)) + max(0.,iso03_1.hadEt-Ahcal1*(rho)))/dau1->pt();
-  
-  if(muonIsoRho0 <= muonIsoRhoCut_ASYM0)iso0 = true;
-  if(muonIsoRho1 <= muonIsoRhoCut_ASYM1)iso1 = true;
-         
-  return iso0 && iso1;       
-  
-  }
-  else if(Flag=="_MuIDSYM"){
-  if(dau0->muonID(muID_SYM.c_str())==1.0)muon_ID0 = true;
-  if(dau1->muonID(muID_SYM.c_str())==1.0)muon_ID1 = true;
-  return muon_ID0 && muon_ID1;
-  }
-  else if(Flag=="_MuIDASYM"){
-  if(dau0->muonID(muID_ASYM0.c_str())==7.0 || dau0->muonID(muID_ASYM0.c_str())==1.0 || dau0->muonID(muID_ASYM0.c_str())==3.0 || dau0->muonID(muID_ASYM0.c_str())==5.0)muon_ID0 = true;
-  if(dau1->muonID(muID_ASYM1.c_str())==7.0 || dau1->muonID(muID_ASYM1.c_str())==1.0 || dau1->muonID(muID_ASYM1.c_str())==3.0 || dau1->muonID(muID_ASYM1.c_str())==5.0)muon_ID1 = true;
-  return muon_ID0 && muon_ID1;
-  }
-  else if(Flag=="_1"){
-  return true;
+  	zdaughters = ZRECDaughters(ZREC);
   }
   else{
-  return false;
+  	return false;
   }
   
+  if(!zdaughters.size()){
+  	return false;
   }
+  else{
   
+  	const pat::Muon* dau0 = zdaughters[0];
+  	const pat::Muon* dau1 = zdaughters[1];
+	 
+	  bool iso0 = false;	
+	  bool iso1 = false;
+				
+	  bool muon_ID0 = false;
+	  bool muon_ID1 = false;
+	  
+	  bool qual0 = false;
+	  bool qual1 = false;
+	
+	  if(Flag=="_AccSYM"){
+	  	return ZREC[0].mass()>zmassmin_sym && ZREC[0].mass()<zmassmax_sym &&
+	               dau0->pt() >= ptmucut && fabs(dau0->eta()) <= etamucut &&
+	               dau1->pt() >= ptmucut && fabs(dau1->eta()) <= etamucut &&
+	               (fabs(dau0->eta())<eta_mu_excl_down || fabs(dau0->eta())>eta_mu_excl_up) &&
+	               (fabs(dau1->eta())<eta_mu_excl_down || fabs(dau1->eta())>eta_mu_excl_up);
+	  }
+	
+	  else if(Flag=="_AccASYM"){
+	  	return ZREC[0].mass()>zmassmin_asym && ZREC[0].mass()<zmassmax_asym &&
+	  	       dau0->pt() >= ptmucut0 && fabs(dau0->eta()) <= etamucut &&
+	  	       dau1->pt() >= ptmucut1 && fabs(dau1->eta()) <= etamucut &&
+	  	       (fabs(dau0->eta())<eta_mu_excl_down || fabs(dau0->eta())>eta_mu_excl_up) &&
+	               (fabs(dau1->eta())<eta_mu_excl_down || fabs(dau1->eta())>eta_mu_excl_up);
+	  }
+	
+	  else if(Flag=="_Trg"){
+	  	bool cutTrg = false;
+	  	if(muTrgMatchReq==true){
+	  		if(isMuonTriggered(triggers, run) && (RecSelected_TrgMatch(*dau0, triggers, run))) 
+				cutTrg=true;
+	  	}
+		else if(muTrgMatchReq==false){
+	  		if(isMuonTriggered(triggers, run)) 
+				cutTrg=true;
+	  	}
+	  	return cutTrg;
+	  }
+	
+	  else if(Flag=="_QualSYM"){
+	  
+	  	float ptRelErr0 = (dau0->userFloat("ptError"))/dau0->pt();
+	  	float ptRelErr1 = (dau1->userFloat("ptError"))/dau1->pt();
+	  
+	  	if(muon::isGoodMuon(*dau0, muon::GlobalMuonPromptTight) &&   
+	           dau0->isGlobalMuon() && 
+	           dau0->userFloat("normChi2") < maxchi2_SYM &&         
+	           dau0->userFloat("numberOfValidMuonHits") > minMuHit_SYM && 
+	           dau0->userFloat("numberOfMatchedStations") > minMatSta_SYM && 
+	           dau0->userFloat("numberOfValidPixelHitsTr") > minVaPiHitTr_SYM && 
+	           dau0->userFloat("numberOfValidTrackerHits") > minVaTrHit_SYM && 
+	           dau0->userFloat("numberOfValidHits") >= minVaHit_SYM && 
+	           dau0->userFloat("numberOfValidPixelHitsInTr") >= minVaPiHitInTr_SYM && 
+	           dau0->userFloat("numberOfMatches") >= minMat_SYM && 
+	           ptRelErr0 <= maxPtRelErr_SYM)
+	  		qual0 = true;
+	         
+	  	if(muon::isGoodMuon(*dau1, muon::GlobalMuonPromptTight) && 
+	  	   dau1->isGlobalMuon() && 
+	  	   dau1->userFloat("normChi2") < maxchi2_SYM &&          
+	  	   dau1->userFloat("numberOfValidMuonHits") > minMuHit_SYM && 
+	  	   dau1->userFloat("numberOfMatchedStations") > minMatSta_SYM && 
+	  	   dau1->userFloat("numberOfValidPixelHitsTr") > minVaPiHitTr_SYM &&
+	  	   dau1->userFloat("numberOfValidTrackerHits") > minVaTrHit_SYM && 
+	  	   dau1->userFloat("numberOfValidHits") >= minVaHit_SYM && 
+	  	   dau1->userFloat("numberOfValidPixelHitsInTr") >= minVaPiHitInTr_SYM && 
+	  	   dau1->userFloat("numberOfMatches") >= minMat_SYM && 
+	  	   ptRelErr1 <= maxPtRelErr_SYM)
+	  		qual1 = true;
+	  
+	  	return qual0 && qual1;
+	  } 
+	  else if(Flag=="_QualASYM"){
+	  
+	  	float ptRelErr0 = (dau0->userFloat("ptError"))/dau0->pt();
+	  	float ptRelErr1 = (dau1->userFloat("ptError"))/dau1->pt();
+	  
+	  	if(muon::isGoodMuon(*dau0, muon::GlobalMuonPromptTight) &&    
+	  	   dau0->isGlobalMuon() && 
+	  	   dau0->userFloat("normChi2") < maxchi2_ASYM0 &&         
+	  	   dau0->userFloat("numberOfValidMuonHits") > minMuHit_ASYM0 && 
+	  	   dau0->userFloat("numberOfMatchedStations") > minMatSta_ASYM0 && 
+	  	   dau0->userFloat("numberOfValidPixelHitsTr") > minVaPiHitTr_ASYM0 && 
+	  	   dau0->userFloat("numberOfValidTrackerHits") > minVaTrHit_ASYM0 && 
+	  	   dau0->userFloat("numberOfValidHits") >= minVaHit_ASYM0 && 
+	  	   dau0->userFloat("numberOfValidPixelHitsInTr") >= minVaPiHitInTr_ASYM0 && 
+	  	   dau0->userFloat("numberOfMatches") >= minMat_ASYM0 && 
+	  	   ptRelErr0 <= maxPtRelErr_ASYM0)
+	  		qual0 = true;
+	         
+	  	if(muon::isGoodMuon(*dau1, muon::GlobalMuonPromptTight) &&    
+	  	   dau1->isGlobalMuon() && 
+	  	   dau1->userFloat("normChi2") < maxchi2_ASYM1 &&        
+	  	   dau1->userFloat("numberOfValidMuonHits") > minMuHit_ASYM1 && 
+	  	   dau1->userFloat("numberOfMatchedStations") > minMatSta_ASYM1 && 
+	  	   dau1->userFloat("numberOfValidPixelHitsTr") > minVaPiHitTr_ASYM1 && 
+	  	   dau1->userFloat("numberOfValidTrackerHits") > minVaTrHit_ASYM1 && 
+	  	   dau1->userFloat("numberOfValidHits") >= minVaHit_ASYM1 && 
+	  	   dau1->userFloat("numberOfValidPixelHitsInTr") >= minVaPiHitInTr_ASYM1 && 
+	  	   dau1->userFloat("numberOfMatches") >= minMat_ASYM1 && 
+	  	   ptRelErr1 <= maxPtRelErr_ASYM1) 
+	  		qual1 = true;
+	  
+	  	return qual0 && qual1;
+	  }  
+	
+	  else if(Flag=="_Imp"){
+	  	return dau0->dB() < dxycut && dau1->dB() < dxycut;
+	  }
+	
+	  else if(Flag=="_IsoSYM"){
+	  
+	  	const reco::MuonIsolation& iso03_0 = dau0->isolationR03(); 
+	  	const reco::MuonIsolation& iso03_1 = dau1->isolationR03();
+	  
+	  	float muEta0 = dau0->eta(); 
+	  	float muEta1 = dau1->eta(); 
+	  
+	  	float Aecal0 = cAecalEE_SYM;
+	 	float Ahcal0 = cAhcalHE_SYM;
+	  	float Aecal1 = cAecalEE_SYM;
+	  	float Ahcal1 = cAhcalHE_SYM;
+	  
+	  	if (fabs(muEta0) < maxmuEta_SYM) {
+	  		Aecal0 = cAecalEB_SYM;
+	  		Ahcal0 = cAhcalEE_SYM;
+	  	}
+	  
+	  	if (fabs(muEta1) < maxmuEta_SYM) {
+	  		Aecal1 = cAecalEB_SYM;
+	  		Ahcal1 = cAhcalEE_SYM;
+	  	}
+	  
+	  	float muonIsoRho0 = (iso03_0.sumPt + max(0.,iso03_0.emEt-Aecal0*(rho)) + max(0.,iso03_0.hadEt-Ahcal0*(rho)))/dau0->pt();
+	  
+	  	float muonIsoRho1 = (iso03_1.sumPt + max(0.,iso03_1.emEt-Aecal1*(rho)) + max(0.,iso03_1.hadEt-Ahcal1*(rho)))/dau1->pt();
+	  
+	  	if(muonIsoRho0 <= muonIsoRhoCut_SYM) iso0 = true;
+	  	if(muonIsoRho1 <= muonIsoRhoCut_SYM) iso1 = true;
+	         
+	  	return iso0 && iso1;       
+	  
+	  }
+	
+	  else if(Flag=="_IsoASYM"){
+	 
+	  	const reco::MuonIsolation& iso03_0 = dau0->isolationR03(); 
+	  	const reco::MuonIsolation& iso03_1 = dau1->isolationR03();
+	  
+	  	float muEta0 = dau0->eta();
+	  	float muEta1 = dau1->eta(); 
+	  
+	  	float Aecal0 = cAecalEE_ASYM0;
+	  	float Ahcal0 = cAhcalHE_ASYM0;
+	  	float Aecal1 = cAecalEE_ASYM1;
+	  	float Ahcal1 = cAhcalHE_ASYM1;
+	  
+	  	if (fabs(muEta0) < maxmuEta_ASYM0) {
+	  		Aecal0 = cAecalEB_ASYM0;
+	  		Ahcal0 = cAhcalEE_ASYM0;
+	  	}
+	  
+	  	if (fabs(muEta1) < maxmuEta_ASYM1) {
+	  		Aecal1 = cAecalEB_ASYM1;
+	  		Ahcal1 = cAhcalEE_ASYM1;
+	  	}
+	  
+	  	float muonIsoRho0 = (iso03_0.sumPt + max(0.,iso03_0.emEt-Aecal0*(rho)) + max(0.,iso03_0.hadEt-Ahcal0*(rho)))/dau0->pt();
+	  
+	  	float muonIsoRho1 = (iso03_1.sumPt + max(0.,iso03_1.emEt-Aecal1*(rho)) + max(0.,iso03_1.hadEt-Ahcal1*(rho)))/dau1->pt();
+	  
+	  	if(muonIsoRho0 <= muonIsoRhoCut_ASYM0) iso0 = true;
+	  	if(muonIsoRho1 <= muonIsoRhoCut_ASYM1) iso1 = true;
+	         
+	  	return iso0 && iso1;       
+	  
+	  }
+	
+	  else if(Flag=="_MuIDSYM"){
+	  	if(dau0->muonID(muID_SYM.c_str())==1.0) muon_ID0 = true;
+	  	if(dau1->muonID(muID_SYM.c_str())==1.0) muon_ID1 = true;
+	  	return muon_ID0 && muon_ID1;
+	  }
+	
+	  else if(Flag=="_MuIDASYM"){
+	  	if(dau0->muonID(muID_ASYM0.c_str())==7.0 || dau0->muonID(muID_ASYM0.c_str())==1.0 || dau0->muonID(muID_ASYM0.c_str())==3.0 || dau0->muonID(muID_ASYM0.c_str())==5.0) 
+			muon_ID0 = true;
+	  	if(dau1->muonID(muID_ASYM1.c_str())==7.0 || dau1->muonID(muID_ASYM1.c_str())==1.0 || dau1->muonID(muID_ASYM1.c_str())==3.0 || dau1->muonID(muID_ASYM1.c_str())==5.0) 
+			muon_ID1 = true;
+	  	return muon_ID0 && muon_ID1;
+	  }
+	
+	  else if(Flag=="_1"){
+	  	return true;
+	  }
+	
+	  else{
+	  	return false;
+	  }
+  }
 }
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Geometrical Methods
 
+// Delta Phi between a Muon and a Jet
 template<class MU> double Delta_Phi(const MU& Muon, const reco::Jet& jet){
 	
 	double deltaPhi = 0;
@@ -713,6 +747,8 @@ template<class MU> double Delta_Phi(const MU& Muon, const reco::Jet& jet){
 	
 }
 
+
+// Delta Eta between a Muon and a Jet
 template<class MU> double Delta_Eta(const MU& Muon, const reco::Jet& jet){
 
 	double deltaEta = Muon.eta() - jet.eta();
@@ -721,6 +757,8 @@ template<class MU> double Delta_Eta(const MU& Muon, const reco::Jet& jet){
 	
 }
 
+
+// Delta R between a Muon and a Jet
 template<class MU> double Delta_R(const MU& Muon, const reco::Jet& jet){
 
 	double deltaR = sqrt(pow(Delta_Phi<MU>(Muon,jet),2) + pow(Delta_Eta<MU>(Muon,jet),2));
@@ -729,6 +767,8 @@ template<class MU> double Delta_R(const MU& Muon, const reco::Jet& jet){
 	
 }
 
+
+// Delta R between 2 Muons and a Jet: it returns the Delta R value of the Muon-Jet couple for wich the Delta R is minimum
 template<class MUON> double MinDeltaRZDau(const std::vector<const MUON*>& muons, const reco::Jet& jet){
 
         double minDeltaRZDau = -999999;
@@ -743,6 +783,8 @@ template<class MUON> double MinDeltaRZDau(const std::vector<const MUON*>& muons,
 
 // Jet Methods
 
+
+// Jets Selector Utility: it returns a vector of Jets, selected for Acceptance (geometrical and kinematic)
 template<class JET> std::vector<const JET*> GetJets_noJetID(const std::vector<JET>& jets){
   std::vector<const JET*> selectedjets;
   for (unsigned int i = 0; i < jets.size();  ++i){
@@ -751,25 +793,28 @@ template<class JET> std::vector<const JET*> GetJets_noJetID(const std::vector<JE
   return selectedjets;
 }
 
+// Single Jet ID Selector Utility: it is true if the Jet pass the ID selection
 template<class JET> int jetID(const JET& jet){
 
    int jetID = -1;
    
    if (jet->isPFJet()) {
              
-   int   chm = jet->chargedHadronMultiplicity();
-   int   npr = jet->chargedMultiplicity() + jet->neutralMultiplicity();
-   float nhf = (jet->neutralHadronEnergy() + jet->HFHadronEnergy())/jet->energy();
-   float phf = jet->photonEnergyFraction();
-   float chf = jet->chargedHadronEnergyFraction();
-   float elf = (jet->electronEnergy())/(jet->energy());
+   	int   chm = jet->chargedHadronMultiplicity();
+   	int   npr = jet->chargedMultiplicity() + jet->neutralMultiplicity();
+   	float nhf = (jet->neutralHadronEnergy() + jet->HFHadronEnergy())/jet->energy();
+   	float phf = jet->photonEnergyFraction();
+   	float chf = jet->chargedHadronEnergyFraction();
+   	float elf = (jet->electronEnergy())/(jet->energy());
    
-   if(npr>1 && phf<0.99 && nhf<0.99 && ((fabs(jet->eta())<=2.4 && nhf<0.9 && phf<0.9 && elf<0.99 && chf>0 && chm>0) || fabs(jet->eta())>2.4)) jetID = 1;
+   	if(npr>1 && phf<0.99 && nhf<0.99 && ((fabs(jet->eta())<=2.4 && nhf<0.9 && phf<0.9 && elf<0.99 && chf>0 && chm>0) || fabs(jet->eta())>2.4)) 
+   		jetID = 1;
              
    }
 
    return jetID;
 }
+
 
 template<class JET> std::vector<const JET*> GetJets_wJECUnc(const std::vector<JET>& jets, JetCorrectionUncertainty& jecUnc, int JECUnc){
   std::vector<const JET*> selectedjets;
@@ -797,33 +842,51 @@ template<class JET> std::vector<const JET*> GetJets_wJECUnc(const std::vector<JE
   return selectedjets;
 }
 
+
+// Jets Selector Utility: it returns a vector of Jets, selected for Acceptance (geometrical and kinematic) and ID
 template<class JET> std::vector<const JET*> GetJets(const std::vector<JET>& jets){
   std::vector<const JET*> selectedjets;
   
   bool jetIDflag = true;
   
   for (unsigned int i = 0; i < jets.size();  ++i){
-  
-  if(JetIDReq){
-  jetIDflag=false;
-  if(jetID(&jets[i])==1)jetIDflag=true;
-  }
-  
-  if (jets[i].pt() > ptjetmin && fabs(jets[i].eta()) < etajetmax && jetIDflag) selectedjets.push_back(&jets[i]);
-  
+  	if(JetIDReq){
+  		jetIDflag=false;
+  		if(jetID(&jets[i])==1) jetIDflag=true;
+  	}
+  	if (jets[i].pt() > ptjetmin && fabs(jets[i].eta()) < etajetmax && jetIDflag)
+		selectedjets.push_back(&jets[i]);
   }
   
   return selectedjets;
 }
 
+// Jet Selector Utility: it returns a vector of Jets, cleaned from a vector of muons
+template<class JET> std::vector<const JET*> CleanJets(std::vector<const JET*> jets, const std::vector<const pat::Muon*> muons){
+  std::vector<const JET*> cleanedjets;
+
+  for (unsigned int i = 0; i < jets.size();  ++i){
+    bool close = false; 
+    for (unsigned int j = 0; j < muons.size();  ++j){
+      if (deltaR(jets[i]->p4(), muons[j]->p4()) < isojetcut){
+        close = true;
+        break;
+      }
+    }
+    if (!close) cleanedjets.push_back(jets[i]);
+  }
+  return cleanedjets;
+}
+
+
+//  Single Jet Selector Utility: it is true if the single Jet is Cleaned from a vector of Muons (2 Muons, because of the MinDeltaRZDau method)
 template<class MUON> bool IsoJet(const std::vector<const MUON*>& muons, const reco::Jet& jet){
 	
-	bool iso_jet = true;
+   bool iso_jet = true;
 	
-	if(MinDeltaRZDau<MUON>(muons,jet) < isojetcut) iso_jet = false;
+   if(MinDeltaRZDau<MUON>(muons,jet) < isojetcut) iso_jet = false;
 	
-	return iso_jet;
-	
+   return iso_jet;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -905,8 +968,8 @@ inline bool singleMu_Tag_SYM(const reco::Candidate& cand, int run, double rho){
   TAG_MuID = false;
   if(muon->muonID(SYM_TAG_MuID.c_str())==1.0)TAG_MuID = true;}
   
-  return muon->pt() > SYM_TAG_ptmucut && 
-  	 fabs(muon->eta()) < SYM_TAG_etamucut &&
+  return muon->pt() >= SYM_TAG_ptmucut && 
+  	 fabs(muon->eta()) <= SYM_TAG_etamucut &&
          (fabs(muon->eta()) < SYM_TAG_eta_mu_excl_down || fabs(muon->eta()) > SYM_TAG_eta_mu_excl_up) &&
          muon->dB() < SYM_TAG_dxycut &&
          TAG_qual &&
@@ -954,8 +1017,8 @@ inline bool singleMu_Tag_ASYM0(const reco::Candidate& cand, int run, double rho)
   TAG_MuID = false;
   if(muon->muonID(ASYM0_TAG_MuID.c_str())==1.0)TAG_MuID = true;}
   
-  return muon->pt() > ASYM0_TAG_ptmucut && 
-  	 fabs(muon->eta()) < ASYM0_TAG_etamucut &&
+  return muon->pt() >= ASYM0_TAG_ptmucut && 
+  	 fabs(muon->eta()) <= ASYM0_TAG_etamucut &&
          (fabs(muon->eta()) < ASYM0_TAG_eta_mu_excl_down || fabs(muon->eta()) > ASYM0_TAG_eta_mu_excl_up) &&
          muon->dB() < ASYM0_TAG_dxycut &&
          TAG_qual &&
@@ -1003,8 +1066,8 @@ inline bool singleMu_Tag_ASYM1(const reco::Candidate& cand, int run, double rho)
   TAG_MuID = false;
   if(muon->muonID(ASYM1_TAG_MuID.c_str())==1.0)TAG_MuID = true;}
   
-  return muon->pt() > ASYM1_TAG_ptmucut && 
-  	 fabs(muon->eta()) < ASYM1_TAG_etamucut &&
+  return muon->pt() >= ASYM1_TAG_ptmucut && 
+  	 fabs(muon->eta()) <= ASYM1_TAG_etamucut &&
          (fabs(muon->eta()) < ASYM1_TAG_eta_mu_excl_down || fabs(muon->eta()) > ASYM1_TAG_eta_mu_excl_up) &&
          muon->dB() < ASYM1_TAG_dxycut &&
          TAG_qual &&
@@ -1014,19 +1077,23 @@ inline bool singleMu_Tag_ASYM1(const reco::Candidate& cand, int run, double rho)
  return false;}
 }
 
+
 //Probe cuts SYM
+// Single Muon cut: Acceptance (geometrical and kinematic)
 inline bool singleMu_Probe_Acc_SYM(const reco::Candidate& cand, int run, double rho){
 
   const pat::Muon* muon = CloneCandidate(cand);
   
   if(muon){
-  return (          
-          muon->pt() > ptmucut 
-          && fabs(muon->eta()) < etamucut 
-          && (fabs(muon->eta())<eta_mu_excl_down || fabs(muon->eta())>eta_mu_excl_up));
-  }else{
-  return false;}
+  	return (muon->pt() >= ptmucut &&
+                fabs(muon->eta()) <= etamucut && 
+                (fabs(muon->eta())<eta_mu_excl_down || fabs(muon->eta())>eta_mu_excl_up));
   }
+  else{
+  	return false;
+  }
+}
+
 
 inline bool singleMu_Probe_Trg_SYM(const reco::Candidate& cand, int run, double rho){
   
@@ -1045,18 +1112,24 @@ inline bool singleMu_Probe_Trg_SYM(const reco::Candidate& cand, int run, double 
   return TPTrgMatch; 
   
  }
-    
+
+
+// Single Muon cut: Impact Parameter    
 inline bool singleMu_Probe_Imp(const reco::Candidate& cand, int run, double rho){
 
   const pat::Muon* muon = CloneCandidate(cand);
   
   if(muon){
-  return muon->dB() < dxycut;
-  }else{
-  return false;}
+  	return muon->dB() < dxycut;
   }
+  else{
+  	return false;
+  }
+}
+
   
-  inline bool singleMu_Probe_Qual_SYM(const reco::Candidate& cand, int run, double rho){
+// Single Muon cut: Quality 
+inline bool singleMu_Probe_Qual_SYM(const reco::Candidate& cand, int run, double rho){
 
   const pat::Muon* mu = CloneCandidate(cand);
   
@@ -1064,24 +1137,26 @@ inline bool singleMu_Probe_Imp(const reco::Candidate& cand, int run, double rho)
   
   if(mu){
   
-  float ptRelErr = (mu->userFloat("ptError"))/mu->pt();
+  	float ptRelErr = (mu->userFloat("ptError"))/mu->pt();
   
-  if(muon::isGoodMuon(*mu, muon::GlobalMuonPromptTight) &&   
-         mu->isGlobalMuon() && 
-         mu->userFloat("normChi2") < maxchi2_SYM &&         
-         mu->userFloat("numberOfValidMuonHits") > minMuHit_SYM && 
-         mu->userFloat("numberOfMatchedStations") > minMatSta_SYM && 
-         mu->userFloat("numberOfValidPixelHitsTr") > minVaPiHitTr_SYM && 
-         mu->userFloat("numberOfValidTrackerHits") > minVaTrHit_SYM && 
-         mu->userFloat("numberOfValidHits") >= minVaHit_SYM && 
-         mu->userFloat("numberOfValidPixelHitsInTr") >= minVaPiHitInTr_SYM && 
-         mu->userFloat("numberOfMatches") >= minMat_SYM && 
-         ptRelErr <= maxPtRelErr_SYM)qual = true;
-         
+  	if(muon::isGoodMuon(*mu, muon::GlobalMuonPromptTight) &&   
+         	mu->isGlobalMuon() && 
+         	mu->userFloat("normChi2") < maxchi2_SYM &&         
+         	mu->userFloat("numberOfValidMuonHits") > minMuHit_SYM && 
+         	mu->userFloat("numberOfMatchedStations") > minMatSta_SYM && 
+         	mu->userFloat("numberOfValidPixelHitsTr") > minVaPiHitTr_SYM && 
+         	mu->userFloat("numberOfValidTrackerHits") > minVaTrHit_SYM && 
+         	mu->userFloat("numberOfValidHits") >= minVaHit_SYM && 
+         	mu->userFloat("numberOfValidPixelHitsInTr") >= minVaPiHitInTr_SYM && 
+         	mu->userFloat("numberOfMatches") >= minMat_SYM && 
+         	ptRelErr <= maxPtRelErr_SYM)
+  			qual = true;
   }       
   return qual;
 }
+
   
+// Single Muon cut: Isolation with rho
 inline bool singleMu_Probe_Iso_SYM(const reco::Candidate& cand, int run, double rho){
 
   const pat::Muon* muon = CloneCandidate(cand);
@@ -1090,26 +1165,29 @@ inline bool singleMu_Probe_Iso_SYM(const reco::Candidate& cand, int run, double 
   
   if(muon){
  
-  const reco::MuonIsolation& iso03 = muon->isolationR03(); 
+  	const reco::MuonIsolation& iso03 = muon->isolationR03(); 
   
-  float muEta = muon->eta(); 
+  	float muEta = muon->eta(); 
   
-  float Aecal = cAecalEE_SYM;
-  float Ahcal = cAhcalHE_SYM;
+  	float Aecal = cAecalEE_SYM;
+  	float Ahcal = cAhcalHE_SYM;
   
-  if (fabs(muEta) < maxmuEta_SYM) {
-  Aecal = cAecalEB_SYM;
-  Ahcal = cAhcalEE_SYM;
+  	if (fabs(muEta) < maxmuEta_SYM) {
+  		Aecal = cAecalEB_SYM;
+  		Ahcal = cAhcalEE_SYM;
+  	}
+  
+  	float muonIsoRho = (iso03.sumPt + max(0.,iso03.emEt-Aecal*(rho)) + max(0.,iso03.hadEt-Ahcal*(rho)))/muon->pt();
+  
+  	if(muonIsoRho <= muonIsoRhoCut_SYM)
+		iso = true;
   }
-  
-  float muonIsoRho = (iso03.sumPt + max(0.,iso03.emEt-Aecal*(rho)) + max(0.,iso03.hadEt-Ahcal*(rho)))/muon->pt();
-  
-  if(muonIsoRho <= muonIsoRhoCut_SYM)iso = true;}
          
   return iso;
   
-  }
+}
   
+
 inline bool singleMu_Probe_MuID_SYM(const reco::Candidate& cand, int run, double rho){
 
   const pat::Muon* muon = CloneCandidate(cand);
@@ -1129,8 +1207,8 @@ inline bool singleMu_Probe_Acc_ASYM0(const reco::Candidate& cand, int run, doubl
   
   if(mu0){
   return (          
-          mu0->pt() > ptmucut0
-          && fabs(mu0->eta()) < etamucut 
+          mu0->pt() >= ptmucut0
+          && fabs(mu0->eta()) <= etamucut 
           && (fabs(mu0->eta())<eta_mu_excl_down || fabs(mu0->eta())>eta_mu_excl_up));
   }else{
   return false;}
@@ -1142,8 +1220,8 @@ inline bool singleMu_Probe_Acc_ASYM1(const reco::Candidate& cand, int run, doubl
   
   if(mu1){
   return (          
-          mu1->pt() > ptmucut1
-          && fabs(mu1->eta()) < etamucut 
+          mu1->pt() >= ptmucut1
+          && fabs(mu1->eta()) <= etamucut 
           && (fabs(mu1->eta())<eta_mu_excl_down || fabs(mu1->eta())>eta_mu_excl_up));
   }else{
   return false;}
