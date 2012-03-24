@@ -67,28 +67,31 @@ int PreDefName, ProcEvents;
   //List of Source Files   
   string SourceFilesDir			= "/data/sandro/Analisi/rel_CMSSW_4_2_5_commit/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/SourceFilesMuons/";
 
-  string Data2011 			= "SourceFilesMuons/data.list";
-  string DYtoLL_All 			= "SourceFilesMuons/DYtoLL_All.list";  
-  string TTJets_All			= "SourceFilesMuons/TTJets_All.list";
-  string WJetsToLNu_All			= "SourceFilesMuons/WJetsToLNu_All.list";
-  string WWJetsTo2L2Nu_All		= "SourceFilesMuons/WWJetsTo2L2Nu_All.list";
-  string QCD_Pt20MuEnPt10_All		= "SourceFilesMuons/QCD_Pt20MuEnPt10_All.list";
+  string Data2011 			= "data.list";
+  string DYtoLL_All 			= "DYtoLL_All.list";  
+  string TTJets_All			= "TTJets_All.list";
+  string WJetsToLNu_All			= "WJetsToLNu_All.list";
+  string WWJetsTo2L2Nu_All		= "WWJetsTo2L2Nu_All.list";
+  string QCD_Pt20MuEnPt10_All		= "QCD_Pt20MuEnPt10_All.list";
   
-  string DYtoLL_Train 			= "SourceFilesMuons/DYtoLL_Train.list";
-  string TTJets_Train			= "SourceFilesMuons/TTJets_Train.list";
-  string WJetsToLNu_Train		= "SourceFilesMuons/WJetsToLNu_Train.list";
-  string WWJetsTo2L2Nu_Train		= "SourceFilesMuons/WWJetsTo2L2Nu_Train.list";
-  string QCD_Pt20MuEnPt10_Train		= "SourceFilesMuons/QCD_Pt20MuEnPt10_Train.list";
+  string DYtoLL_Train 			= "DYtoLL_Train.list";
+  string TTJets_Train			= "TTJets_Train.list";
+  string WJetsToLNu_Train		= "WJetsToLNu_Train.list";
+  string WWJetsTo2L2Nu_Train		= "WWJetsTo2L2Nu_Train.list";
+  string QCD_Pt20MuEnPt10_Train		= "QCD_Pt20MuEnPt10_Train.list";
   
-  string DYtoLL_Sample 			= "SourceFilesMuons/DYtoLL_Sample.list";
-  string TTJets_Sample			= "SourceFilesMuons/TTJets_Sample.list";
-  string WJetsToLNu_Sample		= "SourceFilesMuons/WJetsToLNu_Sample.list";
-  string WWJetsTo2L2Nu_Sample		= "SourceFilesMuons/WWJetsTo2L2Nu_Sample.list";
-  string QCD_Pt20MuEnPt10_Sample	= "SourceFilesMuons/QCD_Pt20MuEnPt10_Sample.list";
+  string DYtoLL_Sample 			= "DYtoLL_Sample.list";
+  string TTJets_Sample			= "TTJets_Sample.list";
+  string WJetsToLNu_Sample		= "WJetsToLNu_Sample.list";
+  string WWJetsTo2L2Nu_Sample		= "WWJetsTo2L2Nu_Sample.list";
+  string QCD_Pt20MuEnPt10_Sample	= "QCD_Pt20MuEnPt10_Sample.list";
   
   string Test 		        	= "Test.list";
   sample = "mc";
-  
+ 
+  //tag to recognize the analysis in the output file
+  string analysis = "_DeltaR"; 
+
   //Path of PATAnalysis dir - DO NOT FORGET THE SLASH AT THE END OF THE PATH
   string path="/data/sandro/Analisi/rel_CMSSW_4_2_5_commit/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/PythonMuons/";
   
@@ -136,54 +139,54 @@ int PreDefName, ProcEvents;
   if(PreDefName==-9)sourceList = (SourceFilesDir + Test).c_str();  
  
   if(PreDefName==0){
-    sourceList = Data2011.c_str();  
+    sourceList = (SourceFilesDir + Data2011).c_str();  
     sample = "data";}
   else if (PreDefName==1){
-    sourceList = DYtoLL_All.c_str();
+    sourceList = (SourceFilesDir + DYtoLL_All).c_str();
     sample = "mc";}
   else if (PreDefName==2){
-    sourceList = TTJets_All.c_str();
+    sourceList = (SourceFilesDir + TTJets_All).c_str();
     sample = "mc";}
   else if (PreDefName==3){
-    sourceList = WJetsToLNu_All.c_str();
+    sourceList = (SourceFilesDir + WJetsToLNu_All).c_str();
     sample = "mc";}
   else if (PreDefName==4){
-    sourceList = WWJetsTo2L2Nu_All.c_str();
+    sourceList = (SourceFilesDir + WWJetsTo2L2Nu_All).c_str();
     sample = "mc";}
   else if (PreDefName==5){
-    sourceList = QCD_Pt20MuEnPt10_All.c_str();
+    sourceList = (SourceFilesDir + QCD_Pt20MuEnPt10_All).c_str();
     sample = "mc";}
     
   else if (PreDefName==11){
-    sourceList = DYtoLL_Train.c_str();
+    sourceList = (SourceFilesDir + DYtoLL_Train).c_str();
     sample = "mc";}
   else if (PreDefName==12){
-    sourceList = TTJets_Train.c_str();
+    sourceList = (SourceFilesDir + TTJets_Train).c_str();
     sample = "mc";}
   else if (PreDefName==13){
-    sourceList = WJetsToLNu_Train.c_str();
+    sourceList = (SourceFilesDir + WJetsToLNu_Train).c_str();
     sample = "mc";}
   else if (PreDefName==14){
-    sourceList = WWJetsTo2L2Nu_Train.c_str();
+    sourceList = (SourceFilesDir + WWJetsTo2L2Nu_Train).c_str();
     sample = "mc";}
   else if (PreDefName==15){
-    sourceList = QCD_Pt20MuEnPt10_Train.c_str();
+    sourceList = (SourceFilesDir + QCD_Pt20MuEnPt10_Train).c_str();
     sample = "mc";}
     
   else if (PreDefName==21){
-    sourceList = DYtoLL_Sample.c_str();
+    sourceList = (SourceFilesDir + DYtoLL_Sample).c_str();
     sample = "mc";}
   else if (PreDefName==22){
-    sourceList = TTJets_Sample.c_str();
+    sourceList = (SourceFilesDir + TTJets_Sample).c_str();
     sample = "mc";}
   else if (PreDefName==23){
-    sourceList = WJetsToLNu_Sample.c_str();
+    sourceList = (SourceFilesDir + WJetsToLNu_Sample).c_str();
     sample = "mc";}
   else if (PreDefName==24){
-    sourceList = WWJetsTo2L2Nu_Sample.c_str();
+    sourceList = (SourceFilesDir + WWJetsTo2L2Nu_Sample).c_str();
     sample = "mc";}
   else if (PreDefName==25){
-    sourceList = QCD_Pt20MuEnPt10_Sample.c_str();
+    sourceList = (SourceFilesDir + QCD_Pt20MuEnPt10_Sample).c_str();
     sample = "mc";}
 
   cout << "RUNNING ON " << sourceList << endl;
@@ -191,7 +194,7 @@ int PreDefName, ProcEvents;
 
   name(PreDefName);
   string outputName = SampleName;
-  outputName+=outNameSuf;
+  outputName+=analysis+=outNameSuf;
   
   double xsec = 1.0; 
   double EventFilter = 1.0;
