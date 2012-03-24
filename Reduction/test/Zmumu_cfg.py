@@ -5,30 +5,39 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 # Customization
 ####################
 
-isMC = False        # True: MC, False: Data
+isMC = True       # True: MC, False: Data
 MCSkimm = False    # True: MC Skimming (no signal!)
 DataSkimm = True   # True: Data Skimming (standard configuration)
 
-nameSource = [ #'file:input_DYJetsToLL_M50_Summer11.root'          # Input file name
+nameSource = [ 'file:input_DYJetsToLL_M50_Fall11.root'          # Input file name
                #'file:input_DYtoMuMu_M20_Fall11.root'
-               'file:input_dati2011.root'
+               #'file:input_dati2011.root'
              ] 
 
-numEventsToRun = 1000                       # (e.g. -1 to run on all events)
-nameOutput = 'test_dati.root'
+numEventsToRun = -1                      # (e.g. -1 to run on all events)
+nameOutput = 'DYJetsToLL_M_50.root'
+             #'DYToMuMu_M_20_Summer11.root'
+             #'TTJets.root' 
+             #'WJetsToLNu.root'
+             #'QCD_Pt_20_MuEnrichedPt_10.root'
+             #'WWJetsTo2L2Nu.root'
+
+             #'WZJetsTo3LNu.root'
+             #'ZZJetsTo4L.root'
+
+             #'test_Gen_DYtoMuMu_M20_Fall11_no13.root'
              #'output_DYJetsToLL_M50_Summer11.root'  # Output file name
-             # 'output_dati2011.root'    
-             # 'output_DYtoMuMu_M20_Fall11.root'        
+             #'output_dati2011.root'    
+             #'output_DYtoMuMu_M20_Fall11.root'        
                
 DataSubset = False   # True: select a Data subset
 Data_firstRun = 175873
 Data_Range = '175873:1-175873:32'
 
-GloTagMC = 'START42_V13::All'              # Global Tag MC
-GloTagData = 'GR_R_42_V19::All'            # Global Tag Data
+GloTagMC = 'START42_V17::All'              # Global Tag MC
+GloTagData = 'GR_R_42_V25::All'            # Global Tag Data
 
 pathTrigger = 'type("TriggerMuon") && (path("HLT_DoubleMu6_v*") || path("HLT_DoubleMu7_v*") || path("HLT_Mu13_Mu8_v*") || path("HLT_Mu17_Mu8_v*"))' # selecting the trigger objects
-#pathTrigger = 'type("TriggerMuon") && (path("HLT_DoubleMu6*") || path("HLT_DoubleMu7*") || path("HLT_Mu13_Mu8*"))'  
 
 ####################
 ################################################################################
@@ -148,11 +157,14 @@ process.load('RecoJets.Configuration.RecoPFJets_cff')
 
 ## Turn-on the FastJet density calculation 
 process.kt6PFJets.doRhoFastjet = True
-process.kt6PFJets.Rho_EtaMax = cms.double(5.0)
+#process.kt6PFJets.Rho_EtaMax = cms.double(5.0)
 
 ## Turn-on the FastJet jet area calculation for your favorite algorithm
 process.ak5PFJets.doAreaFastjet = True
-process.ak5PFJets.Rho_EtaMax = cms.double(5.0)
+#process.ak5PFJets.Rho_EtaMax = cms.double(5.0)
+
+## Slimming the PFJet collection by raising the pt cut
+process.ak5PFJets.jetPtMin = cms.double(15.0)
 
 process.L1FastCorrection = cms.Sequence(process.kt6PFJets * process.ak5PFJets)
 
@@ -228,7 +240,7 @@ process.patMuons.embedPickyMuon = cms.bool(False)
 process.patMuons.embedTpfmsMuon = cms.bool(False)
 process.patMuons.embedPFCandidate = cms.bool(True)
 
-# embeding of track info
+# embedding of track info
 process.patMuons.embedTrack = cms.bool(True)
 
 # embedding of muon MET corrections for caloMET
@@ -256,7 +268,7 @@ process.skimPatMuons=cms.EDFilter("CandViewCountFilter",
 process.recosequence = cms.Sequence( (process.L1FastCorrection * process.patDefaultSequence) * (process.zmumurecSequence + process.recjetsSequence) )
                                  
 if isMC == True:
-	process.gensequence = cms.Sequence(process.genjetsSequence + process.zmumugenSequence)
+	process.gensequence = cms.Sequence(process.zmumugenSequence + process.genjetsSequence)
 	process.pattuples = cms.Sequence(process.gensequence + process.recosequence)
 	if MCSkimm == True: 		
 		process.p = cms.Path(process.pattuples * process.skimPatMuons)
@@ -289,7 +301,7 @@ if isMC == True:
 process.out.outputCommands.extend(zmumurecEventContent)
 process.out.outputCommands.extend(jetrecEventContent)
 #process.out.outputCommands.extend(patTriggerEventContent)
-process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*', 'keep *_pat*METs*_*_*', 'keep *_patTriggerEvent_*_*', 'keep patTriggerPaths_patTrigger_*_*', 'keep *_goodTracks_*_*', 'keep double_kt6PFJets_rho_PAT*'])
+process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*', 'keep *_pat*METs*_*_*', 'keep *_patTriggerEvent_*_*', 'keep patTriggerPaths_patTrigger_*_*', 'keep *_goodTracks_*_*', 'keep double_kt6PFJets_rho_PAT*', 'keep PileupSummaryInfos_*_*_*','keep recoGenParticles_genParticles_*_*'])
 
 process.out.dropMetaData = cms.untracked.string('DROPPED')
 process.out.SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') )

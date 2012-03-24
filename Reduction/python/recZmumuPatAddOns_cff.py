@@ -33,33 +33,45 @@ selectedMuons = selectedPatMuons.clone()
 selectedMuons.src = cms.InputTag("patMuons")
 selectedMuons.cut = cms.string("pt > 15. & abs(eta) < 3. ")
 
-#selectedMuons1 = cms.EDFilter("LargestPtCandViewSelector",
-#    src = cms.InputTag("selectedMuons"),
-#    maxNumber = cms.uint32(2)
-#  )
+# Muon MC Matcher
+from PhysicsTools.PatAlgos.mcMatchLayer0.muonMatch_cfi import *
+muonMatch.src = cms.InputTag("muons") # RECO objects to match
+muonMatch.matched = cms.InputTag("genParticles")   # mc-truth particle collection
+muonMatch.mcStatus = cms.vint32(1)
 
-selectedMuons1 = selectedMuons.clone()
+selectedMuons.addGenMatch = cms.bool(True)
+selectedMuons.embedGenMatch = cms.bool(True)
+selectedMuons.genParticleMatch = cms.InputTag("muonMatch")
+
+# new class of selected Muons
+selectedMuons1 = cms.EDFilter("LargestPtCandViewSelector",
+  src = cms.InputTag("selectedMuons"),
+  maxNumber = cms.uint32(2)
+)
+
+#selectedMuons1 = selectedMuons.clone()
  
 #Z candidate combiner
 zmumurec = cms.EDProducer('CandViewCombiner',
   decay = cms.string('selectedMuons1@+ selectedMuons1@-'),
-  cut   = cms.string('30 < mass < 150'),
+  cut   = cms.string('60 < mass < 120'),
   name  = cms.string('Zmumu'),
   roles = cms.vstring('mu1', 'mu2')
 )
 
 zmumurecSameCharge = cms.EDProducer('CandViewCombiner',
-#both ++ and -- in the same colelction
+#both ++ and -- in the same collection
   decay = cms.string('selectedMuons1@+ selectedMuons1@+'),
-  cut   = cms.string('30 < mass < 150'),
+  cut   = cms.string('60 < mass < 120'),
   name  = cms.string('Zmumu_samecharge'),
   roles = cms.vstring('mu1', 'mu2')
 )
 
-zmumurecSequence = cms.Sequence(selectedMuons*(selectedMuons1*(zmumurec + zmumurecSameCharge)))
+zmumurecSequence = cms.Sequence(muonMatch*selectedMuons*(selectedMuons1*(zmumurec + zmumurecSameCharge)))
 
 zmumurecEventContent = [
   'keep *_selectedMuons_*_*',
+#  'keep *_selectedMuons1_*_*', non funge
   'keep *_zmumurec*_*_*'
 ]
 
