@@ -60,14 +60,14 @@ rr7 = make_pair(149181, 149442);
 rr8 = make_pair(149181, 149442);
 
 if(TrgRange == false){
-rr1 = make_pair(-1, 999999999);
-rr2 = make_pair(-1, 999999999);
-rr3 = make_pair(-1, 999999999);
-rr4 = make_pair(-1, 999999999);
-rr5 = make_pair(-1, 999999999);
-rr6 = make_pair(-1, 999999999);
-rr7 = make_pair(-1, 999999999);
-rr8 = make_pair(-1, 999999999);
+	rr1 = make_pair(-1, 999999999);
+	rr2 = make_pair(-1, 999999999);
+	rr3 = make_pair(-1, 999999999);
+	rr4 = make_pair(-1, 999999999);
+	rr5 = make_pair(-1, 999999999);
+	rr6 = make_pair(-1, 999999999);
+	rr7 = make_pair(-1, 999999999);
+	rr8 = make_pair(-1, 999999999);
 }
 
 static map<std::string, rrange > TrgVector;
@@ -247,10 +247,11 @@ inline const pat::Muon* CloneCandidate(const reco::Candidate& Daughter){
 }
 
 
+// it returns a vector of 2 Muons from a GEN Z sorted by pt. It require that almost a Z exists 
 inline std::vector<const reco::Candidate*> ZGENDaughters(const std::vector<reco::CompositeCandidate>& ZGEN){
 
   std::vector<const reco::Candidate*> zdaughters;
-  
+
   const reco::Candidate* dau0 = ZGEN[0].daughter(0);
   const reco::Candidate* dau1 = ZGEN[0].daughter(1);
 
@@ -258,43 +259,46 @@ inline std::vector<const reco::Candidate*> ZGENDaughters(const std::vector<reco:
   const reco::Candidate* finaldau1 = 0; 
 
   if (dau0->numberOfDaughters()){
-    bool mu0set = false;
-    for (unsigned int i = 0; i < dau0->numberOfDaughters(); ++i ){
-      if (fabs(dau0->daughter(i)->pdgId()) == 13){
-        if (mu0set) {
-          std::cout << "something wrong in GenSelectedInAcceptance: a daughter muon was already found for dau0 " << std::endl; 
-        }
-        finaldau0 = dau0->daughter(i);
-        mu0set = true;
-      }
-    }
+    	bool mu0set = false;
+    	for (unsigned int i = 0; i < dau0->numberOfDaughters(); ++i ){
+      		if (fabs(dau0->daughter(i)->pdgId()) == 13){
+        		if (mu0set) {
+          			std::cout << "something wrong in GenSelectedInAcceptance: a daughter muon was already found for dau0 " << std::endl; 
+        		}
+        		finaldau0 = dau0->daughter(i);
+        		mu0set = true;
+      		}
+    	}
   }
+  else{finaldau0 = dau0;}
 
   if (dau1->numberOfDaughters()){
-    bool mu1set = false;
-    for (unsigned int i = 0; i < dau1->numberOfDaughters(); ++i ){
-      if (fabs(dau1->daughter(i)->pdgId()) == 13){
-        if (mu1set) {
-          std::cout << "something wrong in GenSelectedInAcceptance: a daughter muon was already found for dau1 " << std::endl;
-        }
-        finaldau1 = dau1->daughter(i);
-        mu1set = true;
-      }
-    }
+    	bool mu1set = false;
+    	for (unsigned int i = 0; i < dau1->numberOfDaughters(); ++i ){
+      		if (fabs(dau1->daughter(i)->pdgId()) == 13){
+        		if (mu1set) {
+          			std::cout << "something wrong in GenSelectedInAcceptance: a daughter muon was already found for dau1 " << std::endl;
+        		}
+        		finaldau1 = dau1->daughter(i);
+        		mu1set = true;
+      		}
+    	}
   }
- 
+  else{finaldau1 = dau1;}
+
   const reco::Candidate* leading = finaldau0->pt() > finaldau1->pt() ? finaldau0 : finaldau1;
   const reco::Candidate* second  = finaldau0->pt() > finaldau1->pt() ? finaldau1 : finaldau0;
-  
+
   zdaughters.push_back(leading);
   zdaughters.push_back(second);
-  
+
   if(zdaughters.size()==1 || zdaughters.size()>2){
-  std::cout << "ERROR! Wrong Z daughters association. Z daughters number = "<<zdaughters.size()<<std::endl;
-  std::vector<const reco::Candidate*> nullzdaughters;
-  return nullzdaughters;
-  }else{
-  return zdaughters;
+  	std::cout << "ERROR! Wrong Z daughters association. Z daughters number = "<<zdaughters.size()<<std::endl;
+  	std::vector<const reco::Candidate*> nullzdaughters;
+  	return nullzdaughters;
+  }
+  else{
+  	return zdaughters;
   }
   
 }
@@ -326,84 +330,64 @@ inline std::vector<const pat::Muon*> ZRECDaughters(const std::vector<reco::Compo
 
 //  GEN SELECTION
 
+// GEN Z Candidate: it is true if there is 1 GEN Z with Mass cut
 inline bool GenSelected(const std::vector<reco::CompositeCandidate>& ZGEN, string selections){
      
-  if(selections=="SYM")return ZGEN[0].mass() > zmassmin_sym && ZGEN[0].mass() < zmassmax_sym;
-  if(selections=="ASYM")return ZGEN[0].mass() > zmassmin_asym && ZGEN[0].mass() < zmassmax_asym;
+  if(selections=="SYM") 
+  	return ZGEN[0].mass() > zmassmin_sym && 
+  	       ZGEN[0].mass() < zmassmax_sym;
+  if(selections=="ASYM") 
+  	return ZGEN[0].mass() > zmassmin_asym && 
+  	       ZGEN[0].mass() < zmassmax_asym;
   
   else return false;
 }
 
+
+// GEN Z Candidate: it is true if there is 1 GEN Z with Mass cut decaying in two GEN Muons in the Acceptance (geometrical and kinematic) region
 inline bool GenSelectedInAcceptance(const std::vector<reco::CompositeCandidate>& ZGEN, string selections){
-  
+
+  if (ZGEN.size() == 0) 
+  	return false;
+  if (ZGEN.size() > 1){
+    std::cout << "ERROR! Multiple Gen Z candidates found, you have to choose one before arriving here! " << std::endl;
+    throw cms::Exception("PATAnalysis:RecSelectedTwoMuonsOppositeCharge_Mass") << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! ";
+    return false;
+  }
+
   std::vector<const reco::Candidate*> zgendaughters = ZGENDaughters(ZGEN);
   const reco::Candidate *dau0 = 0;
   const reco::Candidate *dau1 = 0;
   
   if(zgendaughters.size() != 0){      
     
-  dau0 = zgendaughters[0];
-  dau1 = zgendaughters[1];
+  	dau0 = zgendaughters[0];
+  	dau1 = zgendaughters[1];
   
-  if(selections=="SYM"){
-  return ZGEN[0].mass() > zmassmin_sym && ZGEN[0].mass() < zmassmax_sym 
-         && dau0->pt() >= ptmucut && fabs(dau0->eta()) <= etamucut
-         && dau1->pt() >= ptmucut && fabs(dau1->eta()) <= etamucut
-         && (fabs(dau0->eta())<eta_mu_excl_down || fabs(dau0->eta())>eta_mu_excl_up) && 
-	    (fabs(dau1->eta())<eta_mu_excl_down || fabs(dau1->eta())>eta_mu_excl_up);
- }else if(selections=="ASYM"){
- return ZGEN[0].mass() > zmassmin_asym && ZGEN[0].mass() < zmassmax_asym 
-         && dau0->pt() >= ptmucut0 && fabs(dau0->eta()) <= etamucut
-         && dau1->pt() >= ptmucut1 && fabs(dau1->eta()) <= etamucut
-         && (fabs(dau0->eta())<eta_mu_excl_down || fabs(dau0->eta())>eta_mu_excl_up) && 
-	    (fabs(dau1->eta())<eta_mu_excl_down || fabs(dau1->eta())>eta_mu_excl_up);
- }else{
- return false;
- }
- }else{
- return false;
- }
- 
-}
-
-
-// GEN Z Candidate: it is true if there is 1 GEN Z with mass cut decaying in two Muons in the Acceptance (geometrical and kinematic) region.
-// The selection is optimized for Muons in status = 1. 
-inline bool GenSelectedInAcceptanceStatus1(const std::vector<reco::CompositeCandidate>& ZGEN, string selections){
-
-  if (ZGEN.size() == 0) return false;
-  if (ZGEN.size() > 1){
-    std::cout << "ERROR! Multiple Gen Z candidates found, you have to choose one before arriving here! " << std::endl;
-    throw cms::Exception("PATAnalysis:RecSelectedTwoMuonsOppositeCharge_Mass") << "ERROR! Multiple Z candidates found, you have to choose one before arriving here! ";
-    return false;
-  }
-  
-  const reco::Candidate* dau0 = ZGEN[0].daughter(0);
-  const reco::Candidate* dau1 = ZGEN[0].daughter(1);
-
-  const reco::Candidate* leading = dau0->pt() > dau1->pt() ? dau0 : dau1;
-  const reco::Candidate* second  = dau0->pt() > dau1->pt() ? dau1 : dau0;
-
-  if(selections=="SYM"){
-  	return ZGEN.size()==1 &&
-               ZGEN[0].mass() > zmassmin_sym && ZGEN[0].mass() < zmassmax_sym &&
-               leading->pt() >= ptmucut && fabs(leading->eta()) <= etamucut &&
-               second->pt() >= ptmucut && fabs(second->eta()) <= etamucut &&
-               (fabs(leading->eta())<eta_mu_excl_down || fabs(leading->eta())>eta_mu_excl_up) && 
-	       (fabs(second->eta())<eta_mu_excl_down || fabs(second->eta())>eta_mu_excl_up);
-  }
-  else if(selections=="ASYM"){
-  	return ZGEN.size()==1 &&
-  	       ZGEN[0].mass() > zmassmin_asym && ZGEN[0].mass() < zmassmax_asym && 
-  	       leading->pt() >= ptmucut0 && fabs(leading->eta()) <= etamucut &&
-  	       second->pt() >= ptmucut1 && fabs(second->eta()) <= etamucut &&
-	       (fabs(leading->eta())<eta_mu_excl_down || fabs(leading->eta())>eta_mu_excl_up) && 
-  	       (fabs(second->eta())<eta_mu_excl_down || fabs(second->eta())>eta_mu_excl_up);
+  	if(selections=="SYM"){
+  		return ZGEN[0].mass() > zmassmin_sym && ZGEN[0].mass() < zmassmax_sym &&
+  		       dau0->pt() >= ptmucut && fabs(dau0->eta()) <= etamucut &&
+  		       dau1->pt() >= ptmucut && fabs(dau1->eta()) <= etamucut &&
+  		       (fabs(dau0->eta())<eta_mu_excl_down || fabs(dau0->eta())>eta_mu_excl_up) && 
+  		       (fabs(dau1->eta())<eta_mu_excl_down || fabs(dau1->eta())>eta_mu_excl_up);
+  	}
+  	else if(selections=="ASYM"){
+  		return ZGEN[0].mass() > zmassmin_asym && ZGEN[0].mass() < zmassmax_asym && 
+  		       dau0->pt() >= ptmucut0 && fabs(dau0->eta()) <= etamucut &&
+  		       dau1->pt() >= ptmucut1 && fabs(dau1->eta()) <= etamucut &&
+  		       (fabs(dau0->eta())<eta_mu_excl_down || fabs(dau0->eta())>eta_mu_excl_up) && 
+  		       (fabs(dau1->eta())<eta_mu_excl_down || fabs(dau1->eta())>eta_mu_excl_up);
+  	}
+  	else{
+ 		return false;
+  	}
   }
   else{
   	return false;
   }
 }
+
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -500,7 +484,7 @@ return trigmatch;
 
 // Z REC SELECTION
 
-//REC Z Candidate: it is true if there is 1 REC Z with Mass cut decaying in two Muons with these cuts: Acceptance (geometrical and kinematic), Quality, Impact Parameter, Isolation with rho.  
+//REC Z Candidate: it is true if there is 1 REC Z with Mass cut decaying in two REC Muons with these cuts: Acceptance (geometrical and kinematic), Quality, Impact Parameter, Isolation with rho.  
 inline bool RecSelected(string Flag, const std::vector<reco::CompositeCandidate>& ZREC, const pat::TriggerEvent& triggers, int run, double rho){
 
   std::vector<const pat::Muon*> zdaughters; 
@@ -786,9 +770,11 @@ template<class MUON> double MinDeltaRZDau(const std::vector<const MUON*>& muons,
 
 // Jets Selector Utility: it returns a vector of Jets, selected for Acceptance (geometrical and kinematic)
 template<class JET> std::vector<const JET*> GetJets_noJetID(const std::vector<JET>& jets){
+
   std::vector<const JET*> selectedjets;
   for (unsigned int i = 0; i < jets.size();  ++i){
-    if (jets[i].pt() > ptjetmin && fabs(jets[i].eta()) < etajetmax) selectedjets.push_back(&jets[i]);
+    if (jets[i].pt() > ptjetmin && fabs(jets[i].eta()) < etajetmax) 
+  	selectedjets.push_back(&jets[i]);
   }
   return selectedjets;
 }
@@ -816,29 +802,33 @@ template<class JET> int jetID(const JET& jet){
 }
 
 
+//Jets Selector Utility: it returns a vector of Jets, if you want selected for ID, selected for Acceptance (geometrical and kinematic) corrected for the JEC Uncertainties
 template<class JET> std::vector<const JET*> GetJets_wJECUnc(const std::vector<JET>& jets, JetCorrectionUncertainty& jecUnc, int JECUnc){
+
   std::vector<const JET*> selectedjets;
   
   bool jetIDflag = true;
   
   for (unsigned int i = 0; i < jets.size();  ++i){
+  	if(JetIDReq){
+  		jetIDflag=false;
+  		if(jetID(&jets[i])==1)
+  			jetIDflag=true;
+  	}
   
-  if(JetIDReq){
-  jetIDflag=false;
-  if(jetID(&jets[i])==1)jetIDflag=true;
+  	double unc = 0;
+  
+  	if(JECUnc!=0){
+  		jecUnc.setJetEta(jets[i].eta());
+  		jecUnc.setJetPt(jets[i].pt()); 
+  		unc = jecUnc.getUncertainty(true)*JECUnc;
+  	}
+  
+  	if (jets[i].pt()+(jets[i].pt()*unc) > ptjetmin && 
+      	    fabs(jets[i].eta()) < etajetmax && 
+      	    jetIDflag) 
+  		selectedjets.push_back(&jets[i]);
   }
-  
-  double unc = 0;
-  
-  if(JECUnc!=0){
-  jecUnc.setJetEta(jets[i].eta());
-  jecUnc.setJetPt(jets[i].pt()); 
-  unc = jecUnc.getUncertainty(true)*JECUnc;}
-  
-  if (jets[i].pt()+(jets[i].pt()*unc) > ptjetmin && fabs(jets[i].eta()) < etajetmax && jetIDflag) selectedjets.push_back(&jets[i]);
-  
-  }
-  
   return selectedjets;
 }
 

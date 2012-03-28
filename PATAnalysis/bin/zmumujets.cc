@@ -93,13 +93,13 @@ int PreDefName, ProcEvents;
   string analysis = "_DeltaR"; 
 
   //Path of PATAnalysis dir - DO NOT FORGET THE SLASH AT THE END OF THE PATH
-  string path="/data/sandro/Analisi/rel_CMSSW_4_2_5_commit/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/PythonMuons/";
+  string path="/data/sandro/Analisi/rel_CMSSW_4_2_5_commit/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/AnalysisMuons/";
   
   //Modules
-  bool GEN    = false;
-  bool RECO   = false;
-  bool EFF    = false;
-  bool NTUPLE = false;
+  bool GEN    = true;
+  bool RECO   = true;
+  bool EFF    = true;
+  bool NTUPLE = true;
   bool DELTAR = true;
   
   //Ntuple - "zcand" = saves only z candidates; "acc" = save only events with Z in the acceptance; "all" = saves all the events  

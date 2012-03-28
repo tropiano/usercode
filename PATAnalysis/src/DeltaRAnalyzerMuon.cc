@@ -205,7 +205,7 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
    //----richiamo la REC Z----
    fwlite::Handle<std::vector<reco::CompositeCandidate> > zHandle;
    zHandle.getByLabel(iEvent, "zmumurec");
-   //seleziono un vettore di 2 muoni dalla REC Z
+   //seleziono un vettore di 2 muoni figli della REC Z
    std::vector<const pat::Muon*> muonsfromZ;  
    if(zHandle->size()) muonsfromZ = ZRECDaughters(*zHandle);
 
@@ -217,15 +217,15 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
    //seleziono un vettore di jets REC con Cleaning dai 2 Muoni dalla Z REC
    std::vector<const pat::Jet*> recjets = CleanJets<pat::Jet>(jetcollID, muonsfromZ);   
 
-   //----richiamo i Trigger paths----
-   fwlite::Handle<pat::TriggerEvent> triggerHandle; 
-   triggerHandle.getByLabel(iEvent, "patTriggerEvent");
- 
    //----richiamo la rho----
    fwlite::Handle<double> Rho;
    Rho.getByLabel(iEvent, "kt6PFJets", "rho");
    _rho = *Rho;
 
+   //----richiamo i Trigger paths----
+   fwlite::Handle<pat::TriggerEvent> triggerHandle; 
+   triggerHandle.getByLabel(iEvent, "patTriggerEvent");
+ 
    //----richiamo la GEN Z----
    fwlite::Handle<std::vector<reco::CompositeCandidate> > zHandlegen;
    zHandlegen.getByLabel(iEvent, "zmumugen");
@@ -236,7 +236,8 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
    
    //----richiamo i GEN Jets----
    fwlite::Handle<std::vector<reco::GenJet> > jetHandler;
-   jetHandler.getByLabel(iEvent, "selectedGenJetsOld");
+   jetHandler.getByLabel(iEvent, "selectedGenJetsOld"); //jets senza Mu PG
+   //jetHandler.getByLabel(iEvent, "selectedGenJetsNoMuMufromZ");  //jets senza Mu a mano
    //seleziono un vettore di GEN Jets per Accettanza
    std::vector<const reco::GenJet*> genjetsr = GetJets_noJetID<reco::GenJet>(*jetHandler); 
 
@@ -256,8 +257,7 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
    double DeltaR = 0.5;
 
 	//qui apro l'if con le condizioni su Z e muoni
-	//if (GenSelectedMuon(*zHandlegen) &&
-	if (GenSelectedInAcceptanceStatus1(*zHandlegen, _selections) &&
+	if (GenSelectedInAcceptance(*zHandlegen, _selections) &&
 	    ((*zHandlegen)[0].daughter(0))->charge() * ((*zHandlegen)[0].daughter(1))->charge() == -1){ 
 /*
 		//Questi fanno comodo

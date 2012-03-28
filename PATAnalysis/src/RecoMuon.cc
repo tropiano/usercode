@@ -99,26 +99,31 @@ void RecoMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
    _MuID = iConfig.getParameter<int32_t>("MuID"); 
    
    for(int i=0; i<7; i++){
-   _RecoCutFlags[i] = "_1";}
+   	_RecoCutFlags[i] = "_1";
+   }
    
    if(_selections=="SYM"){
-   _RecoCutFlags[_Acc] =  "_AccSYM";
-   _RecoCutFlags[_Qual] = "_QualSYM"; 
-   _RecoCutFlags[_Iso] =  "_IsoSYM";
-   _RecoCutFlags[_MuID] =  "_MuIDSYM";}
+   	_RecoCutFlags[_Acc] =  "_AccSYM";
+   	_RecoCutFlags[_Qual] = "_QualSYM"; 
+   	_RecoCutFlags[_Iso] =  "_IsoSYM";
+   	_RecoCutFlags[_MuID] =  "_MuIDSYM";
+   }
    if(_selections=="ASYM"){
-   _RecoCutFlags[_Acc] =  "_AccASYM";
-   _RecoCutFlags[_Qual] = "_QualASYM"; 
-   _RecoCutFlags[_Iso] =  "_IsoASYM";
-   _RecoCutFlags[_MuID] =  "_MuIDASYM";}
-     
+   	_RecoCutFlags[_Acc] =  "_AccASYM";
+   	_RecoCutFlags[_Qual] = "_QualASYM"; 
+   	_RecoCutFlags[_Iso] =  "_IsoASYM";
+   	_RecoCutFlags[_MuID] =  "_MuIDASYM";
+   }
+    
    _RecoCutFlags[_Trg] =  "_Trg";   
    _RecoCutFlags[_Imp] =  "_Imp";
    
    for(int i=0; i<8; i++){
-   _TrgList[i] = -1;}
+      _TrgList[i] = -1;
+   }
      
    cout << "RecoMuon file name : " << _file->GetName() << endl;
+
    _file->cd();
    _dir = _file->mkdir(dirname.c_str(), dirname.c_str());
    
@@ -131,8 +136,7 @@ void RecoMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
    BestMassIndex = new TH1D("BestMassIndex", "Index of the best mass Z reconstructed (-1=not Z reconstructed)", 11, -1, 10);
    _histoVector.push_back(BestMassIndex);
    
-   //Z plots
-   
+   //Z plots   
    _Zdir = _dir->mkdir("recZ_Plots");
    _Zdir->cd();
    
@@ -372,11 +376,12 @@ void RecoMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
    string JetCounter_name = "JetCounter";
   
    for(int c=1;c!=7;c++){
-   recLeadIsoJetPt_name+=_RecoCutFlags[c].c_str();
-   recLeadIsoJetEta_name+=_RecoCutFlags[c].c_str();
-   RecoIsoJetPt_name+=_RecoCutFlags[c].c_str();
-   RecoJetPt_name+=_RecoCutFlags[c].c_str();
-   JetCounter_name+=_RecoCutFlags[c].c_str();}
+   	recLeadIsoJetPt_name+=_RecoCutFlags[c].c_str();
+   	recLeadIsoJetEta_name+=_RecoCutFlags[c].c_str();
+   	RecoIsoJetPt_name+=_RecoCutFlags[c].c_str();
+   	RecoJetPt_name+=_RecoCutFlags[c].c_str();
+   	JetCounter_name+=_RecoCutFlags[c].c_str();
+   }
    
    recLeadIsoJetPt_123456 = new TH1D(recLeadIsoJetPt_name.c_str(), "Reconstructed Leading Iso Jet p_{T}", 200, 0, 200);
    _histoVector.push_back(recLeadIsoJetPt_123456);
@@ -437,8 +442,8 @@ void RecoMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
   infile.open(_sourceFileList.c_str());
   string datafile;
   while(getline (infile, datafile)){
-    ch->Add(datafile.c_str());
-    _fileCounter++;
+  	ch->Add(datafile.c_str());
+  	_fileCounter++;
   }
   
   if(_EventNumber==0 && _EventsPerFile==0)_entries = ch->GetEntries();
@@ -457,13 +462,13 @@ void RecoMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
   cout << "RecoMuon Worker built." << endl;   
 }
 
+
 RecoMuon::~RecoMuon(){
   _file->ls();
-  
 }
 
-void  RecoMuon::process(const fwlite::Event& iEvent)
-{
+
+void  RecoMuon::process(const fwlite::Event& iEvent){
    
    _run = iEvent.id().run();
    if(_sample=="mc")_run=-1;
@@ -471,333 +476,346 @@ void  RecoMuon::process(const fwlite::Event& iEvent)
    double weight = 1.;
    _file->cd();
 
+   //----richiamo i REC Muons----
    fwlite::Handle<std::vector<pat::Muon> > muonHandle;
    muonHandle.getByLabel(iEvent, "selectedMuons");
 
+   //----richiamo la REC Z----
    fwlite::Handle<std::vector<reco::CompositeCandidate> > zrecHandle;
    zrecHandle.getByLabel(iEvent, "zmumurec");
-  
+   //seleziono un vettore di 2 muoni figli della REC Z ordinati per pt
+   std::vector<const pat::Muon*> zrecdaughters;
+   const pat::Muon *dau0 = 0;
+   const pat::Muon *dau1 = 0;  
+   if(zrecHandle->size()){
+   	zrecdaughters = ZRECDaughters(*zrecHandle);
+   	if(zrecdaughters.size()){
+   		dau0 = zrecdaughters[0];
+   		dau1 = zrecdaughters[1];
+   		if(dau1->pt() > dau0->pt())throw cms::Exception("PATAnalysis:RecoMuon_WrongMuonOrder") << "ERROR! Z muons are in wrong order!";
+   	}
+   }
+
+   //----richiamo i REC Jets----  
    fwlite::Handle<std::vector<pat::Jet> > jetrecHandle;
    jetrecHandle.getByLabel(iEvent, "selectedJetsL1Corrected");
+   //seleziono un vettore di jets REC per Accettanza e ID
+   std::vector<const pat::Jet*> recjets = GetJets<pat::Jet>(*jetrecHandle);
+   //seleziono un vettore di jets REC con Cleaning dai 2 Muoni dalla Z REC, qualora esistano ed uno che non lo è 
+   std::vector<const pat::Jet*> isorecjets;
+   std::vector<const pat::Jet*> notisorecjets;
+   if(zrecdaughters.size()){  
+   	for(unsigned int i = 0; i < recjets.size(); i++){     
+   		if(IsoJet<pat::Muon>(zrecdaughters,*recjets[i]))
+   			isorecjets.push_back(recjets[i]);
+   		if(!IsoJet<pat::Muon>(zrecdaughters,*recjets[i]))
+   			notisorecjets.push_back(recjets[i]);
+   	}
+   }
+   else if(!zrecdaughters.size()){
+   	for(unsigned int i = 0; i < recjets.size(); i++)
+   		isorecjets.push_back(recjets[i]);
+   }
 
-   fwlite::Handle<pat::TriggerEvent> triggerHandle;
-   triggerHandle.getByLabel(iEvent, "patTriggerEvent");
-   
+   //----richiamo la rho----   
    fwlite::Handle<double> Rho;
    Rho.getByLabel(iEvent, "kt6PFJets", "rho");
-   
    _rho = *Rho;
-   
+
+   //----richiamo i Trigger paths----
+   fwlite::Handle<pat::TriggerEvent> triggerHandle;
+   triggerHandle.getByLabel(iEvent, "patTriggerEvent");
    // Available triggers
    static map<std::string, std::pair<int, int> > TrgVector = muTrigger();
    static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;
    int trg = 1;
    for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
-   if(isTriggerAvailable(*triggerHandle,TrgVectorIter->first.c_str()))_TrgList[trg]=1;
-   trg++;
+   	if(isTriggerAvailable(*triggerHandle,TrgVectorIter->first.c_str()))_TrgList[trg]=1;
+   		trg++;
    }
+
    
+
    //Event plots
-   
    recZnum->Fill(zrecHandle->size());
    
    int BestMassZNum = -1;
    double DiffMass = 99999.;
    for(unsigned i=0; i!=zrecHandle->size(); i++){
-   if(DiffMass>TMath::Abs((*zrecHandle)[i].mass()-91.1876)){
-   DiffMass=TMath::Abs((*zrecHandle)[i].mass()-91.1876);
-   BestMassZNum=i;}
+   	if(DiffMass>TMath::Abs((*zrecHandle)[i].mass()-91.1876)){
+   		DiffMass=TMath::Abs((*zrecHandle)[i].mass()-91.1876);
+   		BestMassZNum=i;
+	}
    }
    BestMassIndex->Fill(BestMassZNum);
    
-   // Isolated Jets selection
-   std::vector<const pat::Jet*> recjets = GetJets<pat::Jet>(*jetrecHandle);
-   std::vector<const pat::Jet*> isorecjets;
-   std::vector<const pat::Jet*> notisorecjets;
-   
-   std::vector<const pat::Muon*> zrecdaughters;
-   
-   const pat::Muon *dau0 = 0;
-   const pat::Muon *dau1 = 0;  
-   
-    if(zrecHandle->size()){
-   
-    zrecdaughters = ZRECDaughters(*zrecHandle);
   
-     if(zrecdaughters.size()){
-     
-     dau0 = zrecdaughters[0];
-     dau1 = zrecdaughters[1];
-     
-     if(dau1->pt()>dau0->pt())throw cms::Exception("PATAnalysis:RecoMuon_WrongMuonOrder") << "ERROR! Z muons are in wrong order!";
-    
-     }
-     
-     }
-
-   if(zrecdaughters.size()){  
-   for(unsigned int i = 0; i < recjets.size(); i++){     
-   if(IsoJet<pat::Muon>(zrecdaughters,*recjets[i]))isorecjets.push_back(recjets[i]);
-   
-   if(!IsoJet<pat::Muon>(zrecdaughters,*recjets[i]))notisorecjets.push_back(recjets[i]);}
-   }else if(!zrecdaughters.size()){
-   for(unsigned int i = 0; i < recjets.size(); i++)isorecjets.push_back(recjets[i]);}
-  
-   // Z->ee events (OC) study: selections applied
-   
+   // Z->mumu events (OC) study: selections applied
    if(zrecHandle->size()){
      
-     //Events with a selected Zee - SELECTIONS: 1
-     if (RecSelected(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
+   	//Events with a selected Zmumu - SELECTIONS: 1
+   	if (RecSelected(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
    
-     //Z variables
-     recPtZ_1->Fill((*zrecHandle)[0].pt());
-     recEtaZ_1->Fill((*zrecHandle)[0].eta());
-     recMassZ_1->Fill((*zrecHandle)[0].mass());
+   		//Z variables
+   		recPtZ_1->Fill((*zrecHandle)[0].pt());
+   		recEtaZ_1->Fill((*zrecHandle)[0].eta());
+   		recMassZ_1->Fill((*zrecHandle)[0].mass());
      
-     //Z Muons variables
-     recLeadMuEta_1->Fill(dau0->eta());
-     recSecMuEta_1->Fill(dau1->eta());
-     recLeadMuPt_1->Fill(dau0->pt());
-     recSecMuPt_1->Fill(dau1->pt());
-     recMuIP_1->Fill(dau0->dB());
-     recMuIP_1->Fill(dau1->dB());
+   		//Z Muons variables
+   		recLeadMuEta_1->Fill(dau0->eta());
+   		recSecMuEta_1->Fill(dau1->eta());
+   		recLeadMuPt_1->Fill(dau0->pt());
+   		recSecMuPt_1->Fill(dau1->pt());
+   		recMuIP_1->Fill(dau0->dB());
+   		recMuIP_1->Fill(dau1->dB());
         
-     //Jet variables
-     IsoJetCounter_1->Fill(isorecjets.size());
-      
-     }
+   		//Jet variables
+   		IsoJetCounter_1->Fill(isorecjets.size());
+   	}
    
-     //Events with a selected Zee - SELECTIONS: 1+2
-     if (RecSelected(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
+   	//Events with a selected Zmumu - SELECTIONS: 1+2
+   	if (RecSelected(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+   	    RecSelected(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
     
-     //Z variables
-     recPtZ_12->Fill((*zrecHandle)[0].pt());
-     recEtaZ_12->Fill((*zrecHandle)[0].eta());
-     recMassZ_12->Fill((*zrecHandle)[0].mass());
+   		//Z variables
+   		recPtZ_12->Fill((*zrecHandle)[0].pt());
+   		recEtaZ_12->Fill((*zrecHandle)[0].eta());
+   		recMassZ_12->Fill((*zrecHandle)[0].mass());
      
-     //Z Muons variables
-     recLeadMuEta_12->Fill(dau0->eta());
-     recSecMuEta_12->Fill(dau1->eta());
-     recLeadMuPt_12->Fill(dau0->pt());
-     recSecMuPt_12->Fill(dau1->pt());
-     recMuIP_12->Fill(dau0->dB());
-     recMuIP_12->Fill(dau1->dB());
+   		//Z Muons variables
+   		recLeadMuEta_12->Fill(dau0->eta());
+   		recSecMuEta_12->Fill(dau1->eta());
+   		recLeadMuPt_12->Fill(dau0->pt());
+   		recSecMuPt_12->Fill(dau1->pt());
+   		recMuIP_12->Fill(dau0->dB());
+   		recMuIP_12->Fill(dau1->dB());
       
-     //Jet variables
-     IsoJetCounter_12->Fill(isorecjets.size());
+   		//Jet variables
+   		IsoJetCounter_12->Fill(isorecjets.size());
+   	}
      
-     }
-     
-     //Events with a selected Zee - SELECTIONS: 1+2+3
-     if (RecSelected(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
+   	//Events with a selected Zmumu - SELECTIONS: 1+2+3
+   	if (RecSelected(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+   	    RecSelected(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+   	    RecSelected(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
     
-     //Z variables
-     recPtZ_123->Fill((*zrecHandle)[0].pt());
-     recEtaZ_123->Fill((*zrecHandle)[0].eta());
-     recMassZ_123->Fill((*zrecHandle)[0].mass());
+   		//Z variables
+   		recPtZ_123->Fill((*zrecHandle)[0].pt());
+   		recEtaZ_123->Fill((*zrecHandle)[0].eta());
+   		recMassZ_123->Fill((*zrecHandle)[0].mass());
      
-     //Z Muons variables
-     recLeadMuEta_123->Fill(dau0->eta());
-     recSecMuEta_123->Fill(dau1->eta());
-     recLeadMuPt_123->Fill(dau0->pt());
-     recSecMuPt_123->Fill(dau1->pt());
-     recMuIP_123->Fill(dau0->dB());
-     recMuIP_123->Fill(dau1->dB());
+   		//Z Muons variables
+   		recLeadMuEta_123->Fill(dau0->eta());
+   		recSecMuEta_123->Fill(dau1->eta());
+   		recLeadMuPt_123->Fill(dau0->pt());
+   		recSecMuPt_123->Fill(dau1->pt());
+   		recMuIP_123->Fill(dau0->dB());
+   		recMuIP_123->Fill(dau1->dB());
          
-     //Jet variables
-     IsoJetCounter_123->Fill(isorecjets.size());
-     
-     }
+   		//Jet variables
+   		IsoJetCounter_123->Fill(isorecjets.size());
+   	}
     
-     //Events with a selected Zee - SELECTIONS: 1+2+3+4
-     if (RecSelected(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[4].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
+   	//Events with a selected Zmumu - SELECTIONS: 1+2+3+4
+   	if (RecSelected(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) &&
+   	    RecSelected(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+   	    RecSelected(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+   	    RecSelected(_RecoCutFlags[4].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
      
-     //Z variables
-     recPtZ_1234->Fill((*zrecHandle)[0].pt());
-     recEtaZ_1234->Fill((*zrecHandle)[0].eta());
-     recMassZ_1234->Fill((*zrecHandle)[0].mass());
+   		//Z variables
+   		recPtZ_1234->Fill((*zrecHandle)[0].pt());
+   		recEtaZ_1234->Fill((*zrecHandle)[0].eta());
+   		recMassZ_1234->Fill((*zrecHandle)[0].mass());
      
-     //Z Muons variables
-     recLeadMuEta_1234->Fill(dau0->eta());
-     recSecMuEta_1234->Fill(dau1->eta());
-     recLeadMuPt_1234->Fill(dau0->pt());
-     recSecMuPt_1234->Fill(dau1->pt());
-     recMuIP_1234->Fill(dau0->dB());
-     recMuIP_1234->Fill(dau1->dB());
+   		//Z Muons variables
+   		recLeadMuEta_1234->Fill(dau0->eta());
+   		recSecMuEta_1234->Fill(dau1->eta());
+   		recLeadMuPt_1234->Fill(dau0->pt());
+   		recSecMuPt_1234->Fill(dau1->pt());
+   		recMuIP_1234->Fill(dau0->dB());
+   		recMuIP_1234->Fill(dau1->dB());
          
-     //Jet variables
-     IsoJetCounter_1234->Fill(isorecjets.size());
-          
-    }
+   		//Jet variables
+   		IsoJetCounter_1234->Fill(isorecjets.size());
+   	}
     
-    //Events with a selected Zee - SELECTIONS: 1+2+3+4+5
-     if (RecSelected(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[4].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[5].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
+   	//Events with a selected Zmumu - SELECTIONS: 1+2+3+4+5
+   	if (RecSelected(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+   	    RecSelected(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+   	    RecSelected(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+   	    RecSelected(_RecoCutFlags[4].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+   	    RecSelected(_RecoCutFlags[5].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
 
-      //Z variables     
-      recPtZ_12345->Fill((*zrecHandle)[0].pt());
-      recEtaZ_12345->Fill((*zrecHandle)[0].eta());
-      recMassZ_12345->Fill((*zrecHandle)[0].mass());
+   		//Z variables     
+   		recPtZ_12345->Fill((*zrecHandle)[0].pt());
+   		recEtaZ_12345->Fill((*zrecHandle)[0].eta());
+   		recMassZ_12345->Fill((*zrecHandle)[0].mass());
 
-      //Z Muons variables      
-      recLeadMuEta_12345->Fill(dau0->eta());
-      recSecMuEta_12345->Fill(dau1->eta());
-      recLeadMuPt_12345->Fill(dau0->pt());
-      recSecMuPt_12345->Fill(dau1->pt());
-      recMuIP_12345->Fill(dau0->dB());
-      recMuIP_12345->Fill(dau1->dB());
+   		//Z Muons variables      
+   		recLeadMuEta_12345->Fill(dau0->eta());
+   		recSecMuEta_12345->Fill(dau1->eta());
+   		recLeadMuPt_12345->Fill(dau0->pt());
+   		recSecMuPt_12345->Fill(dau1->pt());
+   		recMuIP_12345->Fill(dau0->dB());
+   		recMuIP_12345->Fill(dau1->dB());
            
-      //Jet variables     
-      IsoJetCounter_12345->Fill(isorecjets.size());
-      
-      }
+   		//Jet variables     
+   		IsoJetCounter_12345->Fill(isorecjets.size());
+   	}
   
-     //Events with a selected Zee - SELECTIONS: 1+2+3+4+5+6
-     if (RecSelected(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[4].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[5].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[6].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
+   	//Events with a selected Zmumu - SELECTIONS: 1+2+3+4+5+6
+   	if (RecSelected(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+   	    RecSelected(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+   	    RecSelected(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+   	    RecSelected(_RecoCutFlags[4].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+   	    RecSelected(_RecoCutFlags[5].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+   	    RecSelected(_RecoCutFlags[6].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
      
-      //Z variables     
-      recPtZ_123456->Fill((*zrecHandle)[0].pt());
-      recEtaZ_123456->Fill((*zrecHandle)[0].eta());
-      recMassZ_123456->Fill((*zrecHandle)[0].mass());
+   		//Z variables     
+   		recPtZ_123456->Fill((*zrecHandle)[0].pt());
+   		recEtaZ_123456->Fill((*zrecHandle)[0].eta());
+   		recMassZ_123456->Fill((*zrecHandle)[0].mass());
 
-      //Z Muons variables      
-      recLeadMuEta_123456->Fill(dau0->eta());
-      recSecMuEta_123456->Fill(dau1->eta());
-      recLeadMuPt_123456->Fill(dau0->pt());
-      recSecMuPt_123456->Fill(dau1->pt());
-      recMuIP_123456->Fill(dau0->dB());
-      recMuIP_123456->Fill(dau1->dB());
+   		//Z Muons variables      
+   		recLeadMuEta_123456->Fill(dau0->eta());
+   		recSecMuEta_123456->Fill(dau1->eta());
+   		recLeadMuPt_123456->Fill(dau0->pt());
+   		recSecMuPt_123456->Fill(dau1->pt());
+   		recMuIP_123456->Fill(dau0->dB());
+   		recMuIP_123456->Fill(dau1->dB());
            
-      //Jet variables     
-      JetCounter_123456->Fill(recjets.size());
-      IsoJetCounter_123456->Fill(isorecjets.size());
+   		//Jet variables     
+   		JetCounter_123456->Fill(recjets.size());
+   		IsoJetCounter_123456->Fill(isorecjets.size());
     
-      for(unsigned int i = 0; i < recjets.size(); i++){
-      RecoJetPt_123456->Fill(recjets[i]->pt());}
+   		for(unsigned int i = 0; i < recjets.size(); i++){
+   			RecoJetPt_123456->Fill(recjets[i]->pt());
+   		}
       
-      for(unsigned int i = 0; i < isorecjets.size(); i++){
-      RecoIsoJetPt_123456->Fill(isorecjets[i]->pt());}
+   		for(unsigned int i = 0; i < isorecjets.size(); i++){
+   			RecoIsoJetPt_123456->Fill(isorecjets[i]->pt());
+   		}
       
-      if (isorecjets.size()){
-        recLeadIsoJetPt_123456->Fill(isorecjets[0]->pt());
-        recLeadIsoJetEta_123456->Fill(isorecjets[0]->eta());
-        }
+   		if (isorecjets.size()){
+   			recLeadIsoJetPt_123456->Fill(isorecjets[0]->pt());
+   			recLeadIsoJetEta_123456->Fill(isorecjets[0]->eta());
+   		}
       
-      //Jet properties
+   		//Jet properties
      
-      //All jets
-      if (recjets.size()){      
-      for (unsigned int i = 0; i < recjets.size(); ++i){     
-          MinDeltaR_ZDau->Fill(MinDeltaRZDau<pat::Muon>(zrecdaughters,*recjets[i]));       
-          AllJetCharge->Fill(recjets[i]->jetCharge());                   
-      }     
-      }  
+   		//All jets
+   		if (recjets.size()){      
+   			for (unsigned int i = 0; i < recjets.size(); ++i){     
+   				MinDeltaR_ZDau->Fill(MinDeltaRZDau<pat::Muon>(zrecdaughters,*recjets[i]));       
+   				AllJetCharge->Fill(recjets[i]->jetCharge());                   
+   			}     
+      		}  
     
-      //Isolated jets    
-      if(isorecjets.size()){      
-      for (unsigned int i = 0; i < isorecjets.size(); ++i){      
-        IsoJetCharge->Fill(isorecjets[i]->jetCharge());  
-        DeltaR_IsoJet->Fill(MinDeltaRZDau<pat::Muon>(zrecdaughters,*isorecjets[i]));
-      
-        //Iso Jets muon-type
-        if(isorecjets[i]->jetCharge() < -0.98 || isorecjets[i]->jetCharge() > 0.98){           
-          DeltaR_IsoJet_MuType->Fill(MinDeltaRZDau<pat::Muon>(zrecdaughters,*isorecjets[i]));          
-          }          
-          }     
-     }
+   		//Isolated jets    
+   		if(isorecjets.size()){      
+   			for (unsigned int i = 0; i < isorecjets.size(); ++i){      
+    				IsoJetCharge->Fill(isorecjets[i]->jetCharge());  
+    				DeltaR_IsoJet->Fill(MinDeltaRZDau<pat::Muon>(zrecdaughters,*isorecjets[i]));
+     				//Iso Jets muon-type
+   				if(isorecjets[i]->jetCharge() < -0.98 || isorecjets[i]->jetCharge() > 0.98){           
+   					DeltaR_IsoJet_MuType->Fill(MinDeltaRZDau<pat::Muon>(zrecdaughters,*isorecjets[i]));          
+   				}          
+   			}     
+     		}
      
-     //Not isolated jets
-     if(notisorecjets.size()){     
-      for (unsigned int i = 0; i < notisorecjets.size(); ++i){      
-          NotIsoJetCharge->Fill(notisorecjets[i]->jetCharge());        
-          DeltaR_NotIsoJet->Fill(MinDeltaRZDau<pat::Muon>(zrecdaughters,*notisorecjets[i]));
-     }
-     }
+   		//Not isolated jets
+   		if(notisorecjets.size()){     
+   			for (unsigned int i = 0; i < notisorecjets.size(); ++i){      
+   				NotIsoJetCharge->Fill(notisorecjets[i]->jetCharge());        
+   				DeltaR_NotIsoJet->Fill(MinDeltaRZDau<pat::Muon>(zrecdaughters,*notisorecjets[i]));
+   			}
+   		}
      
-      //Exclusive - Inclusive Histograms
-      _Jetdir->cd();
-      addHistosVsMulti(isorecjets.size(), "recJetPtIncl", " reconstructed jet p_{T} spectrum", 200, 0, 200, recJetPtVsInclMulti);
-      addHistosVsMulti(isorecjets.size(), "recJetEtaIncl", " reconstructed jet #eta spectrum", 100, -5., 5., recJetEtaVsInclMulti);
-      _Zdir->cd();
-      addHistosVsMulti(isorecjets.size(), "recZPtIncl", " reconstructed Z p_{T} spectrum", 200, 0., 200., recZPtVsInclMulti);
-      addHistosVsMulti(isorecjets.size(), "recZEtaIncl", " reconstructed Z #eta spectrum", 100, -5., 5., recZEtaVsInclMulti);
-      addHistosVsMulti(isorecjets.size(), "recZPtExcl", " reconstructed Z p_{T} spectrum", 200, 0., 200., recZPtVsExclMulti);
-      addHistosVsMulti(isorecjets.size(), "recZEtaExcl", " reconstructed Z #eta spectrum", 100, -5., 5., recZEtaVsExclMulti);
-      _Mudir->cd();
-      addHistosVsMulti(isorecjets.size(), "recMu1PtExcl", " reconstructed lead muon p_{T} spectrum", 200, 0., 200., recMu1PtVsExclMulti);
-      addHistosVsMulti(isorecjets.size(), "recMu1EtaExcl", " reconstructed lead muon #eta spectrum", 100, -5., 5., recMu1EtaVsExclMulti);
-      addHistosVsMulti(isorecjets.size(), "recMu2PtExcl", " reconstructed sec muon p_{T} spectrum", 200, 0., 200., recMu2PtVsExclMulti);
-      addHistosVsMulti(isorecjets.size(), "recMu2EtaExcl", " reconstructed sec muon #eta spectrum", 100, -5., 5., recMu2EtaVsExclMulti);     
-      addHistosVsMulti(isorecjets.size(), "recMu1PtIncl", " reconstructed lead muon p_{T} spectrum", 200, 0., 200., recMu1PtVsInclMulti);
-      addHistosVsMulti(isorecjets.size(), "recMu1EtaIncl", " reconstructed lead muon #eta spectrum", 100, -5., 5., recMu1EtaVsInclMulti);
-      addHistosVsMulti(isorecjets.size(), "recMu2PtIncl", " reconstructed sec muon p_{T} spectrum", 200, 0., 200., recMu2PtVsInclMulti);
-      addHistosVsMulti(isorecjets.size(), "recMu2EtaIncl", " reconstructed sec muon #eta spectrum", 100, -5., 5., recMu2EtaVsInclMulti);  
+   		//Exclusive - Inclusive Histograms
+	   	_Jetdir->cd();
+   		addHistosVsMulti(isorecjets.size(), "recJetPtIncl", " reconstructed jet p_{T} spectrum", 200, 0, 200, recJetPtVsInclMulti);
+   		addHistosVsMulti(isorecjets.size(), "recJetEtaIncl", " reconstructed jet #eta spectrum", 100, -5., 5., recJetEtaVsInclMulti);
+	
+   		_Zdir->cd();
+   		addHistosVsMulti(isorecjets.size(), "recZPtIncl", " reconstructed Z p_{T} spectrum", 200, 0., 200., recZPtVsInclMulti);
+   		addHistosVsMulti(isorecjets.size(), "recZEtaIncl", " reconstructed Z #eta spectrum", 100, -5., 5., recZEtaVsInclMulti);
+   		addHistosVsMulti(isorecjets.size(), "recZPtExcl", " reconstructed Z p_{T} spectrum", 200, 0., 200., recZPtVsExclMulti);
+   		addHistosVsMulti(isorecjets.size(), "recZEtaExcl", " reconstructed Z #eta spectrum", 100, -5., 5., recZEtaVsExclMulti);
+	
+   		_Mudir->cd();
+   		addHistosVsMulti(isorecjets.size(), "recMu1PtExcl", " reconstructed lead muon p_{T} spectrum", 200, 0., 200., recMu1PtVsExclMulti);
+   		addHistosVsMulti(isorecjets.size(), "recMu1EtaExcl", " reconstructed lead muon #eta spectrum", 100, -5., 5., recMu1EtaVsExclMulti);
+   		addHistosVsMulti(isorecjets.size(), "recMu2PtExcl", " reconstructed sec muon p_{T} spectrum", 200, 0., 200., recMu2PtVsExclMulti);
+   		addHistosVsMulti(isorecjets.size(), "recMu2EtaExcl", " reconstructed sec muon #eta spectrum", 100, -5., 5., recMu2EtaVsExclMulti);     
+   		addHistosVsMulti(isorecjets.size(), "recMu1PtIncl", " reconstructed lead muon p_{T} spectrum", 200, 0., 200., recMu1PtVsInclMulti);
+   		addHistosVsMulti(isorecjets.size(), "recMu1EtaIncl", " reconstructed lead muon #eta spectrum", 100, -5., 5., recMu1EtaVsInclMulti);
+   		addHistosVsMulti(isorecjets.size(), "recMu2PtIncl", " reconstructed sec muon p_{T} spectrum", 200, 0., 200., recMu2PtVsInclMulti);
+   		addHistosVsMulti(isorecjets.size(), "recMu2EtaIncl", " reconstructed sec muon #eta spectrum", 100, -5., 5., recMu2EtaVsInclMulti);  
 
-      //fill inclusive histograms
-      for (unsigned int i = 0; i < isorecjets.size()+1; ++i){
-        recZPtVsInclMulti[i]->Fill((*zrecHandle)[0].pt(), weight);
-        recZEtaVsInclMulti[i]->Fill((*zrecHandle)[0].eta(), weight);
-        recMu1PtVsInclMulti[i]->Fill(dau0->pt(), weight);
-        recMu2PtVsInclMulti[i]->Fill(dau1->pt(), weight);
-        recMu1EtaVsInclMulti[i]->Fill(dau0->pt(), weight);
-        recMu2EtaVsInclMulti[i]->Fill(dau1->pt(), weight);
-      }
+   		//fill inclusive histograms
+   		for (unsigned int i = 0; i < isorecjets.size()+1; ++i){
+   			recZPtVsInclMulti[i]->Fill((*zrecHandle)[0].pt(), weight);
+   			recZEtaVsInclMulti[i]->Fill((*zrecHandle)[0].eta(), weight);
+   			recMu1PtVsInclMulti[i]->Fill(dau0->pt(), weight);
+   			recMu2PtVsInclMulti[i]->Fill(dau1->pt(), weight);
+   			recMu1EtaVsInclMulti[i]->Fill(dau0->pt(), weight);
+   			recMu2EtaVsInclMulti[i]->Fill(dau1->pt(), weight);
+   		}
       
-      if (isorecjets.size()){  
-        for (unsigned int i = 0; i < isorecjets.size(); ++i){
-          recJetPtVsInclMulti[i+1]->Fill(isorecjets[i]->pt(), weight);
-          recJetEtaVsInclMulti[i+1]->Fill(isorecjets[i]->eta(), weight);
-      }
-      }
+   		if (isorecjets.size()){  
+   			for (unsigned int i = 0; i < isorecjets.size(); ++i){
+   				recJetPtVsInclMulti[i+1]->Fill(isorecjets[i]->pt(), weight);
+   				recJetEtaVsInclMulti[i+1]->Fill(isorecjets[i]->eta(), weight);
+   			}
+   		}
 
-      //fill exclusive histograms
-      recZPtVsExclMulti[isorecjets.size()]->Fill((*zrecHandle)[0].pt(), weight);
-      recZEtaVsExclMulti[isorecjets.size()]->Fill((*zrecHandle)[0].eta(), weight);
-      recMu1PtVsExclMulti[isorecjets.size()]->Fill(dau0->pt(), weight);
-      recMu1EtaVsExclMulti[isorecjets.size()]->Fill(dau0->eta(), weight);
-      recMu2PtVsExclMulti[isorecjets.size()]->Fill(dau1->pt(), weight);
-      recMu2EtaVsExclMulti[isorecjets.size()]->Fill(dau1->eta(), weight);
+   		//fill exclusive histograms
+   		recZPtVsExclMulti[isorecjets.size()]->Fill((*zrecHandle)[0].pt(), weight);
+   		recZEtaVsExclMulti[isorecjets.size()]->Fill((*zrecHandle)[0].eta(), weight);
+   		recMu1PtVsExclMulti[isorecjets.size()]->Fill(dau0->pt(), weight);
+   		recMu1EtaVsExclMulti[isorecjets.size()]->Fill(dau0->eta(), weight);
+   		recMu2PtVsExclMulti[isorecjets.size()]->Fill(dau1->pt(), weight);
+   		recMu2EtaVsExclMulti[isorecjets.size()]->Fill(dau1->eta(), weight);
    
-   }
+   	}
    
-   string IsoFlag, MuIDFlag;
-   if(_selections=="SYM"){
-   IsoFlag="_IsoSYM";
-   MuIDFlag="_MuIDSYM";}
-   if(_selections=="ASYM"){
-   IsoFlag="_IsoASYM";
-   MuIDFlag="_MuIDASYM";}
+   	string IsoFlag, MuIDFlag;
+   	if(_selections=="SYM"){
+   		IsoFlag="_IsoSYM";
+   		MuIDFlag="_MuIDSYM";
+   	}
+   	if(_selections=="ASYM"){
+   		IsoFlag="_IsoASYM";
+  		MuIDFlag="_MuIDASYM";
+   	}
  
-   for(int fcount = 1; fcount<7; fcount++){
-   
-   if(fcount != 6){
-   if(_RecoCutFlags[fcount+1] == IsoFlag.c_str()){   
-   bool PreIso = false;
-   for(int n = 1; n < fcount+1; n++){
-   if(RecSelected(_RecoCutFlags[n].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
-   PreIso = true;
-   }else{
-   PreIso = false;
-   n = fcount+1;
-   }
-   }
-   
-   if(PreIso){    
-     recTrackIsoLead_PreIso->Fill(dau0->trackIso());
-     recEcalIsoLead_PreIso->Fill(dau0->ecalIso());
-     recHcalIsoLead_PreIso->Fill(dau0->hcalIso());
+   	for(int fcount = 1; fcount<7; fcount++){
+   		if(fcount != 6){
+   			if(_RecoCutFlags[fcount+1] == IsoFlag.c_str()){   
+   				bool PreIso = false;
+   				for(int n = 1; n < fcount+1; n++){
+   					if(RecSelected(_RecoCutFlags[n].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
+   						PreIso = true;
+   					}
+					else{
+   						PreIso = false;
+   						n = fcount+1;
+   					}
+   				}
+   				if(PreIso){    
+   					recTrackIsoLead_PreIso->Fill(dau0->trackIso());
+   					recEcalIsoLead_PreIso->Fill(dau0->ecalIso());
+   					recHcalIsoLead_PreIso->Fill(dau0->hcalIso());
      
-     recTrackIsoSec_PreIso->Fill(dau1->trackIso());
-     recEcalIsoSec_PreIso->Fill(dau1->ecalIso());
-     recHcalIsoSec_PreIso->Fill(dau1->hcalIso());  
-     }
-     
-     }
-     }
+   					recTrackIsoSec_PreIso->Fill(dau1->trackIso());
+   					recEcalIsoSec_PreIso->Fill(dau1->ecalIso());
+   					recHcalIsoSec_PreIso->Fill(dau1->hcalIso());  
+   				}
+   			}
+   		}
+   	} 
 
-} 
-
-   }
+   } // Z->mumu events (OC) study: selections applied closed
    
 }
 
@@ -830,42 +848,43 @@ void RecoMuon::finalize(){
    double lumi = _entries/_xsec;
 
    if(_Norm && lumi!=0){
-   _norm = _targetLumi/lumi;
+   	_norm = _targetLumi/lumi;
    }
 
    std::vector<TH1D*>::const_iterator ibeg = _histoVector.begin();
    std::vector<TH1D*>::const_iterator iend = _histoVector.end();
    
    for (std::vector<TH1D*>::const_iterator i = ibeg; i != iend; ++i){
-   (*i)->Sumw2();
+   	(*i)->Sumw2();
    }
  
    for (std::vector<TH1D*>::const_iterator i = ibeg; i != iend; ++i){
-   if (*i) (*i)->Scale(_norm);
+   	if (*i) (*i)->Scale(_norm);
    }
    
    ofstream Report;
    Report.open(_ReportName.c_str());
    Report<<endl<<endl<<"----- Sample Info -----"<<endl<<endl;
-   if(_sample=="data")Report<<"Sample is: DATA"<<endl<<endl;
-   if(_sample=="mc")Report<<"Sample is: MC"<<endl<<endl; 
+   if(_sample=="data") Report<<"Sample is: DATA"<<endl<<endl;
+   if(_sample=="mc") Report<<"Sample is: MC"<<endl<<endl; 
    Report<<"Source File = "<<_sourceFileList.c_str()<<endl;
    Report<<"File number = "<<_fileCounter<<endl;
    Report<<"Number of events = "<<_entries<<endl;
    Report<<"Number of events obtained from: ";
-   if(_ProcEvents==-1 && _EventNumber==0 && _EventsPerFile==0)Report<<"TChain"<<endl;
-   if(_ProcEvents==-1 && _EventNumber!=0 && _EventsPerFile==0)Report<<"EventNumber"<<endl;
-   if(_ProcEvents==-1 && _EventNumber==0 && _EventsPerFile!=0)Report<<"EventsPerFile = "<<_EventsPerFile<<" * fileCounter"<<endl;
-   if(_ProcEvents==-1 && _EventNumber!=0 && _EventsPerFile!=0)Report<<"ERROR: EventNumber AND EventsPerFile != 0"<<endl;
-   if(_ProcEvents!=-1)Report<<"ProcEvents"<<endl; 
+   if(_ProcEvents==-1 && _EventNumber==0 && _EventsPerFile==0) Report<<"TChain"<<endl;
+   if(_ProcEvents==-1 && _EventNumber!=0 && _EventsPerFile==0) Report<<"EventNumber"<<endl;
+   if(_ProcEvents==-1 && _EventNumber==0 && _EventsPerFile!=0) Report<<"EventsPerFile = "<<_EventsPerFile<<" * fileCounter"<<endl;
+   if(_ProcEvents==-1 && _EventNumber!=0 && _EventsPerFile!=0) Report<<"ERROR: EventNumber AND EventsPerFile != 0"<<endl;
+   if(_ProcEvents!=-1) Report<<"ProcEvents"<<endl; 
    Report<<"Cross section = "<<_xsec<<endl;
    Report<<"Lumi = "<<lumi<<endl;
    if(_Norm && lumi!=0){ 
-   Report<<"Sample is normalized to Lumi "<<_targetLumi<<" pb-1"<<endl;
-   Report<<"Normalization factor = "<<_norm<<endl;}
-   if(!_Norm || lumi==0)Report<<"Sample not normalized"<<endl;
+   	Report<<"Sample is normalized to Lumi "<<_targetLumi<<" pb-1"<<endl;
+   	Report<<"Normalization factor = "<<_norm<<endl;
+   }
+   if(!_Norm || lumi==0) Report<<"Sample not normalized"<<endl;
    Report<<endl<<"Selections Type used = "<<_selections.c_str()<<endl;
-   if(_selections=="SYM")Report<<"MuID applied = "<<muID_SYM.c_str()<<endl;
+   if(_selections=="SYM") Report<<"MuID applied = "<<muID_SYM.c_str()<<endl;
    Report<<"Selections applied:"<<endl;
    Report<<_RecoCutFlags[1].c_str()<<endl;
    Report<<_RecoCutFlags[2].c_str()<<endl;
@@ -883,179 +902,184 @@ void RecoMuon::finalize(){
    static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;
    int trg = 1;
    for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
-   if(_TrgList[trg]==1)Report<<"MuonTrigger = "<<TrgVectorIter->first.c_str()<<endl;
-   trg++;
+   	if(_TrgList[trg]==1) Report<<"MuonTrigger = "<<TrgVectorIter->first.c_str()<<endl;
+   	trg++;
    }
    Report<<endl;
    
    if(_sample=="data"){
-   Report<<"Run range required for each trigger (DATA sample):"<<endl<<endl;
-   static map<std::string, std::pair<int, int> > TrgVector = muTrigger();
-   static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;
-   for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
-   Report<<"MuonTrigger = "<<TrgVectorIter->first.c_str()<<"		Run range = "<<TrgVectorIter->second.first<<" to "<<TrgVectorIter->second.second<<endl;}
+   	Report<<"Run range required for each trigger (DATA sample):"<<endl<<endl;
+   	static map<std::string, std::pair<int, int> > TrgVector = muTrigger();
+   	static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;
+   	for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
+   		Report<<"MuonTrigger = "<<TrgVectorIter->first.c_str()<<"		Run range = "<<TrgVectorIter->second.first<<" to "<<TrgVectorIter->second.second<<endl;
+	}
    }
    
    if(muTrgMatchReq==true){
-   Report<<"Trigger Match Required"<<endl<<endl;
-   }else{
-   Report<<"Trigger Match NOT Required"<<endl<<endl;}
+   	Report<<"Trigger Match Required"<<endl<<endl;
+   }
+   else{
+   Report<<"Trigger Match NOT Required"<<endl<<endl;
+   }
    
    if(_selections=="SYM"){
-   Report<<"ptmucut = "<<ptmucut<<endl;
-   Report<<"etamucut = "<<etamucut<<endl;
-   Report<<"eta_mu_excl_up = "<<eta_mu_excl_up<<endl;
-   Report<<"eta_mu_excl_down = "<<eta_mu_excl_down<<endl;
-   Report<<"zmassmin_sym = "<<zmassmin_sym<<endl;
-   Report<<"zmassmax_sym = "<<zmassmax_sym<<endl;
-   Report<<"dxycut = "<<dxycut<<endl;
-   Report<<"ptjetmin = "<<ptjetmin<<endl;
-   Report<<"etajetmax = "<<etajetmax<<endl;
-   if(JetIDReq==true){
-   Report<<endl<<"Jet ID Required"<<endl;
-   }else{
-   Report<<endl<<"Jet ID NOT Required"<<endl;}
-   Report<<"isojetcut = "<<isojetcut<<endl;
+   	Report<<"ptmucut = "<<ptmucut<<endl;
+   	Report<<"etamucut = "<<etamucut<<endl;
+   	Report<<"eta_mu_excl_up = "<<eta_mu_excl_up<<endl;
+   	Report<<"eta_mu_excl_down = "<<eta_mu_excl_down<<endl;
+   	Report<<"zmassmin_sym = "<<zmassmin_sym<<endl;
+   	Report<<"zmassmax_sym = "<<zmassmax_sym<<endl;
+   	Report<<"dxycut = "<<dxycut<<endl;
+   	Report<<"ptjetmin = "<<ptjetmin<<endl;
+   	Report<<"etajetmax = "<<etajetmax<<endl;
+   	if(JetIDReq==true){
+   		Report<<endl<<"Jet ID Required"<<endl;
+   	}
+   	else{
+   		Report<<endl<<"Jet ID NOT Required"<<endl;
+   	}
+   	Report<<"isojetcut = "<<isojetcut<<endl;
    
-   //SYM Quality cuts
-   Report<<endl<<"Quality cuts:"<<endl;
-   Report<<"maxchi2_SYM = "<<maxchi2_SYM<<endl;
-   Report<<"minMuHit_SYM = "<<minMuHit_SYM<<endl;
-   Report<<"minMatSta_SYM = "<<minMatSta_SYM<<endl;
-   Report<<"minVaPiHitTr_SYM = "<<minVaPiHitTr_SYM<<endl;
-   Report<<"minVaTrHit_SYM = "<<minVaTrHit_SYM<<endl;
-   Report<<"minVaHit_SYM = "<<minVaHit_SYM<<endl;
-   Report<<"minVaPiHitInTr_SYM = "<<minVaPiHitInTr_SYM<<endl;
-   Report<<"minMat_SYM = "<<minMat_SYM<<endl;
-   Report<<"maxPtRelErr_SYM = "<<maxPtRelErr_SYM<<endl;
+   	//SYM Quality cuts
+   	Report<<endl<<"Quality cuts:"<<endl;
+   	Report<<"maxchi2_SYM = "<<maxchi2_SYM<<endl;
+   	Report<<"minMuHit_SYM = "<<minMuHit_SYM<<endl;
+   	Report<<"minMatSta_SYM = "<<minMatSta_SYM<<endl;
+   	Report<<"minVaPiHitTr_SYM = "<<minVaPiHitTr_SYM<<endl;
+   	Report<<"minVaTrHit_SYM = "<<minVaTrHit_SYM<<endl;
+   	Report<<"minVaHit_SYM = "<<minVaHit_SYM<<endl;
+   	Report<<"minVaPiHitInTr_SYM = "<<minVaPiHitInTr_SYM<<endl;
+   	Report<<"minMat_SYM = "<<minMat_SYM<<endl;
+   	Report<<"maxPtRelErr_SYM = "<<maxPtRelErr_SYM<<endl;
 
-   //SYM Mu Isolation (with rho) variables
-   Report<<endl<<"Isolation cuts:"<<endl;
-   Report<<"cAecalEE_SYM = "<<cAecalEE_SYM<<endl;
-   Report<<"cAhcalHE_SYM = "<<cAhcalHE_SYM<<endl;
-   Report<<"maxmuEta_SYM = "<<maxmuEta_SYM<<endl;
-   Report<<"cAecalEB_SYM = "<<cAecalEB_SYM<<endl;
-   Report<<"cAhcalEE_SYM = "<<cAhcalEE_SYM<<endl;
-   Report<<"muonIsoRhoCut_SYM = "<<muonIsoRhoCut_SYM<<endl;
-   
-   //SYM TAG cuts
-   Report<<endl<<"TAG cuts:"<<endl;
-   Report<<"SYM_TAG_ptmucut = "<<SYM_TAG_ptmucut<<endl;   
-   Report<<"SYM_TAG_etamucut = "<<SYM_TAG_etamucut<<endl;
-   Report<<"SYM_TAG_eta_mu_excl_up = "<<SYM_TAG_eta_mu_excl_up<<endl;            
-   Report<<"SYM_TAG_eta_mu_excl_down = "<<SYM_TAG_eta_mu_excl_down<<endl;          
-   Report<<"SYM_TAG_dxycut = "<<SYM_TAG_dxycut<<endl;     
-   Report<<"SYM_TAG_maxchi2 = "<<SYM_TAG_maxchi2<<endl;
-   Report<<"SYM_TAG_minMuHit = "<<SYM_TAG_minMuHit<<endl;
-   Report<<"SYM_TAG_minMatSta = "<<SYM_TAG_minMatSta<<endl;
-   Report<<"SYM_TAG_minVaPiHitTr = "<<SYM_TAG_minVaPiHitTr<<endl;
-   Report<<"SYM_TAG_minVaTrHit = "<<SYM_TAG_minVaTrHit<<endl;
-   Report<<"SYM_TAG_minVaHit = "<<SYM_TAG_minVaHit<<endl;
-   Report<<"SYM_TAG_minVaPiHitInTr = "<<SYM_TAG_minVaPiHitInTr<<endl;
-   Report<<"SYM_TAG_minMat = "<<SYM_TAG_minMat<<endl;
-   Report<<"SYM_TAG_maxPtRelErr = "<<SYM_TAG_maxPtRelErr<<endl;
-   Report<<"SYM_TAG_muonIsoRhoCut = "<<SYM_TAG_muonIsoRhoCut<<endl;                        
-   Report<<"SYM_TAG_MuID = "<<SYM_TAG_MuID.c_str()<<endl;
-   
+   	//SYM Mu Isolation (with rho) variables
+   	Report<<endl<<"Isolation cuts:"<<endl;
+   	Report<<"cAecalEE_SYM = "<<cAecalEE_SYM<<endl;
+   	Report<<"cAhcalHE_SYM = "<<cAhcalHE_SYM<<endl;
+   	Report<<"maxmuEta_SYM = "<<maxmuEta_SYM<<endl;
+   	Report<<"cAecalEB_SYM = "<<cAecalEB_SYM<<endl;
+   	Report<<"cAhcalEE_SYM = "<<cAhcalEE_SYM<<endl;
+   	Report<<"muonIsoRhoCut_SYM = "<<muonIsoRhoCut_SYM<<endl;
+   	
+   	//SYM TAG cuts
+   	Report<<endl<<"TAG cuts:"<<endl;
+   	Report<<"SYM_TAG_ptmucut = "<<SYM_TAG_ptmucut<<endl;   
+   	Report<<"SYM_TAG_etamucut = "<<SYM_TAG_etamucut<<endl;
+   	Report<<"SYM_TAG_eta_mu_excl_up = "<<SYM_TAG_eta_mu_excl_up<<endl;            
+   	Report<<"SYM_TAG_eta_mu_excl_down = "<<SYM_TAG_eta_mu_excl_down<<endl;          
+   	Report<<"SYM_TAG_dxycut = "<<SYM_TAG_dxycut<<endl;     
+   	Report<<"SYM_TAG_maxchi2 = "<<SYM_TAG_maxchi2<<endl;
+   	Report<<"SYM_TAG_minMuHit = "<<SYM_TAG_minMuHit<<endl;
+   	Report<<"SYM_TAG_minMatSta = "<<SYM_TAG_minMatSta<<endl;
+   	Report<<"SYM_TAG_minVaPiHitTr = "<<SYM_TAG_minVaPiHitTr<<endl;
+   	Report<<"SYM_TAG_minVaTrHit = "<<SYM_TAG_minVaTrHit<<endl;
+   	Report<<"SYM_TAG_minVaHit = "<<SYM_TAG_minVaHit<<endl;
+   	Report<<"SYM_TAG_minVaPiHitInTr = "<<SYM_TAG_minVaPiHitInTr<<endl;
+   	Report<<"SYM_TAG_minMat = "<<SYM_TAG_minMat<<endl;
+   	Report<<"SYM_TAG_maxPtRelErr = "<<SYM_TAG_maxPtRelErr<<endl;
+   	Report<<"SYM_TAG_muonIsoRhoCut = "<<SYM_TAG_muonIsoRhoCut<<endl;                        
+   	Report<<"SYM_TAG_MuID = "<<SYM_TAG_MuID.c_str()<<endl;
    }
    
    if(_selections=="ASYM"){
-   Report<<"ptmucut0 = "<<ptmucut0<<endl;
-   Report<<"ptmucut1 = "<<ptmucut1<<endl;
-   Report<<"etamucut = "<<etamucut<<endl;
-   Report<<"eta_mu_excl_up = "<<eta_mu_excl_up<<endl;
-   Report<<"eta_mu_excl_down = "<<eta_mu_excl_down<<endl;
-   Report<<"zmassmin_asym = "<<zmassmin_asym<<endl;
-   Report<<"zmassmax_asym = "<<zmassmax_asym<<endl<<endl;
-   Report<<"muID_ASYM0 = "<<muID_ASYM0.c_str()<<endl;
-   Report<<"muID_ASYM1 = "<<muID_ASYM1.c_str()<<endl<<endl;
-   Report<<"dxycut = "<<dxycut<<endl<<endl;
-   Report<<"ptjetmin = "<<ptjetmin<<endl;
-   Report<<"etajetmax = "<<etajetmax<<endl;
-   if(JetIDReq==true){
-   Report<<endl<<"Jet ID Required"<<endl;
-   }else{
-   Report<<endl<<"Jet ID NOT Required"<<endl;}
-   Report<<"isojetcut = "<<isojetcut<<endl<<endl;
+   	Report<<"ptmucut0 = "<<ptmucut0<<endl;
+   	Report<<"ptmucut1 = "<<ptmucut1<<endl;
+   	Report<<"etamucut = "<<etamucut<<endl;
+   	Report<<"eta_mu_excl_up = "<<eta_mu_excl_up<<endl;
+   	Report<<"eta_mu_excl_down = "<<eta_mu_excl_down<<endl;
+   	Report<<"zmassmin_asym = "<<zmassmin_asym<<endl;
+   	Report<<"zmassmax_asym = "<<zmassmax_asym<<endl<<endl;
+   	Report<<"muID_ASYM0 = "<<muID_ASYM0.c_str()<<endl;
+   	Report<<"muID_ASYM1 = "<<muID_ASYM1.c_str()<<endl<<endl;
+   	Report<<"dxycut = "<<dxycut<<endl<<endl;
+   	Report<<"ptjetmin = "<<ptjetmin<<endl;
+   	Report<<"etajetmax = "<<etajetmax<<endl;
+   	if(JetIDReq==true){
+   		Report<<endl<<"Jet ID Required"<<endl;
+   	}
+   	else{
+   		Report<<endl<<"Jet ID NOT Required"<<endl;
+   	}
+   	Report<<"isojetcut = "<<isojetcut<<endl<<endl;
      
-   //ASYM0 Quality cuts
-   Report<<endl<<"Quality cuts:"<<endl;
-   Report<<"maxchi2_ASYM0 = "<<maxchi2_ASYM0<<endl;
-   Report<<"minMuHit_ASYM0 = "<<minMuHit_ASYM0<<endl;
-   Report<<"minMatSta_ASYM0 = "<<minMatSta_ASYM0<<endl;
-   Report<<"minVaPiHitTr_ASYM0 = "<<minVaPiHitTr_ASYM0<<endl;
-   Report<<"minVaTrHit_ASYM0 = "<<minVaTrHit_ASYM0<<endl;
-   Report<<"minVaHit_ASYM0 = "<<minVaHit_ASYM0<<endl;
-   Report<<"minVaPiHitInTr_ASYM0 = "<<minVaPiHitInTr_ASYM0<<endl;
-   Report<<"minMat_ASYM0 = "<<minMat_ASYM0<<endl;
-   Report<<"maxPtRelErr_ASYM0 = "<<maxPtRelErr_ASYM0<<endl;
+   	//ASYM0 Quality cuts
+   	Report<<endl<<"Quality cuts:"<<endl;
+   	Report<<"maxchi2_ASYM0 = "<<maxchi2_ASYM0<<endl;
+   	Report<<"minMuHit_ASYM0 = "<<minMuHit_ASYM0<<endl;
+   	Report<<"minMatSta_ASYM0 = "<<minMatSta_ASYM0<<endl;
+   	Report<<"minVaPiHitTr_ASYM0 = "<<minVaPiHitTr_ASYM0<<endl;
+   	Report<<"minVaTrHit_ASYM0 = "<<minVaTrHit_ASYM0<<endl;
+   	Report<<"minVaHit_ASYM0 = "<<minVaHit_ASYM0<<endl;
+   	Report<<"minVaPiHitInTr_ASYM0 = "<<minVaPiHitInTr_ASYM0<<endl;
+   	Report<<"minMat_ASYM0 = "<<minMat_ASYM0<<endl;
+   	Report<<"maxPtRelErr_ASYM0 = "<<maxPtRelErr_ASYM0<<endl;
 
-   //ASYM0 Mu Isolation (with rho) variables
-   Report<<endl<<"Isolation cuts:"<<endl;
-   Report<<"cAecalEE_ASYM0 = "<<cAecalEE_ASYM0<<endl;
-   Report<<"cAhcalHE_ASYM0 = "<<cAhcalHE_ASYM0<<endl;
-   Report<<"maxmuEta_ASYM0 = "<<maxmuEta_ASYM0<<endl;
-   Report<<"cAecalEB_ASYM0 = "<<cAecalEB_ASYM0<<endl;
-   Report<<"cAhcalEE_ASYM0 = "<<cAhcalEE_ASYM0<<endl;
-   Report<<"muonIsoRhoCut_ASYM0 = "<<muonIsoRhoCut_ASYM0<<endl;
+   	//ASYM0 Mu Isolation (with rho) variables
+   	Report<<endl<<"Isolation cuts:"<<endl;
+   	Report<<"cAecalEE_ASYM0 = "<<cAecalEE_ASYM0<<endl;
+   	Report<<"cAhcalHE_ASYM0 = "<<cAhcalHE_ASYM0<<endl;
+   	Report<<"maxmuEta_ASYM0 = "<<maxmuEta_ASYM0<<endl;
+   	Report<<"cAecalEB_ASYM0 = "<<cAecalEB_ASYM0<<endl;
+   	Report<<"cAhcalEE_ASYM0 = "<<cAhcalEE_ASYM0<<endl;
+   	Report<<"muonIsoRhoCut_ASYM0 = "<<muonIsoRhoCut_ASYM0<<endl;
    
-   //ASYM1 Quality cuts
-   Report<<endl<<"Quality cuts:"<<endl;
-   Report<<"maxchi2_ASYM1 = "<<maxchi2_ASYM1<<endl;
-   Report<<"minMuHit_ASYM1 = "<<minMuHit_ASYM1<<endl;
-   Report<<"minMatSta_ASYM1 = "<<minMatSta_ASYM1<<endl;
-   Report<<"minVaPiHitTr_ASYM1 = "<<minVaPiHitTr_ASYM1<<endl;
-   Report<<"minVaTrHit_ASYM1 = "<<minVaTrHit_ASYM1<<endl;
-   Report<<"minVaHit_ASYM1 = "<<minVaHit_ASYM1<<endl;
-   Report<<"minVaPiHitInTr_ASYM1 = "<<minVaPiHitInTr_ASYM1<<endl;
-   Report<<"minMat_ASYM1 = "<<minMat_ASYM1<<endl;
-   Report<<"maxPtRelErr_ASYM1 = "<<maxPtRelErr_ASYM1<<endl;
+   	//ASYM1 Quality cuts
+   	Report<<endl<<"Quality cuts:"<<endl;
+   	Report<<"maxchi2_ASYM1 = "<<maxchi2_ASYM1<<endl;
+   	Report<<"minMuHit_ASYM1 = "<<minMuHit_ASYM1<<endl;
+   	Report<<"minMatSta_ASYM1 = "<<minMatSta_ASYM1<<endl;
+   	Report<<"minVaPiHitTr_ASYM1 = "<<minVaPiHitTr_ASYM1<<endl;
+   	Report<<"minVaTrHit_ASYM1 = "<<minVaTrHit_ASYM1<<endl;
+   	Report<<"minVaHit_ASYM1 = "<<minVaHit_ASYM1<<endl;
+   	Report<<"minVaPiHitInTr_ASYM1 = "<<minVaPiHitInTr_ASYM1<<endl;
+   	Report<<"minMat_ASYM1 = "<<minMat_ASYM1<<endl;
+   	Report<<"maxPtRelErr_ASYM1 = "<<maxPtRelErr_ASYM1<<endl;
 
-   //ASYM1 Mu Isolation (with rho) variables
-   Report<<endl<<"Isolation cuts:"<<endl;
-   Report<<"cAecalEE_ASYM1 = "<<cAecalEE_ASYM1<<endl;
-   Report<<"cAhcalHE_ASYM1 = "<<cAhcalHE_ASYM1<<endl;
-   Report<<"maxmuEta_ASYM1 = "<<maxmuEta_ASYM1<<endl;
-   Report<<"cAecalEB_ASYM1 = "<<cAecalEB_ASYM1<<endl;
-   Report<<"cAhcalEE_ASYM1 = "<<cAhcalEE_ASYM1<<endl;
-   Report<<"muonIsoRhoCut_ASYM1 = "<<muonIsoRhoCut_ASYM1<<endl;
+   	//ASYM1 Mu Isolation (with rho) variables
+   	Report<<endl<<"Isolation cuts:"<<endl;
+   	Report<<"cAecalEE_ASYM1 = "<<cAecalEE_ASYM1<<endl;
+   	Report<<"cAhcalHE_ASYM1 = "<<cAhcalHE_ASYM1<<endl;
+   	Report<<"maxmuEta_ASYM1 = "<<maxmuEta_ASYM1<<endl;
+   	Report<<"cAecalEB_ASYM1 = "<<cAecalEB_ASYM1<<endl;
+   	Report<<"cAhcalEE_ASYM1 = "<<cAhcalEE_ASYM1<<endl;
+   	Report<<"muonIsoRhoCut_ASYM1 = "<<muonIsoRhoCut_ASYM1<<endl;
    
-   //ASYM TAG cuts
-   Report<<endl<<"TAG cuts:"<<endl;
-   Report<<"ASYM0_TAG_ptmucut = "<<ASYM0_TAG_ptmucut<<endl;   
-   Report<<"ASYM0_TAG_etamucut = "<<ASYM0_TAG_etamucut<<endl;
-   Report<<"ASYM0_TAG_eta_mu_excl_up = "<<ASYM0_TAG_eta_mu_excl_up<<endl;            
-   Report<<"ASYM0_TAG_eta_mu_excl_down = "<<ASYM0_TAG_eta_mu_excl_down<<endl;          
-   Report<<"ASYM0_TAG_dxycut = "<<ASYM0_TAG_dxycut<<endl;     
-   Report<<"ASYM0_TAG_maxchi2 = "<<ASYM0_TAG_maxchi2<<endl;
-   Report<<"ASYM0_TAG_minMuHit = "<<ASYM0_TAG_minMuHit<<endl;
-   Report<<"ASYM0_TAG_minMatSta = "<<ASYM0_TAG_minMatSta<<endl;
-   Report<<"ASYM0_TAG_minVaPiHitTr = "<<ASYM0_TAG_minVaPiHitTr<<endl;
-   Report<<"ASYM0_TAG_minVaTrHit = "<<ASYM0_TAG_minVaTrHit<<endl;
-   Report<<"ASYM0_TAG_minVaHit = "<<ASYM0_TAG_minVaHit<<endl;
-   Report<<"ASYM0_TAG_minVaPiHitInTr = "<<ASYM0_TAG_minVaPiHitInTr<<endl;
-   Report<<"ASYM0_TAG_minMat = "<<ASYM0_TAG_minMat<<endl;
-   Report<<"ASYM0_TAG_maxPtRelErr = "<<ASYM0_TAG_maxPtRelErr<<endl;
-   Report<<"ASYM0_TAG_muonIsoRhoCut = "<<ASYM0_TAG_muonIsoRhoCut<<endl;                        
-   Report<<"ASYM0_TAG_MuID = "<<ASYM0_TAG_MuID.c_str()<<endl<<endl;
-   
-   Report<<"ASYM1_TAG_ptmucut = "<<ASYM1_TAG_ptmucut<<endl;   
-   Report<<"ASYM1_TAG_etamucut = "<<ASYM1_TAG_etamucut<<endl;
-   Report<<"ASYM1_TAG_eta_mu_excl_up = "<<ASYM1_TAG_eta_mu_excl_up<<endl;            
-   Report<<"ASYM1_TAG_eta_mu_excl_down = "<<ASYM1_TAG_eta_mu_excl_down<<endl;          
-   Report<<"ASYM1_TAG_dxycut = "<<ASYM1_TAG_dxycut<<endl;     
-   Report<<"ASYM1_TAG_maxchi2 = "<<ASYM1_TAG_maxchi2<<endl;
-   Report<<"ASYM1_TAG_minMuHit = "<<ASYM1_TAG_minMuHit<<endl;
-   Report<<"ASYM1_TAG_minMatSta = "<<ASYM1_TAG_minMatSta<<endl;
-   Report<<"ASYM1_TAG_minVaPiHitTr = "<<ASYM1_TAG_minVaPiHitTr<<endl;
-   Report<<"ASYM1_TAG_minVaTrHit = "<<ASYM1_TAG_minVaTrHit<<endl;
-   Report<<"ASYM1_TAG_minVaHit = "<<ASYM1_TAG_minVaHit<<endl;
-   Report<<"ASYM1_TAG_minVaPiHitInTr = "<<ASYM1_TAG_minVaPiHitInTr<<endl;
-   Report<<"ASYM1_TAG_minMat = "<<ASYM1_TAG_minMat<<endl;
-   Report<<"ASYM1_TAG_maxPtRelErr = "<<ASYM1_TAG_maxPtRelErr<<endl;
-   Report<<"ASYM1_TAG_muonIsoRhoCut = "<<ASYM1_TAG_muonIsoRhoCut<<endl;                        
-   Report<<"ASYM1_TAG_MuID = "<<ASYM1_TAG_MuID.c_str()<<endl;
-   
+   	//ASYM TAG cuts
+   	Report<<endl<<"TAG cuts:"<<endl;
+   	Report<<"ASYM0_TAG_ptmucut = "<<ASYM0_TAG_ptmucut<<endl;   
+   	Report<<"ASYM0_TAG_etamucut = "<<ASYM0_TAG_etamucut<<endl;
+   	Report<<"ASYM0_TAG_eta_mu_excl_up = "<<ASYM0_TAG_eta_mu_excl_up<<endl;            
+   	Report<<"ASYM0_TAG_eta_mu_excl_down = "<<ASYM0_TAG_eta_mu_excl_down<<endl;          
+   	Report<<"ASYM0_TAG_dxycut = "<<ASYM0_TAG_dxycut<<endl;     
+   	Report<<"ASYM0_TAG_maxchi2 = "<<ASYM0_TAG_maxchi2<<endl;
+   	Report<<"ASYM0_TAG_minMuHit = "<<ASYM0_TAG_minMuHit<<endl;
+   	Report<<"ASYM0_TAG_minMatSta = "<<ASYM0_TAG_minMatSta<<endl;
+   	Report<<"ASYM0_TAG_minVaPiHitTr = "<<ASYM0_TAG_minVaPiHitTr<<endl;
+   	Report<<"ASYM0_TAG_minVaTrHit = "<<ASYM0_TAG_minVaTrHit<<endl;
+   	Report<<"ASYM0_TAG_minVaHit = "<<ASYM0_TAG_minVaHit<<endl;
+   	Report<<"ASYM0_TAG_minVaPiHitInTr = "<<ASYM0_TAG_minVaPiHitInTr<<endl;
+   	Report<<"ASYM0_TAG_minMat = "<<ASYM0_TAG_minMat<<endl;
+   	Report<<"ASYM0_TAG_maxPtRelErr = "<<ASYM0_TAG_maxPtRelErr<<endl;
+   	Report<<"ASYM0_TAG_muonIsoRhoCut = "<<ASYM0_TAG_muonIsoRhoCut<<endl;                        
+   	Report<<"ASYM0_TAG_MuID = "<<ASYM0_TAG_MuID.c_str()<<endl<<endl;
+   	
+   	Report<<"ASYM1_TAG_ptmucut = "<<ASYM1_TAG_ptmucut<<endl;   
+   	Report<<"ASYM1_TAG_etamucut = "<<ASYM1_TAG_etamucut<<endl;
+   	Report<<"ASYM1_TAG_eta_mu_excl_up = "<<ASYM1_TAG_eta_mu_excl_up<<endl;            
+   	Report<<"ASYM1_TAG_eta_mu_excl_down = "<<ASYM1_TAG_eta_mu_excl_down<<endl;          
+   	Report<<"ASYM1_TAG_dxycut = "<<ASYM1_TAG_dxycut<<endl;     
+   	Report<<"ASYM1_TAG_maxchi2 = "<<ASYM1_TAG_maxchi2<<endl;
+   	Report<<"ASYM1_TAG_minMuHit = "<<ASYM1_TAG_minMuHit<<endl;
+   	Report<<"ASYM1_TAG_minMatSta = "<<ASYM1_TAG_minMatSta<<endl;
+   	Report<<"ASYM1_TAG_minVaPiHitTr = "<<ASYM1_TAG_minVaPiHitTr<<endl;
+   	Report<<"ASYM1_TAG_minVaTrHit = "<<ASYM1_TAG_minVaTrHit<<endl;
+   	Report<<"ASYM1_TAG_minVaHit = "<<ASYM1_TAG_minVaHit<<endl;
+   	Report<<"ASYM1_TAG_minVaPiHitInTr = "<<ASYM1_TAG_minVaPiHitInTr<<endl;
+   	Report<<"ASYM1_TAG_minMat = "<<ASYM1_TAG_minMat<<endl;
+   	Report<<"ASYM1_TAG_maxPtRelErr = "<<ASYM1_TAG_maxPtRelErr<<endl;
+   	Report<<"ASYM1_TAG_muonIsoRhoCut = "<<ASYM1_TAG_muonIsoRhoCut<<endl;                        
+   	Report<<"ASYM1_TAG_MuID = "<<ASYM1_TAG_MuID.c_str()<<endl;
    }
    
    Report.close();

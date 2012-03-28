@@ -25,7 +25,7 @@ public :
 
    void zero_ntuple();
 
-   TTree *zeetree;
+   TTree *zmumutree;
    
    Int_t event, run, lumi;
    Int_t  TrgBit, OneMuTrgMatch;
