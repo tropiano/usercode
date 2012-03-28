@@ -48,8 +48,6 @@ selectedMuons1 = cms.EDFilter("LargestPtCandViewSelector",
   src = cms.InputTag("selectedMuons"),
   maxNumber = cms.uint32(2)
 )
-
-#selectedMuons1 = selectedMuons.clone()
  
 #Z candidate combiner
 zmumurec = cms.EDProducer('CandViewCombiner',
@@ -71,7 +69,6 @@ zmumurecSequence = cms.Sequence(muonMatch*selectedMuons*(selectedMuons1*(zmumure
 
 zmumurecEventContent = [
   'keep *_selectedMuons_*_*',
-#  'keep *_selectedMuons1_*_*', non funge
   'keep *_zmumurec*_*_*'
 ]
 

@@ -122,7 +122,5 @@ zmumugenEventContent = [
   'keep *_zmumugenfull_*_*',
   'keep *_genMuMinusSelector_*_*',
   'keep *_genMuPlusSelector_*_*',
-#  'keep *_genMuSelector_*_*',
-#  'keep *_genMuSelectorFirst_*_*',
   'keep *_zmumugen_*_*'
 ]

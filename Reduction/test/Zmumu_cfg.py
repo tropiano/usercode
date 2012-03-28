@@ -14,7 +14,7 @@ nameSource = [ 'file:input_DYJetsToLL_M50_Fall11.root'          # Input file nam
                #'file:input_dati2011.root'
              ] 
 
-numEventsToRun = -1                      # (e.g. -1 to run on all events)
+numEventsToRun = -1                    # (e.g. -1 to run on all events)
 nameOutput = 'DYJetsToLL_M_50.root'
              #'DYToMuMu_M_20_Summer11.root'
              #'TTJets.root' 
@@ -37,7 +37,7 @@ Data_Range = '175873:1-175873:32'
 GloTagMC = 'START42_V17::All'              # Global Tag MC
 GloTagData = 'GR_R_42_V25::All'            # Global Tag Data
 
-pathTrigger = 'type("TriggerMuon") && (path("HLT_DoubleMu6_v*") || path("HLT_DoubleMu7_v*") || path("HLT_Mu13_Mu8_v*") || path("HLT_Mu17_Mu8_v*"))' # selecting the trigger objects
+pathTrigger = 'type("TriggerMuon") && (path("HLT_DoubleMu6_v*", 1, 1) || path("HLT_DoubleMu7_v*", 1, 1) || path("HLT_Mu13_Mu8_v*", 1, 1) || path("HLT_Mu17_Mu8_v*", 1, 1) || path("HLT_Mu8_v*", 1, 1) || path("HLT_Mu17_v*", 1, 1))' # selecting the trigger objects
 
 ####################
 ################################################################################
