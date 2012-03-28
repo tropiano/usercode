@@ -387,7 +387,20 @@ inline bool GenSelectedInAcceptance(const std::vector<reco::CompositeCandidate>&
   }
 }
 
+inline bool SingleMu_GenSelectedInAcceptance_SYM(const reco::Candidate* mu){
+ return    mu->pt() > ptmucut && fabs(mu->eta()) < etamucut
+           && (fabs(mu->eta())<eta_mu_excl_down || fabs(mu->eta())>eta_mu_excl_up);
+}
 
+inline bool SingleMu_GenSelectedInAcceptance_ASYM0(const reco::Candidate* mu){
+ return    mu->pt() > ptmucut0 && fabs(mu->eta()) < etamucut
+           && (fabs(mu->eta())<eta_mu_excl_down || fabs(mu->eta())>eta_mu_excl_up);
+}
+
+inline bool SingleMu_GenSelectedInAcceptance_ASYM1(const reco::Candidate* mu){
+ return    mu->pt() > ptmucut1 && fabs(mu->eta()) < etamucut
+           && (fabs(mu->eta())<eta_mu_excl_down || fabs(mu->eta())>eta_mu_excl_up);
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -911,10 +924,10 @@ inline void addHistosVsMulti(unsigned int multi, std::string name, std::string t
 // Tag & Probe
 
 //Conditions required to fill TagAndProbe
-inline bool RecSelected_TagAndProbe(const std::vector<reco::CompositeCandidate>& ZREC, string selections, const pat::TriggerEvent& triggers, int run, double rho){
+inline bool MassWindow(const std::vector<reco::CompositeCandidate>& Z, string selections){
   
-  if(selections=="SYM")return ZREC[0].mass() > zmassmin_sym && ZREC[0].mass() < zmassmax_sym;
-  if(selections=="ASYM")return ZREC[0].mass() > zmassmin_asym && ZREC[0].mass() < zmassmax_asym;
+  if(selections=="SYM")return Z[0].mass() > zmassmin_sym && Z[0].mass() < zmassmax_sym;
+  if(selections=="ASYM")return Z[0].mass() > zmassmin_asym && Z[0].mass() < zmassmax_asym;
   else return false;
   
 }

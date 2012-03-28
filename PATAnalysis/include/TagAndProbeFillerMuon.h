@@ -23,7 +23,9 @@ public :
 
     ~TagAndProbeFillerMuon();
 
-    void fill(const reco::Candidate& Z, int run=0, double rho=0, double x=0., double w = 1., double pT1=0., double pT2=0., double pT3=0.);
+    //void fill(const reco::Candidate& Z, int run=0, double rho=0, double x=0., double w = 1., double pT1=0., double pT2=0., double pT3=0.);
+    
+    void fill(const reco::Candidate& Z, int run=0, double rho=0, double x=0., double w = 1., double pt[]= 0, double eta=-1);
 
     void finalize() const;
 
@@ -46,7 +48,9 @@ private:
   double _mass;
   double _bin;
   double _probe, _weight;
-  double _pt1, _pt2, _pt3;
+  
+  double _ptBinTP[10];
+  double _eta;
   
   int _passprobe;
   std::vector<bool (*)(const reco::Candidate&, int run, double rho)> _tag_cuts;

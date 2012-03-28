@@ -47,9 +47,6 @@ _onecombination(onecombinationonly)
   _rootree->Branch("probe", &_probe, "probe/D");
   _rootree->Branch("passprobe", &_passprobe, "passprobe/I");
   _rootree->Branch("weight", &_weight, "weight/D");
-  _rootree->Branch("pt1", &_pt1, "pt1/D");
-  _rootree->Branch("pt2", &_pt2, "pt2/D");
-  _rootree->Branch("pt3", &_pt3, "pt3/D");
   srand(time(0));
 }
 
@@ -58,16 +55,17 @@ TagAndProbeFillerMuon::~TagAndProbeFillerMuon(){
   delete _denominator;
 }
 
-void TagAndProbeFillerMuon::fill(const reco::Candidate& Z, int run, double rho, double x, double w, double pt1, double pt2, double pt3){
+void TagAndProbeFillerMuon::fill(const reco::Candidate& Z, int run, double rho, double x, double w, double pt[], double eta){
   
   _mass = 0.;
   _probe = 0.;
   _passprobe = 0;
-  _pt1 = pt1;
-  _pt2 = pt2;
-  _pt3 = pt3;
+  _eta = eta;
   _run = run;
   _rho = rho;
+  
+  //if(_eta==0 || _eta==1){
+  //for(int i=0; i<10; i++)cout<<"### TP = "<<pt[i]<<endl;}
   
   if((*Z.daughter(0)).pt()<(*Z.daughter(1)).pt()){
   throw cms::Exception("PATAnalysis:PtEl") << "################ ERROR! Pt0 < Pt1";
@@ -75,24 +73,73 @@ void TagAndProbeFillerMuon::fill(const reco::Candidate& Z, int run, double rho, 
 
   if (_onecombination){
   
-    //gli elettroni sono ordinati in pt e io voglio usare il subleading come tag nel caso usi una sel asimmetrica
-    //perche' e' sul leading che voglio distinguere i casi passa/non passa selezione offline
+  //i leptoni sono ordinati in pt e io voglio usare il subleading come tag nel caso usi una sel asimmetrica perche' e' sul leading che voglio distinguere i casi passa/non passa selezione offline
+
+    if(_eta==-1 || (_eta==0 && fabs((Z.daughter(0))->eta())<1.2) || (_eta==1 && fabs((Z.daughter(0))->eta())>1.2)){
     
-    if (tag(*(Z.daughter(1)), _run, _rho)) probe(*(Z.daughter(0)), Z.mass(), x, w, _run, _rho); 
+    if(_eta==0 || _eta==1){
+    if(Z.daughter(0)->pt()>pt[0] && Z.daughter(0)->pt()<pt[1])  x = 0;
+    if(Z.daughter(0)->pt()>pt[1] && Z.daughter(0)->pt()<pt[2])  x = 1;
+    if(Z.daughter(0)->pt()>pt[2] && Z.daughter(0)->pt()<pt[3])  x = 2;
+    if(Z.daughter(0)->pt()>pt[3] && Z.daughter(0)->pt()<pt[4])  x = 3;
+    if(Z.daughter(0)->pt()>pt[4] && Z.daughter(0)->pt()<pt[5])  x = 4;
+    if(Z.daughter(0)->pt()>pt[5] && Z.daughter(0)->pt()<pt[6])  x = 5;
+    if(Z.daughter(0)->pt()>pt[6] && Z.daughter(0)->pt()<pt[7])  x = 6;
+    if(Z.daughter(0)->pt()>pt[7] && Z.daughter(0)->pt()<pt[8])  x = 7;
+    if(Z.daughter(0)->pt()>pt[8] && Z.daughter(0)->pt()<pt[9])  x = 8;
+    if(Z.daughter(0)->pt()>pt[9] && Z.daughter(0)->pt()<pt[10]) x = 9;
+    } 
+    
+    if (tag(*(Z.daughter(1)), _run, _rho)) probe(*(Z.daughter(0)), Z.mass(), x, w, _run, _rho);
+    
+    }
+    
   } else {
-    //tag cand 1, probe cand 2
+  
+    if(_eta==0 || _eta==1){
+    if(Z.daughter(1)->pt()>pt[0] && Z.daughter(1)->pt()<pt[1])  x = 0;
+    if(Z.daughter(1)->pt()>pt[1] && Z.daughter(1)->pt()<pt[2])  x = 1;
+    if(Z.daughter(1)->pt()>pt[2] && Z.daughter(1)->pt()<pt[3])  x = 2;
+    if(Z.daughter(1)->pt()>pt[3] && Z.daughter(1)->pt()<pt[4])  x = 3;
+    if(Z.daughter(1)->pt()>pt[4] && Z.daughter(1)->pt()<pt[5])  x = 4;
+    if(Z.daughter(1)->pt()>pt[5] && Z.daughter(1)->pt()<pt[6])  x = 5;
+    if(Z.daughter(1)->pt()>pt[6] && Z.daughter(1)->pt()<pt[7])  x = 6;
+    if(Z.daughter(1)->pt()>pt[7] && Z.daughter(1)->pt()<pt[8])  x = 7;
+    if(Z.daughter(1)->pt()>pt[8] && Z.daughter(1)->pt()<pt[9])  x = 8;
+    if(Z.daughter(1)->pt()>pt[9] && Z.daughter(1)->pt()<pt[10]) x = 9;
+    } 
+    
+    //tag cand 1, probe cand 2 -> efficiency lepton 1
+    if(_eta==-1 || (_eta==0 && fabs((Z.daughter(1))->eta())<1.2) || (_eta==1 && fabs((Z.daughter(1))->eta())>1.2)){
     if(_tpflag=="" || _tpflag=="soft"){
       if (tag(*(Z.daughter(0)), _run, _rho)) probe(*(Z.daughter(1)), Z.mass(), x, w, _run, _rho);
+    }     
     }
 
     //reset
     _mass = 0.;
     _probe = 0.;
     _passprobe = 0;
- 
-    //tag cand 2 probe cand 1
+    
+    if(_eta==0 || _eta==1){
+    if(Z.daughter(0)->pt()>pt[0] && Z.daughter(0)->pt()<pt[1])  x = 0;
+    if(Z.daughter(0)->pt()>pt[1] && Z.daughter(0)->pt()<pt[2])  x = 1;
+    if(Z.daughter(0)->pt()>pt[2] && Z.daughter(0)->pt()<pt[3])  x = 2;
+    if(Z.daughter(0)->pt()>pt[3] && Z.daughter(0)->pt()<pt[4])  x = 3;
+    if(Z.daughter(0)->pt()>pt[4] && Z.daughter(0)->pt()<pt[5])  x = 4;
+    if(Z.daughter(0)->pt()>pt[5] && Z.daughter(0)->pt()<pt[6])  x = 5;
+    if(Z.daughter(0)->pt()>pt[6] && Z.daughter(0)->pt()<pt[7])  x = 6;
+    if(Z.daughter(0)->pt()>pt[7] && Z.daughter(0)->pt()<pt[8])  x = 7;
+    if(Z.daughter(0)->pt()>pt[8] && Z.daughter(0)->pt()<pt[9])  x = 8;
+    if(Z.daughter(0)->pt()>pt[9] && Z.daughter(0)->pt()<pt[10]) x = 9;
+    } 
+    
+    //tag cand 2, probe cand 1 -> efficiency lepton 0
+    if(_eta==-1 || (_eta==0 && fabs((Z.daughter(0))->eta())<1.2) || (_eta==1 && fabs((Z.daughter(0))->eta())>1.2)){
     if(_tpflag=="" || _tpflag=="hard"){ 
       if (tag(*(Z.daughter(1)), _run, _rho)) probe(*(Z.daughter(0)), Z.mass(), x, w, _run, _rho);
+    }
+     
     }
   }
 }
