@@ -42,7 +42,7 @@ using namespace TMath;
 
 //Trigger flags
 
-static bool muTrgMatchReq = false;
+static bool muTrgMatchReq = true;
 static bool TrgRange = false;
 
 static map<std::string, std::pair<int, int> > muTrigger() {
@@ -79,7 +79,7 @@ TrgVector["HLT_Mu17_Mu8_v"] = rr4;
 TrgVector["HLT_Mu5"] = rr5; 
 TrgVector["HLT_Mu8"] = rr6; 
 TrgVector["HLT_Mu12"] = rr7; 
-TrgVector["HLT_"] = rr8; //qualunque HLT
+TrgVector["HLT_diobastardo"] = rr8; //qualunque HLT
 
 return TrgVector;
 }
@@ -472,25 +472,28 @@ inline bool isMuonTriggered(const pat::TriggerEvent& triggers, int run){
 }
 
 inline bool RecSelected_TrgMatch(const pat::Muon& Muon, const pat::TriggerEvent& triggers, int run){
-bool trigmatch = false;
+  bool trigmatch = false;
+  
+  const pat::TriggerPathCollection * paths = triggers.paths(); 
+  
+  static map<std::string, std::pair<int, int> > TrgVector = muTrigger();
+  static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;
+  
+  for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
+    for(pat::TriggerPathCollection::const_iterator ipath = paths->begin(); ipath != paths->end(); ++ipath){ 
+      if(in_quote(ipath->name(), TrgVectorIter->first.c_str())){
+	//const TriggerObjectStandAloneCollection MatchMuon = Muon.triggerObjectMatchesByPath(ipath->name().c_str(), true);
 
-const pat::TriggerPathCollection * paths = triggers.paths(); 
+	const TriggerObjectStandAloneCollection MatchMuon = Muon.triggerObjectMatches();
 
-static map<std::string, std::pair<int, int> > TrgVector = muTrigger();
-static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;
-
-for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
-for(pat::TriggerPathCollection::const_iterator ipath = paths->begin(); ipath != paths->end(); ++ipath){ 
-if(in_quote(ipath->name(), TrgVectorIter->first.c_str())){
-const TriggerObjectStandAloneCollection MatchMuon = Muon.triggerObjectMatchesByPath(ipath->name().c_str(), true);
-if(TrgRange==true && run!=-1){
-if(MatchMuon.size() && (TrgVectorIter->second.first<=run && run<=TrgVectorIter->second.second))trigmatch = true;
-}else{
-if(MatchMuon.size())trigmatch = true;
-}
-}}
-}
-return trigmatch;
+	if(TrgRange==true && run!=-1){
+	  if(MatchMuon.size() && (TrgVectorIter->second.first<=run && run<=TrgVectorIter->second.second))trigmatch = true;
+	}else{
+	  if(MatchMuon.size())trigmatch = true;
+	}
+      }}
+  }
+  return trigmatch;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
