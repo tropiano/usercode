@@ -37,7 +37,7 @@ Data_Range = '175873:1-175873:32'
 GloTagMC = 'START42_V17::All'              # Global Tag MC
 GloTagData = 'GR_R_42_V25::All'            # Global Tag Data
 
-pathTrigger = 'type("TriggerMuon") && (path("HLT_DoubleMu6_v*", 1, 1) || path("HLT_DoubleMu7_v*", 1, 1) || path("HLT_Mu13_Mu8_v*", 1, 1) || path("HLT_Mu17_Mu8_v*", 1, 1) || path("HLT_Mu8_v*", 1, 1) || path("HLT_Mu17_v*", 1, 1))' # selecting the trigger objects
+pathTrigger = 'type("TriggerMuon") && (path("HLT_DoubleMu6_v*", 1, 0) || path("HLT_DoubleMu7_v*", 1, 0) || path("HLT_Mu13_Mu8_v*", 1, 0) || path("HLT_Mu17_Mu8_v*", 1, 0) || path("HLT_Mu8_v*", 1, 0) || path("HLT_Mu17_v*", 1, 0))' # selecting the trigger objects
 
 ####################
 ################################################################################

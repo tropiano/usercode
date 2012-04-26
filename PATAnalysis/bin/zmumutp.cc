@@ -15,17 +15,17 @@ using namespace std;
 int main() {
 
   //Input files
-  string training_sign = "/data/sfrosali/Zjets/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/MonteCarlo/PtEta/Train/DYtoLL_PtEta_Train_Small.root";
-  string training_back = "/data/sfrosali/Zjets/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/MonteCarlo/PtEta/Train/Background_PtEta_Train.root";
-  string total = "/data/sfrosali/Zjets/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/MonteCarlo/PtEta/Sample/PseudoData_PtEta_Sample.root"; 
+  string training_sign = "/data/sandro/Analisi/rel_CMSSW_4_2_5_TeP/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/AnalysisMuons/DYtoLL_PtEta_Train_Small.root";
+  string training_back = "/data/sandro/Analisi/rel_CMSSW_4_2_5_TeP/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/AnalysisMuons/Background_PtEta_Train.root";
+  string total = "/data/sandro/Analisi/rel_CMSSW_4_2_5_TeP/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/AnalysisMuons/Test_TeP.root"; 
   
   //Output files
   string output_train_sign =  
-"/data/sfrosali/Zjets/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/TagProbe/PtEta/TrainSig_Small_PtEta_Global.root";
+"/data/sandro/Analisi/rel_CMSSW_4_2_5_TeP/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/AnalysisMuons/TrainSig_Small_PtEta_Global.root";
   string output_train_back =  
-"/data/sfrosali/Zjets/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/TagProbe/PtEta/TrainBack_PtEta_Global.root";
+"/data/sandro/Analisi/rel_CMSSW_4_2_5_TeP/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/AnalysisMuons/TrainBack_PtEta_Global.root";
   string output_total =  
-"/data/sfrosali/Zjets/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/TagProbe/PtEta/TP_PseudoData_PtEta_Global.root";
+"/data/sandro/Analisi/rel_CMSSW_4_2_5_TeP/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/AnalysisMuons/TP_Data_PtEta_Global.root";
 
   //Cuts
   int _Acc   = 1;

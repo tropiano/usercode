@@ -30,6 +30,7 @@ using namespace std;
 3.  WJetsToLNu_All		(skimmed)
 4.  WWJetsTo2L2Nu_All		(skimmed)
 5.  QCD_Pt20MuEnPt10_All	(skimmed)
+6.  DYtoMuMu_All		(not skimmed)
 
 -2.  All Train
 11.  DYtoLL_Train		(not skimmed)
@@ -65,14 +66,16 @@ int PreDefName, ProcEvents;
   ProcEvents=atoi(argv[2]);
 
   //List of Source Files   
-  string SourceFilesDir			= "/data/sandro/Analisi/rel_CMSSW_4_2_5_commit/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/SourceFilesMuons/";
+  string SourceFilesDir			= "/data/sandro/Analisi/rel_CMSSW_4_2_5_TeP/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/SourceFilesMuons/";
 
   string Data2011 			= "data.list";
-  string DYtoLL_All 			= "DYtoLL_All.list";  
+//  string DYtoLL_All 			= "DYtoLL_All_Fall11.list";  
+  string DYtoLL_All 			= "DYtoLL_All_Summer11.list";  
   string TTJets_All			= "TTJets_All.list";
   string WJetsToLNu_All			= "WJetsToLNu_All.list";
   string WWJetsTo2L2Nu_All		= "WWJetsTo2L2Nu_All.list";
   string QCD_Pt20MuEnPt10_All		= "QCD_Pt20MuEnPt10_All.list";
+  string DYtoMuMu_All			= "DYtoMuMu_All.list";
   
   string DYtoLL_Train 			= "DYtoLL_Train.list";
   string TTJets_Train			= "TTJets_Train.list";
@@ -87,20 +90,20 @@ int PreDefName, ProcEvents;
   string QCD_Pt20MuEnPt10_Sample	= "QCD_Pt20MuEnPt10_Sample.list";
   
   string Test 		        	= "Test.list";
-  sample = "mc";
+  sample = "data";
  
-  //tag to recognize the analysis in the output file
-  string analysis = "_DeltaR"; 
+  //tag to recognize the analysis in the output file 
+  string analysis = "_TeP"; 
 
   //Path of PATAnalysis dir - DO NOT FORGET THE SLASH AT THE END OF THE PATH
-  string path="/data/sandro/Analisi/rel_CMSSW_4_2_5_commit/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/AnalysisMuons/";
+  string path="/data/sandro/Analisi/rel_CMSSW_4_2_5_TeP/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/AnalysisMuons/";
   
   //Modules
-  bool GEN    = true;
-  bool RECO   = true;
+  bool GEN    = false;
+  bool RECO   = false;
   bool EFF    = true;
-  bool NTUPLE = true;
-  bool DELTAR = true;
+  bool NTUPLE = false;
+  bool DELTAR = false;
   
   //Ntuple - "zcand" = saves only z candidates; "acc" = save only events with Z in the acceptance; "all" = saves all the events  
   string NtupleFill = "all";
@@ -129,7 +132,7 @@ int PreDefName, ProcEvents;
   if(PreDefName==0) Norm="False";   // Do not normalize for data
   
   //Number of CPUs
-  int CPU = 8;
+  int CPU = 4;
   
   //Log (non funziona)
   bool Log = false;
@@ -155,6 +158,9 @@ int PreDefName, ProcEvents;
     sample = "mc";}
   else if (PreDefName==5){
     sourceList = (SourceFilesDir + QCD_Pt20MuEnPt10_All).c_str();
+    sample = "mc";}
+  else if (PreDefName==6){
+    sourceList = (SourceFilesDir + DYtoMuMu_All).c_str();
     sample = "mc";}
     
   else if (PreDefName==11){
@@ -260,6 +266,14 @@ int PreDefName, ProcEvents;
   EventNumber=ParStruct._EventNumber;
   makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, DELTAR, Acc, Trg, Qual, Imp, Iso, MuID, path.c_str(), QCD_Pt20MuEnPt10_All.c_str(), "QCD_Pt20MuEnPt10_All", Norm.c_str(), EventsPerFile, EventNumber, ProcEvents, xsec*EventFilter, targetLumi, NtupleFill, JECUnc, JECUncFilePath);
   
+  Parameters(6, &ParStruct);
+  xsec=ParStruct._xsec;
+  EventFilter=ParStruct._EventFilter;
+  EventsPerFile=ParStruct._EventsPerFile;
+  EventNumber=ParStruct._EventNumber;
+  makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, DELTAR, Acc, Trg, Qual, Imp, Iso, MuID, path.c_str(), DYtoMuMu_All.c_str(), "DYtoMuMu_All", Norm.c_str(), EventsPerFile, EventNumber, ProcEvents, xsec*EventFilter, targetLumi, NtupleFill, JECUnc, JECUncFilePath);
+
+
   }
   
   if(PreDefName==-2){
@@ -350,7 +364,7 @@ int PreDefName, ProcEvents;
   AutoLibraryLoader::enable();
   gSystem->Load("libFirenzePATAnalysis");
 
-  p->Exec(".x /data/sandro/Analisi/rel_CMSSW_4_2_5_commit/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/remote.C");
+  p->Exec(".x /data/sandro/Analisi/rel_CMSSW_4_2_5_TeP/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/remote.C");
 
   if(PreDefName>-1 || PreDefName==-9){
   TDSet* SignalDS = getDS(sourceList.c_str());
@@ -410,6 +424,14 @@ int PreDefName, ProcEvents;
   p->Process(SignalDS_5, "FWLiteTSelector","",ProcEvents);
   p->ClearInput();
   delete SignalDS_5; 
+  string cfgPath_6=path+"DYtoMuMu_All.py";
+  TDSet* SignalDS_6 = getDS(DYtoMuMu_All.c_str());
+  TNamed* configsignal_6 = new TNamed("ConfigFile", cfgPath_6.c_str());
+  p->AddInput(configsignal_6);
+  p->Process(SignalDS_6, "FWLiteTSelector","",ProcEvents);
+  p->ClearInput();
+  delete SignalDS_6; 
+
   }
   
   if(PreDefName==-2){ 

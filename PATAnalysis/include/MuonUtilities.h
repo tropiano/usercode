@@ -79,7 +79,7 @@ TrgVector["HLT_Mu17_Mu8_v"] = rr4;
 TrgVector["HLT_Mu5"] = rr5; 
 TrgVector["HLT_Mu8"] = rr6; 
 TrgVector["HLT_Mu12"] = rr7; 
-TrgVector["HLT_diobastardo"] = rr8; //qualunque HLT
+TrgVector["HLT_"] = rr8; //qualunque HLT
 
 return TrgVector;
 }
@@ -94,7 +94,7 @@ static double dxycut = 0.2;     //cm
 
 //Jets
 static bool JetIDReq = true;
-static double ptjetmin = 30.;   //Gev/c
+static double ptjetmin = 50.;   //Gev/c
 static double etajetmax = 2.5;
 static double isojetcut = 0.4; //Isolation jet - Z muon
 
@@ -121,6 +121,7 @@ static double maxmuEta_SYM = 1.48;
 static float cAecalEB_SYM = 0.074;
 static float cAhcalEE_SYM = 0.023;
 static double muonIsoRhoCut_SYM = 0.15;
+static double muonIsoCut_SYM = 0.15;
 
 static string muID_SYM = "muonIdLoose";//questo muID non va bene, non è riconosciuto
 
@@ -175,6 +176,7 @@ static double maxmuEta_ASYM0 = 1.48;
 static float cAecalEB_ASYM0 = 0.074;
 static float cAhcalEE_ASYM0 = 0.023;
 static double muonIsoRhoCut_ASYM0 = 0.15;
+static double muonIsoCut_ASYM0 = 0.15;
 
 static float cAecalEE_ASYM1 = 0.041;
 static float cAhcalHE_ASYM1 = 0.032;
@@ -182,6 +184,7 @@ static double maxmuEta_ASYM1 = 1.48;
 static float cAecalEB_ASYM1 = 0.074;
 static float cAhcalEE_ASYM1 = 0.023;
 static double muonIsoRhoCut_ASYM1 = 0.15;
+static double muonIsoCut_ASYM1 = 0.15;
 
 //Combined Iso
 static string muID_ASYM0 = "muonIdLoose";//questo muID non va bene, non è riconosciuto
@@ -721,6 +724,226 @@ inline bool RecSelected(string Flag, const std::vector<reco::CompositeCandidate>
   }
 }
 
+//REC Z Candidate modified: it is true if there is 1 REC Z with Mass cut decaying in two REC Muons with these cuts: Acceptance (geometrical and kinematic), Quality, Impact Parameter, Isolation without rho.  
+inline bool RecSelected_mod(string Flag, const std::vector<reco::CompositeCandidate>& ZREC, const pat::TriggerEvent& triggers, int run, double rho){
+
+  std::vector<const pat::Muon*> zdaughters; 
+  
+  if(ZREC.size()!=0){
+  	zdaughters = ZRECDaughters(ZREC);
+  }
+  else{
+  	return false;
+  }
+  
+  if(!zdaughters.size()){
+  	return false;
+  }
+  else{
+  
+  	const pat::Muon* dau0 = zdaughters[0];
+  	const pat::Muon* dau1 = zdaughters[1];
+	 
+	  bool iso0 = false;	
+	  bool iso1 = false;
+				
+	  bool muon_ID0 = false;
+	  bool muon_ID1 = false;
+	  
+	  bool qual0 = false;
+	  bool qual1 = false;
+	
+	  if(Flag=="_AccSYM"){
+	  	return ZREC[0].mass()>zmassmin_sym && ZREC[0].mass()<zmassmax_sym &&
+	               dau0->pt() >= ptmucut && fabs(dau0->eta()) <= etamucut &&
+	               dau1->pt() >= ptmucut && fabs(dau1->eta()) <= etamucut &&
+	               (fabs(dau0->eta())<eta_mu_excl_down || fabs(dau0->eta())>eta_mu_excl_up) &&
+	               (fabs(dau1->eta())<eta_mu_excl_down || fabs(dau1->eta())>eta_mu_excl_up);
+	  }
+	
+	  else if(Flag=="_AccASYM"){
+	  	return ZREC[0].mass()>zmassmin_asym && ZREC[0].mass()<zmassmax_asym &&
+	  	       dau0->pt() >= ptmucut0 && fabs(dau0->eta()) <= etamucut &&
+	  	       dau1->pt() >= ptmucut1 && fabs(dau1->eta()) <= etamucut &&
+	  	       (fabs(dau0->eta())<eta_mu_excl_down || fabs(dau0->eta())>eta_mu_excl_up) &&
+	               (fabs(dau1->eta())<eta_mu_excl_down || fabs(dau1->eta())>eta_mu_excl_up);
+	  }
+	
+	  else if(Flag=="_Trg"){
+	  	bool cutTrg = false;
+	  	if(muTrgMatchReq==true){
+	  		if(isMuonTriggered(triggers, run) && (RecSelected_TrgMatch(*dau0, triggers, run))) 
+				cutTrg=true;
+	  	}
+		else if(muTrgMatchReq==false){
+	  		if(isMuonTriggered(triggers, run)) 
+				cutTrg=true;
+	  	}
+	  	return cutTrg;
+	  }
+	
+	  else if(Flag=="_QualSYM"){
+	  
+	  	float ptRelErr0 = (dau0->userFloat("ptError"))/dau0->pt();
+	  	float ptRelErr1 = (dau1->userFloat("ptError"))/dau1->pt();
+	  
+	  	if(muon::isGoodMuon(*dau0, muon::GlobalMuonPromptTight) &&   
+	           dau0->isGlobalMuon() && 
+	           dau0->userFloat("normChi2") < maxchi2_SYM &&         
+	           dau0->userFloat("numberOfValidMuonHits") > minMuHit_SYM && 
+	           dau0->userFloat("numberOfMatchedStations") > minMatSta_SYM && 
+	           dau0->userFloat("numberOfValidPixelHitsTr") > minVaPiHitTr_SYM && 
+	           dau0->userFloat("numberOfValidTrackerHits") > minVaTrHit_SYM && 
+	           dau0->userFloat("numberOfValidHits") >= minVaHit_SYM && 
+	           dau0->userFloat("numberOfValidPixelHitsInTr") >= minVaPiHitInTr_SYM && 
+	           dau0->userFloat("numberOfMatches") >= minMat_SYM && 
+	           ptRelErr0 <= maxPtRelErr_SYM)
+	  		qual0 = true;
+	         
+	  	if(muon::isGoodMuon(*dau1, muon::GlobalMuonPromptTight) && 
+	  	   dau1->isGlobalMuon() && 
+	  	   dau1->userFloat("normChi2") < maxchi2_SYM &&          
+	  	   dau1->userFloat("numberOfValidMuonHits") > minMuHit_SYM && 
+	  	   dau1->userFloat("numberOfMatchedStations") > minMatSta_SYM && 
+	  	   dau1->userFloat("numberOfValidPixelHitsTr") > minVaPiHitTr_SYM &&
+	  	   dau1->userFloat("numberOfValidTrackerHits") > minVaTrHit_SYM && 
+	  	   dau1->userFloat("numberOfValidHits") >= minVaHit_SYM && 
+	  	   dau1->userFloat("numberOfValidPixelHitsInTr") >= minVaPiHitInTr_SYM && 
+	  	   dau1->userFloat("numberOfMatches") >= minMat_SYM && 
+	  	   ptRelErr1 <= maxPtRelErr_SYM)
+	  		qual1 = true;
+	  
+	  	return qual0 && qual1;
+	  } 
+	  else if(Flag=="_QualASYM"){
+	  
+	  	float ptRelErr0 = (dau0->userFloat("ptError"))/dau0->pt();
+	  	float ptRelErr1 = (dau1->userFloat("ptError"))/dau1->pt();
+	  
+	  	if(muon::isGoodMuon(*dau0, muon::GlobalMuonPromptTight) &&    
+	  	   dau0->isGlobalMuon() && 
+	  	   dau0->userFloat("normChi2") < maxchi2_ASYM0 &&         
+	  	   dau0->userFloat("numberOfValidMuonHits") > minMuHit_ASYM0 && 
+	  	   dau0->userFloat("numberOfMatchedStations") > minMatSta_ASYM0 && 
+	  	   dau0->userFloat("numberOfValidPixelHitsTr") > minVaPiHitTr_ASYM0 && 
+	  	   dau0->userFloat("numberOfValidTrackerHits") > minVaTrHit_ASYM0 && 
+	  	   dau0->userFloat("numberOfValidHits") >= minVaHit_ASYM0 && 
+	  	   dau0->userFloat("numberOfValidPixelHitsInTr") >= minVaPiHitInTr_ASYM0 && 
+	  	   dau0->userFloat("numberOfMatches") >= minMat_ASYM0 && 
+	  	   ptRelErr0 <= maxPtRelErr_ASYM0)
+	  		qual0 = true;
+	         
+	  	if(muon::isGoodMuon(*dau1, muon::GlobalMuonPromptTight) &&    
+	  	   dau1->isGlobalMuon() && 
+	  	   dau1->userFloat("normChi2") < maxchi2_ASYM1 &&        
+	  	   dau1->userFloat("numberOfValidMuonHits") > minMuHit_ASYM1 && 
+	  	   dau1->userFloat("numberOfMatchedStations") > minMatSta_ASYM1 && 
+	  	   dau1->userFloat("numberOfValidPixelHitsTr") > minVaPiHitTr_ASYM1 && 
+	  	   dau1->userFloat("numberOfValidTrackerHits") > minVaTrHit_ASYM1 && 
+	  	   dau1->userFloat("numberOfValidHits") >= minVaHit_ASYM1 && 
+	  	   dau1->userFloat("numberOfValidPixelHitsInTr") >= minVaPiHitInTr_ASYM1 && 
+	  	   dau1->userFloat("numberOfMatches") >= minMat_ASYM1 && 
+	  	   ptRelErr1 <= maxPtRelErr_ASYM1) 
+	  		qual1 = true;
+	  
+	  	return qual0 && qual1;
+	  }  
+	
+	  else if(Flag=="_Imp"){
+	  	return dau0->dB() < dxycut && dau1->dB() < dxycut;
+	  }
+	
+	  else if(Flag=="_IsoSYM"){
+	  
+	  	const reco::MuonIsolation& iso03_0 = dau0->isolationR03(); 
+	  	const reco::MuonIsolation& iso03_1 = dau1->isolationR03();
+	  
+	  	float muEta0 = dau0->eta(); 
+	  	float muEta1 = dau1->eta(); 
+	  
+	  	float Aecal0 = cAecalEE_SYM;
+	 	float Ahcal0 = cAhcalHE_SYM;
+	  	float Aecal1 = cAecalEE_SYM;
+	  	float Ahcal1 = cAhcalHE_SYM;
+	  
+	  	if (fabs(muEta0) < maxmuEta_SYM) {
+	  		Aecal0 = cAecalEB_SYM;
+	  		Ahcal0 = cAhcalEE_SYM;
+	  	}
+	  
+	  	if (fabs(muEta1) < maxmuEta_SYM) {
+	  		Aecal1 = cAecalEB_SYM;
+	  		Ahcal1 = cAhcalEE_SYM;
+	  	}
+  
+	  	float muonIso0 = (iso03_0.sumPt + iso03_0.emEt + iso03_0.hadEt)/dau0->pt();
+	  
+	  	float muonIso1 = (iso03_1.sumPt + iso03_1.emEt + iso03_1.hadEt)/dau1->pt();
+	  
+	  	if(muonIso0 <= muonIsoCut_SYM) iso0 = true;
+	  	if(muonIso1 <= muonIsoCut_SYM) iso1 = true;
+	         
+	  	return iso0 && iso1;       
+	  
+	  }
+	
+	  else if(Flag=="_IsoASYM"){
+	 
+	  	const reco::MuonIsolation& iso03_0 = dau0->isolationR03(); 
+	  	const reco::MuonIsolation& iso03_1 = dau1->isolationR03();
+	  
+	  	float muEta0 = dau0->eta();
+	  	float muEta1 = dau1->eta(); 
+	  
+	  	float Aecal0 = cAecalEE_ASYM0;
+	  	float Ahcal0 = cAhcalHE_ASYM0;
+	  	float Aecal1 = cAecalEE_ASYM1;
+	  	float Ahcal1 = cAhcalHE_ASYM1;
+	  
+	  	if (fabs(muEta0) < maxmuEta_ASYM0) {
+	  		Aecal0 = cAecalEB_ASYM0;
+	  		Ahcal0 = cAhcalEE_ASYM0;
+	  	}
+	  
+	  	if (fabs(muEta1) < maxmuEta_ASYM1) {
+	  		Aecal1 = cAecalEB_ASYM1;
+	  		Ahcal1 = cAhcalEE_ASYM1;
+	  	}
+	  
+	  	float muonIso0 = (iso03_0.sumPt + iso03_0.emEt + iso03_0.hadEt)/dau0->pt();
+	  
+	  	float muonIso1 = (iso03_1.sumPt + iso03_1.emEt + iso03_1.hadEt)/dau1->pt();
+	  
+	  	if(muonIso0 <= muonIsoCut_ASYM0) iso0 = true;
+	  	if(muonIso1 <= muonIsoCut_ASYM1) iso1 = true;
+	         
+	  	return iso0 && iso1;       
+	  
+	  }
+	
+	  else if(Flag=="_MuIDSYM"){
+	  	if(dau0->muonID(muID_SYM.c_str())==1.0) muon_ID0 = true;
+	  	if(dau1->muonID(muID_SYM.c_str())==1.0) muon_ID1 = true;
+	  	return muon_ID0 && muon_ID1;
+	  }
+	
+	  else if(Flag=="_MuIDASYM"){
+	  	if(dau0->muonID(muID_ASYM0.c_str())==7.0 || dau0->muonID(muID_ASYM0.c_str())==1.0 || dau0->muonID(muID_ASYM0.c_str())==3.0 || dau0->muonID(muID_ASYM0.c_str())==5.0) 
+			muon_ID0 = true;
+	  	if(dau1->muonID(muID_ASYM1.c_str())==7.0 || dau1->muonID(muID_ASYM1.c_str())==1.0 || dau1->muonID(muID_ASYM1.c_str())==3.0 || dau1->muonID(muID_ASYM1.c_str())==5.0) 
+			muon_ID1 = true;
+	  	return muon_ID0 && muon_ID1;
+	  }
+	
+	  else if(Flag=="_1"){
+	  	return true;
+	  }
+	
+	  else{
+	  	return false;
+	  }
+  }
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1193,6 +1416,39 @@ inline bool singleMu_Probe_Iso_SYM(const reco::Candidate& cand, int run, double 
   
 }
   
+
+// Single Muon cut: Isolation without rho
+inline bool singleMu_Probe_Iso_SYM_mod(const reco::Candidate& cand, int run, double rho){
+
+  const pat::Muon* muon = CloneCandidate(cand);
+  
+  bool iso = false;
+  
+  if(muon){
+ 
+  	const reco::MuonIsolation& iso03 = muon->isolationR03(); 
+  
+  	float muEta = muon->eta(); 
+  
+  	float Aecal = cAecalEE_SYM;
+  	float Ahcal = cAhcalHE_SYM;
+  
+  	if (fabs(muEta) < maxmuEta_SYM) {
+  		Aecal = cAecalEB_SYM;
+  		Ahcal = cAhcalEE_SYM;
+  	}
+  
+  	float muonIso = (iso03.sumPt + iso03.emEt + iso03.hadEt)/muon->pt();
+  
+  	if(muonIso <= muonIsoCut_SYM)
+		iso = true;
+  }
+         
+  return iso;
+  
+}
+
+
 
 inline bool singleMu_Probe_MuID_SYM(const reco::Candidate& cand, int run, double rho){
 

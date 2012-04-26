@@ -37,12 +37,49 @@ denCounterTrue(0), numCounterTrue(0),
 recoJetCounterTrue(0),
 genJetTotalCounter(0), recoJetTotalCounter(0),
 
+numCounterFalse_iso(0), 
+recoJetCounterFalse_iso(0), 
+numCounterTrue_iso(0), 
+recoJetCounterTrue_iso(0),
+genJetTotalCounter_iso(0), recoJetTotalCounter_iso(0),
+
 recMuSiRefPt(0), recMuSiRefEta(0),
 recMuNoRefPt(0), recMuNoRefEta(0),
 
+denCounterFalse_VertWindA(0), numCounterFalse_VertWindA(0), 
+recoJetCounterFalse_VertWindA(0), 
+denCounterTrue_VertWindA(0), numCounterTrue_VertWindA(0), 
+recoJetCounterTrue_VertWindA(0),
+genJetTotalCounter_VertWindA(0), recoJetTotalCounter_VertWindA(0),
+
+numCounterFalse_VertWindA_iso(0), 
+recoJetCounterFalse_VertWindA_iso(0), 
+numCounterTrue_VertWindA_iso(0), 
+recoJetCounterTrue_VertWindA_iso(0),
+genJetTotalCounter_VertWindA_iso(0), recoJetTotalCounter_VertWindA_iso(0),
+
+recMuSiRefPt_VertWindA(0), recMuSiRefEta_VertWindA(0),
+recMuNoRefPt_VertWindA(0), recMuNoRefEta_VertWindA(0),
+
+denCounterFalse_VertWindB(0), numCounterFalse_VertWindB(0), 
+recoJetCounterFalse_VertWindB(0), 
+denCounterTrue_VertWindB(0), numCounterTrue_VertWindB(0), 
+recoJetCounterTrue_VertWindB(0),
+genJetTotalCounter_VertWindB(0), recoJetTotalCounter_VertWindB(0),
+
+numCounterFalse_VertWindB_iso(0), 
+recoJetCounterFalse_VertWindB_iso(0), 
+numCounterTrue_VertWindB_iso(0), 
+recoJetCounterTrue_VertWindB_iso(0),
+genJetTotalCounter_VertWindB_iso(0), recoJetTotalCounter_VertWindB_iso(0),
+
+recMuSiRefPt_VertWindB(0), recMuSiRefEta_VertWindB(0),
+recMuNoRefPt_VertWindB(0), recMuNoRefEta_VertWindB(0),
+
+
 _targetLumi(50.), _xsec(1.), _norm(1.), _Norm(false), _rho(0), _run(-1), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _fileCounter(0), _Acc(0), _Trg(0), _Qual(0), _Imp(0), _Iso(0), _MuID(0), _JECUnc(0), _selections("SYM"), _JetType("selectedJetsL1Corrected"), _sample("mc"),
 
-_file(0), _dir(0), _dir1(0), _dir2(0), _histoVector()
+_file(0), _dir(0), _dir1(0), _dir1a(0), _dir1b(0), _dir1c(0), _dir2(0), _dir2a(0), _dir2b(0), _dir2c(0), _histoVector()
 
 { }
 
@@ -95,10 +132,22 @@ void DeltaRAnalyzerMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
    cout << "DeltaRAnalyzerMuon file name : " << _file->GetName() << endl;
    _file->cd();
    _dir = _file->mkdir(dirname.c_str(), dirname.c_str());
+
    _dir1 = _dir->mkdir("SingleMu_Overlap"); 
+   _dir1a = _dir1->mkdir("VerticesCut_No");
+   _dir1b = _dir1->mkdir("VerticesCut_Less8");
+   _dir1c = _dir1->mkdir("VerticesCut_Great8");
+
    _dir2 = _dir->mkdir("DoubleMu_Overlap");
+   _dir2a = _dir2->mkdir("VerticesCut_No");
+   _dir2b = _dir2->mkdir("VerticesCut_Less8");
+   _dir2c = _dir2->mkdir("VerticesCut_Great8");
+
    _dir->cd();
+
+   // Double Mu Overlap
    _dir2->cd();
+   _dir2a->cd();
 
    denCounterFalse = new TH1D("denCounterFalse", "Generated jet multiplicity (2 #mu overlap = false)", 10, -0.5, 9.5); 
    _histoVector.push_back(denCounterFalse);
@@ -119,19 +168,147 @@ void DeltaRAnalyzerMuon::begin(TFile* out, const edm::ParameterSet& iConfig){
    recoJetTotalCounter = new TH1D("recoJetTotalCounter", "Reconstructed jet multiplicity (with a rec Z) (without 2 #mu overlap requirement)", 10, -0.5, 9.5); 
    _histoVector.push_back(recoJetTotalCounter);
 
+//   denCounterFalse_iso = new TH1D("denCounterFalse_iso", "Generated jet multiplicity (2 #mu overlap = false)", 10, -0.5, 9.5); 
+//   _histoVector.push_back(denCounterFalse_iso);
+   numCounterFalse_iso = new TH1D("numCounterFalse_iso", "Generated jet multiplicity (with a rec Z) (2 #mu overlap = false). Iso no rho", 10, -0.5, 9.5); 
+   _histoVector.push_back(numCounterFalse_iso);
+   recoJetCounterFalse_iso = new TH1D("recoJetCounterFalse_iso", "Reconstructed jet multiplicity (with a rec Z) (2 #mu overlap = false). Iso no rho", 10, -0.5, 9.5); 
+   _histoVector.push_back(recoJetCounterFalse_iso);
+
+//   denCounterTrue_iso = new TH1D("denCounterTrue_iso", "Generated jet multiplicity (2 #mu overlap = true)", 10, -0.5, 9.5); 
+//   _histoVector.push_back(denCounterTrue_iso);
+   numCounterTrue_iso = new TH1D("numCounterTrue_iso", "Generated jet multiplicity (with a rec Z) (2 #mu overlap = true). Iso no rho", 10, -0.5, 9.5); 
+   _histoVector.push_back(numCounterTrue_iso);
+   recoJetCounterTrue_iso = new TH1D("recoJetCounterTrue_iso", "Reconstructed jet multiplicity (#DeltaR test) (with a rec Z) (2 #mu overlap = true). Iso no rho", 10, -0.5, 9.5); 
+   _histoVector.push_back(recoJetCounterTrue_iso);
+
+   genJetTotalCounter_iso = new TH1D("genJetTotalCounter_iso", "Generated jet multiplicity (with a rec Z) (without 2 #mu overlap requirement). Iso no rho", 10, -0.5, 9.5); 
+   _histoVector.push_back(genJetTotalCounter_iso);
+   recoJetTotalCounter_iso = new TH1D("recoJetTotalCounter_iso", "Reconstructed jet multiplicity (with a rec Z) (without 2 #mu overlap requirement). Iso no rho", 10, -0.5, 9.5); 
+   _histoVector.push_back(recoJetTotalCounter_iso);
+
+
+   //// Vertex window A: n Vertices <= 8
+   _dir2a->cd("-");
+   _dir2b->cd();
+
+   denCounterFalse_VertWindA = new TH1D("denCounterFalse_VertWindA", "Generated jet multiplicity (2 #mu overlap = false): nVert <= 8", 10, -0.5, 9.5); 
+   _histoVector.push_back(denCounterFalse_VertWindA);
+   numCounterFalse_VertWindA = new TH1D("numCounterFalse_VertWindA", "Generated jet multiplicity (with a rec Z) (2 #mu overlap = false): nVert <= 8", 10, -0.5, 9.5); 
+   _histoVector.push_back(numCounterFalse_VertWindA);
+   recoJetCounterFalse_VertWindA = new TH1D("recoJetCounterFalse_VertWindA", "Reconstructed jet multiplicity (with a rec Z) (2 #mu overlap = false): nVert <= 8", 10, -0.5, 9.5); 
+   _histoVector.push_back(recoJetCounterFalse_VertWindA);
+
+   denCounterTrue_VertWindA = new TH1D("denCounterTrue_VertWindA", "Generated jet multiplicity (2 #mu overlap = true): nVert <= 8", 10, -0.5, 9.5); 
+   _histoVector.push_back(denCounterTrue_VertWindA);
+   numCounterTrue_VertWindA = new TH1D("numCounterTrue_VertWindA", "Generated jet multiplicity (with a rec Z) (2 #mu overlap = true): nVert <= 8", 10, -0.5, 9.5); 
+   _histoVector.push_back(numCounterTrue_VertWindA);
+   recoJetCounterTrue_VertWindA = new TH1D("recoJetCounterTrue_VertWindA", "Reconstructed jet multiplicity (#DeltaR test) (with a rec Z) (2 #mu overlap = true): nVert <= 8", 10, -0.5, 9.5); 
+   _histoVector.push_back(recoJetCounterTrue_VertWindA);
+
+   genJetTotalCounter_VertWindA = new TH1D("genJetTotalCounter_VertWindA", "Generated jet multiplicity (with a rec Z) (without 2 #mu overlap requirement): nVert <= 8", 10, -0.5, 9.5); 
+   _histoVector.push_back(genJetTotalCounter_VertWindA);
+   recoJetTotalCounter_VertWindA = new TH1D("recoJetTotalCounter_VertWindA", "Reconstructed jet multiplicity (with a rec Z) (without 2 #mu overlap requirement): nVert <= 8", 10, -0.5, 9.5); 
+   _histoVector.push_back(recoJetTotalCounter_VertWindA);
+
+   numCounterFalse_VertWindA_iso = new TH1D("numCounterFalse_VertWindA_iso", "Generated jet multiplicity (with a rec Z) (2 #mu overlap = false): nVert <= 8. Iso no rho", 10, -0.5, 9.5); 
+   _histoVector.push_back(numCounterFalse_VertWindA_iso);
+   recoJetCounterFalse_VertWindA_iso = new TH1D("recoJetCounterFalse_VertWindA_iso", "Reconstructed jet multiplicity (with a rec Z) (2 #mu overlap = false): nVert <= 8. Iso no rho", 10, -0.5, 9.5); 
+   _histoVector.push_back(recoJetCounterFalse_VertWindA_iso);
+
+   numCounterTrue_VertWindA_iso = new TH1D("numCounterTrue_VertWindA_iso", "Generated jet multiplicity (with a rec Z) (2 #mu overlap = true): nVert <= 8. Iso no rho", 10, -0.5, 9.5); 
+   _histoVector.push_back(numCounterTrue_VertWindA_iso);
+   recoJetCounterTrue_VertWindA_iso = new TH1D("recoJetCounterTrue_VertWindA_iso", "Reconstructed jet multiplicity (#DeltaR test) (with a rec Z) (2 #mu overlap = true): nVert <= 8. Iso no rho", 10, -0.5, 9.5); 
+   _histoVector.push_back(recoJetCounterTrue_VertWindA_iso);
+
+   genJetTotalCounter_VertWindA_iso = new TH1D("genJetTotalCounter_VertWindA_iso", "Generated jet multiplicity (with a rec Z) (without 2 #mu overlap requirement): nVert <= 8. Iso no rho", 10, -0.5, 9.5); 
+   _histoVector.push_back(genJetTotalCounter_VertWindA_iso);
+   recoJetTotalCounter_VertWindA_iso = new TH1D("recoJetTotalCounter_VertWindA_iso", "Reconstructed jet multiplicity (with a rec Z) (without 2 #mu overlap requirement): nVert <= 8. Iso no rho", 10, -0.5, 9.5); 
+   _histoVector.push_back(recoJetTotalCounter_VertWindA_iso);
+
+
+   ////// Vertex window B: n Vertices > 8
+   _dir2b->cd("-");
+   _dir2c->cd();
+
+   denCounterFalse_VertWindB = new TH1D("denCounterFalse_VertWindB", "Generated jet multiplicity (2 #mu overlap = false): nVert > 8", 10, -0.5, 9.5); 
+   _histoVector.push_back(denCounterFalse_VertWindB);
+   numCounterFalse_VertWindB = new TH1D("numCounterFalse_VertWindB", "Generated jet multiplicity (with a rec Z) (2 #mu overlap = false): nVert > 8", 10, -0.5, 9.5); 
+   _histoVector.push_back(numCounterFalse_VertWindB);
+   recoJetCounterFalse_VertWindB = new TH1D("recoJetCounterFalse_VertWindB", "Reconstructed jet multiplicity (with a rec Z) (2 #mu overlap = false): nVert > 8", 10, -0.5, 9.5); 
+   _histoVector.push_back(recoJetCounterFalse_VertWindB);
+
+   denCounterTrue_VertWindB = new TH1D("denCounterTrue_VertWindB", "Generated jet multiplicity (2 #mu overlap = true): nVert > 8", 10, -0.5, 9.5); 
+   _histoVector.push_back(denCounterTrue_VertWindB);
+   numCounterTrue_VertWindB = new TH1D("numCounterTrue_VertWindB", "Generated jet multiplicity (with a rec Z) (2 #mu overlap = true): nVert > 8", 10, -0.5, 9.5); 
+   _histoVector.push_back(numCounterTrue_VertWindB);
+   recoJetCounterTrue_VertWindB = new TH1D("recoJetCounterTrue_VertWindB", "Reconstructed jet multiplicity (#DeltaR test) (with a rec Z) (2 #mu overlap = true): nVert > 8", 10, -0.5, 9.5); 
+   _histoVector.push_back(recoJetCounterTrue_VertWindB);
+
+   genJetTotalCounter_VertWindB = new TH1D("genJetTotalCounter_VertWindB", "Generated jet multiplicity (with a rec Z) (without 2 #mu overlap requirement): nVert > 8", 10, -0.5, 9.5); 
+   _histoVector.push_back(genJetTotalCounter_VertWindB);
+   recoJetTotalCounter_VertWindB = new TH1D("recoJetTotalCounter_VertWindB", "Reconstructed jet multiplicity (with a rec Z) (without 2 #mu overlap requirement): nVert > 8", 10, -0.5, 9.5); 
+   _histoVector.push_back(recoJetTotalCounter_VertWindB);
+
+   numCounterFalse_VertWindB_iso = new TH1D("numCounterFalse_VertWindB_iso", "Generated jet multiplicity (with a rec Z) (2 #mu overlap = false): nVert > 8. Iso no rho", 10, -0.5, 9.5); 
+   _histoVector.push_back(numCounterFalse_VertWindB_iso);
+   recoJetCounterFalse_VertWindB_iso = new TH1D("recoJetCounterFalse_VertWindB_iso", "Reconstructed jet multiplicity (with a rec Z) (2 #mu overlap = false): nVert > 8. Iso no rho", 10, -0.5, 9.5); 
+   _histoVector.push_back(recoJetCounterFalse_VertWindB_iso);
+
+   numCounterTrue_VertWindB_iso = new TH1D("numCounterTrue_VertWindB_iso", "Generated jet multiplicity (with a rec Z) (2 #mu overlap = true): nVert > 8. Iso no rho", 10, -0.5, 9.5); 
+   _histoVector.push_back(numCounterTrue_VertWindB_iso);
+   recoJetCounterTrue_VertWindB_iso = new TH1D("recoJetCounterTrue_VertWindB_iso", "Reconstructed jet multiplicity (#DeltaR test) (with a rec Z) (2 #mu overlap = true): nVert > 8. Iso no rho", 10, -0.5, 9.5); 
+   _histoVector.push_back(recoJetCounterTrue_VertWindB_iso);
+
+   genJetTotalCounter_VertWindB_iso = new TH1D("genJetTotalCounter_VertWindB_iso", "Generated jet multiplicity (with a rec Z) (without 2 #mu overlap requirement): nVert > 8. Iso no rho", 10, -0.5, 9.5); 
+   _histoVector.push_back(genJetTotalCounter_VertWindB_iso);
+   recoJetTotalCounter_VertWindB_iso = new TH1D("recoJetTotalCounter_VertWindB_iso", "Reconstructed jet multiplicity (with a rec Z) (without 2 #mu overlap requirement): nVert > 8. Iso no rho", 10, -0.5, 9.5); 
+   _histoVector.push_back(recoJetTotalCounter_VertWindB_iso);
+
+
+   _dir2c->cd("-");
    _dir2->cd("-");
 
+   // Single Mu Ovelap
    _dir1->cd();
+   _dir1a->cd();
 
    recMuSiRefPt = new TH1D("recMuSiRefPt", "reconstructed #mu p_{T} with gen particle reference", 200, 0, 200); 
    _histoVector.push_back(recMuSiRefPt);
    recMuSiRefEta = new TH1D("recMuSiRefEta", "reconstructed #mu #eta with gen particle reference", 100, -5., 5.); 
-   _histoVector.push_back(recMuSiRefPt);
+   _histoVector.push_back(recMuSiRefEta);
    recMuNoRefPt = new TH1D("recMuNoRefPt", "reconstructed #mu p_{T} without gen particle reference", 200, 0, 200); 
    _histoVector.push_back(recMuNoRefPt);
    recMuNoRefEta = new TH1D("recMuNoRefEta", "reconstructed #mu #eta without gen particle reference", 100, -5., 5.); 
-   _histoVector.push_back(recMuNoRefPt);
+   _histoVector.push_back(recMuNoRefEta);
 
+   //// Vertex window A: n Vertices <= 8
+   _dir1a->cd("-");
+   _dir1b->cd();
+
+   recMuSiRefPt_VertWindA = new TH1D("recMuSiRefPt_VertWindA", "reconstructed #mu p_{T} with gen particle reference: nVert <= 8", 200, 0, 200); 
+   _histoVector.push_back(recMuSiRefPt_VertWindA);
+   recMuSiRefEta_VertWindA = new TH1D("recMuSiRefEta_VertWindA", "reconstructed #mu #eta with gen particle reference: nVert <= 8", 100, -5., 5.); 
+   _histoVector.push_back(recMuSiRefEta_VertWindA);
+   recMuNoRefPt_VertWindA = new TH1D("recMuNoRefPt_VertWindA", "reconstructed #mu p_{T} without gen particle reference: nVert <= 8", 200, 0, 200); 
+   _histoVector.push_back(recMuNoRefPt_VertWindA);
+   recMuNoRefEta_VertWindA = new TH1D("recMuNoRefEta_VertWindA", "reconstructed #mu #eta without gen particle reference: nVert <= 8", 100, -5., 5.); 
+   _histoVector.push_back(recMuNoRefEta_VertWindA);
+
+   ////// Vertex window B: n Vertices > 8
+   _dir1b->cd("-");
+   _dir1c->cd();
+
+   recMuSiRefPt_VertWindB = new TH1D("recMuSiRefPt_VertWindB", "reconstructed #mu p_{T} with gen particle reference: nVert > 8", 200, 0, 200); 
+   _histoVector.push_back(recMuSiRefPt_VertWindB);
+   recMuSiRefEta_VertWindB = new TH1D("recMuSiRefEta_VertWindB", "reconstructed #mu #eta with gen particle reference: nVert > 8", 100, -5., 5.); 
+   _histoVector.push_back(recMuSiRefEta_VertWindB);
+   recMuNoRefPt_VertWindB = new TH1D("recMuNoRefPt_VertWindB", "reconstructed #mu p_{T} without gen particle reference: nVert > 8", 200, 0, 200); 
+   _histoVector.push_back(recMuNoRefPt_VertWindB);
+   recMuNoRefEta_VertWindB = new TH1D("recMuNoRefEta_VertWindB", "reconstructed #mu #eta without gen particle reference: nVert > 8", 100, -5., 5.); 
+   _histoVector.push_back(recMuNoRefEta_VertWindB);
+
+   _dir1c->cd("-");
    _dir1->cd("-");
 
  ///////////////////// Normalizzazione
@@ -236,25 +413,152 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
    
    //----richiamo i GEN Jets----
    fwlite::Handle<std::vector<reco::GenJet> > jetHandler;
-   jetHandler.getByLabel(iEvent, "selectedGenJetsOld"); //jets senza Mu PG
-   //jetHandler.getByLabel(iEvent, "selectedGenJetsNoMuMufromZ");  //jets senza Mu a mano
+   //jetHandler.getByLabel(iEvent, "selectedGenJetsOld"); //jets senza Mu PG
+   jetHandler.getByLabel(iEvent, "selectedGenJetsNoMuMufromZ");  //jets senza Mu a mano
    //seleziono un vettore di GEN Jets per Accettanza
    std::vector<const reco::GenJet*> genjetsr = GetJets_noJetID<reco::GenJet>(*jetHandler); 
 
+   //----richiamo i Vertici----
+   fwlite::Handle<reco::VertexCollection> priVertHandle;
+   priVertHandle.getByLabel(iEvent, "offlinePrimaryVertices");
+   //creo un contatore di numero di vertici a seconda di alcuni tagli
+   double nVerticesAll = priVertHandle->size();
+   reco::VertexCollection vtxs = *priVertHandle;
+   //   std::vector<float> vtxZ;
+   //   std::vector<float> vtxNdof;
+   double nVertices = 0;
+   for(int iv = 0; iv < nVerticesAll; iv++){
+   	if(fabs(vtxs[iv].z()) < 24 &&
+   	   !vtxs[iv].isFake() &&
+   	   //vtxs[iv].position().rho() <= 2 &&
+   	   vtxs[iv].ndof() >= 4){
+    		//vtxZ[nVertices] = vtxs[iv].z();
+   		//vtxNdof[nVertices] = vtxs[iv].ndof();
+    		nVertices++;
+   	}
+   }
+//cout << "nVertices finale = " << nVertices << endl;
+
    _dir->cd();
    _dir1->cd();
+   _dir1a->cd();
 
-   addHistosVsMulti(genjetsr.size(), "genMuPt", " - Gen: Generated #mu p_{T}", 200, 0, 200, genMuPt);
-   addHistosVsMulti(genjetsr.size(), "genMuEta", " - Gen: Generated #mu #eta", 100, -5., 5., genMuEta);
-   addHistosVsMulti(genjetsr.size(), "genMuPtinDeltaR", " - Gen: Generated #mu p_{T} (1 #mu overlap = false)", 200, 0, 200, genMuPtinDeltaR);
-   addHistosVsMulti(genjetsr.size(), "genMuEtainDeltaR", " - Gen: Generated #mu #eta (1 #mu overlap = false)", 100, -5., 5., genMuEtainDeltaR);
-   addHistosVsMulti(genjetsr.size(), "genMuPtinDeltaRMCMatch", " - Gen: Generated #mu p_{T} (1 #mu overlap = false) MC Match", 200, 0, 200, genMuPtinDeltaRMCMatch);
-   addHistosVsMulti(genjetsr.size(), "genMuEtainDeltaRMCMatch", " - Gen: Generated #mu #eta (1 #mu overlap = false) MC Match", 100, -5., 5., genMuEtainDeltaRMCMatch);
+   addHistosVsMulti(genjetsr.size(), "genMuPt_", " - Gen: Generated #mu p_{T}", 200, 0, 200, genMuPt);
+   addHistosVsMulti(genjetsr.size(), "genMuEta_", " - Gen: Generated #mu #eta", 100, -5., 5., genMuEta);
+   addHistosVsMulti(genjetsr.size(), "genMuPtinDeltaR_", " - Gen: Generated #mu p_{T} (1 #mu overlap = false)", 200, 0, 200, genMuPtinDeltaR);
+   addHistosVsMulti(genjetsr.size(), "genMuEtainDeltaR_", " - Gen: Generated #mu #eta (1 #mu overlap = false)", 100, -5., 5., genMuEtainDeltaR);
+   addHistosVsMulti(genjetsr.size(), "genMuPtinDeltaRMCMatch_", " - Gen: Generated #mu p_{T} (1 #mu overlap = false) MC Match", 200, 0, 200, genMuPtinDeltaRMCMatch);
+   addHistosVsMulti(genjetsr.size(), "genMuEtainDeltaRMCMatch_", " - Gen: Generated #mu #eta (1 #mu overlap = false) MC Match", 100, -5., 5., genMuEtainDeltaRMCMatch);
+   addHistosVsMulti(genjetsr.size(), "genMuPtinDeltaRMCMatch_iso_", " - Gen: Generated #mu p_{T} (1 #mu overlap = false) MC Match. Iso no rho", 200, 0, 200, genMuPtinDeltaRMCMatch_iso);
+   addHistosVsMulti(genjetsr.size(), "genMuEtainDeltaRMCMatch_iso_", " - Gen: Generated #mu #eta (1 #mu overlap = false) MC Match. Iso no rho", 100, -5., 5., genMuEtainDeltaRMCMatch_iso);
 
+   //// Vertex window A: n Vertices <= 8
+   _dir1a->cd("-");
+   _dir1b->cd();
+
+   addHistosVsMulti(genjetsr.size(), "genMuPt_VertWindA_", " - Gen: Generated #mu p_{T}. nVert <= 8", 200, 0, 200, genMuPt_VertWindA);
+   addHistosVsMulti(genjetsr.size(), "genMuEta_VertWindA_", " - Gen: Generated #mu #eta. nVert <= 8", 100, -5., 5., genMuEta_VertWindA);
+   addHistosVsMulti(genjetsr.size(), "genMuPtinDeltaR_VertWindA_", " - Gen: Generated #mu p_{T} (1 #mu overlap = false). nVert <= 8", 200, 0, 200, genMuPtinDeltaR_VertWindA);
+   addHistosVsMulti(genjetsr.size(), "genMuEtainDeltaR_VertWindA_", " - Gen: Generated #mu #eta (1 #mu overlap = false). nVert <= 8", 100, -5., 5., genMuEtainDeltaR_VertWindA);
+   addHistosVsMulti(genjetsr.size(), "genMuPtinDeltaRMCMatch_VertWindA_", " - Gen: Generated #mu p_{T} (1 #mu overlap = false) MC Match. nVert <= 8", 200, 0, 200, genMuPtinDeltaRMCMatch_VertWindA);
+   addHistosVsMulti(genjetsr.size(), "genMuEtainDeltaRMCMatch_VertWindA_", " - Gen: Generated #mu #eta (1 #mu overlap = false) MC Match. nVert <= 8", 100, -5., 5., genMuEtainDeltaRMCMatch_VertWindA);
+   addHistosVsMulti(genjetsr.size(), "genMuPtinDeltaRMCMatch_VertWindA_iso_", " - Gen: Generated #mu p_{T} (1 #mu overlap = false) MC Match. nVert <= 8. Iso no rho", 200, 0, 200, genMuPtinDeltaRMCMatch_VertWindA_iso);
+   addHistosVsMulti(genjetsr.size(), "genMuEtainDeltaRMCMatch_VertWindA_iso_", " - Gen: Generated #mu #eta (1 #mu overlap = false) MC Match. nVert <= 8. Iso no rho", 100, -5., 5., genMuEtainDeltaRMCMatch_VertWindA_iso);
+
+   ////// Vertex window B: n Vertices > 8
+   _dir1b->cd("-");
+   _dir1c->cd();
+
+   addHistosVsMulti(genjetsr.size(), "genMuPt_VertWindB_", " - Gen: Generated #mu p_{T}. nVert > 8", 200, 0, 200, genMuPt_VertWindB);
+   addHistosVsMulti(genjetsr.size(), "genMuEta_VertWindB_", " - Gen: Generated #mu #eta. nVert > 8", 100, -5., 5., genMuEta_VertWindB);
+   addHistosVsMulti(genjetsr.size(), "genMuPtinDeltaR_VertWindB_", " - Gen: Generated #mu p_{T} (1 #mu overlap = false). nVert > 8", 200, 0, 200, genMuPtinDeltaR_VertWindB);
+   addHistosVsMulti(genjetsr.size(), "genMuEtainDeltaR_VertWindB_", " - Gen: Generated #mu #eta (1 #mu overlap = false). nVert > 8", 100, -5., 5., genMuEtainDeltaR_VertWindB);
+   addHistosVsMulti(genjetsr.size(), "genMuPtinDeltaRMCMatch_VertWindB_", " - Gen: Generated #mu p_{T} (1 #mu overlap = false) MC Match. nVert > 8", 200, 0, 200, genMuPtinDeltaRMCMatch_VertWindB);
+   addHistosVsMulti(genjetsr.size(), "genMuEtainDeltaRMCMatch_VertWindB_", " - Gen: Generated #mu #eta (1 #mu overlap = false) MC Match. nVert > 8", 100, -5., 5., genMuEtainDeltaRMCMatch_VertWindB);
+   addHistosVsMulti(genjetsr.size(), "genMuPtinDeltaRMCMatch_VertWindB_iso_", " - Gen: Generated #mu p_{T} (1 #mu overlap = false) MC Match. nVert > 8. Iso no rho", 200, 0, 200, genMuPtinDeltaRMCMatch_VertWindB_iso);
+   addHistosVsMulti(genjetsr.size(), "genMuEtainDeltaRMCMatch_VertWindB_iso_", " - Gen: Generated #mu #eta (1 #mu overlap = false) MC Match. nVert > 8. Iso no rho", 100, -5., 5., genMuEtainDeltaRMCMatch_VertWindB_iso);
+
+   _dir1c->cd("-");
    _dir1->cd("-");
    _dir->cd("-");
 
-   double DeltaR = 0.5;
+   _dir->cd();
+   _dir2->cd();
+   _dir2a->cd();
+
+   addHistosVsMulti(genjetsr.size(), "genLeadMuPtFalse_", " - Gen: Generated Leading #mu p_{T} (2 #mu overlap = false)", 200, 0, 200, genLeadMuPtFalse);
+   addHistosVsMulti(genjetsr.size(), "genSecondMuPtFalse_", " - Gen: Generated Second #mu p_{T} (2 #mu overlap = false)", 200, 0, 200, genSecondMuPtFalse);
+   addHistosVsMulti(genjetsr.size(), "genLeadMuEtaFalse_", " - Gen: Generated Leading #mu #eta (2 #mu overlap = false)", 100, -5., 5., genLeadMuEtaFalse);
+   addHistosVsMulti(genjetsr.size(), "genSecondMuEtaFalse_", " - Gen: Generated Second #mu #eta (2 #mu overlap = false)", 100, -5., 5., genSecondMuEtaFalse);
+
+   addHistosVsMulti(genjetsr.size(), "genLeadMuPtFalse_iso_", " - Gen: Generated Leading #mu p_{T} (2 #mu overlap = false). Iso no rho", 200, 0, 200, genLeadMuPtFalse_iso);
+   addHistosVsMulti(genjetsr.size(), "genSecondMuPtFalse_iso_", " - Gen: Generated Second #mu p_{T} (2 #mu overlap = false). Iso no rho", 200, 0, 200, genSecondMuPtFalse_iso);
+   addHistosVsMulti(genjetsr.size(), "genLeadMuEtaFalse_iso_", " - Gen: Generated Leading #mu #eta (2 #mu overlap = false). Iso no rho", 100, -5., 5., genLeadMuEtaFalse_iso);
+   addHistosVsMulti(genjetsr.size(), "genSecondMuEtaFalse_iso_", " - Gen: Generated Second #mu #eta (2 #mu overlap = false). Iso no rho", 100, -5., 5., genSecondMuEtaFalse_iso);
+
+   addHistosVsMulti(genjetsr.size(), "genLeadMuPtTrue_", " - Gen: Generated Leading #mu p_{T} (2 #mu overlap = true)", 200, 0, 200, genLeadMuPtTrue);
+   addHistosVsMulti(genjetsr.size(), "genSecondMuPtTrue_", " - Gen: Generated Second #mu p_{T} (2 #mu overlap = true)", 200, 0, 200, genSecondMuPtTrue);
+   addHistosVsMulti(genjetsr.size(), "genLeadMuEtaTrue_", " - Gen: Generated Leading #mu #eta (2 #mu overlap = true)", 100, -5., 5., genLeadMuEtaTrue);
+   addHistosVsMulti(genjetsr.size(), "genSecondMuEtaTrue_", " - Gen: Generated Second #mu #eta (2 #mu overlap = true)", 100, -5., 5., genSecondMuEtaTrue);
+
+   addHistosVsMulti(genjetsr.size(), "genLeadMuPtTrue_iso_", " - Gen: Generated Leading #mu p_{T} (2 #mu overlap = true). Iso no rho", 200, 0, 200, genLeadMuPtTrue_iso);
+   addHistosVsMulti(genjetsr.size(), "genSecondMuPtTrue_iso_", " - Gen: Generated Second #mu p_{T} (2 #mu overlap = true). Iso no rho", 200, 0, 200, genSecondMuPtTrue_iso);
+   addHistosVsMulti(genjetsr.size(), "genLeadMuEtaTrue_iso_", " - Gen: Generated Leading #mu #eta (2 #mu overlap = true). Iso no rho", 100, -5., 5., genLeadMuEtaTrue_iso);
+   addHistosVsMulti(genjetsr.size(), "genSecondMuEtaTrue_iso_", " - Gen: Generated Second #mu #eta (2 #mu overlap = true). Iso no rho", 100, -5., 5., genSecondMuEtaTrue_iso);
+
+   _dir2a->cd("-");
+   _dir2b->cd();
+
+   ////// Vertex window A: n Vertices <= 8
+   addHistosVsMulti(genjetsr.size(), "genLeadMuPtFalse_VertWindA_", " - Gen: Generated Leading #mu p_{T} (2 #mu overlap = false). nVert <= 8", 200, 0, 200, genLeadMuPtFalse_VertWindA);
+   addHistosVsMulti(genjetsr.size(), "genSecondMuPtFalse_VertWindA_", " - Gen: Generated Second #mu p_{T} (2 #mu overlap = false). nVert <= 8", 200, 0, 200, genSecondMuPtFalse_VertWindA);
+   addHistosVsMulti(genjetsr.size(), "genLeadMuEtaFalse_VertWindA_", " - Gen: Generated Leading #mu #eta (2 #mu overlap = false). nVert <= 8", 100, -5., 5., genLeadMuEtaFalse_VertWindA);
+   addHistosVsMulti(genjetsr.size(), "genSecondMuEtaFalse_VertWindA_", " - Gen: Generated Second #mu #eta (2 #mu overlap = false). nVert <= 8", 100, -5., 5., genSecondMuEtaFalse_VertWindA);
+
+   addHistosVsMulti(genjetsr.size(), "genLeadMuPtFalse_VertWindA_iso_", " - Gen: Generated Leading #mu p_{T} (2 #mu overlap = false). nVert <= 8. Iso no rho", 200, 0, 200, genLeadMuPtFalse_VertWindA_iso);
+   addHistosVsMulti(genjetsr.size(), "genSecondMuPtFalse_VertWindA_iso_", " - Gen: Generated Second #mu p_{T} (2 #mu overlap = false). nVert <= 8. Iso no rho", 200, 0, 200, genSecondMuPtFalse_VertWindA_iso);
+   addHistosVsMulti(genjetsr.size(), "genLeadMuEtaFalse_VertWindA_iso_", " - Gen: Generated Leading #mu #eta (2 #mu overlap = false). nVert <= 8. Iso no rho", 100, -5., 5., genLeadMuEtaFalse_VertWindA_iso);
+   addHistosVsMulti(genjetsr.size(), "genSecondMuEtaFalse_VertWindA_iso_", " - Gen: Generated Second #mu #eta (2 #mu overlap = false). nVert <= 8. Iso no rho", 100, -5., 5., genSecondMuEtaFalse_VertWindA_iso);
+
+   addHistosVsMulti(genjetsr.size(), "genLeadMuPtTrue_VertWindA_", " - Gen: Generated Leading #mu p_{T} (2 #mu overlap = true). nVert <= 8", 200, 0, 200, genLeadMuPtTrue_VertWindA);
+   addHistosVsMulti(genjetsr.size(), "genSecondMuPtTrue_VertWindA_", " - Gen: Generated Second #mu p_{T} (2 #mu overlap = true). nVert <= 8", 200, 0, 200, genSecondMuPtTrue_VertWindA);
+   addHistosVsMulti(genjetsr.size(), "genLeadMuEtaTrue_VertWindA_", " - Gen: Generated Leading #mu #eta (2 #mu overlap = true). nVert <= 8", 100, -5., 5., genLeadMuEtaTrue_VertWindA);
+   addHistosVsMulti(genjetsr.size(), "genSecondMuEtaTrue_VertWindA_", " - Gen: Generated Second #mu #eta (2 #mu overlap = true). nVert <= 8", 100, -5., 5., genSecondMuEtaTrue_VertWindA);
+
+   addHistosVsMulti(genjetsr.size(), "genLeadMuPtTrue_VertWindA_iso_", " - Gen: Generated Leading #mu p_{T} (2 #mu overlap = true). nVert <= 8. Iso no rho", 200, 0, 200, genLeadMuPtTrue_VertWindA_iso);
+   addHistosVsMulti(genjetsr.size(), "genSecondMuPtTrue_VertWindA_iso_", " - Gen: Generated Second #mu p_{T} (2 #mu overlap = true). nVert <= 8. Iso no rho", 200, 0, 200, genSecondMuPtTrue_VertWindA_iso);
+   addHistosVsMulti(genjetsr.size(), "genLeadMuEtaTrue_VertWindA_iso_", " - Gen: Generated Leading #mu #eta (2 #mu overlap = true). nVert <= 8. Iso no rho", 100, -5., 5., genLeadMuEtaTrue_VertWindA_iso);
+   addHistosVsMulti(genjetsr.size(), "genSecondMuEtaTrue_VertWindA_iso_", " - Gen: Generated Second #mu #eta (2 #mu overlap = true). nVert <= 8. Iso no rho", 100, -5., 5., genSecondMuEtaTrue_VertWindA_iso);
+
+   _dir2b->cd("-");
+   _dir2c->cd();
+
+   ////// Vertex window B: n Vertices > 8
+   addHistosVsMulti(genjetsr.size(), "genLeadMuPtFalse_VertWindB_", " - Gen: Generated Leading #mu p_{T} (2 #mu overlap = false). nVert > 8", 200, 0, 200, genLeadMuPtFalse_VertWindB);
+   addHistosVsMulti(genjetsr.size(), "genSecondMuPtFalse_VertWindB_", " - Gen: Generated Second #mu p_{T} (2 #mu overlap = false). nVert > 8", 200, 0, 200, genSecondMuPtFalse_VertWindB);
+   addHistosVsMulti(genjetsr.size(), "genLeadMuEtaFalse_VertWindB_", " - Gen: Generated Leading #mu #eta (2 #mu overlap = false). nVert > 8", 100, -5., 5., genLeadMuEtaFalse_VertWindB);
+   addHistosVsMulti(genjetsr.size(), "genSecondMuEtaFalse_VertWindB_", " - Gen: Generated Second #mu #eta (2 #mu overlap = false). nVert > 8", 100, -5., 5., genSecondMuEtaFalse_VertWindB);
+
+   addHistosVsMulti(genjetsr.size(), "genLeadMuPtFalse_VertWindB_iso_", " - Gen: Generated Leading #mu p_{T} (2 #mu overlap = false). nVert > 8. Iso no rho", 200, 0, 200, genLeadMuPtFalse_VertWindB_iso);
+   addHistosVsMulti(genjetsr.size(), "genSecondMuPtFalse_VertWindB_iso_", " - Gen: Generated Second #mu p_{T} (2 #mu overlap = false). nVert > 8. Iso no rho", 200, 0, 200, genSecondMuPtFalse_VertWindB_iso);
+   addHistosVsMulti(genjetsr.size(), "genLeadMuEtaFalse_VertWindB_iso_", " - Gen: Generated Leading #mu #eta (2 #mu overlap = false). nVert > 8. Iso no rho", 100, -5., 5., genLeadMuEtaFalse_VertWindB_iso);
+   addHistosVsMulti(genjetsr.size(), "genSecondMuEtaFalse_VertWindB_iso_", " - Gen: Generated Second #mu #eta (2 #mu overlap = false). nVert > 8. Iso no rho", 100, -5., 5., genSecondMuEtaFalse_VertWindB_iso);
+
+   addHistosVsMulti(genjetsr.size(), "genLeadMuPtTrue_VertWindB_", " - Gen: Generated Leading #mu p_{T} (2 #mu overlap = true). nVert > 8", 200, 0, 200, genLeadMuPtTrue_VertWindB);
+   addHistosVsMulti(genjetsr.size(), "genSecondMuPtTrue_VertWindB_", " - Gen: Generated Second #mu p_{T} (2 #mu overlap = true). nVert > 8", 200, 0, 200, genSecondMuPtTrue_VertWindB);
+   addHistosVsMulti(genjetsr.size(), "genLeadMuEtaTrue_VertWindB_", " - Gen: Generated Leading #mu #eta (2 #mu overlap = true). nVert > 8", 100, -5., 5., genLeadMuEtaTrue_VertWindB);
+   addHistosVsMulti(genjetsr.size(), "genSecondMuEtaTrue_VertWindB_", " - Gen: Generated Second #mu #eta (2 #mu overlap = true). nVert > 8", 100, -5., 5., genSecondMuEtaTrue_VertWindB);
+
+   addHistosVsMulti(genjetsr.size(), "genLeadMuPtTrue_VertWindB_iso_", " - Gen: Generated Leading #mu p_{T} (2 #mu overlap = true). nVert > 8. Iso no rho", 200, 0, 200, genLeadMuPtTrue_VertWindB_iso);
+   addHistosVsMulti(genjetsr.size(), "genSecondMuPtTrue_VertWindB_iso_", " - Gen: Generated Second #mu p_{T} (2 #mu overlap = true). nVert > 8. Iso no rho", 200, 0, 200, genSecondMuPtTrue_VertWindB_iso);
+   addHistosVsMulti(genjetsr.size(), "genLeadMuEtaTrue_VertWindB_iso_", " - Gen: Generated Leading #mu #eta (2 #mu overlap = true). nVert > 8. Iso no rho", 100, -5., 5., genLeadMuEtaTrue_VertWindB_iso);
+   addHistosVsMulti(genjetsr.size(), "genSecondMuEtaTrue_VertWindB_iso_", " - Gen: Generated Second #mu #eta (2 #mu overlap = true). nVert > 8. Iso no rho", 100, -5., 5., genSecondMuEtaTrue_VertWindB_iso);
+
+   _dir2c->cd("-");
+   _dir2->cd("-");
+   _dir->cd("-");
+
+   double DeltaR = 0.0;
 
 	//qui apro l'if con le condizioni su Z e muoni
 	if (GenSelectedInAcceptance(*zHandlegen, _selections) &&
@@ -277,6 +581,15 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 		for (unsigned int a = 0; a < 2 ; ++a) {
 			genMuPt[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(a))->pt());
 			genMuEta[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(a))->eta());
+			if(nVertices <=8){
+				genMuPt_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(a))->pt());
+				genMuEta_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(a))->eta());
+			}
+  			else{ 
+				genMuPt_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(a))->pt());
+				genMuEta_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(a))->eta());
+			}
+
 		}
 
 
@@ -311,9 +624,17 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 		
 			// qui apro il controllo di overlapSingMu
 			if (!overlapSingMu){
-
 				genMuPtinDeltaR[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->pt());
 				genMuEtainDeltaR[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->eta());
+
+				if(nVertices <=8){
+					genMuPtinDeltaR_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->pt());
+					genMuEtainDeltaR_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->eta());
+				}
+				else{
+					genMuPtinDeltaR_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->pt());
+					genMuEtainDeltaR_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->eta());
+				}					
 
 				if ((*muonHandle).size() !=0){
         				for (unsigned int y = 0; y < (*muonHandle).size(); ++y){
@@ -329,7 +650,15 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 */
 							recMuSiRefPt->Fill((*muonHandle)[y].pt());
 							recMuSiRefEta->Fill((*muonHandle)[y].eta());
-
+							if(nVertices <=8){
+	 							recMuSiRefPt_VertWindA->Fill((*muonHandle)[y].pt());
+								recMuSiRefEta_VertWindA->Fill((*muonHandle)[y].eta());
+							}
+							else{
+	 							recMuSiRefPt_VertWindB->Fill((*muonHandle)[y].pt());
+								recMuSiRefEta_VertWindB->Fill((*muonHandle)[y].eta());
+							}
+							// controllo del MC match di singolo Mu (Iso con rho)
 							if (singleMu_Probe_Acc_SYM((*muonHandle)[y], _run, _rho) &&
 							    singleMu_Probe_Qual_SYM((*muonHandle)[y], _run, _rho) &&
 							    singleMu_Probe_Imp((*muonHandle)[y], _run, _rho) &&
@@ -337,19 +666,60 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 
 								if ((*muonHandle)[y].genParticle()->pt() == ((*zHandlegen)[0].daughter(c))->pt() && 
 			     				    	    (*muonHandle)[y].genParticle()->eta() == ((*zHandlegen)[0].daughter(c))->eta()){
-									cout << "MC Matching trovato: (*muonHandle)[" << y << "] matcha con ((*zHandlegen)[0].daughter(" << c << "))" << endl;
-
+									cout << "MC Matching trovato: (*muonHandle)[" << y << "] matcha con ((*zHandlegen)[0].daughter(" << c << ")(Iso con rho))" << endl;
+						
 									genMuPtinDeltaRMCMatch[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->pt());
 									genMuEtainDeltaRMCMatch[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->eta());
+									if(nVertices <=8){
+										genMuPtinDeltaRMCMatch_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->pt());
+										genMuEtainDeltaRMCMatch_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->eta());
+									}
+									else{
+										genMuPtinDeltaRMCMatch_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->pt());
+										genMuEtainDeltaRMCMatch_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->eta());
+									}
 								}
 								else {
-									cout << "Vedo che (*muonHandle)[" << y << "] non matcha con ((*zHandlegen)[0].daughter(" << c << "))" << endl;
+									cout << "Vedo che (*muonHandle)[" << y << "] non matcha con ((*zHandlegen)[0].daughter(" << c << ")(Iso con rho))" << endl;
 								}
-							}
+							}// chiudo il controllo del MC match di singolo Mu (Iso con rho)
+							// controllo del MC match di singolo Mu (Iso senza rho)
+							if (singleMu_Probe_Acc_SYM((*muonHandle)[y], _run, _rho) &&
+							    singleMu_Probe_Qual_SYM((*muonHandle)[y], _run, _rho) &&
+							    singleMu_Probe_Imp((*muonHandle)[y], _run, _rho) &&
+							    singleMu_Probe_Iso_SYM_mod((*muonHandle)[y], _run, _rho)){
+
+								if ((*muonHandle)[y].genParticle()->pt() == ((*zHandlegen)[0].daughter(c))->pt() && 
+			     				    	    (*muonHandle)[y].genParticle()->eta() == ((*zHandlegen)[0].daughter(c))->eta()){
+									cout << "MC Matching trovato: (*muonHandle)[" << y << "] matcha con ((*zHandlegen)[0].daughter(" << c << ") (Iso senza rho))" << endl;
+						
+									genMuPtinDeltaRMCMatch_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->pt());
+									genMuEtainDeltaRMCMatch_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->eta());
+									if(nVertices <=8){
+										genMuPtinDeltaRMCMatch_VertWindA_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->pt());
+										genMuEtainDeltaRMCMatch_VertWindA_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->eta());
+									}
+									else{
+										genMuPtinDeltaRMCMatch_VertWindB_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->pt());
+										genMuEtainDeltaRMCMatch_VertWindB_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->eta());
+									}
+								}
+								else {
+									cout << "Vedo che (*muonHandle)[" << y << "] non matcha con ((*zHandlegen)[0].daughter(" << c << ") (Iso senza rho))" << endl;
+								}
+							}// chiudo il controllo del MC match di singolo Mu (Iso senza rho)
 						}
 						else {
 							recMuNoRefPt->Fill((*muonHandle)[y].pt());
 							recMuNoRefEta->Fill((*muonHandle)[y].eta());
+							if(nVertices <=8){
+								recMuNoRefPt_VertWindA->Fill((*muonHandle)[y].pt());
+								recMuNoRefEta_VertWindA->Fill((*muonHandle)[y].eta());
+							}
+							else{
+								recMuNoRefPt_VertWindB->Fill((*muonHandle)[y].pt());
+								recMuNoRefEta_VertWindB->Fill((*muonHandle)[y].eta());
+							}
 						}
 					}
 				}
@@ -387,8 +757,14 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 		if(!overlap){
 
 			denCounterFalse->Fill(genjetsr.size());
+			if(nVertices <=8){
+				denCounterFalse_VertWindA->Fill(genjetsr.size());
+			}
+			else{
+				denCounterFalse_VertWindB->Fill(genjetsr.size());
+			}
 
-			//qui apro la sezione della Z ricostruita di overlap false
+			//qui apro la sezione della Z ricostruita di overlap false (Iso con rho)
 			if (RecSelected(_RecoCutFlags[1].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
 			    RecSelected(_RecoCutFlags[2].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
 			    RecSelected(_RecoCutFlags[3].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
@@ -398,16 +774,74 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 
 				numCounterFalse->Fill(genjetsr.size());
 				recoJetCounterFalse-> Fill(recjets.size());
+				genLeadMuPtFalse[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->pt());
+				genSecondMuPtFalse[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->pt());
+				genLeadMuEtaFalse[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->eta());
+				genSecondMuEtaFalse[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->eta());
+				if(nVertices <=8){
+					numCounterFalse_VertWindA->Fill(genjetsr.size());
+					recoJetCounterFalse_VertWindA-> Fill(recjets.size());
+					genLeadMuPtFalse_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->pt());
+					genSecondMuPtFalse_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->pt());
+					genLeadMuEtaFalse_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->eta());
+					genSecondMuEtaFalse_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->eta());
+				}
+				else{
+					numCounterFalse_VertWindB->Fill(genjetsr.size());
+					recoJetCounterFalse_VertWindB-> Fill(recjets.size());
+					genLeadMuPtFalse_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->pt());
+					genSecondMuPtFalse_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->pt());
+					genLeadMuEtaFalse_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->eta());
+					genSecondMuEtaFalse_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->eta());
+				}
 
-			} // qui chiudo la sezione della Z ricostruita di overlap false
+			} // qui chiudo la sezione della Z ricostruita di overlap false (Iso con rho)
+			//qui apro la sezione della Z ricostruita di overlap false (Iso senza rho)
+			if (RecSelected_mod(_RecoCutFlags[1].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_mod(_RecoCutFlags[2].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_mod(_RecoCutFlags[3].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_mod(_RecoCutFlags[4].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_mod(_RecoCutFlags[5].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_mod(_RecoCutFlags[6].c_str(), *zHandle, *triggerHandle, _run, _rho)){
+
+				numCounterFalse_iso->Fill(genjetsr.size());
+				recoJetCounterFalse_iso-> Fill(recjets.size());
+				genLeadMuPtFalse_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->pt());
+				genSecondMuPtFalse_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->pt());
+				genLeadMuEtaFalse_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->eta());
+				genSecondMuEtaFalse_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->eta());
+				if(nVertices <=8){
+					numCounterFalse_VertWindA_iso->Fill(genjetsr.size());
+					recoJetCounterFalse_VertWindA_iso-> Fill(recjets.size());
+					genLeadMuPtFalse_VertWindA_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->pt());
+					genSecondMuPtFalse_VertWindA_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->pt());
+					genLeadMuEtaFalse_VertWindA_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->eta());
+					genSecondMuEtaFalse_VertWindA_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->eta());
+				}
+				else{
+					numCounterFalse_VertWindB_iso->Fill(genjetsr.size());
+					recoJetCounterFalse_VertWindB_iso-> Fill(recjets.size());
+					genLeadMuPtFalse_VertWindB_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->pt());
+					genSecondMuPtFalse_VertWindB_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->pt());
+					genLeadMuEtaFalse_VertWindB_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->eta());
+					genSecondMuEtaFalse_VertWindB_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->eta());
+				}
+
+			} // qui chiudo la sezione della Z ricostruita di overlap false (Iso senza rho)
+
 		}// qui chiudo il controllo di overlap false di 2 Mu
 
 		//qui apro il controllo di overlap true di 2 Mu
 		else {
-
 			denCounterTrue->Fill(genjetsr.size());
+			if(nVertices <=8){
+				denCounterTrue_VertWindA->Fill(genjetsr.size());
+			}
+			else{
+				denCounterTrue_VertWindB->Fill(genjetsr.size());
+			}
 
-			//qui apro la sezione della Z ricostruita di overlap true
+			//qui apro la sezione della Z ricostruita di overlap true (Iso con rho)
 			if (RecSelected(_RecoCutFlags[1].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
 			    RecSelected(_RecoCutFlags[2].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
 			    RecSelected(_RecoCutFlags[3].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
@@ -417,11 +851,64 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 
 				numCounterTrue->Fill(genjetsr.size());
 				recoJetCounterTrue-> Fill(recjets.size());
+				genLeadMuPtTrue[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->pt());
+				genSecondMuPtTrue[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->pt());
+				genLeadMuEtaTrue[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->eta());
+				genSecondMuEtaTrue[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->eta());
+				if(nVertices <=8){
+					numCounterTrue_VertWindA->Fill(genjetsr.size());
+					recoJetCounterTrue_VertWindA-> Fill(recjets.size());
+					genLeadMuPtTrue_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->pt());
+					genSecondMuPtTrue_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->pt());
+					genLeadMuEtaTrue_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->eta());
+					genSecondMuEtaTrue_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->eta());
+				}
+				else{
+					numCounterTrue_VertWindB->Fill(genjetsr.size());
+					recoJetCounterTrue_VertWindB-> Fill(recjets.size());
+					genLeadMuPtTrue_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->pt());
+					genSecondMuPtTrue_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->pt());
+					genLeadMuEtaTrue_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->eta());
+					genSecondMuEtaTrue_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->eta());
+				}
 
-			} // qui chiudo la sezione della Z ricostruita di overlap true
+			} // qui chiudo la sezione della Z ricostruita di overlap true (Iso con rho)
+			//qui apro la sezione della Z ricostruita di overlap true (Iso senza rho)
+			if (RecSelected_mod(_RecoCutFlags[1].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_mod(_RecoCutFlags[2].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_mod(_RecoCutFlags[3].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_mod(_RecoCutFlags[4].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_mod(_RecoCutFlags[5].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_mod(_RecoCutFlags[6].c_str(), *zHandle, *triggerHandle, _run, _rho)){
+
+				numCounterTrue_iso->Fill(genjetsr.size());
+				recoJetCounterTrue_iso-> Fill(recjets.size());
+				genLeadMuPtTrue_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->pt());
+				genSecondMuPtTrue_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->pt());
+				genLeadMuEtaTrue_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->eta());
+				genSecondMuEtaTrue_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->eta());
+				if(nVertices <=8){
+					numCounterTrue_VertWindA_iso->Fill(genjetsr.size());
+					recoJetCounterTrue_VertWindA_iso-> Fill(recjets.size());
+					genLeadMuPtTrue_VertWindA_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->pt());
+					genSecondMuPtTrue_VertWindA_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->pt());
+					genLeadMuEtaTrue_VertWindA_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->eta());
+					genSecondMuEtaTrue_VertWindA_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->eta());
+				}
+				else{
+					numCounterTrue_VertWindB_iso->Fill(genjetsr.size());
+					recoJetCounterTrue_VertWindB_iso-> Fill(recjets.size());
+					genLeadMuPtTrue_VertWindB_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->pt());
+					genSecondMuPtTrue_VertWindB_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->pt());
+					genLeadMuEtaTrue_VertWindB_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->eta());
+					genSecondMuEtaTrue_VertWindB_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->eta());
+				}
+
+			} // qui chiudo la sezione della Z ricostruita di overlap true (Iso senza rho)
+
 		}// qui chiudo il controllo di overlap true di 2 Mu
 
-		//qui apro la sezione della Z ricostruita senza richiesta di overlap
+		//qui apro la sezione della Z ricostruita senza richiesta di overlap (Iso con rho)
 		if (RecSelected(_RecoCutFlags[1].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
 		    RecSelected(_RecoCutFlags[2].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
 		    RecSelected(_RecoCutFlags[3].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
@@ -431,8 +918,35 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 
 			genJetTotalCounter-> Fill(genjetsr.size());
 			recoJetTotalCounter-> Fill(recjets.size());
+			if(nVertices <=8){
+				genJetTotalCounter_VertWindA-> Fill(genjetsr.size());
+				recoJetTotalCounter_VertWindA-> Fill(recjets.size());
+			}
+			else{
+				genJetTotalCounter_VertWindB-> Fill(genjetsr.size());
+				recoJetTotalCounter_VertWindB-> Fill(recjets.size());
+			}
+		} // qui chiudo la sezione della Z ricostruita senza richiesta di overlap (Iso con rho)
+		//qui apro la sezione della Z ricostruita senza richiesta di overlap (Iso senza rho)
+		if (RecSelected_mod(_RecoCutFlags[1].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
+		    RecSelected_mod(_RecoCutFlags[2].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
+		    RecSelected_mod(_RecoCutFlags[3].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
+		    RecSelected_mod(_RecoCutFlags[4].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
+		    RecSelected_mod(_RecoCutFlags[5].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
+		    RecSelected_mod(_RecoCutFlags[6].c_str(), *zHandle, *triggerHandle, _run, _rho)){
 
-		} // qui chiudo la sezione della Z ricostruita senza richiesta di overlap
+			genJetTotalCounter_iso-> Fill(genjetsr.size());
+			recoJetTotalCounter_iso-> Fill(recjets.size());
+			if(nVertices <=8){
+				genJetTotalCounter_VertWindA_iso-> Fill(genjetsr.size());
+				recoJetTotalCounter_VertWindA_iso-> Fill(recjets.size());
+			}
+			else{
+				genJetTotalCounter_VertWindB_iso-> Fill(genjetsr.size());
+				recoJetTotalCounter_VertWindB_iso-> Fill(recjets.size());
+			}
+		} // qui chiudo la sezione della Z ricostruita senza richiesta di overlap (Iso senza rho)
+
 		//######### Fine Analisi di efficienza di doppio Mu #########
 
 	} //qui chiudo l'if con le condizioni su Z e muoni

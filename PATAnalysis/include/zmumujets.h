@@ -22,6 +22,7 @@ using namespace std;
 3.  WJetsToLNu_All		(skimmed)
 4.  WWJetsTo2L2Nu_All		(skimmed)
 5.  QCD_Pt20MuEnPt10_All	(skimmed)
+6.  DYtoMuMu_All		(not skimmed)
 
 -2.  All Train
 11.  DYtoLL_Train		(not skimmed)
@@ -48,6 +49,7 @@ else if(i==2)SampleName="TTJets_All";
 else if(i==3)SampleName="WJetsToLNu_All";
 else if(i==4)SampleName="WWJetsTo2L2Nu_All";
 else if(i==5)SampleName="QCD_Pt20MuEnPt10_All";
+else if(i==6)SampleName="DYtoMuMu_All";
 
 else if(i==11)SampleName="DYtoLL_Train";
 else if(i==12)SampleName="TTJets_Train";
@@ -124,6 +126,14 @@ Par->_EventFilter=0.00118;
 Par->_EventsPerFile=0;
 Par->_EventNumber=8747418;
 break;
+case(6):
+//DYtoMuMu_All (not skimmed) events = 
+Par->_xsec=1666.;
+Par->_EventFilter=1.;
+Par->_EventsPerFile=0;
+Par->_EventNumber=0;
+break;
+
 case(11):
 //DYtoLL Train (not skimmed)
 Par->_xsec=3048.;
