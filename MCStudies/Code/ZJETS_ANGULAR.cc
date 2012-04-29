@@ -8,6 +8,7 @@
 #include "Rivet/Projections/FastJets.hh"
 #include "Rivet/Projections/VetoedFinalState.hh"
 #include "Rivet/Projections/InvMassFinalState.hh"
+#include "Rivet/Projections/LeadingParticlesFinalState.hh"
 #include "Rivet/Tools/ParticleIdUtils.hh"
 
 
@@ -28,22 +29,33 @@ namespace Rivet {
     /// Book histograms and initialise projections before the run
     void init() {
       
-      const FinalState fs(-MAXRAPIDITY,MAXRAPIDITY);
+      const FinalState fs(-5.0,5.0);
       addProjection(fs, "FS");
       
+      // Zee
+      LeadingParticlesFinalState ZeeFS(FinalState(-2.5,2.5, 0.)); 
+      ZeeFS.addParticleIdPair(ELECTRON);
+      addProjection(ZeeFS, "ZeeFS");
+      // Zmm
+      LeadingParticlesFinalState ZmmFS(FinalState(-2.4,2.4, 0.)); 
+      ZmmFS.addParticleIdPair(MUON);
+      addProjection(ZmmFS, "ZmmFS");
+
       vector<pair<PdgId,PdgId> > vidsZ;
       vidsZ.push_back(make_pair(ELECTRON, POSITRON));
       vidsZ.push_back(make_pair(MUON, ANTIMUON));
       
-      FinalState fsZ(-MAXRAPIDITY,MAXRAPIDITY);
+      FinalState fsZ(-5.0,5.0);
       InvMassFinalState invfsZ(fsZ, vidsZ, 71*GeV, 111*GeV);
       addProjection(invfsZ, "INVFSZ");
   
       VetoedFinalState vfs(fs);
       vfs.addVetoOnThisFinalState(invfsZ);
-      
+      vfs.addVetoOnThisFinalState(ZeeFS);
+      vfs.addVetoOnThisFinalState(ZmmFS);
+
       addProjection(vfs, "VFS");
-      addProjection(FastJets(vfs, FastJets::ANTIKT, 0.5), "ak5Jets");
+      addProjection(FastJets(vfs, FastJets::ANTIKT, 0.6), "ak6Jets");
       
       //data points
       //histograms 
@@ -66,6 +78,41 @@ namespace Rivet {
       _histSumDeltaPhi    = bookHistogram1D("SumDeltaPhi", 32, 0, 3.15);
       
     } 
+    
+    void GetPtEtaPhi(Particle p1, double& pt, double& eta,double& phi){
+      pt = p1.momentum().pT();
+      eta = p1.momentum().eta();
+      phi = p1.momentum().phi();
+      return;
+    }
+   
+    bool ApplyZAcceptance(const LeadingParticlesFinalState& zFS, std::string lepton){
+      const ParticleVector& Zdaughters = zFS.particlesByPt();
+      double phi1 = -9999., phi2 = -9999.;
+      double pt1 = -9999., pt2 = -9999.;
+      double eta1 = -9999., eta2 = -9999.;
+      GetPtEtaPhi(Zdaughters[0],pt1,eta1,phi1);
+      GetPtEtaPhi(Zdaughters[1],pt2,eta2,phi2);
+      bool isFid1 = false;
+      bool isFid2 = false;
+      if(lepton=="electron"){
+	isFid1 = ((fabs(eta1)<1.4442)||((fabs(eta1)>1.566)&&(fabs(eta1)<2.5)));
+	isFid2 = ((fabs(eta2)<1.4442)||((fabs(eta2)>1.566)&&(fabs(eta2)<2.5)));
+      }
+      if(lepton=="muon"){
+	isFid1 = ((fabs(eta1)<2.4));
+	isFid2 = ((fabs(eta2)<2.4));
+      }
+
+      if( isFid1 && isFid2 && pt1>20 && pt2 >20){
+	const FourMomentum pmom = Zdaughters[0].momentum() + Zdaughters[1].momentum();
+	double mass = sqrt(pmom.invariant());
+	if (inRange(mass/GeV, 71.0, 111.0))
+	  return true;
+	else return false;
+      }
+      else return false;
+    }
     
     bool ApplyElectronCutsForZee(double pt1, double pt2, double eta1, double eta2){
       bool isFid1 = ((fabs(eta1)<1.4442)||((fabs(eta1)>1.566)&&(fabs(eta1)<2.5)));
@@ -175,17 +222,25 @@ namespace Rivet {
       
       //define the Z candidate
       const InvMassFinalState& invMassFinalStateZ = applyProjection<InvMassFinalState>(event, "INVFSZ");
-      const InvMassFinalState& invMassFinalStateW = applyProjection<InvMassFinalState>(event, "INVFSW");
+      ////const InvMassFinalState& invMassFinalStateW = applyProjection<InvMassFinalState>(event, "INVFSW");
+      const LeadingParticlesFinalState& ZeeFS = applyProjection<LeadingParticlesFinalState>(event, "ZeeFS");
+      const LeadingParticlesFinalState& ZmmFS = applyProjection<LeadingParticlesFinalState>(event, "ZmmFS");
       
       bool isW(false); bool isZ(false);
       
-      isW  = (invMassFinalStateZ.empty() && !(invMassFinalStateW.empty()));
-      isZ  = !(invMassFinalStateZ.empty());
-	       //&& invMassFinalStateW.empty());
+      isZ= (ZeeFS.particles().size()>1 && ZmmFS.empty()) || (ZmmFS.particles().size()>1 && ZeeFS.empty()); 
+      //isW=(!WminusenuFS.empty() || !WplusenuFS.empty() || !WminusmunuFS.empty() || !WplusmunuFS.empty());
       
-      const ParticleVector&  ZDecayProducts =  invMassFinalStateZ.particles();
+      //isW  = (invMassFinalStateZ.empty() && !(invMassFinalStateW.empty()));
+      //isZ  = !(invMassFinalStateZ.empty());
+      //&& invMassFinalStateW.empty());
       
-      if (ZDecayProducts.size() < 2 ) vetoEvent; 
+      const ParticleVector& ZeeDaus  = ZeeFS.particlesByPt();
+      const ParticleVector& ZmmDaus = ZmmFS.particlesByPt();
+
+      //const ParticleVector&  ZDecayProducts =  invMassFinalStateZ.particles();
+      
+      //if (ZDecayProducts.size() < 2 ) vetoEvent; 
       //&& WDecayProducts.size() <2) vetoEvent;
       
       double pt1=-9999.,  pt2=-9999.;
@@ -193,6 +248,18 @@ namespace Rivet {
       double eta1=-9999., eta2=-9999.;
       
       if(isZ){
+        cout<<"found a Z"<<endl;
+	if(ZeeDaus.size()==2 && ZmmDaus.size()<2){
+	  isZee = ApplyZAcceptance(ZeeFS,"electron");
+	  GetPtEtaPhi(ZeeDaus[0],pt1,eta1,phi1);
+	  GetPtEtaPhi(ZeeDaus[1],pt2,eta2,phi2);
+	}
+	if(ZmmDaus.size()==2 && ZeeDaus.size()<2){
+	  isZmm = ApplyZAcceptance(ZmmFS,"muon");
+	}
+      }
+
+      /*if(isZ){
 	pt1  = ZDecayProducts[0].momentum().pT();
 	pt2  = ZDecayProducts[1].momentum().pT();
 	eta1 = ZDecayProducts[0].momentum().eta();
@@ -202,17 +269,18 @@ namespace Rivet {
       }
       
       isZmm = isZ && ((fabs(ZDecayProducts[0].pdgId()) == 13) && (fabs(ZDecayProducts[1].pdgId()) == 13));
-      isZee = isZ && ((fabs(ZDecayProducts[0].pdgId()) == 11) && (fabs(ZDecayProducts[1].pdgId()) == 11));
+      isZee = isZ && ((fabs(ZDecayProducts[0].pdgId()) == 11) && (fabs(ZDecayProducts[1].pdgId()) == 11));*/
       
+
       if(!(isZmm||isZee)) vetoEvent;
       
-      bool passBosonConditions = false;
+      /*bool passBosonConditions = false;
       //apply kinematical cuts on pt and eta
       if(isZmm)passBosonConditions = ApplyMuonCutsForZmm(pt1,pt2,eta1,eta2);
       if(isZee)passBosonConditions = ApplyElectronCutsForZee(pt1,pt2,eta1,eta2);
       
       
-      if(!passBosonConditions) vetoEvent;
+      if(!passBosonConditions) vetoEvent;*/
       
       //Obtain the jets.
       vector<FourMomentum> finaljet_list;
@@ -240,7 +308,12 @@ namespace Rivet {
       
       double Njets = finaljet_list.size();
       
-      FourMomentum pZ = ZDecayProducts[0].momentum() + ZDecayProducts[1].momentum();
+      //FourMomentum pZ = ZDecayProducts[0].momentum() + ZDecayProducts[1].momentum();
+      FourMomentum pZ;// = 0.;
+      
+      if(isZee) pZ = ZeeDaus[0].momentum() + ZeeDaus[1].momentum();                                                                       
+      else if (isZmm) pZ = ZmmDaus[0].momentum() + ZmmDaus[1].momentum();
+      
       double Mll  = pZ.mass();
       _histMll->fill(Mll, weight);
       
@@ -248,7 +321,7 @@ namespace Rivet {
 	//double Njets = finaljet_list.size();
 	cout<<"No of jets: "<<Njets<<endl;
 	cout<<"pt 1st jet: "<<finaljet_list[0].pT()<<endl;
-	FourMomentum pZ = ZDecayProducts[0].momentum() + ZDecayProducts[1].momentum();
+	//FourMomentum pZ = ZDecayProducts[0].momentum() + ZDecayProducts[1].momentum();
 	double Mll  = pZ.mass();
 	double Ptll = pZ.pT();
 	double PhiZ = pZ.phi();
@@ -274,6 +347,8 @@ namespace Rivet {
 	  if(Njets>2){
 	    double PtJet3  = finaljet_list[2].pT();
 	    double PhiJet3 = finaljet_list[2].phi();
+	    double SumDeltaPhi = deltaPhi(PhiJet1,PhiJet2) + deltaPhi(PhiJet1,PhiJet3) + deltaPhi(PhiJet3,PhiJet2);
+	    _histSumDeltaPhi->fill(SumDeltaPhi, weight);
 	    _histPtJet2->fill(PtJet3, weight);
 	    _histDeltaPhiZJ1_3->fill(deltaPhi(PhiJet1,PhiZ), weight);
 	    _histDeltaPhiZJ2_3->fill(deltaPhi(PhiJet2,PhiZ), weight);
@@ -282,9 +357,9 @@ namespace Rivet {
 	    
 	    if(Njets>3){
 	      double PtJet4  = finaljet_list[2].pT();
-	      double SumDeltaPhi = deltaPhi(PhiJet1,PhiJet2) + deltaPhi(PhiJet1,PhiJet3) + deltaPhi(PhiJet3,PhiJet2);
+	      //double SumDeltaPhi = deltaPhi(PhiJet1,PhiJet2) + deltaPhi(PhiJet1,PhiJet3) + deltaPhi(PhiJet3,PhiJet2);
 	      _histPtJet4->fill(PtJet4, weight);
-	      _histSumDeltaPhi->fill(SumDeltaPhi, weight);
+	      //(_histSumDeltaPhi->fill(SumDeltaPhi, weight);
 	    }
 	  }
 	}
