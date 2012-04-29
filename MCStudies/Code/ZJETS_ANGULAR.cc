@@ -55,8 +55,8 @@ namespace Rivet {
       vfs.addVetoOnThisFinalState(ZmmFS);
 
       addProjection(vfs, "VFS");
-      addProjection(FastJets(vfs, FastJets::ANTIKT, 0.6), "ak6Jets");
-      
+      addProjection(FastJets(vfs, FastJets::ANTIKT, 0.5), "ak5Jets");
+      addProjection(FastJets(vfs, FastJets::ANTIKT, 0.6), "ak6Jets");      
       //data points
       //histograms 
       _histMll            = bookHistogram1D("Mll", 80, 50., 130.);
@@ -75,7 +75,7 @@ namespace Rivet {
       _histDeltaPhiZJ2_3  = bookHistogram1D("DeltaPhiZJ2_3", 32, 0., 3.15);
       _histDeltaPhiJ1J2_2 = bookHistogram1D("DeltaPhiJ1J2_2", 32, 0., 3.15);
       _histDeltaPhiJ1J2_3 = bookHistogram1D("DeltaPhiJ1J2_3", 32, 0., 3.15);
-      _histSumDeltaPhi    = bookHistogram1D("SumDeltaPhi", 32, 0, 3.15);
+      _histSumDeltaPhi    = bookHistogram1D("SumDeltaPhi", 32, 0, 6.30);
       
     } 
     
@@ -314,8 +314,8 @@ namespace Rivet {
       if(isZee) pZ = ZeeDaus[0].momentum() + ZeeDaus[1].momentum();                                                                       
       else if (isZmm) pZ = ZmmDaus[0].momentum() + ZmmDaus[1].momentum();
       
-      double Mll  = pZ.mass();
-      _histMll->fill(Mll, weight);
+      //double Mll  = pZ.mass();
+      //_histMll->fill(Mll, weight);
       
       if(Njets){
 	//double Njets = finaljet_list.size();
@@ -347,7 +347,7 @@ namespace Rivet {
 	  if(Njets>2){
 	    double PtJet3  = finaljet_list[2].pT();
 	    double PhiJet3 = finaljet_list[2].phi();
-	    double SumDeltaPhi = deltaPhi(PhiJet1,PhiJet2) + deltaPhi(PhiJet1,PhiJet3) + deltaPhi(PhiJet3,PhiJet2);
+	    double SumDeltaPhi = deltaPhi(PhiJet1,PhiJet2) + deltaPhi(PhiJet1,PhiJet3) + deltaPhi(PhiJet2,PhiJet3);
 	    _histSumDeltaPhi->fill(SumDeltaPhi, weight);
 	    _histPtJet2->fill(PtJet3, weight);
 	    _histDeltaPhiZJ1_3->fill(deltaPhi(PhiJet1,PhiZ), weight);
