@@ -59,7 +59,7 @@ namespace Rivet {
       addProjection(FastJets(vfs, FastJets::ANTIKT, 0.6), "ak6Jets");      
       //data points
       //histograms 
-      _histMll            = bookHistogram1D("Mll", 80, 50., 130.);
+      _histMll            = bookHistogram1D("Mll", 60, 50., 130.);
       _histNjets          = bookHistogram1D("Njets", 5, -0.5, 4.5);
       _histPtll           = bookHistogram1D("Ptll", 50, 0., 1000.);
       _histMjj            = bookHistogram1D("Mjj", 70, 0., 1400.);   
@@ -284,7 +284,7 @@ namespace Rivet {
       
       //Obtain the jets.
       vector<FourMomentum> finaljet_list;
-      foreach (const Jet& j, applyProjection<FastJets>(event, "ak5Jets").jetsByPt(30.0*GeV)) {
+      foreach (const Jet& j, applyProjection<FastJets>(event, "ak6Jets").jetsByPt(30.0*GeV)) {
 	const double jeta = j.momentum().eta();
 	const double jphi = j.momentum().phi();
 	const double jpt  = j.momentum().pT();
@@ -349,7 +349,7 @@ namespace Rivet {
 	    double PhiJet3 = finaljet_list[2].phi();
 	    double SumDeltaPhi = deltaPhi(PhiJet1,PhiJet2) + deltaPhi(PhiJet1,PhiJet3) + deltaPhi(PhiJet2,PhiJet3);
 	    _histSumDeltaPhi->fill(SumDeltaPhi, weight);
-	    _histPtJet2->fill(PtJet3, weight);
+	    _histPtJet3->fill(PtJet3, weight);
 	    _histDeltaPhiZJ1_3->fill(deltaPhi(PhiJet1,PhiZ), weight);
 	    _histDeltaPhiZJ2_3->fill(deltaPhi(PhiJet2,PhiZ), weight);
 	    _histDeltaPhiJ1J2_3->fill(deltaPhi(PhiJet1,PhiJet2), weight);
