@@ -56,7 +56,7 @@ namespace Rivet {
 
       addProjection(vfs, "VFS");
       addProjection(FastJets(vfs, FastJets::ANTIKT, 0.5), "ak5Jets");
-      addProjection(FastJets(vfs, FastJets::ANTIKT, 0.6), "ak6Jets");      
+      addProjection(FastJets(vfs, FastJets::ANTIKT, 0.4), "ak4Jets");      
       //data points
       //histograms 
       _histMll            = bookHistogram1D("Mll", 60, 50., 130.);
@@ -284,7 +284,7 @@ namespace Rivet {
       
       //Obtain the jets.
       vector<FourMomentum> finaljet_list;
-      foreach (const Jet& j, applyProjection<FastJets>(event, "ak6Jets").jetsByPt(30.0*GeV)) {
+      foreach (const Jet& j, applyProjection<FastJets>(event, "ak4Jets").jetsByPt(30.0*GeV)) {
 	const double jeta = j.momentum().eta();
 	const double jphi = j.momentum().phi();
 	const double jpt  = j.momentum().pT();
