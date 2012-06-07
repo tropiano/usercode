@@ -557,6 +557,11 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
 
    // generators quantities
 
+   //----richiamo la rho----   
+   fwlite::Handle<double> Rho;
+   Rho.getByLabel(iEvent, "kt6PFJets", "rho");
+   rho = *Rho;
+
    fwlite::Handle<std::vector<reco::CompositeCandidate> > zgenHandle;
    zgenHandle.getByLabel(iEvent, "zeegenfull");
 
@@ -567,22 +572,22 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    
    if(_sample=="mc" && zgenHandle->size()!=0){
    
-   std::vector<const reco::Candidate*> zgendaughters;
+   std::vector<const pat::Electron*> zgendaughters;
    const reco::Candidate *gendau0 = 0;
    const reco::Candidate *gendau1 = 0;
    
-   zgendaughters = ZGENDaughters((*zgenHandle)[0]);
-   std::vector<const reco::GenJet*> genjets = GetJets_GenJets<reco::GenJet>(*jetgenHandle);
+   zgendaughters = ZGENDaughters((*zgenHandle));
+   std::vector<const reco::GenJet*> genjets = GetJets_noJetID<reco::GenJet>(*jetgenHandle);
    
    if(zgendaughters.size()){
    gendau0 = zgendaughters[0];
    gendau1 = zgendaughters[1];
    for(unsigned int i = 0; i < genjets.size(); i++){
-   if(IsoJet<reco::Candidate>(zgendaughters,*genjets[i]))isogenjets.push_back(genjets[i]);}
+   if(IsoJet<pat::Electron>(zgendaughters,*genjets[i]))isogenjets.push_back(genjets[i]);}
    }else if(!zgendaughters.size()){
    for(unsigned int i = 0; i < genjets.size(); i++)isogenjets.push_back(genjets[i]);}
 
-   if (GenSelected((*zgenHandle)[0], _selections)&&zgendaughters.size()!=0){   
+   if (GenSelected((*zgenHandle), _selections)&&zgendaughters.size()!=0){   
 
       ptzgen=(*zgenHandle)[0].pt();
       etazgen=(*zgenHandle)[0].eta();
@@ -605,7 +610,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
       
    }  
 
-   if (GenSelectedInAcceptance((*zgenHandle)[0], _selections)&&zgendaughters.size()){
+   if (GenSelectedInAcceptance((*zgenHandle), _selections)&&zgendaughters.size()){
    
       acc_ptzgen=(*zgenHandle)[0].pt();
       acc_etazgen=(*zgenHandle)[0].eta();
@@ -686,7 +691,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
      std::vector<const pat::Jet*> pfl1isorecjets;
         
      if(zrecHandle->size()){
-     zrecdaughters = ZRECDaughters((*zrecHandle)[0]);}
+     zrecdaughters = ZRECDaughters((*zrecHandle));}
      
      if(zrecdaughters.size()){
      recdau0 = zrecdaughters[0];
@@ -703,17 +708,17 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
      std::vector<const pat::Jet*> geniso_pfisorecjets;
      std::vector<const pat::Jet*> geniso_pfl1isorecjets;
      if(_sample=="mc" && zgenHandle->size()!=0){
-     std::vector<const reco::Candidate*> zgendaughters = ZGENDaughters((*zgenHandle)[0]);
+     std::vector<const pat::Electron*> zgendaughters = ZGENDaughters((*zgenHandle));
      if(zgendaughters.size()){
      for(unsigned int i = 0; i < pfrecjets.size(); i++){
-     if(IsoJet<reco::Candidate>(zgendaughters,*pfrecjets[i]))geniso_pfisorecjets.push_back(pfrecjets[i]);}
+     if(IsoJet<pat::Electron>(zgendaughters,*pfrecjets[i]))geniso_pfisorecjets.push_back(pfrecjets[i]);}
      for(unsigned int i = 0; i < pfl1recjets.size(); i++){     
-     if(IsoJet<reco::Candidate>(zgendaughters,*pfl1recjets[i]))geniso_pfl1isorecjets.push_back(pfl1recjets[i]);}
+     if(IsoJet<pat::Electron>(zgendaughters,*pfl1recjets[i]))geniso_pfl1isorecjets.push_back(pfl1recjets[i]);}
      }else if(!zgendaughters.size()){
      for(unsigned int i = 0; i < pfrecjets.size(); i++)geniso_pfisorecjets.push_back(pfrecjets[i]);
      for(unsigned int i = 0; i < pfl1recjets.size(); i++)geniso_pfl1isorecjets.push_back(pfl1recjets[i]);}
      
-     if (GenSelectedInAcceptance((*zgenHandle)[0], _selections)&&zgendaughters.size()){
+     if (GenSelectedInAcceptance((*zgenHandle), _selections)&&zgendaughters.size()){
      genacc_npfjetsele=geniso_pfisorecjets.size();
      genacc_npfl1jetsele=geniso_pfl1isorecjets.size();}
      
@@ -738,23 +743,23 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    TrgBit=0;
    if(isElectronTriggered(*triggerHandle, run)){
    TrgBit=1;
-   if(RecSelected_TrgMatch(*recdau0, run)||RecSelected_TrgMatch(*recdau1, run))OneElTrgMatch=1;
+   if(RecSelected_TrgMatch(*recdau0, *triggerHandle, run)||RecSelected_TrgMatch(*recdau1, *triggerHandle, run))OneElTrgMatch=1;
    }
    }
    
    //Cut flags
    
-   if (RecSelected("_AccSYM", (*zrecHandle)[0], *triggerHandle, run))cutAccSYM=1;
-   if (RecSelected("_AccASYM", (*zrecHandle)[0], *triggerHandle, run))cutAccASYM=1;
-   if (RecSelected("_Trg", (*zrecHandle)[0], *triggerHandle, run))cutTrg=1;
-   if (RecSelected("_Imp", (*zrecHandle)[0], *triggerHandle, run))cutImp=1;
-   if (RecSelected("_ConvASYM", (*zrecHandle)[0], *triggerHandle, run))cutConvASYM=1;
-   if (RecSelected("_IsoSYM", (*zrecHandle)[0], *triggerHandle, run))cutIsoSYM=1;
-   if (RecSelected("_IsoASYM", (*zrecHandle)[0], *triggerHandle, run))cutIsoASYM=1;
-   if (RecSelected("_EiDSYM", (*zrecHandle)[0], *triggerHandle, run))cutEiDSYM=1;
-   if (RecSelected("_EiDASYM", (*zrecHandle)[0], *triggerHandle, run))cutEiDASYM=1;
+   if (RecSelected("_AccSYM", (*zrecHandle), *triggerHandle, run, rho))cutAccSYM=1;
+   if (RecSelected("_AccASYM", (*zrecHandle), *triggerHandle, run, rho))cutAccASYM=1;
+   if (RecSelected("_Trg", (*zrecHandle), *triggerHandle, run, rho))cutTrg=1;
+   if (RecSelected("_Imp", (*zrecHandle), *triggerHandle, run, rho))cutImp=1;
+   if (RecSelected("_ConvASYM", (*zrecHandle), *triggerHandle, run, rho))cutConvASYM=1;
+   if (RecSelected("_IsoSYM", (*zrecHandle), *triggerHandle, run, rho))cutIsoSYM=1;
+   if (RecSelected("_IsoASYM", (*zrecHandle), *triggerHandle, run, rho))cutIsoASYM=1;
+   if (RecSelected("_EiDSYM", (*zrecHandle), *triggerHandle, run, rho))cutEiDSYM=1;
+   if (RecSelected("_EiDASYM", (*zrecHandle), *triggerHandle, run, rho))cutEiDASYM=1;
    
-   if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
+   if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle), *triggerHandle, run, rho)){
    
       const reco::GsfTrackRef& track0 = recdau0->gsfTrack();
       const reco::GsfTrackRef& track1 = recdau1->gsfTrack();
@@ -775,9 +780,11 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
       eleecaliso1=recdau0->ecalIso();
       eletrackiso1=recdau0->trackIso();
       
-      if(fabs(recdau0->eta())<eta_el_excl_down){
+      //if(fabs(recdau0->eta())<eta_el_excl_down){
+      if(recdau0->isEB()){
       elereliso1=(recdau0->dr03TkSumPt()+max(0.,recdau0->dr03EcalRecHitSumEt() - 1.)+recdau0->dr03HcalTowerSumEt())/recdau0->p4().Pt();}
-      if(fabs(recdau0->eta())>eta_el_excl_up && fabs(recdau0->eta()) < etaelcut){
+      //if(fabs(recdau0->eta())>eta_el_excl_up && fabs(recdau0->eta()) < etaelcut){
+      if(recdau0->isEE()){
       elereliso1=(recdau0->dr03TkSumPt()+recdau0->dr03EcalRecHitSumEt()+recdau0->dr03HcalTowerSumEt())/recdau0->p4().Pt();}
       
       elenhits1=track0->numberOfValidHits();
@@ -817,9 +824,11 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
       eleecaliso2=recdau1->ecalIso();
       eletrackiso2=recdau1->trackIso(); 
         
-      if(fabs(recdau1->eta())<eta_el_excl_down){
+      //if(fabs(recdau1->eta())<eta_el_excl_down){
+      if(recdau1->isEB()){
       elereliso2=(recdau1->dr03TkSumPt()+max(0.,recdau1->dr03EcalRecHitSumEt() - 1.)+recdau1->dr03HcalTowerSumEt())/recdau1->p4().Pt();}
-      if(fabs(recdau1->eta())>eta_el_excl_up && fabs(recdau1->eta()) < etaelcut){
+      //if(fabs(recdau1->eta())>eta_el_excl_up && fabs(recdau1->eta()) < etaelcut){
+      if(recdau1->isEE()){
       elereliso2=(recdau1->dr03TkSumPt()+recdau1->dr03EcalRecHitSumEt()+recdau1->dr03HcalTowerSumEt())/recdau1->p4().Pt();}     
       
       eledB2=recdau1->dB();
@@ -975,7 +984,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
 
    //stricter cuts
       
-      if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandle)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandle)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[6].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
+      if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle), *triggerHandle, run, rho)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle), *triggerHandle, run, rho)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle), *triggerHandle, run, rho)&&RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandle), *triggerHandle, run, rho)&&RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandle), *triggerHandle, run, rho)&&RecSelected(_RecoCutFlags[6].c_str(), (*zrecHandle), *triggerHandle, run, rho)){
   
       zmass_AllCuts=(*zrecHandle)[0].mass();
       

@@ -128,7 +128,7 @@ PixelHit_OC(0), PixelHit_SC(0), FirstPixelBarrelHit_OC(0), FirstPixelBarrelHit_S
 
 DeltaRvsCharge_JetRec(0), DeltaRvsCharge_JetRec_Iso(0), DeltaRvsCharge_JetRec_NotIso(0),
 
-_targetLumi(50.), _xsec(1.), _norm(1.), _dir(0), _charge_dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _Norm(false), _GenParticleMatch(false), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _fileCounter(0), _Acc(1), _Trg(2), _Conv(3), _Imp(4), _Iso(5), _EiD(6), _JECUnc(0), _selections("ASYM"), _JetType("PF"), _sample("data"), _file(0), _histoVector(), _histoVector2D()
+_targetLumi(50.), _xsec(1.), _norm(1.), _dir(0), _charge_dir(0), _Zdir(0), _Eldir(0), _Jetdir(0), _Norm(false), _GenParticleMatch(false), _entries(0), _EventsPerFile(0), _EventNumber(0), _ProcEvents(-1), _fileCounter(0), _Acc(1), _Trg(2), _Conv(3), _Imp(4), _Iso(5), _ElID(6), _JECUnc(0), _selections("ASYM"), _JetType("PF"), _sample("data"), _file(0), _histoVector(), _histoVector2D()
 
 { }
 
@@ -156,7 +156,7 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _Conv = iConfig.getParameter<int32_t>("Conv");
    _Imp = iConfig.getParameter<int32_t>("Imp");
    _Iso = iConfig.getParameter<int32_t>("Iso");
-   _EiD = iConfig.getParameter<int32_t>("EiD");
+   _ElID = iConfig.getParameter<int32_t>("ElID");
    
    for(int i=0; i<7; i++){
    _RecoCutFlags[i] = "_1";}
@@ -165,12 +165,12 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    _RecoCutFlags[_Acc] =  "_AccSYM";
    _RecoCutFlags[_Conv] = "_ConvSYM"; 
    _RecoCutFlags[_Iso] =  "_IsoSYM";
-   _RecoCutFlags[_EiD] =  "_EiDSYM";}
+   _RecoCutFlags[_ElID] =  "_ElIDSYM";}
    if(_selections=="ASYM"){
    _RecoCutFlags[_Acc] =  "_AccASYM";
    _RecoCutFlags[_Conv] = "_ConvASYM"; 
    _RecoCutFlags[_Iso] =  "_IsoASYM";
-   _RecoCutFlags[_EiD] =  "_EiDASYM";}
+   _RecoCutFlags[_ElID] =  "_ElIDASYM";}
      
    _RecoCutFlags[_Trg] =  "_Trg";   
    _RecoCutFlags[_Imp] =  "_Imp";
@@ -1100,778 +1100,841 @@ RecoElectron::~RecoElectron(){
   
 }
 
-void  RecoElectron::process(const fwlite::Event& iEvent)
-{
-   
-   run = iEvent.id().run();
-   if(_sample=="mc")run=-1;
+void  RecoElectron::process(const fwlite::Event& iEvent){
 
-   double weight = 1.;
-   _file->cd();
+	_run = iEvent.id().run();
+	if(_sample=="mc") _run=-1;
 
-   fwlite::Handle<std::vector<pat::Electron> > electronHandle;
-   electronHandle.getByLabel(iEvent, "selectedElectrons");
+	double weight = 1.;
+	_file->cd();
 
-   fwlite::Handle<std::vector<reco::CompositeCandidate> > zrecHandle;
-   zrecHandle.getByLabel(iEvent, "zeerec");
-   
-   fwlite::Handle<std::vector<reco::CompositeCandidate> > zrecHandleSC;
-   zrecHandleSC.getByLabel(iEvent, "zeerecSameChargePlus");
+	fwlite::Handle<std::vector<pat::Electron> > electronHandle;
+	electronHandle.getByLabel(iEvent, "selectedElectrons");
+
+	fwlite::Handle<std::vector<reco::CompositeCandidate> > zrecHandle;
+	zrecHandle.getByLabel(iEvent, "zeerec");
+	
+	fwlite::Handle<std::vector<reco::CompositeCandidate> > zrecHandleSC;
+	zrecHandleSC.getByLabel(iEvent, "zeerecSameChargePlus");
   
-   fwlite::Handle<std::vector<pat::Jet> > jetrecHandle;
-   if(_JetType=="PFold")jetrecHandle.getByLabel(iEvent, "selectedJets");
-   if(_JetType=="PFL1CORRold")jetrecHandle.getByLabel(iEvent, "selectedJetsL1Corrected");
-   if(_JetType=="PFnew")jetrecHandle.getByLabel(iEvent, "selectedJetsNoL1");
-   if(_JetType=="PFL1CORRnew")jetrecHandle.getByLabel(iEvent, "selectedJetsL1Corrected");
+	fwlite::Handle<std::vector<pat::Jet> > jetrecHandle;
+	if(_JetType=="PFold") jetrecHandle.getByLabel(iEvent, "selectedJets");
+	if(_JetType=="PFL1CORRold") jetrecHandle.getByLabel(iEvent, "selectedJetsL1Corrected");
+	if(_JetType=="PFnew") jetrecHandle.getByLabel(iEvent, "selectedJetsNoL1");
+	if(_JetType=="PFL1CORRnew") jetrecHandle.getByLabel(iEvent, "selectedJetsL1Corrected");
 
-   fwlite::Handle<pat::TriggerEvent> triggerHandle;
-   triggerHandle.getByLabel(iEvent, "patTriggerEvent");
-   
-   // Available triggers
-   static map<std::string, std::pair<int, int> > TrgVector = elTrigger();
-   static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;
-   int trg = 1;
-   for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
-   if(isTriggerAvailable(*triggerHandle,TrgVectorIter->first.c_str()))_TrgList[trg]=1;
-   trg++;
-   }
-   
-   //Event plots
-   
-   recZnum->Fill(zrecHandle->size());
-   
-   recZSCnum->Fill(zrecHandleSC->size());
-   
-   int BestMassZNum = -1;
-   double DiffMass = 99999.;
-   for(unsigned i=0; i!=zrecHandle->size(); i++){
-   if(DiffMass>TMath::Abs((*zrecHandle)[i].mass()-91.1876)){
-   DiffMass=TMath::Abs((*zrecHandle)[i].mass()-91.1876);
-   BestMassZNum=i;}
-   }
-   BestMassIndex->Fill(BestMassZNum);
-   
-   // Isolated Jets selection
-   std::vector<const pat::Jet*> recjets = GetJets<pat::Jet>(*jetrecHandle);
-   std::vector<const pat::Jet*> isorecjets;
-   std::vector<const pat::Jet*> notisorecjets;
-   
-   std::vector<const pat::Electron*> zdaughters;
-   
-   const pat::Electron *dau0 = 0;
-   const pat::Electron *dau1 = 0;  
-   
-    if(zrecHandle->size()){
-   
-    zdaughters = ZRECDaughters((*zrecHandle)[0]);
-  
-     if(zdaughters.size()){
-     
-     dau0 = zdaughters[0];
-     dau1 = zdaughters[1];
-     
-     if(dau1->pt()>dau0->pt())throw cms::Exception("PATAnalysis:RecoElectron_WrongElectronOrder") << "ERROR! Z electrons are in wrong order!";
-    
-     }
-     
-     }
+	//----richiamo la rho----	
+	fwlite::Handle<double> Rho;
+	Rho.getByLabel(iEvent, "kt6PFJets", "rho");
+	_rho = *Rho;
 
-   if(zdaughters.size()){  
-   for(unsigned int i = 0; i < recjets.size(); i++){     
-   if(IsoJet<pat::Electron>(zdaughters,*recjets[i]))isorecjets.push_back(recjets[i]);
-   if(!IsoJet<pat::Electron>(zdaughters,*recjets[i]))notisorecjets.push_back(recjets[i]);}
-   }else if(!zdaughters.size()){
-   for(unsigned int i = 0; i < recjets.size(); i++)isorecjets.push_back(recjets[i]);}
-   
-   // Same Charge Z study
-   
-   if(zrecHandleSC->size()){
-     
-     std::vector<const pat::Electron*> zdaughtersSC = ZRECDaughters((*zrecHandleSC)[0]);
-     
-     const pat::Electron *dau0SC = 0;
-     const pat::Electron *dau1SC = 0;
-     
-     if(zdaughtersSC.size()){
-    
-     
-     dau0SC = zdaughtersSC[0];
-     dau1SC = zdaughtersSC[1];
-     
-     //Pre selections events
-    
-   
-    
-     }
-   
-     //Events with a selected Zee SC - SELECTIONS: 1
-     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)){
-     
-     //Z variables
-     recPtZSC_1->Fill((*zrecHandleSC)[0].pt());
-     recEtaZSC_1->Fill((*zrecHandleSC)[0].eta());
-     recMassZSC_1->Fill((*zrecHandleSC)[0].mass());
-     
-     //Z Electrons variables
-     recLeadElEtaSC_1->Fill(dau0SC->eta());
-     recSecElEtaSC_1->Fill(dau1SC->eta());
-     recLeadElPtSC_1->Fill(dau0SC->pt());
-     recSecElPtSC_1->Fill(dau1SC->pt());
-     recLeadElIPSC_1->Fill(dau0SC->dB());
-     recSecElIPSC_1->Fill(dau1SC->dB());
-     recLeadElfBremSC_1->Fill(dau0SC->fbrem());
-     recSecElfBremSC_1->Fill(dau1SC->fbrem());
-    
-     }
-     
-     //Events with a selected Zee SC - SELECTIONS: 1+2
-     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)){
-     
-     //Z variables
-     recPtZSC_12->Fill((*zrecHandleSC)[0].pt());
-     recEtaZSC_12->Fill((*zrecHandleSC)[0].eta());
-     recMassZSC_12->Fill((*zrecHandleSC)[0].mass());
-     
-     //Z Electrons variables
-     recLeadElEtaSC_12->Fill(dau0SC->eta());
-     recSecElEtaSC_12->Fill(dau1SC->eta());
-     recLeadElPtSC_12->Fill(dau0SC->pt());
-     recSecElPtSC_12->Fill(dau1SC->pt());
-     recLeadElIPSC_12->Fill(dau0SC->dB());
-     recSecElIPSC_12->Fill(dau1SC->dB());
-     recLeadElfBremSC_12->Fill(dau0SC->fbrem());
-     recSecElfBremSC_12->Fill(dau1SC->fbrem());
-    
-     }
-   
-     //Events with a selected Zee SC - SELECTIONS: 1+2+3
-     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)){
-     
-     //Z variables
-     recPtZSC_123->Fill((*zrecHandleSC)[0].pt());
-     recEtaZSC_123->Fill((*zrecHandleSC)[0].eta());
-     recMassZSC_123->Fill((*zrecHandleSC)[0].mass());
-     
-     //Z Electrons variables
-     recLeadElEtaSC_123->Fill(dau0SC->eta());
-     recSecElEtaSC_123->Fill(dau1SC->eta());
-     recLeadElPtSC_123->Fill(dau0SC->pt());
-     recSecElPtSC_123->Fill(dau1SC->pt());
-     recLeadElIPSC_123->Fill(dau0SC->dB());
-     recSecElIPSC_123->Fill(dau1SC->dB());
-     recLeadElfBremSC_123->Fill(dau0SC->fbrem());
-     recSecElfBremSC_123->Fill(dau1SC->fbrem());
-    
-     }
-   
-     //Events with a selected Zee SC - SELECTIONS: 1+2+3+4
-     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)){
-     
-     //Z variables
-     recPtZSC_1234->Fill((*zrecHandleSC)[0].pt());
-     recEtaZSC_1234->Fill((*zrecHandleSC)[0].eta());
-     recMassZSC_1234->Fill((*zrecHandleSC)[0].mass());
-    
-     //Z Electrons variables
-     recLeadElEtaSC_1234->Fill(dau0SC->eta());
-     recSecElEtaSC_1234->Fill(dau1SC->eta());
-     recLeadElPtSC_1234->Fill(dau0SC->pt());
-     recSecElPtSC_1234->Fill(dau1SC->pt());
-     
-     recLeadElIPSC_1234->Fill(dau0SC->dB());
-     recSecElIPSC_1234->Fill(dau1SC->dB());
-     recLeadElfBremSC_1234->Fill(dau0SC->fbrem());
-     recSecElfBremSC_1234->Fill(dau1SC->fbrem());
+	fwlite::Handle<pat::TriggerEvent> triggerHandle;
+	triggerHandle.getByLabel(iEvent, "patTriggerEvent");
+	
+	// Available triggers
+	static map<std::string, std::pair<int, int> > TrgVector = elTrigger();
+	static map<std::string, std::pair<int, int> >::iterator TrgVectorIter;
+	int trg = 1;
+	for(TrgVectorIter = TrgVector.begin(); TrgVectorIter != TrgVector.end(); TrgVectorIter++){
+		if(isTriggerAvailable(*triggerHandle,TrgVectorIter->first.c_str())) _TrgList[trg]=1;
+		trg++;
+	}
+	
+	//Event plots
+	
+	recZnum->Fill(zrecHandle->size());
+	
+	recZSCnum->Fill(zrecHandleSC->size());
+	
+	int BestMassZNum = -1;
+	double DiffMass = 99999.;
+	for(unsigned i=0; i!=zrecHandle->size(); i++){
+		if(DiffMass>TMath::Abs((*zrecHandle)[i].mass()-91.1876)){
+			DiffMass=TMath::Abs((*zrecHandle)[i].mass()-91.1876);
+			BestMassZNum=i;
+		}
+	}
+	BestMassIndex->Fill(BestMassZNum);
+	
+	// Isolated Jets selection
+	std::vector<const pat::Jet*> recjets = GetJets<pat::Jet>(*jetrecHandle);
+	std::vector<const pat::Jet*> isorecjets;
+	std::vector<const pat::Jet*> notisorecjets;
+	
+	std::vector<const pat::Electron*> zdaughters;
+	
+	const pat::Electron *dau0 = 0;
+	const pat::Electron *dau1 = 0;  
+	
+	if(zrecHandle->size()){
+	
+		zdaughters = ZRECDaughters((*zrecHandle));
   
-     }
-     
-     //Events with a selected Zee SC - SELECTIONS: 1+2+3+4+5
-     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)){
-     
-     //Z variables
-     recPtZSC_12345->Fill((*zrecHandleSC)[0].pt());
-     recEtaZSC_12345->Fill((*zrecHandleSC)[0].eta());
-     recMassZSC_12345->Fill((*zrecHandleSC)[0].mass());
-     
-     //Z Electrons variables
-     recLeadElEtaSC_12345->Fill(dau0SC->eta());
-     recSecElEtaSC_12345->Fill(dau1SC->eta());
-     recLeadElPtSC_12345->Fill(dau0SC->pt());
-     recSecElPtSC_12345->Fill(dau1SC->pt());
-     recLeadElIPSC_12345->Fill(dau0SC->dB());
-     recSecElIPSC_12345->Fill(dau1SC->dB());
-     recLeadElfBremSC_12345->Fill(dau0SC->fbrem());
-     recSecElfBremSC_12345->Fill(dau1SC->fbrem());
-  
-     }
-     
-     //Events with a selected Zee SC - SELECTIONS: 1+2+3+4+5+6
-     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)&&RecSelected(_RecoCutFlags[6].c_str(), (*zrecHandleSC)[0], *triggerHandle, run)){
-     
-     //Z variables
-     recPtZSC_123456->Fill((*zrecHandleSC)[0].pt());
-     recEtaZSC_123456->Fill((*zrecHandleSC)[0].eta());
-     recMassZSC_123456->Fill((*zrecHandleSC)[0].mass());
-     
-     //Z Electrons variables
-     recLeadElEtaSC_123456->Fill(dau0SC->eta());
-     recSecElEtaSC_123456->Fill(dau1SC->eta());
-     recLeadElPtSC_123456->Fill(dau0SC->pt());
-     recSecElPtSC_123456->Fill(dau1SC->pt());
-     recLeadElIPSC_123456->Fill(dau0SC->dB());
-     recSecElIPSC_123456->Fill(dau1SC->dB());
-     recLeadElfBremSC_123456->Fill(dau0SC->fbrem());
-     recSecElfBremSC_123456->Fill(dau1SC->fbrem());
-   
-     }
-   
-    } 
-     
-   // End of Same Charge Z study 
+	 	if(zdaughters.size()){
+	
+			dau0 = zdaughters[0];
+			dau1 = zdaughters[1];
+	
+			if(dau1->pt()>dau0->pt()) throw cms::Exception("PATAnalysis:RecoElectron_WrongElectronOrder") << "ERROR! Z electrons are in wrong order!";
+	 
+		}
+	}
 
-   // Electron Charge MisID study
-   
-   std::vector<pat::Electron> selectedelectrons;  
-   for(unsigned i = 0; i != electronHandle->size(); i++){
-   if((*electronHandle)[i].pt() > ptelcut && fabs((*electronHandle)[i].eta()) < etaelcut && (fabs((*electronHandle)[i].eta())<eta_el_excl_down || fabs((*electronHandle)[i].eta())>eta_el_excl_up)) selectedelectrons.push_back((*electronHandle)[i]);
-   }
-   
-   bool ZdauOCinAcc, ZdauSCinAcc;
+	if(zdaughters.size()){  
+		for(unsigned int i = 0; i < recjets.size(); i++){	
+			if(IsoJet<pat::Electron>(zdaughters,*recjets[i])) isorecjets.push_back(recjets[i]);
+			if(!IsoJet<pat::Electron>(zdaughters,*recjets[i])) notisorecjets.push_back(recjets[i]);
+		}
+	}
+	else if(!zdaughters.size()){
+		for(unsigned int i = 0; i < recjets.size(); i++) isorecjets.push_back(recjets[i]);
+	}
+	
+	// Same Charge Z study
+	if(zrecHandleSC->size()){
+	
+		std::vector<const pat::Electron*> zdaughtersSC = ZRECDaughters((*zrecHandleSC));
+	
+		const pat::Electron *dau0SC = 0;
+		const pat::Electron *dau1SC = 0;
+	
+		if(zdaughtersSC.size()){
+	 
+	
+			dau0SC = zdaughtersSC[0];
+			dau1SC = zdaughtersSC[1];
+	
+			//Pre selections events
+	 	}
+	
+		//Events with a selected Zee SC - SELECTIONS: 1
+		if (RecSelected(_RecoCutFlags[1].c_str(), *zrecHandleSC, *triggerHandle, _run, _rho)){
+	
+			//Z variables
+			recPtZSC_1->Fill((*zrecHandleSC)[0].pt());
+			recEtaZSC_1->Fill((*zrecHandleSC)[0].eta());
+			recMassZSC_1->Fill((*zrecHandleSC)[0].mass());
+	
+			//Z Electrons variables
+			recLeadElEtaSC_1->Fill(dau0SC->eta());
+			recSecElEtaSC_1->Fill(dau1SC->eta());
+			recLeadElPtSC_1->Fill(dau0SC->pt());
+			recSecElPtSC_1->Fill(dau1SC->pt());
+			recLeadElIPSC_1->Fill(dau0SC->dB());
+			recSecElIPSC_1->Fill(dau1SC->dB());
+			recLeadElfBremSC_1->Fill(dau0SC->fbrem());
+			recSecElfBremSC_1->Fill(dau1SC->fbrem());
+	 
+		}
+	
+		//Events with a selected Zee SC - SELECTIONS: 1+2
+		if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandleSC), *triggerHandle, _run, _rho) && 
+		    RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandleSC), *triggerHandle, _run, _rho)){
+	
+			//Z variables
+			recPtZSC_12->Fill((*zrecHandleSC)[0].pt());
+			recEtaZSC_12->Fill((*zrecHandleSC)[0].eta());
+			recMassZSC_12->Fill((*zrecHandleSC)[0].mass());
+	
+			//Z Electrons variables
+			recLeadElEtaSC_12->Fill(dau0SC->eta());
+			recSecElEtaSC_12->Fill(dau1SC->eta());
+			recLeadElPtSC_12->Fill(dau0SC->pt());
+			recSecElPtSC_12->Fill(dau1SC->pt());
+			recLeadElIPSC_12->Fill(dau0SC->dB());
+			recSecElIPSC_12->Fill(dau1SC->dB());
+			recLeadElfBremSC_12->Fill(dau0SC->fbrem());
+			recSecElfBremSC_12->Fill(dau1SC->fbrem());
+	 	}
+	
+		//Events with a selected Zee SC - SELECTIONS: 1+2+3
+		if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandleSC), *triggerHandle, _run, _rho) && 
+		    RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandleSC), *triggerHandle, _run, _rho) && 
+		    RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandleSC), *triggerHandle, _run, _rho)){
+	
+			//Z variables
+			recPtZSC_123->Fill((*zrecHandleSC)[0].pt());
+			recEtaZSC_123->Fill((*zrecHandleSC)[0].eta());
+			recMassZSC_123->Fill((*zrecHandleSC)[0].mass());
+	
+			//Z Electrons variables
+			recLeadElEtaSC_123->Fill(dau0SC->eta());
+			recSecElEtaSC_123->Fill(dau1SC->eta());
+			recLeadElPtSC_123->Fill(dau0SC->pt());
+			recSecElPtSC_123->Fill(dau1SC->pt());
+			recLeadElIPSC_123->Fill(dau0SC->dB());
+			recSecElIPSC_123->Fill(dau1SC->dB());
+			recLeadElfBremSC_123->Fill(dau0SC->fbrem());
+			recSecElfBremSC_123->Fill(dau1SC->fbrem());
+	 
+		}
+	
+		//Events with a selected Zee SC - SELECTIONS: 1+2+3+4
+		if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandleSC), *triggerHandle, _run, _rho) && 
+		    RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandleSC), *triggerHandle, _run, _rho) && 
+		    RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandleSC), *triggerHandle, _run, _rho) && 
+		    RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandleSC), *triggerHandle, _run, _rho)){
+	
+			//Z variables
+			recPtZSC_1234->Fill((*zrecHandleSC)[0].pt());
+			recEtaZSC_1234->Fill((*zrecHandleSC)[0].eta());
+			recMassZSC_1234->Fill((*zrecHandleSC)[0].mass());
+	 
+			//Z Electrons variables
+			recLeadElEtaSC_1234->Fill(dau0SC->eta());
+			recSecElEtaSC_1234->Fill(dau1SC->eta());
+			recLeadElPtSC_1234->Fill(dau0SC->pt());
+			recSecElPtSC_1234->Fill(dau1SC->pt());
+	
+			recLeadElIPSC_1234->Fill(dau0SC->dB());
+			recSecElIPSC_1234->Fill(dau1SC->dB());
+			recLeadElfBremSC_1234->Fill(dau0SC->fbrem());
+			recSecElfBremSC_1234->Fill(dau1SC->fbrem());
   
-   for(unsigned i = 0; i != selectedelectrons.size(); i++){
-   
-   reco::GenParticleRef genCorrElectron = selectedelectrons[i].genParticleById(11,0,true);
-   reco::GenParticleRef genMisElectron = selectedelectrons[i].genParticleById(-11,0,true);
-      
-   const reco::GsfTrack eltrack = *(selectedelectrons[i].gsfTrack());
-   const reco::HitPattern& hp = eltrack.hitPattern();
+		}
+	
 
-   ZdauOCinAcc = false; 
-   ZdauSCinAcc = false;
+		//Events with a selected Zee SC - SELECTIONS: 1+2+3+4+5
+		if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandleSC), *triggerHandle, _run, _rho) && 
+		    RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandleSC), *triggerHandle, _run, _rho) && 
+		    RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandleSC), *triggerHandle, _run, _rho) && 
+		    RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandleSC), *triggerHandle, _run, _rho) && 
+		    RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandleSC), *triggerHandle, _run, _rho)){
+	
+			//Z variables
+			recPtZSC_12345->Fill((*zrecHandleSC)[0].pt());
+			recEtaZSC_12345->Fill((*zrecHandleSC)[0].eta());
+			recMassZSC_12345->Fill((*zrecHandleSC)[0].mass());
+	
+			//Z Electrons variables
+			recLeadElEtaSC_12345->Fill(dau0SC->eta());
+			recSecElEtaSC_12345->Fill(dau1SC->eta());
+			recLeadElPtSC_12345->Fill(dau0SC->pt());
+			recSecElPtSC_12345->Fill(dau1SC->pt());
+			recLeadElIPSC_12345->Fill(dau0SC->dB());
+			recSecElIPSC_12345->Fill(dau1SC->dB());
+			recLeadElfBremSC_12345->Fill(dau0SC->fbrem());
+			recSecElfBremSC_12345->Fill(dau1SC->fbrem());
   
-   if(_GenParticleMatch){
+		}
+		
+		//Events with a selected Zee SC - SELECTIONS: 1+2+3+4+5+6
+		if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandleSC), *triggerHandle, _run, _rho) && 
+		    RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandleSC), *triggerHandle, _run, _rho) && 
+		    RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandleSC), *triggerHandle, _run, _rho) && 
+		    RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandleSC), *triggerHandle, _run, _rho) && 
+		    RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandleSC), *triggerHandle, _run, _rho) && 
+		    RecSelected(_RecoCutFlags[6].c_str(), (*zrecHandleSC), *triggerHandle, _run, _rho)){
+	
+			//Z variables
+			recPtZSC_123456->Fill((*zrecHandleSC)[0].pt());
+			recEtaZSC_123456->Fill((*zrecHandleSC)[0].eta());
+			recMassZSC_123456->Fill((*zrecHandleSC)[0].mass());
+	
+			//Z Electrons variables
+			recLeadElEtaSC_123456->Fill(dau0SC->eta());
+			recSecElEtaSC_123456->Fill(dau1SC->eta());
+			recLeadElPtSC_123456->Fill(dau0SC->pt());
+			recSecElPtSC_123456->Fill(dau1SC->pt());
+			recLeadElIPSC_123456->Fill(dau0SC->dB());
+			recSecElIPSC_123456->Fill(dau1SC->dB());
+			recLeadElfBremSC_123456->Fill(dau0SC->fbrem());
+			recSecElfBremSC_123456->Fill(dau1SC->fbrem());
+	
+		}
+	
+	} // End of Same Charge Z study 
+
+
+	// Electron Charge MisID study
+	std::vector<pat::Electron> selectedelectrons;  
+	for(unsigned i = 0; i != electronHandle->size(); i++){
+		if((*electronHandle)[i].pt() > ptelcut && fabs((*electronHandle)[i].eta()) < etaelcut && 
+		   (!(*electronHandle)[i].isGap())){
+		   //(fabs((*electronHandle)[i].eta())<eta_el_excl_down || fabs((*electronHandle)[i].eta())>eta_el_excl_up)){ 
+			selectedelectrons.push_back((*electronHandle)[i]);
+		}
+	}
+
+	bool ZdauOCinAcc, ZdauSCinAcc;
+  
+	for(unsigned i = 0; i != selectedelectrons.size(); i++){
+	
+		reco::GenParticleRef genCorrElectron = selectedelectrons[i].genParticleById(11,0,true);
+		reco::GenParticleRef genMisElectron = selectedelectrons[i].genParticleById(-11,0,true);
+		
+		const reco::GsfTrack eltrack = *(selectedelectrons[i].gsfTrack());
+		const reco::HitPattern& hp = eltrack.hitPattern();
+
+		ZdauOCinAcc = false; 
+		ZdauSCinAcc = false;
+  
+		if(_GenParticleMatch){
  
-   const reco::Candidate *mom;
-     
-   if(genCorrElectron.isNonnull()){
-   if(genCorrElectron->pt() > ptelcut && fabs(genCorrElectron->eta()) < etaelcut && (fabs(genCorrElectron->eta())<eta_el_excl_down || fabs(genCorrElectron->eta())>eta_el_excl_up)){
-     if(genCorrElectron->numberOfMothers()){
-       mom = genCorrElectron->mother();
-       if(mom->pdgId()==23)ZdauOCinAcc=true;
-       while(mom->numberOfMothers()){
-	 mom = mom->mother();
-	 if(mom->pdgId()==23)ZdauOCinAcc=true;
-    }
-    }
-    }
-     }
+			const reco::Candidate *mom;
+	
+			if(genCorrElectron.isNonnull()){
+				if(genCorrElectron->pt() > ptelcut && fabs(genCorrElectron->eta()) < etaelcut //&& 
+				   //!(genCorrElectron->isGap())){ 
+				   //(fabs(genCorrElectron->eta())<eta_el_excl_down || fabs(genCorrElectron->eta())>eta_el_excl_up))
+				){
+					if(genCorrElectron->numberOfMothers()){
+						mom = genCorrElectron->mother();
+						if(mom->pdgId()==23) ZdauOCinAcc=true;
+						while(mom->numberOfMothers()){
+							mom = mom->mother();
+							if(mom->pdgId()==23) ZdauOCinAcc=true;
+						}
+					}
+				}
+			}
  
-   if(genMisElectron.isNonnull()){
-   if(genMisElectron->pt() > ptelcut && fabs(genMisElectron->eta()) < etaelcut && (fabs(genMisElectron->eta())<eta_el_excl_down || fabs(genMisElectron->eta())>eta_el_excl_up)){
-     if(genMisElectron->numberOfMothers()){
-       mom = genMisElectron->mother();
-       if(mom->pdgId()==23)ZdauSCinAcc=true; 
-       while(mom->numberOfMothers()){
-	 mom = mom->mother();
-	 if(mom->pdgId()==23)ZdauSCinAcc=true;
-    }
-    }
-    }
-     }
+			if(genMisElectron.isNonnull()){
+				if(genMisElectron->pt() > ptelcut && fabs(genMisElectron->eta()) < etaelcut //&& 
+				   //!(genMisElectron->isGap())){
+				   //(fabs(genMisElectron->eta())<eta_el_excl_down || fabs(genMisElectron->eta())>eta_el_excl_up)){
+				){
+					if(genMisElectron->numberOfMothers()){
+						mom = genMisElectron->mother();
+			 			if(mom->pdgId()==23) ZdauSCinAcc=true; 
+			 			while(mom->numberOfMothers()){
+		 					mom = mom->mother();
+		 					if(mom->pdgId()==23) ZdauSCinAcc=true;
+		 				}
+		 			}
+		 		}
+			}
+		}
+
+		else{
   
-   }else{
+			if(genCorrElectron.isNonnull()){
+				if(genCorrElectron->pt() > ptelcut && fabs(genCorrElectron->eta()) < etaelcut //&& 
+				   //!(genCorrElectron->isGap())){
+				   //(fabs(genCorrElectron->eta())<eta_el_excl_down || fabs(genCorrElectron->eta())>eta_el_excl_up)){	
+				){
+					ZdauOCinAcc=true; 
+	 			}
+			}
+
+			if(genMisElectron.isNonnull()){
+				if(genMisElectron->pt() > ptelcut && fabs(genMisElectron->eta()) < etaelcut //&& 
+				   //!(genMisElectron->isGap())){
+				   //(fabs(genMisElectron->eta())<eta_el_excl_down || fabs(genMisElectron->eta())>eta_el_excl_up)){
+				){
+					ZdauSCinAcc=true; 
+	 			}
+			}
+	 	}
+ 
+		if(ZdauOCinAcc){
+
+			fBremVsEta->Fill(selectedelectrons[i].eta(),selectedelectrons[i].fbrem());
+	
+			PixelHit_OC->Fill(hp.numberOfValidPixelBarrelHits()+hp.numberOfValidPixelEndcapHits());
+ 
+			if(hp.hasValidHitInFirstPixelBarrel()){
+				FirstPixelBarrelHit_OC->Fill(1);
+			}
+			else{
+				FirstPixelBarrelHit_OC->Fill(-1);
+			}
   
-   if(genCorrElectron.isNonnull()){
-   if(genCorrElectron->pt() > ptelcut && fabs(genCorrElectron->eta()) < etaelcut && (fabs(genCorrElectron->eta())<eta_el_excl_down || fabs(genCorrElectron->eta())>eta_el_excl_up)){   
-     ZdauOCinAcc=true; 
-    }}
-
-   if(genMisElectron.isNonnull()){
-   if(genMisElectron->pt() > ptelcut && fabs(genMisElectron->eta()) < etaelcut && (fabs(genMisElectron->eta())<eta_el_excl_down || fabs(genMisElectron->eta())>eta_el_excl_up)){
-      ZdauSCinAcc=true; 
-    }}
-    
-    }
- 
-   if(ZdauOCinAcc){
-
-   fBremVsEta->Fill(selectedelectrons[i].eta(),selectedelectrons[i].fbrem());
-   
-   PixelHit_OC->Fill(hp.numberOfValidPixelBarrelHits()+hp.numberOfValidPixelEndcapHits());
- 
-   if(hp.hasValidHitInFirstPixelBarrel()){
-   FirstPixelBarrelHit_OC->Fill(1);
-   }else{
-   FirstPixelBarrelHit_OC->Fill(-1);}
+			_charge_dir->cd();
+			addHistosVsMulti(isorecjets.size(), "ElCorrChargePtExcl", "Correct Charge electron p_{T} spectrum", 200, 0., 200., ElCorrChargePtExclMulti);
+			addHistosVsMulti(isorecjets.size(), "ElCorrChargeEtaExcl", "Correct Charge electron #eta spectrum", 100, -5, 5, ElCorrChargeEtaExclMulti);
+			addHistosVsMulti(isorecjets.size(), "ElCorrChargeHitExcl", "Correct Charge electron track hit number", 30, 0., 30., ElCorrChargeHitExclMulti);
+			addHistosVsMulti(isorecjets.size(), "ElCorrChargefBremExcl", "Correct Charge electron fBrem", 100, 0., 2., ElCorrChargefBremExclMulti);
   
-   _charge_dir->cd();
-   addHistosVsMulti(isorecjets.size(), "ElCorrChargePtExcl", "Correct Charge electron p_{T} spectrum", 200, 0., 200., ElCorrChargePtExclMulti);
-   addHistosVsMulti(isorecjets.size(), "ElCorrChargeEtaExcl", "Correct Charge electron #eta spectrum", 100, -5, 5, ElCorrChargeEtaExclMulti);
-   addHistosVsMulti(isorecjets.size(), "ElCorrChargeHitExcl", "Correct Charge electron track hit number", 30, 0., 30., ElCorrChargeHitExclMulti);
-   addHistosVsMulti(isorecjets.size(), "ElCorrChargefBremExcl", "Correct Charge electron fBrem", 100, 0., 2., ElCorrChargefBremExclMulti);
+			CorrectCharge_Pt_Acc->Fill(genCorrElectron->pt());
+			CorrectCharge_Eta_Acc->Fill(genCorrElectron->eta());
+			CorrectCharge_Hit_Acc->Fill(selectedelectrons[i].gsfTrack()->numberOfValidHits());
+			CorrectCharge_fBrem_Acc->Fill(selectedelectrons[i].fbrem());
+			CorrectCharge_IP_Acc->Fill(selectedelectrons[i].dB());
+			CorrectCharge_RecoExclJet_Acc->Fill(isorecjets.size());
+ 
+			for(unsigned int n = 0; (n < isorecjets.size()+1) && ((n+1)<10); n++) CorrectCharge_RecoInclJet_Acc->AddBinContent(n+1,1);
+	
+			HitVsEta_CorrCharge->Fill(genCorrElectron->eta(),selectedelectrons[i].gsfTrack()->numberOfValidHits());
+	
+			ElCorrChargePtExclMulti[isorecjets.size()]->Fill(genCorrElectron->pt(), weight);
+			ElCorrChargeEtaExclMulti[isorecjets.size()]->Fill(genCorrElectron->eta(), weight);
+			ElCorrChargeHitExclMulti[isorecjets.size()]->Fill(selectedelectrons[i].gsfTrack()->numberOfValidHits(), weight);
+			ElCorrChargefBremExclMulti[isorecjets.size()]->Fill(selectedelectrons[i].fbrem(), weight);
+ 
+			_charge_dir->cd();
+			addHistosVsMulti(isorecjets.size(), "AllElPtExcl", "All electron p_{T} spectrum", 200, 0., 200., AllElPtExclMulti);
+			addHistosVsMulti(isorecjets.size(), "AllElEtaExcl", "All electron #eta spectrum", 100, -5, 5, AllElEtaExclMulti);
+			addHistosVsMulti(isorecjets.size(), "AllElHitExcl", "All electron track hit number", 30, 0., 30., AllElHitExclMulti);
+			addHistosVsMulti(isorecjets.size(), "AllElfBremExcl", "All electron fBrem", 100, 0., 2., AllElfBremExclMulti);
+ 
+			AllEl_Eta_Acc->Fill(genCorrElectron->eta());
+			AllEl_Hit_Acc->Fill(selectedelectrons[i].gsfTrack()->numberOfValidHits());
+			AllEl_fBrem_Acc->Fill(selectedelectrons[i].fbrem());
+			AllEl_IP_Acc->Fill(selectedelectrons[i].dB());
+			AllEl_RecoExclJet_Acc->Fill(isorecjets.size());
+		
+			for(unsigned int n = 0; (n < isorecjets.size()+1) && ((n+1)<10); n++) AllEl_RecoInclJet_Acc->AddBinContent(n+1,1);
+		
+			HitVsEta_AllEl->Fill(genCorrElectron->eta(),selectedelectrons[i].gsfTrack()->numberOfValidHits());
+		
+			AllElPtExclMulti[isorecjets.size()]->Fill(genCorrElectron->pt(), weight);
+			AllElEtaExclMulti[isorecjets.size()]->Fill(genCorrElectron->eta(), weight);
+			AllElHitExclMulti[isorecjets.size()]->Fill(selectedelectrons[i].gsfTrack()->numberOfValidHits(), weight);
+			AllElfBremExclMulti[isorecjets.size()]->Fill(selectedelectrons[i].fbrem(), weight);
+
+		}
+
+		if(ZdauSCinAcc){
+
+			fBremVsEta->Fill(selectedelectrons[i].eta(),selectedelectrons[i].fbrem());
+	
+			PixelHit_SC->Fill(hp.numberOfValidPixelBarrelHits()+hp.numberOfValidPixelEndcapHits());
+	
+			if(hp.hasValidHitInFirstPixelBarrel()){
+				FirstPixelBarrelHit_SC->Fill(1);
+			}
+			else{
+				FirstPixelBarrelHit_SC->Fill(-1);
+			}
+	
+			_charge_dir->cd();
+			addHistosVsMulti(isorecjets.size(), "ElMisIDChargePtExcl", "MisID Charge electron p_{T} spectrum", 200, 0., 200., ElMisIDChargePtExclMulti);
+			addHistosVsMulti(isorecjets.size(), "ElMisIDChargeEtaExcl", "MisID Charge electron #eta spectrum", 100, -5, 5, ElMisIDChargeEtaExclMulti);
+			addHistosVsMulti(isorecjets.size(), "ElMisIDChargeHitExcl", "MisID Charge electron track hit number", 30, 0., 30., ElMisIDChargeHitExclMulti);
+			addHistosVsMulti(isorecjets.size(), "ElMisIDChargefBremExcl", "MisID Charge electron fBrem", 100, 0., 2., ElMisIDChargefBremExclMulti);
+			
+			ChargeMisID_Pt_Acc->Fill(genMisElectron->pt());
+			ChargeMisID_Eta_Acc->Fill(genMisElectron->eta());
+			ChargeMisID_Hit_Acc->Fill(selectedelectrons[i].gsfTrack()->numberOfValidHits());
+			ChargeMisID_fBrem_Acc->Fill(selectedelectrons[i].fbrem());
+			ChargeMisID_IP_Acc->Fill(selectedelectrons[i].dB());
+			ChargeMisID_RecoExclJet_Acc->Fill(isorecjets.size());
+			for(unsigned int n = 0; (n < isorecjets.size()+1) &&( (n+1)<10); n++) ChargeMisID_RecoInclJet_Acc->AddBinContent(n+1,1);
+	
+			HitVsEta_MisIDCharge->Fill(genMisElectron->eta(),selectedelectrons[i].gsfTrack()->numberOfValidHits());
+			
+			ElMisIDChargePtExclMulti[isorecjets.size()]->Fill(genMisElectron->pt(), weight);
+			ElMisIDChargeEtaExclMulti[isorecjets.size()]->Fill(genMisElectron->eta(), weight);
+			ElMisIDChargeHitExclMulti[isorecjets.size()]->Fill(selectedelectrons[i].gsfTrack()->numberOfValidHits(), weight);
+			ElMisIDChargefBremExclMulti[isorecjets.size()]->Fill(selectedelectrons[i].fbrem(), weight);
+
+			_charge_dir->cd();
+			addHistosVsMulti(isorecjets.size(), "AllElPtExcl", "All electron p_{T} spectrum", 200, 0., 200., AllElPtExclMulti);
+			addHistosVsMulti(isorecjets.size(), "AllElEtaExcl", "All electron #eta spectrum", 100, -5, 5, AllElEtaExclMulti);
+			addHistosVsMulti(isorecjets.size(), "AllElHitExcl", "All electron track hit number", 30, 0., 30., AllElHitExclMulti);
+			addHistosVsMulti(isorecjets.size(), "AllElfBremExcl", "All electron fBrem", 100, 0., 2., AllElfBremExclMulti);
+			
+			AllEl_Pt_Acc->Fill(genMisElectron->pt());
+			AllEl_Eta_Acc->Fill(genMisElectron->eta());
+			AllEl_Hit_Acc->Fill(selectedelectrons[i].gsfTrack()->numberOfValidHits());
+			AllEl_fBrem_Acc->Fill(selectedelectrons[i].fbrem());
+			AllEl_IP_Acc->Fill(selectedelectrons[i].dB());
+			AllEl_RecoExclJet_Acc->Fill(isorecjets.size());
+			for(unsigned int n = 0; (n < isorecjets.size()+1)&&((n+1)<10); n++)AllEl_RecoInclJet_Acc->AddBinContent(n+1,1);
+			
+			HitVsEta_AllEl->Fill(genMisElectron->eta(),selectedelectrons[i].gsfTrack()->numberOfValidHits());
+			
+			AllElPtExclMulti[isorecjets.size()]->Fill(genMisElectron->pt(), weight);
+			AllElEtaExclMulti[isorecjets.size()]->Fill(genMisElectron->eta(), weight);
+			AllElHitExclMulti[isorecjets.size()]->Fill(selectedelectrons[i].gsfTrack()->numberOfValidHits(), weight);
+			AllElfBremExclMulti[isorecjets.size()]->Fill(selectedelectrons[i].fbrem(), weight);
+			
+		}
+
+	}// End of charge MisID study 
+	
+	
+	
+	// Z->ee events (OC) study: selections applied
+	
+	if(zrecHandle->size()){
+
+	//Events with a selected Zee - SELECTIONS: 1
+	if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle), *triggerHandle, _run, _rho)){
+
+	//Z variables
+	recPtZ_1->Fill((*zrecHandle)[0].pt());
+	recEtaZ_1->Fill((*zrecHandle)[0].eta());
+	recMassZ_1->Fill((*zrecHandle)[0].mass());
+
+	//Z Electrons variables
+	recLeadElEta_1->Fill(dau0->eta());
+	recSecElEta_1->Fill(dau1->eta());
+	recLeadElPt_1->Fill(dau0->pt());
+	recSecElPt_1->Fill(dau1->pt());
+	recElIP_1->Fill(dau0->dB());
+	recElIP_1->Fill(dau1->dB());
+	recLeadElfBrem_1->Fill(dau0->fbrem());
+	recSecElfBrem_1->Fill(dau1->fbrem());
+	recLeadElConvCotDist_1->Fill(sqrt(pow(dau0->convDcot(),2)+pow(dau0->convDist(),2)));
+	recSecElConvCotDist_1->Fill(sqrt(pow(dau1->convDcot(),2)+pow(dau1->convDist(),2)));
+
+	const reco::Track *track0 = (const reco::Track*)(dau0->gsfTrack().get()); 
+	const reco::Track *track1 = (const reco::Track*)(dau1->gsfTrack().get());
+	const reco::HitPattern& p0_inner = track0->trackerExpectedHitsInner(); 
+	const reco::HitPattern& p1_inner = track1->trackerExpectedHitsInner();
+
+	recLeadElConvMissHit_1->Fill(p0_inner.numberOfHits());
+	recSecElConvMissHit_1->Fill(p1_inner.numberOfHits()); 
+
+	//Barrel
+	//if(fabs(dau0->eta())<eta_el_excl_down){
+	if(dau0->isEB()){
+	HoverE_Barrel_1->Fill(dau0->hcalOverEcal());
+	DeltaEtaIn_Barrel_1->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
+	DeltaPhiIn_Barrel_1->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
+	SigmaIEtaIEta_Barrel_1->Fill(dau0->sigmaIetaIeta());
+	recRelIso_Barrel_1->Fill((dau0->dr03TkSumPt()+max(0.,dau0->dr03EcalRecHitSumEt() - 1.)+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}
+	//if(fabs(dau1->eta())<eta_el_excl_down){
+	if(dau1->isEB()){
+	HoverE_Barrel_1->Fill(dau1->hcalOverEcal());
+	DeltaEtaIn_Barrel_1->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());
+	SigmaIEtaIEta_Barrel_1->Fill(dau1->sigmaIetaIeta());
+	recRelIso_Barrel_1->Fill((dau1->dr03TkSumPt()+max(0.,dau1->dr03EcalRecHitSumEt() - 1.)+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
+
+	//Endcap
+	//if(fabs(dau0->eta())>eta_el_excl_up && fabs(dau0->eta()) < etaelcut){
+	if(dau0->isEE()){
+	HoverE_Endcap_1->Fill(dau0->hcalOverEcal());
+	DeltaEtaIn_Endcap_1->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
+	DeltaPhiIn_Endcap_1->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
+	SigmaIEtaIEta_Endcap_1->Fill(dau0->sigmaIetaIeta());
+	recRelIso_Endcap_1->Fill((dau0->dr03TkSumPt()+dau0->dr03EcalRecHitSumEt()+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}
+	//if(fabs(dau1->eta())>eta_el_excl_up && fabs(dau1->eta()) < etaelcut){	
+	if(dau1->isEE()){
+	HoverE_Endcap_1->Fill(dau1->hcalOverEcal());	 
+	DeltaEtaIn_Endcap_1->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());		
+	SigmaIEtaIEta_Endcap_1->Fill(dau1->sigmaIetaIeta());
+	recRelIso_Endcap_1->Fill((dau1->dr03TkSumPt()+dau1->dr03EcalRecHitSumEt()+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
+		
+	//Jet variables
+	IsoJetCounter_1->Fill(isorecjets.size());
+		
+	}
+	
+	//Events with a selected Zee - SELECTIONS: 1+2
+	if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle), *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle), *triggerHandle, _run, _rho)){
+	 
+	//Z variables
+	recPtZ_12->Fill((*zrecHandle)[0].pt());
+	recEtaZ_12->Fill((*zrecHandle)[0].eta());
+	recMassZ_12->Fill((*zrecHandle)[0].mass());
+	
+	//Z Electrons variables
+	recLeadElEta_12->Fill(dau0->eta());
+	recSecElEta_12->Fill(dau1->eta());
+	recLeadElPt_12->Fill(dau0->pt());
+	recSecElPt_12->Fill(dau1->pt());
+	recElIP_12->Fill(dau0->dB());
+	recElIP_12->Fill(dau1->dB());
+	recLeadElfBrem_12->Fill(dau0->fbrem());
+	recSecElfBrem_12->Fill(dau1->fbrem());
+	recLeadElConvCotDist_12->Fill(sqrt(pow(dau0->convDcot(),2)+pow(dau0->convDist(),2)));
+	recSecElConvCotDist_12->Fill(sqrt(pow(dau1->convDcot(),2)+pow(dau1->convDist(),2)));
+	
+	const reco::Track *track0 = (const reco::Track*)(dau0->gsfTrack().get()); 
+	const reco::Track *track1 = (const reco::Track*)(dau1->gsfTrack().get());		
+	const reco::HitPattern& p0_inner = track0->trackerExpectedHitsInner(); 
+	const reco::HitPattern& p1_inner = track1->trackerExpectedHitsInner();
+	
+	recLeadElConvMissHit_12->Fill(p0_inner.numberOfHits());
+	recSecElConvMissHit_12->Fill(p1_inner.numberOfHits()); 
+	
+	//Barrel
+	//if(fabs(dau0->eta())<eta_el_excl_down){
+	if(dau0->isEB()){
+	HoverE_Barrel_12->Fill(dau0->hcalOverEcal());
+	DeltaEtaIn_Barrel_12->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
+	DeltaPhiIn_Barrel_12->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
+	SigmaIEtaIEta_Barrel_12->Fill(dau0->sigmaIetaIeta());
+	recRelIso_Barrel_12->Fill((dau0->dr03TkSumPt()+max(0.,dau0->dr03EcalRecHitSumEt() - 1.)+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}	
+	//if(fabs(dau1->eta())<eta_el_excl_down){
+	if(dau1->isEB()){
+	HoverE_Barrel_12->Fill(dau1->hcalOverEcal());	 
+	DeltaEtaIn_Barrel_12->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());	 
+	SigmaIEtaIEta_Barrel_12->Fill(dau1->sigmaIetaIeta());
+	recRelIso_Barrel_12->Fill((dau1->dr03TkSumPt()+max(0.,dau1->dr03EcalRecHitSumEt() - 1.)+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
+	//Endcap
+	//if(fabs(dau0->eta())>eta_el_excl_up && fabs(dau0->eta()) < etaelcut){
+	if(dau0->isEE()){
+	HoverE_Endcap_12->Fill(dau0->hcalOverEcal());
+	DeltaEtaIn_Endcap_12->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
+	DeltaPhiIn_Endcap_12->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
+	SigmaIEtaIEta_Endcap_12->Fill(dau0->sigmaIetaIeta());
+	recRelIso_Endcap_12->Fill((dau0->dr03TkSumPt()+dau0->dr03EcalRecHitSumEt()+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}
+	//if(fabs(dau1->eta())>eta_el_excl_up && fabs(dau1->eta()) < etaelcut){	
+	if(dau1->isEE()){
+	HoverE_Endcap_12->Fill(dau1->hcalOverEcal());	 
+	DeltaEtaIn_Endcap_12->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());	 
+	SigmaIEtaIEta_Endcap_12->Fill(dau1->sigmaIetaIeta());
+	recRelIso_Endcap_12->Fill((dau1->dr03TkSumPt()+dau1->dr03EcalRecHitSumEt()+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
+		
+	//Jet variables
+	IsoJetCounter_12->Fill(isorecjets.size());
+	
+	}
+	
+	//Events with a selected Zee - SELECTIONS: 1+2+3
+	if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle), *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle), *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle), *triggerHandle, _run, _rho)){
+	 
+	//Z variables
+	recPtZ_123->Fill((*zrecHandle)[0].pt());
+	recEtaZ_123->Fill((*zrecHandle)[0].eta());
+	recMassZ_123->Fill((*zrecHandle)[0].mass());
+	
+	//Z Electrons variables
+	recLeadElEta_123->Fill(dau0->eta());
+	recSecElEta_123->Fill(dau1->eta());
+	recLeadElPt_123->Fill(dau0->pt());
+	recSecElPt_123->Fill(dau1->pt());
+	recElIP_123->Fill(dau0->dB());
+	recElIP_123->Fill(dau1->dB());
+	recLeadElfBrem_123->Fill(dau0->fbrem());
+	recSecElfBrem_123->Fill(dau1->fbrem());
+	recLeadElConvCotDist_123->Fill(sqrt(pow(dau0->convDcot(),2)+pow(dau0->convDist(),2)));
+	recSecElConvCotDist_123->Fill(sqrt(pow(dau1->convDcot(),2)+pow(dau1->convDist(),2)));
+	
+	const reco::Track *track0 = (const reco::Track*)(dau0->gsfTrack().get()); 
+	const reco::Track *track1 = (const reco::Track*)(dau1->gsfTrack().get());		
+	const reco::HitPattern& p0_inner = track0->trackerExpectedHitsInner(); 
+	const reco::HitPattern& p1_inner = track1->trackerExpectedHitsInner();
+	
+	recLeadElConvMissHit_123->Fill(p0_inner.numberOfHits());
+	recSecElConvMissHit_123->Fill(p1_inner.numberOfHits()); 
+	
+	//Barrel
+	//if(fabs(dau0->eta())<eta_el_excl_down){
+	if(dau0->isEB()){
+	HoverE_Barrel_123->Fill(dau0->hcalOverEcal());
+	DeltaEtaIn_Barrel_123->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
+	DeltaPhiIn_Barrel_123->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
+	SigmaIEtaIEta_Barrel_123->Fill(dau0->sigmaIetaIeta());
+	recRelIso_Barrel_123->Fill((dau0->dr03TkSumPt()+max(0.,dau0->dr03EcalRecHitSumEt() - 1.)+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}	
+	//if(fabs(dau1->eta())<eta_el_excl_down){
+	if(dau1->isEB()){
+	HoverE_Barrel_123->Fill(dau1->hcalOverEcal());	 
+	DeltaEtaIn_Barrel_123->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());		
+	SigmaIEtaIEta_Barrel_123->Fill(dau1->sigmaIetaIeta());
+	recRelIso_Barrel_123->Fill((dau1->dr03TkSumPt()+max(0.,dau1->dr03EcalRecHitSumEt() - 1.)+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
+	//Endcap
+	//if(fabs(dau0->eta())>eta_el_excl_up && fabs(dau0->eta()) < etaelcut){
+	if(dau0->isEE()){
+	HoverE_Endcap_123->Fill(dau0->hcalOverEcal());
+	DeltaEtaIn_Endcap_123->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
+	DeltaPhiIn_Endcap_123->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
+	SigmaIEtaIEta_Endcap_123->Fill(dau0->sigmaIetaIeta());
+	recRelIso_Endcap_123->Fill((dau0->dr03TkSumPt()+dau0->dr03EcalRecHitSumEt()+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}
+	//if(fabs(dau1->eta())>eta_el_excl_up && fabs(dau1->eta()) < etaelcut){	
+	if(dau1->isEE()){
+	HoverE_Endcap_123->Fill(dau1->hcalOverEcal());	 
+	DeltaEtaIn_Endcap_123->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());	
+	SigmaIEtaIEta_Endcap_123->Fill(dau1->sigmaIetaIeta());
+	recRelIso_Endcap_123->Fill((dau1->dr03TkSumPt()+dau1->dr03EcalRecHitSumEt()+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
+			
+	//Jet variables
+	IsoJetCounter_123->Fill(isorecjets.size());
+	
+	}
+	 
+	//Events with a selected Zee - SELECTIONS: 1+2+3+4
+	if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle), *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle), *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle), *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandle), *triggerHandle, _run, _rho)){
+	
+	//Z variables
+	recPtZ_1234->Fill((*zrecHandle)[0].pt());
+	recEtaZ_1234->Fill((*zrecHandle)[0].eta());
+	recMassZ_1234->Fill((*zrecHandle)[0].mass());
+	
+	//Z Electrons variables
+	recLeadElEta_1234->Fill(dau0->eta());
+	recSecElEta_1234->Fill(dau1->eta());
+	recLeadElPt_1234->Fill(dau0->pt());
+	recSecElPt_1234->Fill(dau1->pt());
+	recElIP_1234->Fill(dau0->dB());
+	recElIP_1234->Fill(dau1->dB());
+	recLeadElfBrem_1234->Fill(dau0->fbrem());
+	recSecElfBrem_1234->Fill(dau1->fbrem());
+	recLeadElConvCotDist_1234->Fill(sqrt(pow(dau0->convDcot(),2)+pow(dau0->convDist(),2)));
+	recSecElConvCotDist_1234->Fill(sqrt(pow(dau1->convDcot(),2)+pow(dau1->convDist(),2)));
+	
+	const reco::Track *track0 = (const reco::Track*)(dau0->gsfTrack().get()); 
+	const reco::Track *track1 = (const reco::Track*)(dau1->gsfTrack().get());		
+	const reco::HitPattern& p0_inner = track0->trackerExpectedHitsInner(); 
+	const reco::HitPattern& p1_inner = track1->trackerExpectedHitsInner();
+	
+	recLeadElConvMissHit_1234->Fill(p0_inner.numberOfHits());
+	recSecElConvMissHit_1234->Fill(p1_inner.numberOfHits()); 
+	
+	//Barrel
+	//if(fabs(dau0->eta())<eta_el_excl_down){
+	if(dau0->isEB()){
+	HoverE_Barrel_1234->Fill(dau0->hcalOverEcal());
+	DeltaEtaIn_Barrel_1234->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
+	DeltaPhiIn_Barrel_1234->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
+	SigmaIEtaIEta_Barrel_1234->Fill(dau0->sigmaIetaIeta());
+	recRelIso_Barrel_1234->Fill((dau0->dr03TkSumPt()+max(0.,dau0->dr03EcalRecHitSumEt() - 1.)+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}	
+	//if(fabs(dau1->eta())<eta_el_excl_down){
+	if(dau1->isEB()){
+	HoverE_Barrel_1234->Fill(dau1->hcalOverEcal());	 
+	DeltaEtaIn_Barrel_1234->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());		
+	SigmaIEtaIEta_Barrel_1234->Fill(dau1->sigmaIetaIeta());
+	recRelIso_Barrel_1234->Fill((dau1->dr03TkSumPt()+max(0.,dau1->dr03EcalRecHitSumEt() - 1.)+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
+	//Endcap
+	//if(fabs(dau0->eta())>eta_el_excl_up && fabs(dau0->eta()) < etaelcut){
+	if(dau0->isEE()){
+	HoverE_Endcap_1234->Fill(dau0->hcalOverEcal());
+	DeltaEtaIn_Endcap_1234->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
+	DeltaPhiIn_Endcap_1234->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
+	SigmaIEtaIEta_Endcap_1234->Fill(dau0->sigmaIetaIeta());
+	recRelIso_Endcap_1234->Fill((dau0->dr03TkSumPt()+dau0->dr03EcalRecHitSumEt()+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}
+	//if(fabs(dau1->eta())>eta_el_excl_up && fabs(dau1->eta()) < etaelcut){	
+	if(dau1->isEE()){
+	HoverE_Endcap_1234->Fill(dau1->hcalOverEcal());	 
+	DeltaEtaIn_Endcap_1234->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());	 
+	SigmaIEtaIEta_Endcap_1234->Fill(dau1->sigmaIetaIeta());
+	recRelIso_Endcap_1234->Fill((dau1->dr03TkSumPt()+dau1->dr03EcalRecHitSumEt()+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
+			
+	//Jet variables
+	IsoJetCounter_1234->Fill(isorecjets.size());
+			 
+	 }
+	 
+	 //Events with a selected Zee - SELECTIONS: 1+2+3+4+5
+	if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle), *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle), *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle), *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandle), *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandle), *triggerHandle, _run, _rho)){
+
+		//Z variables	
+		recPtZ_12345->Fill((*zrecHandle)[0].pt());
+		recEtaZ_12345->Fill((*zrecHandle)[0].eta());
+		recMassZ_12345->Fill((*zrecHandle)[0].mass());
+
+		//Z Electrons variables		
+		recLeadElEta_12345->Fill(dau0->eta());
+		recSecElEta_12345->Fill(dau1->eta());
+		recLeadElPt_12345->Fill(dau0->pt());
+		recSecElPt_12345->Fill(dau1->pt());
+		recElIP_12345->Fill(dau0->dB());
+		recElIP_12345->Fill(dau1->dB());
+		recLeadElfBrem_12345->Fill(dau0->fbrem());
+		recSecElfBrem_12345->Fill(dau1->fbrem());
+		recLeadElConvCotDist_12345->Fill(sqrt(pow(dau0->convDcot(),2)+pow(dau0->convDist(),2)));
+		recSecElConvCotDist_12345->Fill(sqrt(pow(dau1->convDcot(),2)+pow(dau1->convDist(),2)));
+	
+		const reco::Track *track0 = (const reco::Track*)(dau0->gsfTrack().get()); 
+		const reco::Track *track1 = (const reco::Track*)(dau1->gsfTrack().get());		
+		const reco::HitPattern& p0_inner = track0->trackerExpectedHitsInner(); 
+		const reco::HitPattern& p1_inner = track1->trackerExpectedHitsInner();
+	
+		recLeadElConvMissHit_12345->Fill(p0_inner.numberOfHits());
+		recSecElConvMissHit_12345->Fill(p1_inner.numberOfHits()); 
+		
+		//Barrel
+	//if(fabs(dau0->eta())<eta_el_excl_down){
+	if(dau0->isEB()){
+	HoverE_Barrel_12345->Fill(dau0->hcalOverEcal());
+	DeltaEtaIn_Barrel_12345->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
+	DeltaPhiIn_Barrel_12345->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
+	SigmaIEtaIEta_Barrel_12345->Fill(dau0->sigmaIetaIeta());
+	recRelIso_Barrel_12345->Fill((dau0->dr03TkSumPt()+max(0.,dau0->dr03EcalRecHitSumEt() - 1.)+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}	
+	//if(fabs(dau1->eta())<eta_el_excl_down){
+	if(dau1->isEB()){
+	HoverE_Barrel_12345->Fill(dau1->hcalOverEcal());	 
+	DeltaEtaIn_Barrel_12345->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());		
+	SigmaIEtaIEta_Barrel_12345->Fill(dau1->sigmaIetaIeta());
+	recRelIso_Barrel_12345->Fill((dau1->dr03TkSumPt()+max(0.,dau1->dr03EcalRecHitSumEt() - 1.)+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
+	//Endcap
+	//if(fabs(dau0->eta())>eta_el_excl_up && fabs(dau0->eta()) < etaelcut){
+	if(dau0->isEE()){
+	HoverE_Endcap_12345->Fill(dau0->hcalOverEcal());
+	DeltaEtaIn_Endcap_12345->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
+	DeltaPhiIn_Endcap_12345->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
+	SigmaIEtaIEta_Endcap_12345->Fill(dau0->sigmaIetaIeta());
+	recRelIso_Endcap_12345->Fill((dau0->dr03TkSumPt()+dau0->dr03EcalRecHitSumEt()+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}
+	//if(fabs(dau1->eta())>eta_el_excl_up && fabs(dau1->eta()) < etaelcut){	
+	if(dau1->isEE()){
+	HoverE_Endcap_12345->Fill(dau1->hcalOverEcal());	 
+	DeltaEtaIn_Endcap_12345->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());		
+	SigmaIEtaIEta_Endcap_12345->Fill(dau1->sigmaIetaIeta());
+	recRelIso_Endcap_12345->Fill((dau1->dr03TkSumPt()+dau1->dr03EcalRecHitSumEt()+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
+			
+		//Jet variables	
+		IsoJetCounter_12345->Fill(isorecjets.size());
+		
+		}
   
-   CorrectCharge_Pt_Acc->Fill(genCorrElectron->pt());
-   CorrectCharge_Eta_Acc->Fill(genCorrElectron->eta());
-   CorrectCharge_Hit_Acc->Fill(selectedelectrons[i].gsfTrack()->numberOfValidHits());
-   CorrectCharge_fBrem_Acc->Fill(selectedelectrons[i].fbrem());
-   CorrectCharge_IP_Acc->Fill(selectedelectrons[i].dB());
-   CorrectCharge_RecoExclJet_Acc->Fill(isorecjets.size());
- 
-   for(unsigned int n = 0; (n < isorecjets.size()+1)&&((n+1)<10); n++)CorrectCharge_RecoInclJet_Acc->AddBinContent(n+1,1);
-   
-   HitVsEta_CorrCharge->Fill(genCorrElectron->eta(),selectedelectrons[i].gsfTrack()->numberOfValidHits());
-   
-   ElCorrChargePtExclMulti[isorecjets.size()]->Fill(genCorrElectron->pt(), weight);
-   ElCorrChargeEtaExclMulti[isorecjets.size()]->Fill(genCorrElectron->eta(), weight);
-   ElCorrChargeHitExclMulti[isorecjets.size()]->Fill(selectedelectrons[i].gsfTrack()->numberOfValidHits(), weight);
-   ElCorrChargefBremExclMulti[isorecjets.size()]->Fill(selectedelectrons[i].fbrem(), weight);
- 
-   _charge_dir->cd();
-   addHistosVsMulti(isorecjets.size(), "AllElPtExcl", "All electron p_{T} spectrum", 200, 0., 200., AllElPtExclMulti);
-   addHistosVsMulti(isorecjets.size(), "AllElEtaExcl", "All electron #eta spectrum", 100, -5, 5, AllElEtaExclMulti);
-   addHistosVsMulti(isorecjets.size(), "AllElHitExcl", "All electron track hit number", 30, 0., 30., AllElHitExclMulti);
-   addHistosVsMulti(isorecjets.size(), "AllElfBremExcl", "All electron fBrem", 100, 0., 2., AllElfBremExclMulti);
- 
-   AllEl_Eta_Acc->Fill(genCorrElectron->eta());
-   AllEl_Hit_Acc->Fill(selectedelectrons[i].gsfTrack()->numberOfValidHits());
-   AllEl_fBrem_Acc->Fill(selectedelectrons[i].fbrem());
-   AllEl_IP_Acc->Fill(selectedelectrons[i].dB());
-   AllEl_RecoExclJet_Acc->Fill(isorecjets.size());
-   
-   for(unsigned int n = 0; (n < isorecjets.size()+1)&&((n+1)<10); n++)AllEl_RecoInclJet_Acc->AddBinContent(n+1,1);
-   
-   HitVsEta_AllEl->Fill(genCorrElectron->eta(),selectedelectrons[i].gsfTrack()->numberOfValidHits());
-   
-   AllElPtExclMulti[isorecjets.size()]->Fill(genCorrElectron->pt(), weight);
-   AllElEtaExclMulti[isorecjets.size()]->Fill(genCorrElectron->eta(), weight);
-   AllElHitExclMulti[isorecjets.size()]->Fill(selectedelectrons[i].gsfTrack()->numberOfValidHits(), weight);
-   AllElfBremExclMulti[isorecjets.size()]->Fill(selectedelectrons[i].fbrem(), weight);
+	//Events with a selected Zee - SELECTIONS: 1+2+3+4+5+6
+	if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle), *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle), *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle), *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandle), *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandle), *triggerHandle, _run, _rho) && RecSelected(_RecoCutFlags[6].c_str(), (*zrecHandle), *triggerHandle, _run, _rho)){
+	
+		//Z variables	
+		recPtZ_123456->Fill((*zrecHandle)[0].pt());
+		recEtaZ_123456->Fill((*zrecHandle)[0].eta());
+		recMassZ_123456->Fill((*zrecHandle)[0].mass());
 
-   }
-   
-   if(ZdauSCinAcc){
-
-   fBremVsEta->Fill(selectedelectrons[i].eta(),selectedelectrons[i].fbrem());
-   
-   PixelHit_SC->Fill(hp.numberOfValidPixelBarrelHits()+hp.numberOfValidPixelEndcapHits());
-   
-   if(hp.hasValidHitInFirstPixelBarrel()){
-   FirstPixelBarrelHit_SC->Fill(1);
-   }else{
-   FirstPixelBarrelHit_SC->Fill(-1);}
-   
-   _charge_dir->cd();
-   addHistosVsMulti(isorecjets.size(), "ElMisIDChargePtExcl", "MisID Charge electron p_{T} spectrum", 200, 0., 200., ElMisIDChargePtExclMulti);
-   addHistosVsMulti(isorecjets.size(), "ElMisIDChargeEtaExcl", "MisID Charge electron #eta spectrum", 100, -5, 5, ElMisIDChargeEtaExclMulti);
-   addHistosVsMulti(isorecjets.size(), "ElMisIDChargeHitExcl", "MisID Charge electron track hit number", 30, 0., 30., ElMisIDChargeHitExclMulti);
-   addHistosVsMulti(isorecjets.size(), "ElMisIDChargefBremExcl", "MisID Charge electron fBrem", 100, 0., 2., ElMisIDChargefBremExclMulti);
-   
-   ChargeMisID_Pt_Acc->Fill(genMisElectron->pt());
-   ChargeMisID_Eta_Acc->Fill(genMisElectron->eta());
-   ChargeMisID_Hit_Acc->Fill(selectedelectrons[i].gsfTrack()->numberOfValidHits());
-   ChargeMisID_fBrem_Acc->Fill(selectedelectrons[i].fbrem());
-   ChargeMisID_IP_Acc->Fill(selectedelectrons[i].dB());
-   ChargeMisID_RecoExclJet_Acc->Fill(isorecjets.size());
-   for(unsigned int n = 0; (n < isorecjets.size()+1)&&((n+1)<10); n++)ChargeMisID_RecoInclJet_Acc->AddBinContent(n+1,1);
-   
-   HitVsEta_MisIDCharge->Fill(genMisElectron->eta(),selectedelectrons[i].gsfTrack()->numberOfValidHits());
-   
-   ElMisIDChargePtExclMulti[isorecjets.size()]->Fill(genMisElectron->pt(), weight);
-   ElMisIDChargeEtaExclMulti[isorecjets.size()]->Fill(genMisElectron->eta(), weight);
-   ElMisIDChargeHitExclMulti[isorecjets.size()]->Fill(selectedelectrons[i].gsfTrack()->numberOfValidHits(), weight);
-   ElMisIDChargefBremExclMulti[isorecjets.size()]->Fill(selectedelectrons[i].fbrem(), weight);
-
-   _charge_dir->cd();
-   addHistosVsMulti(isorecjets.size(), "AllElPtExcl", "All electron p_{T} spectrum", 200, 0., 200., AllElPtExclMulti);
-   addHistosVsMulti(isorecjets.size(), "AllElEtaExcl", "All electron #eta spectrum", 100, -5, 5, AllElEtaExclMulti);
-   addHistosVsMulti(isorecjets.size(), "AllElHitExcl", "All electron track hit number", 30, 0., 30., AllElHitExclMulti);
-   addHistosVsMulti(isorecjets.size(), "AllElfBremExcl", "All electron fBrem", 100, 0., 2., AllElfBremExclMulti);
-   
-   AllEl_Pt_Acc->Fill(genMisElectron->pt());
-   AllEl_Eta_Acc->Fill(genMisElectron->eta());
-   AllEl_Hit_Acc->Fill(selectedelectrons[i].gsfTrack()->numberOfValidHits());
-   AllEl_fBrem_Acc->Fill(selectedelectrons[i].fbrem());
-   AllEl_IP_Acc->Fill(selectedelectrons[i].dB());
-   AllEl_RecoExclJet_Acc->Fill(isorecjets.size());
-   for(unsigned int n = 0; (n < isorecjets.size()+1)&&((n+1)<10); n++)AllEl_RecoInclJet_Acc->AddBinContent(n+1,1);
-   
-   HitVsEta_AllEl->Fill(genMisElectron->eta(),selectedelectrons[i].gsfTrack()->numberOfValidHits());
-   
-   AllElPtExclMulti[isorecjets.size()]->Fill(genMisElectron->pt(), weight);
-   AllElEtaExclMulti[isorecjets.size()]->Fill(genMisElectron->eta(), weight);
-   AllElHitExclMulti[isorecjets.size()]->Fill(selectedelectrons[i].gsfTrack()->numberOfValidHits(), weight);
-   AllElfBremExclMulti[isorecjets.size()]->Fill(selectedelectrons[i].fbrem(), weight);
-   
-   }
-
-   } 
-   
-   // End of charge MisID study     
-   
-   // Z->ee events (OC) study: selections applied
-   
-   if(zrecHandle->size()){
-     
-     //Events with a selected Zee - SELECTIONS: 1
-     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
-     
-     //Z variables
-     recPtZ_1->Fill((*zrecHandle)[0].pt());
-     recEtaZ_1->Fill((*zrecHandle)[0].eta());
-     recMassZ_1->Fill((*zrecHandle)[0].mass());
-     
-     //Z Electrons variables
-     recLeadElEta_1->Fill(dau0->eta());
-     recSecElEta_1->Fill(dau1->eta());
-     recLeadElPt_1->Fill(dau0->pt());
-     recSecElPt_1->Fill(dau1->pt());
-     recElIP_1->Fill(dau0->dB());
-     recElIP_1->Fill(dau1->dB());
-     recLeadElfBrem_1->Fill(dau0->fbrem());
-     recSecElfBrem_1->Fill(dau1->fbrem());
-     recLeadElConvCotDist_1->Fill(sqrt(pow(dau0->convDcot(),2)+pow(dau0->convDist(),2)));
-     recSecElConvCotDist_1->Fill(sqrt(pow(dau1->convDcot(),2)+pow(dau1->convDist(),2)));
-     
-     const reco::Track *track0 = (const reco::Track*)(dau0->gsfTrack().get()); 
-     const reco::Track *track1 = (const reco::Track*)(dau1->gsfTrack().get());      
-     const reco::HitPattern& p0_inner = track0->trackerExpectedHitsInner(); 
-     const reco::HitPattern& p1_inner = track1->trackerExpectedHitsInner();
-     
-     recLeadElConvMissHit_1->Fill(p0_inner.numberOfHits());
-     recSecElConvMissHit_1->Fill(p1_inner.numberOfHits()); 
-     
-     //Barrel
-     if(fabs(dau0->eta())<eta_el_excl_down){
-     HoverE_Barrel_1->Fill(dau0->hcalOverEcal());
-     DeltaEtaIn_Barrel_1->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
-     DeltaPhiIn_Barrel_1->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
-     SigmaIEtaIEta_Barrel_1->Fill(dau0->sigmaIetaIeta());
-     recRelIso_Barrel_1->Fill((dau0->dr03TkSumPt()+max(0.,dau0->dr03EcalRecHitSumEt() - 1.)+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}   
-     if(fabs(dau1->eta())<eta_el_excl_down){
-     HoverE_Barrel_1->Fill(dau1->hcalOverEcal());    
-     DeltaEtaIn_Barrel_1->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());    
-     SigmaIEtaIEta_Barrel_1->Fill(dau1->sigmaIetaIeta());
-     recRelIso_Barrel_1->Fill((dau1->dr03TkSumPt()+max(0.,dau1->dr03EcalRecHitSumEt() - 1.)+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
-     //Endcap
-     if(fabs(dau0->eta())>eta_el_excl_up && fabs(dau0->eta()) < etaelcut){
-     HoverE_Endcap_1->Fill(dau0->hcalOverEcal());
-     DeltaEtaIn_Endcap_1->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
-     DeltaPhiIn_Endcap_1->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
-     SigmaIEtaIEta_Endcap_1->Fill(dau0->sigmaIetaIeta());
-     recRelIso_Endcap_1->Fill((dau0->dr03TkSumPt()+dau0->dr03EcalRecHitSumEt()+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}
-     if(fabs(dau1->eta())>eta_el_excl_up && fabs(dau1->eta()) < etaelcut){   
-     HoverE_Endcap_1->Fill(dau1->hcalOverEcal());    
-     DeltaEtaIn_Endcap_1->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());      
-     SigmaIEtaIEta_Endcap_1->Fill(dau1->sigmaIetaIeta());
-     recRelIso_Endcap_1->Fill((dau1->dr03TkSumPt()+dau1->dr03EcalRecHitSumEt()+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
-        
-     //Jet variables
-     IsoJetCounter_1->Fill(isorecjets.size());
-      
-     }
-   
-     //Events with a selected Zee - SELECTIONS: 1+2
-     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
-    
-     //Z variables
-     recPtZ_12->Fill((*zrecHandle)[0].pt());
-     recEtaZ_12->Fill((*zrecHandle)[0].eta());
-     recMassZ_12->Fill((*zrecHandle)[0].mass());
-     
-     //Z Electrons variables
-     recLeadElEta_12->Fill(dau0->eta());
-     recSecElEta_12->Fill(dau1->eta());
-     recLeadElPt_12->Fill(dau0->pt());
-     recSecElPt_12->Fill(dau1->pt());
-     recElIP_12->Fill(dau0->dB());
-     recElIP_12->Fill(dau1->dB());
-     recLeadElfBrem_12->Fill(dau0->fbrem());
-     recSecElfBrem_12->Fill(dau1->fbrem());
-     recLeadElConvCotDist_12->Fill(sqrt(pow(dau0->convDcot(),2)+pow(dau0->convDist(),2)));
-     recSecElConvCotDist_12->Fill(sqrt(pow(dau1->convDcot(),2)+pow(dau1->convDist(),2)));
-     
-     const reco::Track *track0 = (const reco::Track*)(dau0->gsfTrack().get()); 
-     const reco::Track *track1 = (const reco::Track*)(dau1->gsfTrack().get());      
-     const reco::HitPattern& p0_inner = track0->trackerExpectedHitsInner(); 
-     const reco::HitPattern& p1_inner = track1->trackerExpectedHitsInner();
-     
-     recLeadElConvMissHit_12->Fill(p0_inner.numberOfHits());
-     recSecElConvMissHit_12->Fill(p1_inner.numberOfHits()); 
-     
-     //Barrel
-     if(fabs(dau0->eta())<eta_el_excl_down){
-     HoverE_Barrel_12->Fill(dau0->hcalOverEcal());
-     DeltaEtaIn_Barrel_12->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
-     DeltaPhiIn_Barrel_12->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
-     SigmaIEtaIEta_Barrel_12->Fill(dau0->sigmaIetaIeta());
-     recRelIso_Barrel_12->Fill((dau0->dr03TkSumPt()+max(0.,dau0->dr03EcalRecHitSumEt() - 1.)+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}   
-     if(fabs(dau1->eta())<eta_el_excl_down){
-     HoverE_Barrel_12->Fill(dau1->hcalOverEcal());    
-     DeltaEtaIn_Barrel_12->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());    
-     SigmaIEtaIEta_Barrel_12->Fill(dau1->sigmaIetaIeta());
-     recRelIso_Barrel_12->Fill((dau1->dr03TkSumPt()+max(0.,dau1->dr03EcalRecHitSumEt() - 1.)+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
-     //Endcap
-     if(fabs(dau0->eta())>eta_el_excl_up && fabs(dau0->eta()) < etaelcut){
-     HoverE_Endcap_12->Fill(dau0->hcalOverEcal());
-     DeltaEtaIn_Endcap_12->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
-     DeltaPhiIn_Endcap_12->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
-     SigmaIEtaIEta_Endcap_12->Fill(dau0->sigmaIetaIeta());
-     recRelIso_Endcap_12->Fill((dau0->dr03TkSumPt()+dau0->dr03EcalRecHitSumEt()+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}
-     if(fabs(dau1->eta())>eta_el_excl_up && fabs(dau1->eta()) < etaelcut){   
-     HoverE_Endcap_12->Fill(dau1->hcalOverEcal());    
-     DeltaEtaIn_Endcap_12->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());    
-     SigmaIEtaIEta_Endcap_12->Fill(dau1->sigmaIetaIeta());
-     recRelIso_Endcap_12->Fill((dau1->dr03TkSumPt()+dau1->dr03EcalRecHitSumEt()+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
-        
-     //Jet variables
-     IsoJetCounter_12->Fill(isorecjets.size());
-     
-     }
-     
-     //Events with a selected Zee - SELECTIONS: 1+2+3
-     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
-    
-     //Z variables
-     recPtZ_123->Fill((*zrecHandle)[0].pt());
-     recEtaZ_123->Fill((*zrecHandle)[0].eta());
-     recMassZ_123->Fill((*zrecHandle)[0].mass());
-     
-     //Z Electrons variables
-     recLeadElEta_123->Fill(dau0->eta());
-     recSecElEta_123->Fill(dau1->eta());
-     recLeadElPt_123->Fill(dau0->pt());
-     recSecElPt_123->Fill(dau1->pt());
-     recElIP_123->Fill(dau0->dB());
-     recElIP_123->Fill(dau1->dB());
-     recLeadElfBrem_123->Fill(dau0->fbrem());
-     recSecElfBrem_123->Fill(dau1->fbrem());
-     recLeadElConvCotDist_123->Fill(sqrt(pow(dau0->convDcot(),2)+pow(dau0->convDist(),2)));
-     recSecElConvCotDist_123->Fill(sqrt(pow(dau1->convDcot(),2)+pow(dau1->convDist(),2)));
-     
-     const reco::Track *track0 = (const reco::Track*)(dau0->gsfTrack().get()); 
-     const reco::Track *track1 = (const reco::Track*)(dau1->gsfTrack().get());      
-     const reco::HitPattern& p0_inner = track0->trackerExpectedHitsInner(); 
-     const reco::HitPattern& p1_inner = track1->trackerExpectedHitsInner();
-     
-     recLeadElConvMissHit_123->Fill(p0_inner.numberOfHits());
-     recSecElConvMissHit_123->Fill(p1_inner.numberOfHits()); 
-     
-     //Barrel
-     if(fabs(dau0->eta())<eta_el_excl_down){
-     HoverE_Barrel_123->Fill(dau0->hcalOverEcal());
-     DeltaEtaIn_Barrel_123->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
-     DeltaPhiIn_Barrel_123->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
-     SigmaIEtaIEta_Barrel_123->Fill(dau0->sigmaIetaIeta());
-     recRelIso_Barrel_123->Fill((dau0->dr03TkSumPt()+max(0.,dau0->dr03EcalRecHitSumEt() - 1.)+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}   
-     if(fabs(dau1->eta())<eta_el_excl_down){
-     HoverE_Barrel_123->Fill(dau1->hcalOverEcal());    
-     DeltaEtaIn_Barrel_123->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());      
-     SigmaIEtaIEta_Barrel_123->Fill(dau1->sigmaIetaIeta());
-     recRelIso_Barrel_123->Fill((dau1->dr03TkSumPt()+max(0.,dau1->dr03EcalRecHitSumEt() - 1.)+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
-     //Endcap
-     if(fabs(dau0->eta())>eta_el_excl_up && fabs(dau0->eta()) < etaelcut){
-     HoverE_Endcap_123->Fill(dau0->hcalOverEcal());
-     DeltaEtaIn_Endcap_123->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
-     DeltaPhiIn_Endcap_123->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
-     SigmaIEtaIEta_Endcap_123->Fill(dau0->sigmaIetaIeta());
-     recRelIso_Endcap_123->Fill((dau0->dr03TkSumPt()+dau0->dr03EcalRecHitSumEt()+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}
-     if(fabs(dau1->eta())>eta_el_excl_up && fabs(dau1->eta()) < etaelcut){   
-     HoverE_Endcap_123->Fill(dau1->hcalOverEcal());    
-     DeltaEtaIn_Endcap_123->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());     
-     SigmaIEtaIEta_Endcap_123->Fill(dau1->sigmaIetaIeta());
-     recRelIso_Endcap_123->Fill((dau1->dr03TkSumPt()+dau1->dr03EcalRecHitSumEt()+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
-         
-     //Jet variables
-     IsoJetCounter_123->Fill(isorecjets.size());
-     
-     }
-    
-     //Events with a selected Zee - SELECTIONS: 1+2+3+4
-     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
-     
-     //Z variables
-     recPtZ_1234->Fill((*zrecHandle)[0].pt());
-     recEtaZ_1234->Fill((*zrecHandle)[0].eta());
-     recMassZ_1234->Fill((*zrecHandle)[0].mass());
-     
-     //Z Electrons variables
-     recLeadElEta_1234->Fill(dau0->eta());
-     recSecElEta_1234->Fill(dau1->eta());
-     recLeadElPt_1234->Fill(dau0->pt());
-     recSecElPt_1234->Fill(dau1->pt());
-     recElIP_1234->Fill(dau0->dB());
-     recElIP_1234->Fill(dau1->dB());
-     recLeadElfBrem_1234->Fill(dau0->fbrem());
-     recSecElfBrem_1234->Fill(dau1->fbrem());
-     recLeadElConvCotDist_1234->Fill(sqrt(pow(dau0->convDcot(),2)+pow(dau0->convDist(),2)));
-     recSecElConvCotDist_1234->Fill(sqrt(pow(dau1->convDcot(),2)+pow(dau1->convDist(),2)));
-     
-     const reco::Track *track0 = (const reco::Track*)(dau0->gsfTrack().get()); 
-     const reco::Track *track1 = (const reco::Track*)(dau1->gsfTrack().get());      
-     const reco::HitPattern& p0_inner = track0->trackerExpectedHitsInner(); 
-     const reco::HitPattern& p1_inner = track1->trackerExpectedHitsInner();
-     
-     recLeadElConvMissHit_1234->Fill(p0_inner.numberOfHits());
-     recSecElConvMissHit_1234->Fill(p1_inner.numberOfHits()); 
-     
-     //Barrel
-     if(fabs(dau0->eta())<eta_el_excl_down){
-     HoverE_Barrel_1234->Fill(dau0->hcalOverEcal());
-     DeltaEtaIn_Barrel_1234->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
-     DeltaPhiIn_Barrel_1234->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
-     SigmaIEtaIEta_Barrel_1234->Fill(dau0->sigmaIetaIeta());
-     recRelIso_Barrel_1234->Fill((dau0->dr03TkSumPt()+max(0.,dau0->dr03EcalRecHitSumEt() - 1.)+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}   
-     if(fabs(dau1->eta())<eta_el_excl_down){
-     HoverE_Barrel_1234->Fill(dau1->hcalOverEcal());    
-     DeltaEtaIn_Barrel_1234->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());      
-     SigmaIEtaIEta_Barrel_1234->Fill(dau1->sigmaIetaIeta());
-     recRelIso_Barrel_1234->Fill((dau1->dr03TkSumPt()+max(0.,dau1->dr03EcalRecHitSumEt() - 1.)+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
-     //Endcap
-     if(fabs(dau0->eta())>eta_el_excl_up && fabs(dau0->eta()) < etaelcut){
-     HoverE_Endcap_1234->Fill(dau0->hcalOverEcal());
-     DeltaEtaIn_Endcap_1234->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
-     DeltaPhiIn_Endcap_1234->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
-     SigmaIEtaIEta_Endcap_1234->Fill(dau0->sigmaIetaIeta());
-     recRelIso_Endcap_1234->Fill((dau0->dr03TkSumPt()+dau0->dr03EcalRecHitSumEt()+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}
-     if(fabs(dau1->eta())>eta_el_excl_up && fabs(dau1->eta()) < etaelcut){   
-     HoverE_Endcap_1234->Fill(dau1->hcalOverEcal());    
-     DeltaEtaIn_Endcap_1234->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());    
-     SigmaIEtaIEta_Endcap_1234->Fill(dau1->sigmaIetaIeta());
-     recRelIso_Endcap_1234->Fill((dau1->dr03TkSumPt()+dau1->dr03EcalRecHitSumEt()+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
-         
-     //Jet variables
-     IsoJetCounter_1234->Fill(isorecjets.size());
-          
-    }
-    
-    //Events with a selected Zee - SELECTIONS: 1+2+3+4+5
-     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
-
-      //Z variables     
-      recPtZ_12345->Fill((*zrecHandle)[0].pt());
-      recEtaZ_12345->Fill((*zrecHandle)[0].eta());
-      recMassZ_12345->Fill((*zrecHandle)[0].mass());
-
-      //Z Electrons variables      
-      recLeadElEta_12345->Fill(dau0->eta());
-      recSecElEta_12345->Fill(dau1->eta());
-      recLeadElPt_12345->Fill(dau0->pt());
-      recSecElPt_12345->Fill(dau1->pt());
-      recElIP_12345->Fill(dau0->dB());
-      recElIP_12345->Fill(dau1->dB());
-      recLeadElfBrem_12345->Fill(dau0->fbrem());
-      recSecElfBrem_12345->Fill(dau1->fbrem());
-      recLeadElConvCotDist_12345->Fill(sqrt(pow(dau0->convDcot(),2)+pow(dau0->convDist(),2)));
-      recSecElConvCotDist_12345->Fill(sqrt(pow(dau1->convDcot(),2)+pow(dau1->convDist(),2)));
-     
-      const reco::Track *track0 = (const reco::Track*)(dau0->gsfTrack().get()); 
-      const reco::Track *track1 = (const reco::Track*)(dau1->gsfTrack().get());      
-      const reco::HitPattern& p0_inner = track0->trackerExpectedHitsInner(); 
-      const reco::HitPattern& p1_inner = track1->trackerExpectedHitsInner();
-     
-      recLeadElConvMissHit_12345->Fill(p0_inner.numberOfHits());
-      recSecElConvMissHit_12345->Fill(p1_inner.numberOfHits()); 
-      
-      //Barrel
-     if(fabs(dau0->eta())<eta_el_excl_down){
-     HoverE_Barrel_12345->Fill(dau0->hcalOverEcal());
-     DeltaEtaIn_Barrel_12345->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
-     DeltaPhiIn_Barrel_12345->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
-     SigmaIEtaIEta_Barrel_12345->Fill(dau0->sigmaIetaIeta());
-     recRelIso_Barrel_12345->Fill((dau0->dr03TkSumPt()+max(0.,dau0->dr03EcalRecHitSumEt() - 1.)+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}   
-     if(fabs(dau1->eta())<eta_el_excl_down){
-     HoverE_Barrel_12345->Fill(dau1->hcalOverEcal());    
-     DeltaEtaIn_Barrel_12345->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());      
-     SigmaIEtaIEta_Barrel_12345->Fill(dau1->sigmaIetaIeta());
-     recRelIso_Barrel_12345->Fill((dau1->dr03TkSumPt()+max(0.,dau1->dr03EcalRecHitSumEt() - 1.)+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
-     //Endcap
-     if(fabs(dau0->eta())>eta_el_excl_up && fabs(dau0->eta()) < etaelcut){
-     HoverE_Endcap_12345->Fill(dau0->hcalOverEcal());
-     DeltaEtaIn_Endcap_12345->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
-     DeltaPhiIn_Endcap_12345->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
-     SigmaIEtaIEta_Endcap_12345->Fill(dau0->sigmaIetaIeta());
-     recRelIso_Endcap_12345->Fill((dau0->dr03TkSumPt()+dau0->dr03EcalRecHitSumEt()+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}
-     if(fabs(dau1->eta())>eta_el_excl_up && fabs(dau1->eta()) < etaelcut){   
-     HoverE_Endcap_12345->Fill(dau1->hcalOverEcal());    
-     DeltaEtaIn_Endcap_12345->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());        
-     SigmaIEtaIEta_Endcap_12345->Fill(dau1->sigmaIetaIeta());
-     recRelIso_Endcap_12345->Fill((dau1->dr03TkSumPt()+dau1->dr03EcalRecHitSumEt()+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
-           
-      //Jet variables     
-      IsoJetCounter_12345->Fill(isorecjets.size());
-      
-      }
-  
-     //Events with a selected Zee - SELECTIONS: 1+2+3+4+5+6
-     if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandle)[0], *triggerHandle, run) && RecSelected(_RecoCutFlags[6].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
-     
-      //Z variables     
-      recPtZ_123456->Fill((*zrecHandle)[0].pt());
-      recEtaZ_123456->Fill((*zrecHandle)[0].eta());
-      recMassZ_123456->Fill((*zrecHandle)[0].mass());
-
-      //Z Electrons variables      
-      recLeadElEta_123456->Fill(dau0->eta());
-      recSecElEta_123456->Fill(dau1->eta());
-      recLeadElPt_123456->Fill(dau0->pt());
-      recSecElPt_123456->Fill(dau1->pt());
-      recElIP_123456->Fill(dau0->dB());
-      recElIP_123456->Fill(dau1->dB());
-      recLeadElfBrem_123456->Fill(dau0->fbrem());
-      recSecElfBrem_123456->Fill(dau1->fbrem());
-      recLeadElConvCotDist_123456->Fill(sqrt(pow(dau0->convDcot(),2)+pow(dau0->convDist(),2)));
-      recSecElConvCotDist_123456->Fill(sqrt(pow(dau1->convDcot(),2)+pow(dau1->convDist(),2)));
-     
-      const reco::Track *track0 = (const reco::Track*)(dau0->gsfTrack().get()); 
-      const reco::Track *track1 = (const reco::Track*)(dau1->gsfTrack().get());      
-      const reco::HitPattern& p0_inner = track0->trackerExpectedHitsInner(); 
-      const reco::HitPattern& p1_inner = track1->trackerExpectedHitsInner();
-     
-      recLeadElConvMissHit_123456->Fill(p0_inner.numberOfHits());
-      recSecElConvMissHit_123456->Fill(p1_inner.numberOfHits()); 
-      
-       //Barrel
-     if(fabs(dau0->eta())<eta_el_excl_down){
-     HoverE_Barrel_123456->Fill(dau0->hcalOverEcal());
-     DeltaEtaIn_Barrel_123456->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
-     DeltaPhiIn_Barrel_123456->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
-     SigmaIEtaIEta_Barrel_123456->Fill(dau0->sigmaIetaIeta());
-     recRelIso_Barrel_123456->Fill((dau0->dr03TkSumPt()+max(0.,dau0->dr03EcalRecHitSumEt() - 1.)+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}   
-     if(fabs(dau1->eta())<eta_el_excl_down){
-     HoverE_Barrel_123456->Fill(dau1->hcalOverEcal());    
-     DeltaEtaIn_Barrel_123456->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());       
-     SigmaIEtaIEta_Barrel_123456->Fill(dau1->sigmaIetaIeta());
-     recRelIso_Barrel_123456->Fill((dau1->dr03TkSumPt()+max(0.,dau1->dr03EcalRecHitSumEt() - 1.)+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
-     //Endcap
-     if(fabs(dau0->eta())>eta_el_excl_up && fabs(dau0->eta()) < etaelcut){
-     HoverE_Endcap_123456->Fill(dau0->hcalOverEcal());
-     DeltaEtaIn_Endcap_123456->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
-     DeltaPhiIn_Endcap_123456->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
-     SigmaIEtaIEta_Endcap_123456->Fill(dau0->sigmaIetaIeta());
-     recRelIso_Endcap_123456->Fill((dau0->dr03TkSumPt()+dau0->dr03EcalRecHitSumEt()+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}
-     if(fabs(dau1->eta())>eta_el_excl_up && fabs(dau1->eta()) < etaelcut){   
-     HoverE_Endcap_123456->Fill(dau1->hcalOverEcal());    
-     DeltaEtaIn_Endcap_123456->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());       
-     SigmaIEtaIEta_Endcap_123456->Fill(dau1->sigmaIetaIeta());
-     recRelIso_Endcap_123456->Fill((dau1->dr03TkSumPt()+dau1->dr03EcalRecHitSumEt()+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
-           
-      //Jet variables     
-      JetCounter_123456->Fill(recjets.size());
-      IsoJetCounter_123456->Fill(isorecjets.size());
-    
-      for(unsigned int i = 0; i < recjets.size(); i++){
-      RecoJetPt_123456->Fill(recjets[i]->pt());}
-      
-      for(unsigned int i = 0; i < isorecjets.size(); i++){
-      RecoIsoJetPt_123456->Fill(isorecjets[i]->pt());}
-      
-      if (isorecjets.size()){
-        recLeadIsoJetPt_123456->Fill(isorecjets[0]->pt());
-        recLeadIsoJetEta_123456->Fill(isorecjets[0]->eta());
-        }
-      
-      //Jet properties
-     
+		//Z Electrons variables		
+		recLeadElEta_123456->Fill(dau0->eta());
+		recSecElEta_123456->Fill(dau1->eta());
+		recLeadElPt_123456->Fill(dau0->pt());
+		recSecElPt_123456->Fill(dau1->pt());
+		recElIP_123456->Fill(dau0->dB());
+		recElIP_123456->Fill(dau1->dB());
+		recLeadElfBrem_123456->Fill(dau0->fbrem());
+		recSecElfBrem_123456->Fill(dau1->fbrem());
+		recLeadElConvCotDist_123456->Fill(sqrt(pow(dau0->convDcot(),2)+pow(dau0->convDist(),2)));
+		recSecElConvCotDist_123456->Fill(sqrt(pow(dau1->convDcot(),2)+pow(dau1->convDist(),2)));
+	
+		const reco::Track *track0 = (const reco::Track*)(dau0->gsfTrack().get()); 
+		const reco::Track *track1 = (const reco::Track*)(dau1->gsfTrack().get());		
+		const reco::HitPattern& p0_inner = track0->trackerExpectedHitsInner(); 
+		const reco::HitPattern& p1_inner = track1->trackerExpectedHitsInner();
+	
+		recLeadElConvMissHit_123456->Fill(p0_inner.numberOfHits());
+		recSecElConvMissHit_123456->Fill(p1_inner.numberOfHits()); 
+		
+		 //Barrel
+	//if(fabs(dau0->eta())<eta_el_excl_down){
+	if(dau0->isEB()){
+	HoverE_Barrel_123456->Fill(dau0->hcalOverEcal());
+	DeltaEtaIn_Barrel_123456->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
+	DeltaPhiIn_Barrel_123456->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
+	SigmaIEtaIEta_Barrel_123456->Fill(dau0->sigmaIetaIeta());
+	recRelIso_Barrel_123456->Fill((dau0->dr03TkSumPt()+max(0.,dau0->dr03EcalRecHitSumEt() - 1.)+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}	
+	//if(fabs(dau1->eta())<eta_el_excl_down){
+	if(dau1->isEB()){
+	HoverE_Barrel_123456->Fill(dau1->hcalOverEcal());	 
+	DeltaEtaIn_Barrel_123456->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());		 
+	SigmaIEtaIEta_Barrel_123456->Fill(dau1->sigmaIetaIeta());
+	recRelIso_Barrel_123456->Fill((dau1->dr03TkSumPt()+max(0.,dau1->dr03EcalRecHitSumEt() - 1.)+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
+	//Endcap
+	//if(fabs(dau0->eta())>eta_el_excl_up && fabs(dau0->eta()) < etaelcut){
+	if(dau0->isEE()){
+	HoverE_Endcap_123456->Fill(dau0->hcalOverEcal());
+	DeltaEtaIn_Endcap_123456->Fill(dau0->deltaEtaSuperClusterTrackAtVtx());
+	DeltaPhiIn_Endcap_123456->Fill(dau0->deltaPhiSuperClusterTrackAtVtx());
+	SigmaIEtaIEta_Endcap_123456->Fill(dau0->sigmaIetaIeta());
+	recRelIso_Endcap_123456->Fill((dau0->dr03TkSumPt()+dau0->dr03EcalRecHitSumEt()+dau0->dr03HcalTowerSumEt())/dau0->p4().Pt());}
+	//if(fabs(dau1->eta())>eta_el_excl_up && fabs(dau1->eta()) < etaelcut){	
+	if(dau1->isEE()){
+	HoverE_Endcap_123456->Fill(dau1->hcalOverEcal());	 
+	DeltaEtaIn_Endcap_123456->Fill(dau1->deltaEtaSuperClusterTrackAtVtx());		 
+	SigmaIEtaIEta_Endcap_123456->Fill(dau1->sigmaIetaIeta());
+	recRelIso_Endcap_123456->Fill((dau1->dr03TkSumPt()+dau1->dr03EcalRecHitSumEt()+dau1->dr03HcalTowerSumEt())/dau1->p4().Pt());}
+			
+		//Jet variables	
+		JetCounter_123456->Fill(recjets.size());
+		IsoJetCounter_123456->Fill(isorecjets.size());
+	 
+		for(unsigned int i = 0; i < recjets.size(); i++){
+		RecoJetPt_123456->Fill(recjets[i]->pt());}
+		
+		for(unsigned int i = 0; i < isorecjets.size(); i++){
+		RecoIsoJetPt_123456->Fill(isorecjets[i]->pt());}
+		
+		if (isorecjets.size()){
+		recLeadIsoJetPt_123456->Fill(isorecjets[0]->pt());
+		recLeadIsoJetEta_123456->Fill(isorecjets[0]->eta());
+		}
+		
+		//Jet properties
+	
       //All jets
       if (recjets.size()){      
       for (unsigned int i = 0; i < recjets.size(); ++i){     
@@ -1879,116 +1942,116 @@ void  RecoElectron::process(const fwlite::Event& iEvent)
           DeltaRvsCharge_JetRec->Fill(recjets[i]->jetCharge(), MinDeltaRZDau<pat::Electron>(zdaughters,*recjets[i]));
           AllJetCharge->Fill(recjets[i]->jetCharge());                   
       }     
-      }  
-    
-      //Isolated jets    
-      if(isorecjets.size()){      
-      for (unsigned int i = 0; i < isorecjets.size(); ++i){      
-        DeltaRvsCharge_JetRec_Iso->Fill(isorecjets[i]->jetCharge(), MinDeltaRZDau<pat::Electron>(zdaughters,*isorecjets[i]));
-        IsoJetCharge->Fill(isorecjets[i]->jetCharge());  
-        DeltaR_IsoJet->Fill(MinDeltaRZDau<pat::Electron>(zdaughters,*isorecjets[i]));
-      
-        //Iso Jets electron-type
-        if(isorecjets[i]->jetCharge() < -0.98 || isorecjets[i]->jetCharge() > 0.98){           
-          DeltaR_IsoJet_ElType->Fill(MinDeltaRZDau<pat::Electron>(zdaughters,*isorecjets[i]));          
-          }          
-          }     
-     }
-     
-     //Not isolated jets
-     if(notisorecjets.size()){     
-      for (unsigned int i = 0; i < notisorecjets.size(); ++i){      
-          NotIsoJetCharge->Fill(notisorecjets[i]->jetCharge());        
-          DeltaR_NotIsoJet->Fill(MinDeltaRZDau<pat::Electron>(zdaughters,*notisorecjets[i]));
-          DeltaRvsCharge_JetRec_NotIso->Fill(recjets[i]->jetCharge(), MinDeltaRZDau<pat::Electron>(zdaughters,*notisorecjets[i]));        
-     }
-     }
-     
-      //Exclusive - Inclusive Histograms
-      _Jetdir->cd();
-      addHistosVsMulti(isorecjets.size(), "recJetPtIncl", " reconstructed jet p_{T} spectrum", 200, 0, 200, recJetPtVsInclMulti);
-      addHistosVsMulti(isorecjets.size(), "recJetEtaIncl", " reconstructed jet #eta spectrum", 100, -5., 5., recJetEtaVsInclMulti);
-      _Zdir->cd();
-      addHistosVsMulti(isorecjets.size(), "recZPtIncl", " reconstructed Z p_{T} spectrum", 200, 0., 200., recZPtVsInclMulti);
-      addHistosVsMulti(isorecjets.size(), "recZEtaIncl", " reconstructed Z #eta spectrum", 100, -5., 5., recZEtaVsInclMulti);
-      addHistosVsMulti(isorecjets.size(), "recZPtExcl", " reconstructed Z p_{T} spectrum", 200, 0., 200., recZPtVsExclMulti);
-      addHistosVsMulti(isorecjets.size(), "recZEtaExcl", " reconstructed Z #eta spectrum", 100, -5., 5., recZEtaVsExclMulti);
-      _Eldir->cd();
-      addHistosVsMulti(isorecjets.size(), "recEl1PtExcl", " reconstructed lead electron p_{T} spectrum", 200, 0., 200., recEl1PtVsExclMulti);
-      addHistosVsMulti(isorecjets.size(), "recEl1EtaExcl", " reconstructed lead electron #eta spectrum", 100, -5., 5., recEl1EtaVsExclMulti);
-      addHistosVsMulti(isorecjets.size(), "recEl2PtExcl", " reconstructed sec electron p_{T} spectrum", 200, 0., 200., recEl2PtVsExclMulti);
-      addHistosVsMulti(isorecjets.size(), "recEl2EtaExcl", " reconstructed sec electron #eta spectrum", 100, -5., 5., recEl2EtaVsExclMulti);     
-      addHistosVsMulti(isorecjets.size(), "recEl1PtIncl", " reconstructed lead electron p_{T} spectrum", 200, 0., 200., recEl1PtVsInclMulti);
-      addHistosVsMulti(isorecjets.size(), "recEl1EtaIncl", " reconstructed lead electron #eta spectrum", 100, -5., 5., recEl1EtaVsInclMulti);
-      addHistosVsMulti(isorecjets.size(), "recEl2PtIncl", " reconstructed sec electron p_{T} spectrum", 200, 0., 200., recEl2PtVsInclMulti);
-      addHistosVsMulti(isorecjets.size(), "recEl2EtaIncl", " reconstructed sec electron #eta spectrum", 100, -5., 5., recEl2EtaVsInclMulti);  
+      } 
 
-      //fill inclusive histograms
-      for (unsigned int i = 0; i < isorecjets.size()+1; ++i){
-        recZPtVsInclMulti[i]->Fill((*zrecHandle)[0].pt(), weight);
-        recZEtaVsInclMulti[i]->Fill((*zrecHandle)[0].eta(), weight);
-        recEl1PtVsInclMulti[i]->Fill(dau0->pt(), weight);
-        recEl2PtVsInclMulti[i]->Fill(dau1->pt(), weight);
-        recEl1EtaVsInclMulti[i]->Fill(dau0->pt(), weight);
-        recEl2EtaVsInclMulti[i]->Fill(dau1->pt(), weight);
-      }
-      
-      if (isorecjets.size()){  
-        for (unsigned int i = 0; i < isorecjets.size(); ++i){
-          recJetPtVsInclMulti[i+1]->Fill(isorecjets[i]->pt(), weight);
-          recJetEtaVsInclMulti[i+1]->Fill(isorecjets[i]->eta(), weight);
-      }
-      }
-
-      //fill exclusive histograms
-      recZPtVsExclMulti[isorecjets.size()]->Fill((*zrecHandle)[0].pt(), weight);
-      recZEtaVsExclMulti[isorecjets.size()]->Fill((*zrecHandle)[0].eta(), weight);
-      recEl1PtVsExclMulti[isorecjets.size()]->Fill(dau0->pt(), weight);
-      recEl1EtaVsExclMulti[isorecjets.size()]->Fill(dau0->eta(), weight);
-      recEl2PtVsExclMulti[isorecjets.size()]->Fill(dau1->pt(), weight);
-      recEl2EtaVsExclMulti[isorecjets.size()]->Fill(dau1->eta(), weight);
-   
-   }
-   
-   string IsoFlag, EiDFlag;
-   if(_selections=="SYM"){
-   IsoFlag="_IsoSYM";
-   EiDFlag="_EiDSYM";}
-   if(_selections=="ASYM"){
-   IsoFlag="_IsoASYM";
-   EiDFlag="_EiDASYM";}
+		//Isolated jets
+		if(isorecjets.size()){
+		for (unsigned int i = 0; i < isorecjets.size(); ++i){
+		DeltaRvsCharge_JetRec_Iso->Fill(isorecjets[i]->jetCharge(), MinDeltaRZDau<pat::Electron>(zdaughters,*isorecjets[i]));
+		IsoJetCharge->Fill(isorecjets[i]->jetCharge());  
+		DeltaR_IsoJet->Fill(MinDeltaRZDau<pat::Electron>(zdaughters,*isorecjets[i]));
+		
+		//Iso Jets electron-type
+		if(isorecjets[i]->jetCharge() < -0.98 || isorecjets[i]->jetCharge() > 0.98){
+			 DeltaR_IsoJet_ElType->Fill(MinDeltaRZDau<pat::Electron>(zdaughters,*isorecjets[i]));
+			 }
+			 }
+	}
  
-   for(int fcount = 1; fcount<7; fcount++){
-   
-   if(fcount != 6){
-   if(_RecoCutFlags[fcount+1] == IsoFlag.c_str()){   
-   bool PreIso = false;
-   for(int n = 1; n < fcount+1; n++){
-   if(RecSelected(_RecoCutFlags[n].c_str(), (*zrecHandle)[0], *triggerHandle, run)){
-   PreIso = true;
-   }else{
-   PreIso = false;
-   n = fcount+1;
-   }
-   }
-   
-   if(PreIso){    
-     recTrackIsoLead_PreIso->Fill(dau0->trackIso());
-     recEcalIsoLead_PreIso->Fill(dau0->ecalIso());
-     recHcalIsoLead_PreIso->Fill(dau0->hcalIso());
-     
-     recTrackIsoSec_PreIso->Fill(dau1->trackIso());
-     recEcalIsoSec_PreIso->Fill(dau1->ecalIso());
-     recHcalIsoSec_PreIso->Fill(dau1->hcalIso());  
-     }
-     
-     }
-     }
+	//Not isolated jets
+	if(notisorecjets.size()){ 
+		for (unsigned int i = 0; i < notisorecjets.size(); ++i){
+			 NotIsoJetCharge->Fill(notisorecjets[i]->jetCharge()); 
+			 DeltaR_NotIsoJet->Fill(MinDeltaRZDau<pat::Electron>(zdaughters,*notisorecjets[i]));
+			 DeltaRvsCharge_JetRec_NotIso->Fill(recjets[i]->jetCharge(), MinDeltaRZDau<pat::Electron>(zdaughters,*notisorecjets[i]));
+	}
+	}
+ 
+		//Exclusive - Inclusive Histograms
+		_Jetdir->cd();
+		addHistosVsMulti(isorecjets.size(), "recJetPtIncl", " reconstructed jet p_{T} spectrum", 200, 0, 200, recJetPtVsInclMulti);
+		addHistosVsMulti(isorecjets.size(), "recJetEtaIncl", " reconstructed jet #eta spectrum", 100, -5., 5., recJetEtaVsInclMulti);
+		_Zdir->cd();
+		addHistosVsMulti(isorecjets.size(), "recZPtIncl", " reconstructed Z p_{T} spectrum", 200, 0., 200., recZPtVsInclMulti);
+		addHistosVsMulti(isorecjets.size(), "recZEtaIncl", " reconstructed Z #eta spectrum", 100, -5., 5., recZEtaVsInclMulti);
+		addHistosVsMulti(isorecjets.size(), "recZPtExcl", " reconstructed Z p_{T} spectrum", 200, 0., 200., recZPtVsExclMulti);
+		addHistosVsMulti(isorecjets.size(), "recZEtaExcl", " reconstructed Z #eta spectrum", 100, -5., 5., recZEtaVsExclMulti);
+		_Eldir->cd();
+		addHistosVsMulti(isorecjets.size(), "recEl1PtExcl", " reconstructed lead electron p_{T} spectrum", 200, 0., 200., recEl1PtVsExclMulti);
+		addHistosVsMulti(isorecjets.size(), "recEl1EtaExcl", " reconstructed lead electron #eta spectrum", 100, -5., 5., recEl1EtaVsExclMulti);
+		addHistosVsMulti(isorecjets.size(), "recEl2PtExcl", " reconstructed sec electron p_{T} spectrum", 200, 0., 200., recEl2PtVsExclMulti);
+		addHistosVsMulti(isorecjets.size(), "recEl2EtaExcl", " reconstructed sec electron #eta spectrum", 100, -5., 5., recEl2EtaVsExclMulti);	
+		addHistosVsMulti(isorecjets.size(), "recEl1PtIncl", " reconstructed lead electron p_{T} spectrum", 200, 0., 200., recEl1PtVsInclMulti);
+		addHistosVsMulti(isorecjets.size(), "recEl1EtaIncl", " reconstructed lead electron #eta spectrum", 100, -5., 5., recEl1EtaVsInclMulti);
+		addHistosVsMulti(isorecjets.size(), "recEl2PtIncl", " reconstructed sec electron p_{T} spectrum", 200, 0., 200., recEl2PtVsInclMulti);
+		addHistosVsMulti(isorecjets.size(), "recEl2EtaIncl", " reconstructed sec electron #eta spectrum", 100, -5., 5., recEl2EtaVsInclMulti);  
+
+		//fill inclusive histograms
+		for (unsigned int i = 0; i < isorecjets.size()+1; ++i){
+		recZPtVsInclMulti[i]->Fill((*zrecHandle)[0].pt(), weight);
+		recZEtaVsInclMulti[i]->Fill((*zrecHandle)[0].eta(), weight);
+		recEl1PtVsInclMulti[i]->Fill(dau0->pt(), weight);
+		recEl2PtVsInclMulti[i]->Fill(dau1->pt(), weight);
+		recEl1EtaVsInclMulti[i]->Fill(dau0->pt(), weight);
+		recEl2EtaVsInclMulti[i]->Fill(dau1->pt(), weight);
+		}
+		
+		if (isorecjets.size()){  
+		for (unsigned int i = 0; i < isorecjets.size(); ++i){
+			 recJetPtVsInclMulti[i+1]->Fill(isorecjets[i]->pt(), weight);
+			 recJetEtaVsInclMulti[i+1]->Fill(isorecjets[i]->eta(), weight);
+		}
+		}
+
+		//fill exclusive histograms
+		recZPtVsExclMulti[isorecjets.size()]->Fill((*zrecHandle)[0].pt(), weight);
+		recZEtaVsExclMulti[isorecjets.size()]->Fill((*zrecHandle)[0].eta(), weight);
+		recEl1PtVsExclMulti[isorecjets.size()]->Fill(dau0->pt(), weight);
+		recEl1EtaVsExclMulti[isorecjets.size()]->Fill(dau0->eta(), weight);
+		recEl2PtVsExclMulti[isorecjets.size()]->Fill(dau1->pt(), weight);
+		recEl2EtaVsExclMulti[isorecjets.size()]->Fill(dau1->eta(), weight);
+	
+	}
+	
+	string IsoFlag, ElIDFlag;
+	if(_selections=="SYM"){
+	IsoFlag="_IsoSYM";
+	ElIDFlag="_ElIDSYM";}
+	if(_selections=="ASYM"){
+	IsoFlag="_IsoASYM";
+	ElIDFlag="_ElIDASYM";}
+ 
+	for(int fcount = 1; fcount<7; fcount++){
+	
+	if(fcount != 6){
+	if(_RecoCutFlags[fcount+1] == IsoFlag.c_str()){	
+	bool PreIso = false;
+	for(int n = 1; n < fcount+1; n++){
+	if(RecSelected(_RecoCutFlags[n].c_str(), (*zrecHandle), *triggerHandle, _run, _rho)){
+	PreIso = true;
+	}else{
+	PreIso = false;
+	n = fcount+1;
+	}
+	}
+	
+	if(PreIso){	 
+	recTrackIsoLead_PreIso->Fill(dau0->trackIso());
+	recEcalIsoLead_PreIso->Fill(dau0->ecalIso());
+	recHcalIsoLead_PreIso->Fill(dau0->hcalIso());
+	
+	recTrackIsoSec_PreIso->Fill(dau1->trackIso());
+	recEcalIsoSec_PreIso->Fill(dau1->ecalIso());
+	recHcalIsoSec_PreIso->Fill(dau1->hcalIso());  
+	}
+	
+	}
+	}
 
 } 
 
-   }
-   
+	}
+	
 }
 
 
@@ -2071,7 +2134,8 @@ void RecoElectron::finalize(){
    Report<<"Normalization factor = "<<_norm<<endl;}
    if(!_Norm || lumi==0)Report<<"Sample not normalized"<<endl;
    Report<<endl<<"Selections Type used = "<<_selections.c_str()<<endl;
-   if(_selections=="SYM")Report<<"EiD applied = "<<eID_SYM.c_str()<<endl;
+   if(_selections=="SYM")Report<<"Endcap ElID applied = "<<ElID_End_SYM.c_str()<<endl;
+   Report<<"Barrel ElID applied = "<<ElID_Bar_SYM.c_str()<<endl;
    Report<<"Selections applied:"<<endl;
    Report<<_RecoCutFlags[1].c_str()<<endl;
    Report<<_RecoCutFlags[2].c_str()<<endl;
@@ -2110,14 +2174,14 @@ void RecoElectron::finalize(){
    if(_selections=="SYM"){
    Report<<"ptelcut = "<<ptelcut<<endl;
    Report<<"etaelcut = "<<etaelcut<<endl;
-   Report<<"eta_el_excl_up = "<<eta_el_excl_up<<endl;
-   Report<<"eta_el_excl_down = "<<eta_el_excl_down<<endl;
+   //Report<<"eta_el_excl_up = "<<eta_el_excl_up<<endl;
+   //Report<<"eta_el_excl_down = "<<eta_el_excl_down<<endl;
    Report<<"zmassmin_sym = "<<zmassmin_sym<<endl;
    Report<<"zmassmax_sym = "<<zmassmax_sym<<endl;
    Report<<"dxycut = "<<dxycut<<endl;
    Report<<"ptjetmin = "<<ptjetmin<<endl;
    Report<<"etajetmax = "<<etajetmax<<endl;
-   Report<<"isocut = "<<sym_isocut<<endl;
+   Report<<"electronCombinedIsoRhoCut_SYM = "<<electronCombinedIsoRhoCut_SYM<<endl;
    if(JetIDReq==true){
    Report<<endl<<"Jet ID Required"<<endl;
    }else{
@@ -2126,25 +2190,27 @@ void RecoElectron::finalize(){
  
    Report<<"SYM_TAG_ptelcut = "<<SYM_TAG_ptelcut<<endl;
    Report<<"SYM_TAG_etaelcut = "<<SYM_TAG_etaelcut<<endl;
-   Report<<"SYM_TAG_eta_el_excl_up = "<<SYM_TAG_eta_el_excl_up<<endl;
-   Report<<"SYM_TAG_eta_el_excl_down = "<<SYM_TAG_eta_el_excl_down<<endl;
-   Report<<"SYM_TAG_minnhit = "<<SYM_TAG_minnhit<<endl;
+   //Report<<"SYM_TAG_eta_el_excl_up = "<<SYM_TAG_eta_el_excl_up<<endl;
+   //Report<<"SYM_TAG_eta_el_excl_down = "<<SYM_TAG_eta_el_excl_down<<endl;
+   Report<<"SYM_TAG_minVaHit = "<<SYM_TAG_minVaHit<<endl;
    Report<<"SYM_TAG_maxchi2 = "<<SYM_TAG_maxchi2<<endl;
    Report<<"SYM_TAG_dxycut = "<<SYM_TAG_dxycut<<endl;
-   Report<<"SYM_TAG_isocut = "<<SYM_TAG_isocut<<endl;
-   Report<<"SYM_TagEiD = "<<SYM_TagEiD.c_str()<<endl;
+   Report<<"SYM_TAG_electronCombinedIsoRhoCut = "<<SYM_TAG_electronCombinedIsoRhoCut<<endl;
+   //Report<<"SYM_TAG_ElID = "<<SYM_TAG_ElID.c_str()<<endl;
    }
    
    if(_selections=="ASYM"){
    Report<<"ptelcut0 = "<<ptelcut0<<endl;
    Report<<"ptelcut1 = "<<ptelcut1<<endl;
    Report<<"etaelcut = "<<etaelcut<<endl;
-   Report<<"eta_el_excl_up = "<<eta_el_excl_up<<endl;
-   Report<<"eta_el_excl_down = "<<eta_el_excl_down<<endl;
+   //Report<<"eta_el_excl_up = "<<eta_el_excl_up<<endl;
+   //Report<<"eta_el_excl_down = "<<eta_el_excl_down<<endl;
    Report<<"zmassmin_asym = "<<zmassmin_asym<<endl;
    Report<<"zmassmax_asym = "<<zmassmax_asym<<endl<<endl;
-   Report<<"eID_ASYM0 = "<<eID_ASYM0.c_str()<<endl;
-   Report<<"eID_ASYM1 = "<<eID_ASYM1.c_str()<<endl<<endl;
+   Report<<"ASYM0 Endcaps ElID applied = "<<ElID_End_ASYM0.c_str()<<endl;
+   Report<<"ASYM0 Barrel ElID applied = "<<ElID_Bar_ASYM0.c_str()<<endl;
+   Report<<"ASYM1 Endcaps ElID applied = "<<ElID_End_ASYM1.c_str()<<endl;
+   Report<<"ASYM1 Barrel ElID applied = "<<ElID_Bar_ASYM1.c_str()<<endl;
    Report<<"dxycut = "<<dxycut<<endl<<endl;
    Report<<"ptjetmin = "<<ptjetmin<<endl;
    Report<<"etajetmax = "<<etajetmax<<endl;
@@ -2156,22 +2222,22 @@ void RecoElectron::finalize(){
    
    Report<<"ASYM0_TAG_ptelcut = "<<ASYM0_TAG_ptelcut<<endl;
    Report<<"ASYM0_TAG_etaelcut = "<<ASYM0_TAG_etaelcut<<endl;
-   Report<<"ASYM0_TAG_eta_el_excl_up = "<<ASYM0_TAG_eta_el_excl_up<<endl;
-   Report<<"ASYM0_TAG_eta_el_excl_down = "<<ASYM0_TAG_eta_el_excl_down<<endl;
-   Report<<"ASYM0_TAG_minnhit = "<<ASYM0_TAG_minnhit<<endl;
+   //Report<<"ASYM0_TAG_eta_el_excl_up = "<<ASYM0_TAG_eta_el_excl_up<<endl;
+   //Report<<"ASYM0_TAG_eta_el_excl_down = "<<ASYM0_TAG_eta_el_excl_down<<endl;
+   Report<<"ASYM0_TAG_minVaHit = "<<ASYM0_TAG_minVaHit<<endl;
    Report<<"ASYM0_TAG_maxchi2 = "<<ASYM0_TAG_maxchi2<<endl;
    Report<<"ASYM0_TAG_dxycut = "<<ASYM0_TAG_dxycut<<endl;
-   Report<<"ASYM0_TAG_isocut = "<<ASYM0_TAG_isocut<<endl;
-   Report<<"ASYM0_TagEiD = "<<ASYM0_TagEiD.c_str()<<endl<<endl;
+   Report<<"ASYM0_TAG_electronCombinedIsoRhoCut = "<<ASYM0_TAG_electronCombinedIsoRhoCut<<endl;
+   //Report<<"ASYM0_TAG_ElID = "<<ASYM0_TAG_ElID.c_str()<<endl<<endl;
    Report<<"ASYM1_TAG_ptelcut = "<<ASYM1_TAG_ptelcut<<endl;
    Report<<"ASYM1_TAG_etaelcut = "<<ASYM1_TAG_etaelcut<<endl;
-   Report<<"ASYM1_TAG_eta_el_excl_up = "<<ASYM1_TAG_eta_el_excl_up<<endl;
-   Report<<"ASYM1_TAG_eta_el_excl_down = "<<ASYM1_TAG_eta_el_excl_down<<endl;
-   Report<<"ASYM1_TAG_minnhit = "<<ASYM1_TAG_minnhit<<endl;
+   //Report<<"ASYM1_TAG_eta_el_excl_up = "<<ASYM1_TAG_eta_el_excl_up<<endl;
+   //Report<<"ASYM1_TAG_eta_el_excl_down = "<<ASYM1_TAG_eta_el_excl_down<<endl;
+   Report<<"ASYM1_TAG_minVaHit = "<<ASYM1_TAG_minVaHit<<endl;
    Report<<"ASYM1_TAG_maxchi2 = "<<ASYM1_TAG_maxchi2<<endl;
    Report<<"ASYM1_TAG_dxycut = "<<ASYM1_TAG_dxycut<<endl;
-   Report<<"ASYM1_TAG_isocut = "<<ASYM1_TAG_isocut<<endl; 
-   Report<<"ASYM1_TagEiD = "<<ASYM1_TagEiD.c_str()<<endl;
+   Report<<"ASYM1_TAG_electronCombinedIsoRhoCut = "<<ASYM1_TAG_electronCombinedIsoRhoCut<<endl; 
+   //Report<<"ASYM1_TAG_ElID = "<<ASYM1_TAG_ElID.c_str()<<endl;
    }
    
    Report.close();

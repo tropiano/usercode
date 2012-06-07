@@ -12,56 +12,55 @@
 
 
 class TagAndProbeFillerMuon {
-public :
 
-    TagAndProbeFillerMuon(TDirectory* output, std::string name, int nbins, double xmin, double xmax,
-                const std::vector<bool (*)(const reco::Candidate&, int run, double rho)>& tag_cuts,
-                const std::vector<bool (*)(const reco::Candidate&, int run, double rho)>& probe_cuts,
-                const std::vector<bool (*)(const reco::Candidate&, int run, double rho)>& passprobe_cuts,
-                std::string tpflag="",
-                bool onecombinationonly=false);
+	public :
+		TagAndProbeFillerMuon(TDirectory* output, std::string name, int nbins, double xmin, double xmax,
+		const std::vector<bool (*)(const reco::Candidate&, int run, double rho)>& tag_cuts,
+		const std::vector<bool (*)(const reco::Candidate&, int run, double rho)>& probe_cuts,
+		const std::vector<bool (*)(const reco::Candidate&, int run, double rho)>& passprobe_cuts,
+		std::string tpflag="",
+		bool onecombinationonly=false);
 
-    ~TagAndProbeFillerMuon();
+		~TagAndProbeFillerMuon();
 
-    //void fill(const reco::Candidate& Z, int run=0, double rho=0, double x=0., double w = 1., double pT1=0., double pT2=0., double pT3=0.);
-    
-    void fill(const reco::Candidate& Z, int run=0, double rho=0, double x=0., double w = 1., double pt[]= 0, double eta=-1);
+		//void fill(const reco::Candidate& Z, int run=0, double rho=0, double x=0., double w = 1., double pT1=0., double pT2=0., double pT3=0.);
+		void fill(const reco::Candidate& Z, int run=0, double rho=0, double x=0., double w = 1., double pt[]= 0, double eta=-1);
 
-    void finalize() const;
+		void finalize() const;
 
 
-private:  
-  bool tag(const reco::Candidate& muon, int run, double rho);
-  void probe(const reco::Candidate& muon, double mass, double x, double w, int run, double rho);
-  bool applyCuts(const reco::Candidate& cand, int run, double rho, const std::vector<bool (*)(const reco::Candidate&, int run, double rho)>& cuts);
+	private:
+		bool tag(const reco::Candidate& muon, int run, double rho);
+		void probe(const reco::Candidate& muon, double mass, double x, double w, int run, double rho);
+		bool applyCuts(const reco::Candidate& cand, int run, double rho, const std::vector<bool (*)(const reco::Candidate&, int run, double rho)>& cuts);
 
-  TDirectory* _output;
-  std::string _name;
-  TH1D* _numerator;
-  TH1D* _denominator;
+		TDirectory* _output;
+		std::string _name;
+		TH1D* _numerator;
+		TH1D* _denominator;
 
-  std::vector<TH1D*> _v_mass_tagprobe;
-  std::vector<TH1D*> _v_mass_tagpassprobe;
+		std::vector<TH1D*> _v_mass_tagprobe;
+		std::vector<TH1D*> _v_mass_tagpassprobe;
 
-  TTree* _rootree;
-  
-  double _mass;
-  double _bin;
-  double _probe, _weight;
-  
-  double _ptBinTP[10];
-  double _eta;
-  
-  int _passprobe;
-  std::vector<bool (*)(const reco::Candidate&, int run, double rho)> _tag_cuts;
-  std::vector<bool (*)(const reco::Candidate&, int run, double rho)> _probe_cuts;
-  std::vector<bool (*)(const reco::Candidate&, int run, double rho)> _passprobe_cuts;
-  
-  std::string _tpflag;
-  bool _onecombination;
-  int _run;
-  double _rho;
-  
+		TTree* _rootree;
+		
+		double _mass;
+		double _bin;
+		double _probe, _weight;
+		
+		double _ptBinTP[10];
+		double _eta;
+		
+		int _passprobe;
+		std::vector<bool (*)(const reco::Candidate&, int run, double rho)> _tag_cuts;
+		std::vector<bool (*)(const reco::Candidate&, int run, double rho)> _probe_cuts;
+		std::vector<bool (*)(const reco::Candidate&, int run, double rho)> _passprobe_cuts;
+		
+		std::string _tpflag;
+		bool _onecombination;
+		int _run;
+		double _rho;
+		
 };
 
 #endif

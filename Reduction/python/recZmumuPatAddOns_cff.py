@@ -1,3 +1,9 @@
+####################
+# Customization
+####################
+isMC = True
+####################
+
 import FWCore.ParameterSet.Config as cms
 
 #add user data
@@ -33,15 +39,16 @@ selectedMuons = selectedPatMuons.clone()
 selectedMuons.src = cms.InputTag("patMuons")
 selectedMuons.cut = cms.string("pt > 15. & abs(eta) < 3. ")
 
-# Muon MC Matcher
-from PhysicsTools.PatAlgos.mcMatchLayer0.muonMatch_cfi import *
-muonMatch.src = cms.InputTag("muons") # RECO objects to match
-muonMatch.matched = cms.InputTag("genParticles")   # mc-truth particle collection
-muonMatch.mcStatus = cms.vint32(1)
+if isMC == True:
+	# Muon MC Matcher
+	from PhysicsTools.PatAlgos.mcMatchLayer0.muonMatch_cfi import *
+	muonMatch.src = cms.InputTag("muons") # RECO objects to match
+	muonMatch.matched = cms.InputTag("genParticles")   # mc-truth particle collection
+	muonMatch.mcStatus = cms.vint32(1)
 
-selectedMuons.addGenMatch = cms.bool(True)
-selectedMuons.embedGenMatch = cms.bool(True)
-selectedMuons.genParticleMatch = cms.InputTag("muonMatch")
+	selectedMuons.addGenMatch = cms.bool(True)
+	selectedMuons.embedGenMatch = cms.bool(True)
+	selectedMuons.genParticleMatch = cms.InputTag("muonMatch")
 
 # new class of selected Muons
 selectedMuons1 = cms.EDFilter("LargestPtCandViewSelector",
@@ -57,15 +64,25 @@ zmumurec = cms.EDProducer('CandViewCombiner',
   roles = cms.vstring('mu1', 'mu2')
 )
 
-zmumurecSameCharge = cms.EDProducer('CandViewCombiner',
 #both ++ and -- in the same collection
+zmumurecSameChargePlus = cms.EDProducer('CandViewCombiner',
   decay = cms.string('selectedMuons1@+ selectedMuons1@+'),
   cut   = cms.string('60 < mass < 120'),
-  name  = cms.string('Zmumu_samecharge'),
+  name  = cms.string('Zmumu_samechargeplus'),
   roles = cms.vstring('mu1', 'mu2')
 )
 
-zmumurecSequence = cms.Sequence(muonMatch*selectedMuons*(selectedMuons1*(zmumurec + zmumurecSameCharge)))
+zmumurecSameChargeMinus = cms.EDProducer('CandViewCombiner',
+  decay = cms.string('selectedMuons1@- selectedMuons1@-'),
+  cut   = cms.string('60 < mass < 120'),
+  name  = cms.string('Zmumu_samechargeminus'),
+  roles = cms.vstring('mu1', 'mu2')
+)
+
+if isMC == True:
+	zmumurecSequence = cms.Sequence(muonMatch*selectedMuons*(selectedMuons1*(zmumurec + zmumurecSameChargePlus + zmumurecSameChargeMinus)))
+else:
+	zmumurecSequence = cms.Sequence(selectedMuons*(selectedMuons1*(zmumurec + zmumurecSameChargePlus + zmumurecSameChargeMinus)))
 
 zmumurecEventContent = [
   'keep *_selectedMuons_*_*',

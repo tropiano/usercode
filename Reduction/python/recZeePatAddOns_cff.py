@@ -1,63 +1,65 @@
+####################
+# Customization
+####################
+isMC = False
+####################
+
 import FWCore.ParameterSet.Config as cms
 
-##select muons according to these criteria
-import PhysicsTools.PatAlgos.selectionLayer1.electronSelector_cfi
-selectedElectrons = PhysicsTools.PatAlgos.selectionLayer1.electronSelector_cfi.selectedPatElectrons.clone()
+##select electrons according to these criteria
+
+from PhysicsTools.PatAlgos.selectionLayer1.electronSelector_cfi import selectedPatElectrons
+selectedElectrons = selectedPatElectrons.clone()
 selectedElectrons.src = cms.InputTag("patElectrons")
-#selectedElectrons.cut = cms.string("pt > 20. & abs(eta) < 2.4 & isGood('GlobalElectronPromptTight') & innerTrack().found()>=11 & abs(globalTrack().d0())<0.2 & (trackIso()+caloIso()+ecalIso())/pt<0.1")
-selectedElectrons.cut = cms.string("pt > 10. & abs(eta) < 3.")
+selectedElectrons.cut = cms.string("pt > 10. & abs(eta) < 3. ")
 
+if isMC == True:
+	# Electron MC Matcher
+	from PhysicsTools.PatAlgos.mcMatchLayer0.electronMatch_cfi import *
+	electronMatch.src = cms.InputTag("gsfElectrons") # RECO objects to match
+	electronMatch.matched = cms.InputTag("genParticles")   # mc-truth particle collection
+	electronMatch.mcStatus = cms.vint32(1)
 
+	selectedElectrons.addGenMatch = cms.bool(True)
+	selectedElectrons.embedGenMatch = cms.bool(True)
+	selectedElectrons.genParticleMatch = cms.InputTag("electronMatch")
+
+# new class of selected Electrons
+selectedElectrons1 = cms.EDFilter("LargestPtCandViewSelector",
+  src = cms.InputTag("selectedElectrons"),
+  maxNumber = cms.uint32(2)
+)
+ 
 #Z candidate combiner
-# zeerec = cms.EDFilter('CandViewShallowCloneCombiner',
-#  decay = cms.string('selectedElectrons@+ selectedElectrons@-'),
-#  cut   = cms.string('50 < mass < 130'),
-#  name  = cms.string('Zeerec'),
-#  roles = cms.vstring('e1', 'e2')
-#)
-#zeerecSameChargePlus = cms.EDFilter('CandViewShallowCloneCombiner',
-#  decay = cms.string('selectedElectrons@+ selectedElectrons@+'),
-#  cut   = cms.string('50 < mass < 130'),
-#  name  = cms.string('Zeerec_samechargeplus'),
-#  roles = cms.vstring('e1', 'e2')
-#)
-
-#zeerecSameChargeMinus = cms.EDFilter('CandViewShallowCloneCombiner',
-#  decay = cms.string('selectedElectrons@- selectedElectrons@-'),
-#  cut   = cms.string('50 < mass < 130'),
-#  name  = cms.string('Zeerec_samechargeminus'),
-#  roles = cms.vstring('e1', 'e2')
-#)
-
-
-
-
 zeerec = cms.EDProducer('CandViewCombiner',
-  decay = cms.string('selectedElectrons@+ selectedElectrons@-'),
-  cut   = cms.string('50 < mass < 130'),
-  name  = cms.string('Zeerec'),
+  decay = cms.string('selectedElectrons1@+ selectedElectrons1@-'),
+  cut   = cms.string('60 < mass < 120'),
+  name  = cms.string('Zee'),
   roles = cms.vstring('e1', 'e2')
 )
 
-
+#both ++ and -- in the same collection
 zeerecSameChargePlus = cms.EDProducer('CandViewCombiner',
-  decay = cms.string('selectedElectrons@+ selectedElectrons@+'),
-  cut   = cms.string('50 < mass < 130'),
-  name  = cms.string('Zeerec_samechargeplus'),
+  decay = cms.string('selectedElectrons1@+ selectedElectrons1@+'),
+  cut   = cms.string('60 < mass < 120'),
+  name  = cms.string('Zee_samechargeplus'),
   roles = cms.vstring('e1', 'e2')
 )
 
 zeerecSameChargeMinus = cms.EDProducer('CandViewCombiner',
-  decay = cms.string('selectedElectrons@- selectedElectrons@-'),
-  cut   = cms.string('50 < mass < 130'),
-  name  = cms.string('Zeerec_samechargeminus'),
+  decay = cms.string('selectedElectrons1@- selectedElectrons1@-'),
+  cut   = cms.string('60 < mass < 120'),
+  name  = cms.string('Zee_samechargeminus'),
   roles = cms.vstring('e1', 'e2')
 )
 
-
-zeerecSequence = cms.Sequence(selectedElectrons * (zeerec + zeerecSameChargePlus + zeerecSameChargeMinus))
+if isMC == True:
+	zeerecSequence = cms.Sequence(electronMatch * selectedElectrons * (selectedElectrons1 * (zeerec + zeerecSameChargePlus + zeerecSameChargeMinus)))
+else:
+	zeerecSequence = cms.Sequence(selectedElectrons * (selectedElectrons1 * (zeerec + zeerecSameChargePlus + zeerecSameChargeMinus)))
 
 zeerecEventContent = [
   'keep *_selectedElectrons_*_*',
   'keep *_zeerec*_*_*'
 ]
+

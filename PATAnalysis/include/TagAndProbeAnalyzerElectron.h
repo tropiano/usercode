@@ -17,39 +17,38 @@
 
 
 class TagAndProbeAnalyzerElectron {
-public :
 
-    TagAndProbeAnalyzerElectron(TDirectory* input, TFile* output, TDirectory* sec_input, std::string name, bool performfits=true, TFile* training_signal=0, TFile* training_background=0);
+	public :
+		TagAndProbeAnalyzerElectron(TDirectory* input, TFile* output, TDirectory* sec_input, std::string name, bool performfits=true, TFile* training_signal=0, TFile* training_background=0);
+		~TagAndProbeAnalyzerElectron();
 
-    ~TagAndProbeAnalyzerElectron();
+		void analyze(unsigned int nbins, std::string option="signal");
 
-    void analyze(unsigned int nbins, std::string option="signal");
-    
-    TGraphAsymmErrors createDoubleEfficiency(const TGraphAsymmErrors& single) const;
-    
-    TGraphAsymmErrors createAsymmCutEfficiency(const TGraphAsymmErrors& single0, const TGraphAsymmErrors& single1) const;
+		TGraphAsymmErrors createDoubleEfficiency(const TGraphAsymmErrors& single) const;
 
-private:  
-  std::pair<RooFitResult*, RooRealVar*> fit(RooAbsData* data, const char* name, std::string option = "signal", unsigned int bin=0) ;
-  bool _initialized;
-  TDirectory* _input;
-  TDirectory* _sec_input;
-  TFile* _output;
-  std::string _name;
-  std::string _dataset;
-  bool _performfits;
-  TFile *_training_signal, *_training_background;
-  RooDataSet* _rootree; 
-  RooDataSet* _rootree1;
-  //tree vars
-  RooRealVar _mass;
-  RooRealVar _bin;
-  RooRealVar _probe, _weight;
-  RooCategory _passprobe_cat;
-  RooArgSet* _argset;
-  TDirectory *_YieldPlots;
-  TGraphAsymmErrors *_SignalYield_0, *_SignalYield_1, *_BackgroundYield_0, *_BackgroundYield_1;
-  
+		TGraphAsymmErrors createAsymmCutEfficiency(const TGraphAsymmErrors& single0, const TGraphAsymmErrors& single1) const;
+
+	private:
+		std::pair<RooFitResult*, RooRealVar*> fit(RooAbsData* data, const char* name, std::string option = "signal", unsigned int bin=0) ;
+		bool _initialized;
+		TDirectory* _input;
+		TDirectory* _sec_input;
+		TFile* _output;
+		std::string _name;
+		std::string _dataset;
+		bool _performfits;
+		TFile *_training_signal, *_training_background;
+		RooDataSet* _rootree; 
+		RooDataSet* _rootree1;
+		//tree vars
+		RooRealVar _mass;
+		RooRealVar _bin;
+		RooRealVar _probe, _weight;
+		RooCategory _passprobe_cat;
+		RooArgSet* _argset;
+		TDirectory *_YieldPlots;
+		TGraphAsymmErrors *_SignalYield_0, *_SignalYield_1, *_BackgroundYield_0, *_BackgroundYield_1;
+
 };
 
 #endif

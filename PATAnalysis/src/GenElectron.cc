@@ -171,15 +171,15 @@ void  GenElectron::process(const fwlite::Event& iEvent)
    fwlite::Handle<std::vector<pat::Electron> > electronHandle;
    electronHandle.getByLabel(iEvent, "selectedElectrons");
    
-   std::vector<const reco::Candidate*> zdaughters;
-   if(zgenHandle->size())zdaughters = ZGENDaughters((*zgenHandle)[0]);
+   std::vector<const pat::Electron*> zdaughters;
+   if(zgenHandle->size())zdaughters = ZGENDaughters((*zgenHandle));
    
-   std::vector<const reco::GenJet*> genjets = GetJets_GenJets<reco::GenJet>(*jetgenHandle);   
+   std::vector<const reco::GenJet*> genjets = GetJets_noJetID<reco::GenJet>(*jetgenHandle);   
    std::vector<const reco::GenJet*> isogenjets;
  
    if(zdaughters.size()){
    for(unsigned int i = 0; i < genjets.size(); i++){
-   if(IsoJet<reco::Candidate>(zdaughters,*genjets[i]))isogenjets.push_back(genjets[i]);}
+   if(IsoJet<pat::Electron>(zdaughters,*genjets[i]))isogenjets.push_back(genjets[i]);}
    }else if(!zdaughters.size()){
    for(unsigned int i = 0; i < genjets.size(); i++)isogenjets.push_back(genjets[i]);}
    
@@ -196,7 +196,7 @@ void  GenElectron::process(const fwlite::Event& iEvent)
      }
      
    //Events with a selected GEN Zee - NO Acceptance cuts applied
-   if(GenSelected((*zgenHandle)[0], _selections)&&zdaughters.size()!=0){
+   if(GenSelected((*zgenHandle), _selections)&&zdaughters.size()!=0){
    
       genPtZ->Fill((*zgenHandle)[0].pt(), weight);
       genEtaZ->Fill((*zgenHandle)[0].eta(), weight);
@@ -222,7 +222,7 @@ void  GenElectron::process(const fwlite::Event& iEvent)
    
 
    //Events with a selected GEN Zee in Acceptance
-   if (GenSelectedInAcceptance((*zgenHandle)[0], _selections)&&zdaughters.size()!=0){
+   if (GenSelectedInAcceptance((*zgenHandle), _selections)&&zdaughters.size()!=0){
    
       genPtZ_Acc->Fill((*zgenHandle)[0].pt(), weight);
       genEtaZ_Acc->Fill((*zgenHandle)[0].eta(), weight);
@@ -247,7 +247,7 @@ void  GenElectron::process(const fwlite::Event& iEvent)
       
       for(unsigned int i = 0; i < genjets.size(); i++){
       GenJetPt_Acc->Fill(genjets[i]->pt());
-      JetMinDeltaRZDau_GEN->Fill(MinDeltaRZDau<reco::Candidate>(zdaughters,*genjets[i]));
+      JetMinDeltaRZDau_GEN->Fill(MinDeltaRZDau<pat::Electron>(zdaughters,*genjets[i]));
       }
       
       for(unsigned int i = 0; i < isogenjets.size(); i++){

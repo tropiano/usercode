@@ -5,7 +5,7 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 # Customization
 ####################
 
-isMC = True       # True: MC, False: Data
+isMC = True       # True: MC, False: Data - To set in recZmumuPatAddOns_cff.py too!
 MCSkimm = False    # True: MC Skimming (no signal!)
 DataSkimm = True   # True: Data Skimming (standard configuration)
 

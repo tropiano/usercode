@@ -101,6 +101,8 @@ private:
   double _isocut;
 
   Float_t _weight;
+
+  double rho;
   
   double _targetLumi;
   

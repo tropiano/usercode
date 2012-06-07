@@ -22,7 +22,7 @@
     <use   name="CondFormats/JetMETObjects"/>
     <lib   name="Proof"/>
   </bin>
-  <bin   name="zeetpana.exe" file="zeetpana.cc">
+  <bin   name="zeetp.exe" file="zeetp.cc">
     <use   name="rootphysics"/>
     <use   name="FWCore/FWLite"/>
     <use   name="FWCore/Framework"/>
