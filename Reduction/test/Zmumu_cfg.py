@@ -10,12 +10,13 @@ MCSkimm = False    # True: MC Skimming (no signal!)
 DataSkimm = True   # True: Data Skimming (standard configuration)
 
 nameSource = [ 'file:input_DYJetsToLL_M50_Fall11.root'          # Input file name
+               #'file:input_DYJetsToLL_M50_Summer11.root'
                #'file:input_DYtoMuMu_M20_Fall11.root'
                #'file:input_dati2011.root'
              ] 
 
 numEventsToRun = -1                    # (e.g. -1 to run on all events)
-nameOutput = 'DYJetsToLL_M_50.root'
+nameOutput = 'DYJetsToLL_M_50_Fall11_NO13_NO15.root'
              #'DYToMuMu_M_20_Summer11.root'
              #'TTJets.root' 
              #'WJetsToLNu.root'

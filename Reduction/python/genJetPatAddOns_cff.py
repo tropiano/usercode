@@ -13,7 +13,7 @@ GenParticlesNoMuMufromZ = cms.EDProducer('InputGenJetsParticleSelector',
                src = cms.InputTag('genParticles'),
                partonicFinalState = cms.bool(False),  
                excludeResonances = cms.bool(True), 
-               excludeFromResonancePids = cms.vuint32(13),
+               excludeFromResonancePids = cms.vuint32(13,15),
 #               excludeFromResonancePids = cms.vuint32(0),
                tausAsJets = cms.bool(False),
                ignoreParticleIDs = cms.vuint32(1000022, 2000012, 2000014,
@@ -51,7 +51,7 @@ GenParticlesStatus3NoMuMufromZ = cms.EDProducer('NewGenJetsParticleSelector',
                src = cms.InputTag("genParticles"),
                partonicFinalState = cms.bool(False),  
                excludeResonances = cms.bool(True), 
-               excludeFromResonancePids = cms.vuint32(13),
+               excludeFromResonancePids = cms.vuint32(13,15),
 #               excludeFromResonancePids = cms.vuint32(0),
                tausAsJets = cms.bool(False),
                ignoreParticleIDs = cms.vuint32(1000022, 2000012, 2000014,
@@ -61,7 +61,7 @@ GenParticlesStatus3NoMuMufromZ = cms.EDProducer('NewGenJetsParticleSelector',
                checkForStatus3Mother = cms.PSet(
                  motherIds=cms.vuint32(13),
                  excludeSameFlavourDaughterOnly=cms.bool(True)),
-               reverseAllSelections  = cms.bool(True)  
+               reverseAllSelections  = cms.bool(False)  
 )
 
 from RecoJets.JetProducers.GenJetParameters_cfi import *

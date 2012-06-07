@@ -66,16 +66,23 @@ int PreDefName, ProcEvents;
   ProcEvents=atoi(argv[2]);
 
   //List of Source Files   
-  string SourceFilesDir			= "/data/sandro/Analisi/rel_CMSSW_4_2_5_TeP/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/SourceFilesMuons/";
+
+  string SourceFilesDir			= "/data/sandro/Analisi/rel_CMSSW_4_2_5_AN/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/SourceFilesMuons/";
 
   string Data2011 			= "data.list";
-//  string DYtoLL_All 			= "DYtoLL_All_Fall11.list";  
-  string DYtoLL_All 			= "DYtoLL_All_Summer11.list";  
+
+  string DYtoLL_All 			= "DYtoLL_All_Fall11_FSR_NO13_NO15.list";
+//string DYtoLL_All 			= "DYtoLL_All_Fall11_FSR_NO13_SI15.list";
+//string DYtoLL_All 			= "DYtoLL_All_Fall11.list";  
+//string DYtoLL_All 			= "DYtoLL_All_Summer11.list";  
+
   string TTJets_All			= "TTJets_All.list";
   string WJetsToLNu_All			= "WJetsToLNu_All.list";
   string WWJetsTo2L2Nu_All		= "WWJetsTo2L2Nu_All.list";
   string QCD_Pt20MuEnPt10_All		= "QCD_Pt20MuEnPt10_All.list";
-  string DYtoMuMu_All			= "DYtoMuMu_All.list";
+
+  string DYtoMuMu_All			= "DYtoMuMu_All_preFSRstudies.list";
+
   
   string DYtoLL_Train 			= "DYtoLL_Train.list";
   string TTJets_Train			= "TTJets_Train.list";
@@ -92,18 +99,24 @@ int PreDefName, ProcEvents;
   string Test 		        	= "Test.list";
   sample = "data";
  
+
   //tag to recognize the analysis in the output file 
-  string analysis = "_TeP"; 
+  string analysis = "_Fall11_DeltaR_0e5_pt50_FSR_NO13_NO15"; 
+
 
   //Path of PATAnalysis dir - DO NOT FORGET THE SLASH AT THE END OF THE PATH
-  string path="/data/sandro/Analisi/rel_CMSSW_4_2_5_TeP/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/AnalysisMuons/";
+
+  string path="/data/sandro/Analisi/rel_CMSSW_4_2_5_AN/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/AnalysisMuons/";
+
   
   //Modules
+
   bool GEN    = false;
   bool RECO   = false;
-  bool EFF    = true;
+  bool EFF    = false;
   bool NTUPLE = false;
-  bool DELTAR = false;
+  bool DELTAR = true;
+
   
   //Ntuple - "zcand" = saves only z candidates; "acc" = save only events with Z in the acceptance; "all" = saves all the events  
   string NtupleFill = "all";
@@ -127,12 +140,14 @@ int PreDefName, ProcEvents;
   string JECUncFilePath = "/data/sfrosali/Zjets/Commit/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/JECUncertainty/Jec10V1_Uncertainty_AK5PF.txt";
   
   //Normalization
-  string Norm = "True";
+  string Norm = "False";
   double targetLumi = 100.; //pb-1
   if(PreDefName==0) Norm="False";   // Do not normalize for data
   
   //Number of CPUs
-  int CPU = 4;
+
+  int CPU = 7;
+
   
   //Log (non funziona)
   bool Log = false;
@@ -364,7 +379,9 @@ int PreDefName, ProcEvents;
   AutoLibraryLoader::enable();
   gSystem->Load("libFirenzePATAnalysis");
 
-  p->Exec(".x /data/sandro/Analisi/rel_CMSSW_4_2_5_TeP/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/remote.C");
+
+  p->Exec(".x /data/sandro/Analisi/rel_CMSSW_4_2_5_AN/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/remote.C");
+
 
   if(PreDefName>-1 || PreDefName==-9){
   TDSet* SignalDS = getDS(sourceList.c_str());
