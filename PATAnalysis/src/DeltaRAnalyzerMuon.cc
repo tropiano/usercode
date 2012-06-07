@@ -405,7 +405,11 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
  
    //----richiamo la GEN Z----
    fwlite::Handle<std::vector<reco::CompositeCandidate> > zHandlegen;
+   //zHandlegen.getByLabel(iEvent, "zmumugenfull");
    zHandlegen.getByLabel(iEvent, "zmumugen");
+   //seleziono un vettore di 2 muoni figli della Z GEN ordinati in pt
+   std::vector<const reco::Candidate*> muonsfromZgen;
+   if(zHandlegen->size()) muonsfromZgen = ZGENDaughters(*zHandlegen);
 
    //----richiamo la GenParticles per il MC Matching----
    fwlite::Handle<reco::GenParticleCollection> genParticles;
@@ -413,8 +417,11 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
    
    //----richiamo i GEN Jets----
    fwlite::Handle<std::vector<reco::GenJet> > jetHandler;
+
    //jetHandler.getByLabel(iEvent, "selectedGenJetsOld"); //jets senza Mu PG
-   jetHandler.getByLabel(iEvent, "selectedGenJetsNoMuMufromZ");  //jets senza Mu a mano
+   //jetHandler.getByLabel(iEvent, "selectedGenJetsNoMuMufromZ");  //jets senza Mu a mano (analisi precedente)
+   jetHandler.getByLabel(iEvent, "selectedGenJetsStatus3NoMuMufromZ");  //jets senza Mu a mano ( No Status 3 mother)
+
    //seleziono un vettore di GEN Jets per Accettanza
    std::vector<const reco::GenJet*> genjetsr = GetJets_noJetID<reco::GenJet>(*jetHandler); 
 
@@ -481,6 +488,7 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
    _dir1c->cd("-");
    _dir1->cd("-");
    _dir->cd("-");
+
 
    _dir->cd();
    _dir2->cd();
@@ -558,7 +566,8 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
    _dir2->cd("-");
    _dir->cd("-");
 
-   double DeltaR = 0.0;
+   double DeltaR = 0.5;
+
 
 	//qui apro l'if con le condizioni su Z e muoni
 	if (GenSelectedInAcceptance(*zHandlegen, _selections) &&
@@ -581,7 +590,8 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 		for (unsigned int a = 0; a < 2 ; ++a) {
 			genMuPt[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(a))->pt());
 			genMuEta[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(a))->eta());
-			if(nVertices <=8){
+
+/*analisi veloce			if(nVertices <=8){
 				genMuPt_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(a))->pt());
 				genMuEta_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(a))->eta());
 			}
@@ -589,6 +599,7 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 				genMuPt_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(a))->pt());
 				genMuEta_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(a))->eta());
 			}
+*/
 
 		}
 
@@ -627,7 +638,8 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 				genMuPtinDeltaR[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->pt());
 				genMuEtainDeltaR[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->eta());
 
-				if(nVertices <=8){
+
+/*analisi veloce				if(nVertices <=8){
 					genMuPtinDeltaR_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->pt());
 					genMuEtainDeltaR_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->eta());
 				}
@@ -635,6 +647,7 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 					genMuPtinDeltaR_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->pt());
 					genMuEtainDeltaR_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->eta());
 				}					
+*/
 
 				if ((*muonHandle).size() !=0){
         				for (unsigned int y = 0; y < (*muonHandle).size(); ++y){
@@ -650,7 +663,8 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 */
 							recMuSiRefPt->Fill((*muonHandle)[y].pt());
 							recMuSiRefEta->Fill((*muonHandle)[y].eta());
-							if(nVertices <=8){
+
+/*analisi veloce							if(nVertices <=8){
 	 							recMuSiRefPt_VertWindA->Fill((*muonHandle)[y].pt());
 								recMuSiRefEta_VertWindA->Fill((*muonHandle)[y].eta());
 							}
@@ -658,7 +672,8 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 	 							recMuSiRefPt_VertWindB->Fill((*muonHandle)[y].pt());
 								recMuSiRefEta_VertWindB->Fill((*muonHandle)[y].eta());
 							}
-							// controllo del MC match di singolo Mu (Iso con rho)
+*/							// controllo del MC match di singolo Mu (Iso con rho)
+
 							if (singleMu_Probe_Acc_SYM((*muonHandle)[y], _run, _rho) &&
 							    singleMu_Probe_Qual_SYM((*muonHandle)[y], _run, _rho) &&
 							    singleMu_Probe_Imp((*muonHandle)[y], _run, _rho) &&
@@ -670,7 +685,8 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 						
 									genMuPtinDeltaRMCMatch[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->pt());
 									genMuEtainDeltaRMCMatch[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->eta());
-									if(nVertices <=8){
+
+/*analisi veloce									if(nVertices <=8){
 										genMuPtinDeltaRMCMatch_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->pt());
 										genMuEtainDeltaRMCMatch_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->eta());
 									}
@@ -678,9 +694,10 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 										genMuPtinDeltaRMCMatch_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->pt());
 										genMuEtainDeltaRMCMatch_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->eta());
 									}
-								}
+*/								}
 								else {
 									cout << "Vedo che (*muonHandle)[" << y << "] non matcha con ((*zHandlegen)[0].daughter(" << c << ")(Iso con rho))" << endl;
+
 								}
 							}// chiudo il controllo del MC match di singolo Mu (Iso con rho)
 							// controllo del MC match di singolo Mu (Iso senza rho)
@@ -695,7 +712,7 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 						
 									genMuPtinDeltaRMCMatch_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->pt());
 									genMuEtainDeltaRMCMatch_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->eta());
-									if(nVertices <=8){
+/*analisi veloce									if(nVertices <=8){
 										genMuPtinDeltaRMCMatch_VertWindA_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->pt());
 										genMuEtainDeltaRMCMatch_VertWindA_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->eta());
 									}
@@ -703,16 +720,21 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 										genMuPtinDeltaRMCMatch_VertWindB_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->pt());
 										genMuEtainDeltaRMCMatch_VertWindB_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(c))->eta());
 									}
-								}
+*/								}
 								else {
+
 									cout << "Vedo che (*muonHandle)[" << y << "] non matcha con ((*zHandlegen)[0].daughter(" << c << ") (Iso senza rho))" << endl;
+
 								}
+
 							}// chiudo il controllo del MC match di singolo Mu (Iso senza rho)
+
 						}
 						else {
 							recMuNoRefPt->Fill((*muonHandle)[y].pt());
 							recMuNoRefEta->Fill((*muonHandle)[y].eta());
-							if(nVertices <=8){
+
+/*analisi veloce							if(nVertices <=8){
 								recMuNoRefPt_VertWindA->Fill((*muonHandle)[y].pt());
 								recMuNoRefEta_VertWindA->Fill((*muonHandle)[y].eta());
 							}
@@ -720,7 +742,8 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 								recMuNoRefPt_VertWindB->Fill((*muonHandle)[y].pt());
 								recMuNoRefEta_VertWindB->Fill((*muonHandle)[y].eta());
 							}
-						}
+*/						}
+
 					}
 				}
 			}// qui chiudo il controllo di overlapSingMu
@@ -757,14 +780,16 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 		if(!overlap){
 
 			denCounterFalse->Fill(genjetsr.size());
-			if(nVertices <=8){
+
+/*analisi veloce			if(nVertices <=8){
 				denCounterFalse_VertWindA->Fill(genjetsr.size());
 			}
 			else{
 				denCounterFalse_VertWindB->Fill(genjetsr.size());
 			}
-
+*/
 			//qui apro la sezione della Z ricostruita di overlap false (Iso con rho)
+
 			if (RecSelected(_RecoCutFlags[1].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
 			    RecSelected(_RecoCutFlags[2].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
 			    RecSelected(_RecoCutFlags[3].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
@@ -774,27 +799,28 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 
 				numCounterFalse->Fill(genjetsr.size());
 				recoJetCounterFalse-> Fill(recjets.size());
-				genLeadMuPtFalse[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->pt());
-				genSecondMuPtFalse[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->pt());
-				genLeadMuEtaFalse[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->eta());
-				genSecondMuEtaFalse[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->eta());
-				if(nVertices <=8){
+
+				genLeadMuPtFalse[genjetsr.size()]-> Fill(muonsfromZgen[0]->pt());
+				genSecondMuPtFalse[genjetsr.size()]-> Fill(muonsfromZgen[1]->pt());
+				genLeadMuEtaFalse[genjetsr.size()]-> Fill(muonsfromZgen[0]->eta());
+				genSecondMuEtaFalse[genjetsr.size()]-> Fill(muonsfromZgen[1]->eta());
+/*analisi veloce				if(nVertices <=8){
 					numCounterFalse_VertWindA->Fill(genjetsr.size());
 					recoJetCounterFalse_VertWindA-> Fill(recjets.size());
-					genLeadMuPtFalse_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->pt());
-					genSecondMuPtFalse_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->pt());
-					genLeadMuEtaFalse_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->eta());
-					genSecondMuEtaFalse_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->eta());
+					genLeadMuPtFalse_VertWindA[genjetsr.size()]-> Fill(muonsfromZgen[0]->pt());
+					genSecondMuPtFalse_VertWindA[genjetsr.size()]-> Fill(muonsfromZgen[1]->pt());
+					genLeadMuEtaFalse_VertWindA[genjetsr.size()]-> Fill(muonsfromZgen[0]->eta());
+					genSecondMuEtaFalse_VertWindA[genjetsr.size()]-> Fill(muonsfromZgen[1]->eta());
 				}
 				else{
 					numCounterFalse_VertWindB->Fill(genjetsr.size());
 					recoJetCounterFalse_VertWindB-> Fill(recjets.size());
-					genLeadMuPtFalse_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->pt());
-					genSecondMuPtFalse_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->pt());
-					genLeadMuEtaFalse_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->eta());
-					genSecondMuEtaFalse_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->eta());
+					genLeadMuPtFalse_VertWindB[genjetsr.size()]-> Fill(muonsfromZgen[0]->pt());
+					genSecondMuPtFalse_VertWindB[genjetsr.size()]-> Fill(muonsfromZgen[1]->pt());
+					genLeadMuEtaFalse_VertWindB[genjetsr.size()]-> Fill(muonsfromZgen[0]->eta());
+					genSecondMuEtaFalse_VertWindB[genjetsr.size()]-> Fill(muonsfromZgen[1]->eta());
 				}
-
+*/
 			} // qui chiudo la sezione della Z ricostruita di overlap false (Iso con rho)
 			//qui apro la sezione della Z ricostruita di overlap false (Iso senza rho)
 			if (RecSelected_mod(_RecoCutFlags[1].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
@@ -806,42 +832,45 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 
 				numCounterFalse_iso->Fill(genjetsr.size());
 				recoJetCounterFalse_iso-> Fill(recjets.size());
-				genLeadMuPtFalse_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->pt());
-				genSecondMuPtFalse_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->pt());
-				genLeadMuEtaFalse_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->eta());
-				genSecondMuEtaFalse_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->eta());
-				if(nVertices <=8){
+				genLeadMuPtFalse_iso[genjetsr.size()]-> Fill(muonsfromZgen[0]->pt());
+				genSecondMuPtFalse_iso[genjetsr.size()]-> Fill(muonsfromZgen[1]->pt());
+				genLeadMuEtaFalse_iso[genjetsr.size()]-> Fill(muonsfromZgen[0]->eta());
+				genSecondMuEtaFalse_iso[genjetsr.size()]-> Fill(muonsfromZgen[1]->eta());
+/*analisi veloce				if(nVertices <=8){
 					numCounterFalse_VertWindA_iso->Fill(genjetsr.size());
 					recoJetCounterFalse_VertWindA_iso-> Fill(recjets.size());
-					genLeadMuPtFalse_VertWindA_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->pt());
-					genSecondMuPtFalse_VertWindA_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->pt());
-					genLeadMuEtaFalse_VertWindA_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->eta());
-					genSecondMuEtaFalse_VertWindA_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->eta());
+					genLeadMuPtFalse_VertWindA_iso[genjetsr.size()]-> Fill(muonsfromZgen[0]->pt());
+					genSecondMuPtFalse_VertWindA_iso[genjetsr.size()]-> Fill(muonsfromZgen[1]->pt());
+					genLeadMuEtaFalse_VertWindA_iso[genjetsr.size()]-> Fill(muonsfromZgen[0]->eta());
+					genSecondMuEtaFalse_VertWindA_iso[genjetsr.size()]-> Fill(muonsfromZgen[1]->eta());
 				}
 				else{
 					numCounterFalse_VertWindB_iso->Fill(genjetsr.size());
 					recoJetCounterFalse_VertWindB_iso-> Fill(recjets.size());
-					genLeadMuPtFalse_VertWindB_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->pt());
-					genSecondMuPtFalse_VertWindB_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->pt());
-					genLeadMuEtaFalse_VertWindB_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->eta());
-					genSecondMuEtaFalse_VertWindB_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->eta());
+					genLeadMuPtFalse_VertWindB_iso[genjetsr.size()]-> Fill(muonsfromZgen[0]->pt());
+					genSecondMuPtFalse_VertWindB_iso[genjetsr.size()]-> Fill(muonsfromZgen[1]->pt());
+					genLeadMuEtaFalse_VertWindB_iso[genjetsr.size()]-> Fill(muonsfromZgen[0]->eta());
+					genSecondMuEtaFalse_VertWindB_iso[genjetsr.size()]-> Fill(muonsfromZgen[1]->eta());
 				}
-
+*/
 			} // qui chiudo la sezione della Z ricostruita di overlap false (Iso senza rho)
+
 
 		}// qui chiudo il controllo di overlap false di 2 Mu
 
 		//qui apro il controllo di overlap true di 2 Mu
 		else {
 			denCounterTrue->Fill(genjetsr.size());
-			if(nVertices <=8){
+
+/*analisi veloce			if(nVertices <=8){
 				denCounterTrue_VertWindA->Fill(genjetsr.size());
 			}
 			else{
 				denCounterTrue_VertWindB->Fill(genjetsr.size());
 			}
-
+*/
 			//qui apro la sezione della Z ricostruita di overlap true (Iso con rho)
+
 			if (RecSelected(_RecoCutFlags[1].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
 			    RecSelected(_RecoCutFlags[2].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
 			    RecSelected(_RecoCutFlags[3].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
@@ -851,27 +880,28 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 
 				numCounterTrue->Fill(genjetsr.size());
 				recoJetCounterTrue-> Fill(recjets.size());
-				genLeadMuPtTrue[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->pt());
-				genSecondMuPtTrue[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->pt());
-				genLeadMuEtaTrue[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->eta());
-				genSecondMuEtaTrue[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->eta());
-				if(nVertices <=8){
+
+				genLeadMuPtTrue[genjetsr.size()]-> Fill(muonsfromZgen[0]->pt());
+				genSecondMuPtTrue[genjetsr.size()]-> Fill(muonsfromZgen[1]->pt());
+				genLeadMuEtaTrue[genjetsr.size()]-> Fill(muonsfromZgen[0]->eta());
+				genSecondMuEtaTrue[genjetsr.size()]-> Fill(muonsfromZgen[1]->eta());
+/*analisi veloce				if(nVertices <=8){
 					numCounterTrue_VertWindA->Fill(genjetsr.size());
 					recoJetCounterTrue_VertWindA-> Fill(recjets.size());
-					genLeadMuPtTrue_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->pt());
-					genSecondMuPtTrue_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->pt());
-					genLeadMuEtaTrue_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->eta());
-					genSecondMuEtaTrue_VertWindA[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->eta());
+					genLeadMuPtTrue_VertWindA[genjetsr.size()]-> Fill(muonsfromZgen[0]->pt());
+					genSecondMuPtTrue_VertWindA[genjetsr.size()]-> Fill(muonsfromZgen[1]->pt());
+					genLeadMuEtaTrue_VertWindA[genjetsr.size()]-> Fill(muonsfromZgen[0]->eta());
+					genSecondMuEtaTrue_VertWindA[genjetsr.size()]-> Fill(muonsfromZgen[1]->eta());
 				}
 				else{
 					numCounterTrue_VertWindB->Fill(genjetsr.size());
 					recoJetCounterTrue_VertWindB-> Fill(recjets.size());
-					genLeadMuPtTrue_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->pt());
-					genSecondMuPtTrue_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->pt());
-					genLeadMuEtaTrue_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->eta());
-					genSecondMuEtaTrue_VertWindB[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->eta());
+					genLeadMuPtTrue_VertWindB[genjetsr.size()]-> Fill(muonsfromZgen[0]->pt());
+					genSecondMuPtTrue_VertWindB[genjetsr.size()]-> Fill(muonsfromZgen[1]->pt());
+					genLeadMuEtaTrue_VertWindB[genjetsr.size()]-> Fill(muonsfromZgen[0]->eta());
+					genSecondMuEtaTrue_VertWindB[genjetsr.size()]-> Fill(muonsfromZgen[1]->eta());
 				}
-
+*/
 			} // qui chiudo la sezione della Z ricostruita di overlap true (Iso con rho)
 			//qui apro la sezione della Z ricostruita di overlap true (Iso senza rho)
 			if (RecSelected_mod(_RecoCutFlags[1].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
@@ -883,28 +913,29 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 
 				numCounterTrue_iso->Fill(genjetsr.size());
 				recoJetCounterTrue_iso-> Fill(recjets.size());
-				genLeadMuPtTrue_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->pt());
-				genSecondMuPtTrue_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->pt());
-				genLeadMuEtaTrue_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->eta());
-				genSecondMuEtaTrue_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->eta());
-				if(nVertices <=8){
+				genLeadMuPtTrue_iso[genjetsr.size()]-> Fill(muonsfromZgen[0]->pt());
+				genSecondMuPtTrue_iso[genjetsr.size()]-> Fill(muonsfromZgen[1]->pt());
+				genLeadMuEtaTrue_iso[genjetsr.size()]-> Fill(muonsfromZgen[0]->eta());
+				genSecondMuEtaTrue_iso[genjetsr.size()]-> Fill(muonsfromZgen[1]->eta());
+/*analisi veloce				if(nVertices <=8){
 					numCounterTrue_VertWindA_iso->Fill(genjetsr.size());
 					recoJetCounterTrue_VertWindA_iso-> Fill(recjets.size());
-					genLeadMuPtTrue_VertWindA_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->pt());
-					genSecondMuPtTrue_VertWindA_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->pt());
-					genLeadMuEtaTrue_VertWindA_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->eta());
-					genSecondMuEtaTrue_VertWindA_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->eta());
+					genLeadMuPtTrue_VertWindA_iso[genjetsr.size()]-> Fill(muonsfromZgen[0]->pt());
+					genSecondMuPtTrue_VertWindA_iso[genjetsr.size()]-> Fill(muonsfromZgen[1]->pt());
+					genLeadMuEtaTrue_VertWindA_iso[genjetsr.size()]-> Fill(muonsfromZgen[0]->eta());
+					genSecondMuEtaTrue_VertWindA_iso[genjetsr.size()]-> Fill(muonsfromZgen[1]->eta());
 				}
 				else{
 					numCounterTrue_VertWindB_iso->Fill(genjetsr.size());
 					recoJetCounterTrue_VertWindB_iso-> Fill(recjets.size());
-					genLeadMuPtTrue_VertWindB_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->pt());
-					genSecondMuPtTrue_VertWindB_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->pt());
-					genLeadMuEtaTrue_VertWindB_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(0))->eta());
-					genSecondMuEtaTrue_VertWindB_iso[genjetsr.size()]-> Fill(((*zHandlegen)[0].daughter(1))->eta());
+					genLeadMuPtTrue_VertWindB_iso[genjetsr.size()]-> Fill(muonsfromZgen[0]->pt());
+					genSecondMuPtTrue_VertWindB_iso[genjetsr.size()]-> Fill(muonsfromZgen[1]->pt());
+					genLeadMuEtaTrue_VertWindB_iso[genjetsr.size()]-> Fill(muonsfromZgen[0]->eta());
+					genSecondMuEtaTrue_VertWindB_iso[genjetsr.size()]-> Fill(muonsfromZgen[1]->eta());
 				}
-
+*/
 			} // qui chiudo la sezione della Z ricostruita di overlap true (Iso senza rho)
+
 
 		}// qui chiudo il controllo di overlap true di 2 Mu
 
@@ -918,7 +949,8 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 
 			genJetTotalCounter-> Fill(genjetsr.size());
 			recoJetTotalCounter-> Fill(recjets.size());
-			if(nVertices <=8){
+
+/*analisi veloce			if(nVertices <=8){
 				genJetTotalCounter_VertWindA-> Fill(genjetsr.size());
 				recoJetTotalCounter_VertWindA-> Fill(recjets.size());
 			}
@@ -926,7 +958,7 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 				genJetTotalCounter_VertWindB-> Fill(genjetsr.size());
 				recoJetTotalCounter_VertWindB-> Fill(recjets.size());
 			}
-		} // qui chiudo la sezione della Z ricostruita senza richiesta di overlap (Iso con rho)
+*/		} // qui chiudo la sezione della Z ricostruita senza richiesta di overlap (Iso con rho)
 		//qui apro la sezione della Z ricostruita senza richiesta di overlap (Iso senza rho)
 		if (RecSelected_mod(_RecoCutFlags[1].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
 		    RecSelected_mod(_RecoCutFlags[2].c_str(), *zHandle, *triggerHandle, _run, _rho) && 
@@ -937,7 +969,7 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 
 			genJetTotalCounter_iso-> Fill(genjetsr.size());
 			recoJetTotalCounter_iso-> Fill(recjets.size());
-			if(nVertices <=8){
+/*analisi veloce			if(nVertices <=8){
 				genJetTotalCounter_VertWindA_iso-> Fill(genjetsr.size());
 				recoJetTotalCounter_VertWindA_iso-> Fill(recjets.size());
 			}
@@ -945,7 +977,8 @@ void  DeltaRAnalyzerMuon::process(const fwlite::Event& iEvent)
 				genJetTotalCounter_VertWindB_iso-> Fill(genjetsr.size());
 				recoJetTotalCounter_VertWindB_iso-> Fill(recjets.size());
 			}
-		} // qui chiudo la sezione della Z ricostruita senza richiesta di overlap (Iso senza rho)
+*/		} // qui chiudo la sezione della Z ricostruita senza richiesta di overlap (Iso senza rho)
+
 
 		//######### Fine Analisi di efficienza di doppio Mu #########
 
