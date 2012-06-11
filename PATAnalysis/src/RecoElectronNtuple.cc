@@ -743,7 +743,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    TrgBit=0;
    if(isElectronTriggered(*triggerHandle, run)){
    TrgBit=1;
-   if(RecSelected_TrgMatch(*recdau0, *triggerHandle, run)||RecSelected_TrgMatch(*recdau1, *triggerHandle, run))OneElTrgMatch=1;
+   if(RecSelected_TrgMatch(*recdau0, run)||RecSelected_TrgMatch(*recdau1, run))OneElTrgMatch=1;
    }
    }
    
