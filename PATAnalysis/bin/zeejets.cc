@@ -95,9 +95,9 @@ int main(int argc, char *argv[]) {
 	ProcEvents=atoi(argv[2]);
 
 	//List of Source Files
-	string SourceFilesDir 		= "/raid/sandro/Analisi/rel_CMSSW_4_2_25_modifiche_TeP/CMSSW_4_2_25/src/Firenze/PATAnalysis/bin/SourceFilesElectrons/";
+	string SourceFilesDir 		= "SourceFilesElectrons/";
 
-	string Run2011A_May10ReReco_v1 = "";
+	string Run2011A_May10ReReco_v1 = "Run2011A_May10ReReco_v1.list";
 	string Run2011A_PromptReco_v4 = "";
 	string Run2011A_05Aug2011_v1 = "";
 	string Run2011A_PromptReco_v6 = "";
@@ -142,15 +142,15 @@ int main(int argc, char *argv[]) {
 	string WZJetsTo3LNu_Sample = "";
 	string ZZJetsTo4L_Sample = "";	
 
-	string Test = "Test.list";
+	string Test = "test.list";
 
-	sample = "mc";
+	sample = "data";
  
 	//tag to recognize the analysis in the output file 
-	string analysis = "_modifiche_TeP"; 
+	string analysis = "_test_TnP"; 
 
-	//Path of PATAnalysis dir - DO NOT FORGET THE SLASH AT THE END OF THE PATH
-	string path="/raid/sandro/Analisi/rel_CMSSW_4_2_25_modifiche_TeP/CMSSW_4_2_25/src/Firenze/PATAnalysis/bin/AnalysisElectrons/";
+	//Path of PATAnalysis dir - DO NOT FORGET THE SLASH AT THE END OF THE PATH (complete path)
+	string path="/raid/tropiano/ZJets/TP/Electrons/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/AnalysisElectrons/";
 
 
 	//Modules
@@ -195,7 +195,7 @@ int main(int argc, char *argv[]) {
 	   PreDefName==5) Norm="False"; // Do not normalize for data
 
 	//Number of CPUs
-	int CPU = 8;
+	int CPU = 1;
 
 	//Log (non funziona)
 	bool Log = false;
@@ -716,18 +716,31 @@ int main(int argc, char *argv[]) {
 	}
 
 
-	gEnv->SetValue("Proof.Sandbox", "/raid/sandro/.proof");
+	gEnv->SetValue("Proof.Sandbox", "/raid/tropiano/.proof");
 
 	TProof * p = TProof::Open("");
 
-	p->SetParallel(CPU);
+	//	p->SetParallel(CPU);
+	p->SetParameter( "PROOF_UseTreeCache", ( Int_t ) 0 );
+
 
 	gSystem->Load("libFWCoreFWLite");
 	AutoLibraryLoader::enable();
 	gSystem->Load("libFirenzePATAnalysis");
+	p->Exec(".x /raid/tropiano/ZJets/TP/Electrons/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/remote.C");
 
-	p->Exec(".x /raid/sandro/Analisi/rel_CMSSW_4_2_25_modifiche_TeP/CMSSW_4_2_25/src/Firenze/PATAnalysis/bin/remote.C");
-
+	if(PreDefName>-1 || PreDefName==-9){
+	  TDSet* SetDS = getDS(sourceList.c_str());
+	  
+	  string cfgPath = path;
+	  cfgPath+=outputName;
+	  cfgPath+=".py";
+	  TNamed* configfile = new TNamed("ConfigFile", cfgPath.c_str());
+	  p->AddInput(configfile);
+	  p->Process(SetDS, "FWLiteTSelector","",ProcEvents);
+	  p->ClearInput();
+	  delete SetDS;
+	}
 
 	if(PreDefName==0){ 
 
