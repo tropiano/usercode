@@ -135,7 +135,20 @@ static string ElID_End_SYM = "simpleEleId90cIso";
 static string ElID_Bar_SYM = "simpleEleId95cIso";
 
 //SYM Electron Trigger
-static string filter = ""; 
+//leg 8 GeV for May10-2011Av4-Aug5
+static string filter = "hltEle17CaloIdIsoEle8CaloIdIsoPixelMatchDoubleFilter"; 
+//leg 17 GeV for May10-2011Av4                                                                                                      
+//static string filter = "hltEle17CaloIdLCaloIsoVLPixelMatchFilter";
+//leg 17 GeV for Aug5
+//static string filter = "hltEle17CaloIdLCaloIsoVLPixelMatchFilterDoubleEG125";
+//leg 17 for 2011Av6-2011B
+//static string filter = "hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolFilter";
+//leg 8 GeV for 2011Av6-2011B
+//static string filter = "hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter";
+
+//hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolFilter
+
+
 
 // SYM Tag cuts
 static double SYM_TAG_ptelcut = 20.;    //Gev/c
@@ -575,7 +588,7 @@ inline bool isElectronTriggered(const pat::TriggerEvent& triggers, int run){
 
 
 // Trigger Matching: it is true if the trigger path matches one of the trigger in the collection for a specified run or in the complete run set
-inline bool RecSelected_TrgMatch(const pat::Electron& Electron, const pat::TriggerEvent& triggers, int run){
+inline bool RecSelected_TrgMatch(const pat::Electron& Electron, int run){
 
 	bool trigmatch = false;
 /*	const pat::TriggerPathCollection * paths = triggers.paths(); 
@@ -591,24 +604,24 @@ inline bool RecSelected_TrgMatch(const pat::Electron& Electron, const pat::Trigg
 */
 	const TriggerObjectStandAloneCollection MatchElectron = Electron.triggerObjectMatchesByFilter(filter.c_str());
 
-/*				if(TrgRange==true && run!=-1){
-					if(MatchElectron.size() && 
-					   (TrgVectorIter->second.first<=run && run<=TrgVectorIter->second.second)) {
+	/*				if(TrgRange==true && run!=-1){
+	  if(MatchElectron.size() && 
+	  (TrgVectorIter->second.first<=run && run<=TrgVectorIter->second.second)) {
+	  trigmatch = true;
+	  }
+	  }
+	  else{
+	  if(MatchElectron.size()) {
 						trigmatch = true;
-					}
-				}
-				else{
-					if(MatchElectron.size()) {
-						trigmatch = true;
-					}
-				}
-			}
-		}
-	}
-*/
+						}
+						}
+						}
+						}
+						}
+	*/
 	if(MatchElectron.size()) trigmatch = true;
 	std::cout<<"matched electrons size: "<<MatchElectron.size()<<std::endl;
-
+	
 	return trigmatch;
 }
 /*old
@@ -700,7 +713,7 @@ inline bool RecSelected(string Flag, const std::vector<reco::CompositeCandidate>
 		else if(Flag=="_Trg"){
 			bool cutTrg = false;
 			if(elTrgMatchReq==true){
-				if(isElectronTriggered(triggers, run)&&(RecSelected_TrgMatch(*dau0, triggers, run))){
+				if(isElectronTriggered(triggers, run)&&(RecSelected_TrgMatch(*dau0, run))){
 					cutTrg=true;
 				}
 			}
@@ -1150,7 +1163,7 @@ inline bool RecSelected_mod(string Flag, const std::vector<reco::CompositeCandid
 		else if(Flag=="_Trg"){
 			bool cutTrg = false;
 			if(elTrgMatchReq==true){
-				if(isElectronTriggered(triggers, run)&&(RecSelected_TrgMatch(*dau0, triggers, run))){
+				if(isElectronTriggered(triggers, run)&&(RecSelected_TrgMatch(*dau0, run))){
 					cutTrg=true;
 				}
 			}
@@ -2299,7 +2312,7 @@ inline bool singleEl_Probe_Trg_SYM(const reco::Candidate& cand, int run, double 
 	if(elTrgMatchReq){
 		TPTrgMatch=false;
 		if(electron){
-			//if(RecSelected_TrgMatch(*electron, run))
+			if(RecSelected_TrgMatch(*electron, run))
 			TPTrgMatch=true;
 		}
 		else{
