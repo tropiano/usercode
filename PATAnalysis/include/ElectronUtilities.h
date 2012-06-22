@@ -659,7 +659,7 @@ inline bool isJetTriggered(const pat::TriggerEvent& triggers){
 // Z REC SELECTION
 
 // REC Z Candidate: it is true if there is 1 REC Z with Mass cut decaying in two REC Electrons with these cuts: Acceptance (geometrical and kinematic), Quality, Impact Parameter, Isolation with rho.
-inline bool RecSelected(string Flag, const std::vector<reco::CompositeCandidate>& ZREC, const pat::TriggerEvent& triggers, int run, double rho){
+inline bool RecSelected_ele(string Flag, const std::vector<reco::CompositeCandidate>& ZREC, const pat::TriggerEvent& triggers, int run, double rho){
 
 	std::vector<const pat::Electron*> zdaughters;
 
@@ -907,7 +907,7 @@ inline bool RecSelected(string Flag, const std::vector<reco::CompositeCandidate>
 			}
 			else{
 				std::cout << "ERROR! The electron 0 is not either in Barrel nor in Endcaps"<< std::endl;
-				throw cms::Exception("PATAnalysis:RecSelected, IsoSYM") << "ERROR! electron Barrel or Endcaps not found ";
+				//throw cms::Exception("PATAnalysis:RecSelected, IsoSYM") << "ERROR! electron Barrel or Endcaps not found ";
 				return false;
 			}
 						
@@ -919,7 +919,7 @@ inline bool RecSelected(string Flag, const std::vector<reco::CompositeCandidate>
 			}
 			else{
 				std::cout << "ERROR! The electron 1 is not either in Barrel nor in Endcaps"<< std::endl;
-				throw cms::Exception("PATAnalysis:RecSelected, IsoSYM") << "ERROR! electron Barrel or Endcaps not found ";
+				//throw cms::Exception("PATAnalysis:RecSelected, IsoSYM") << "ERROR! electron Barrel or Endcaps not found ";
 				return false;
 			}
 
@@ -1006,7 +1006,7 @@ inline bool RecSelected(string Flag, const std::vector<reco::CompositeCandidate>
 			}
 			else{
 				std::cout << "ERROR! The electron 0 is not either in Barrel nor in Endcaps"<< std::endl;
-				throw cms::Exception("PATAnalysis:RecSelected, ElIDSYM") << "ERROR! electron Barrel or Endcaps not found ";
+				//throw cms::Exception("PATAnalysis:RecSelected, ElIDSYM") << "ERROR! electron Barrel or Endcaps not found ";
 				return false;
 			}
 
@@ -1032,7 +1032,7 @@ inline bool RecSelected(string Flag, const std::vector<reco::CompositeCandidate>
 			}
 			else{
 				std::cout << "ERROR! The electron 1 is not either in Barrel nor in Endcaps"<< std::endl;
-				throw cms::Exception("PATAnalysis:RecSelected, ElIDSYM") << "ERROR! electron Barrel or Endcaps not found ";
+				//throw cms::Exception("PATAnalysis:RecSelected, ElIDSYM") << "ERROR! electron Barrel or Endcaps not found ";
 				return false;
 			}
 			return electron_ID0 && electron_ID1;

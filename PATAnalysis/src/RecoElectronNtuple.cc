@@ -749,17 +749,17 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
    
    //Cut flags
    
-   if (RecSelected("_AccSYM", (*zrecHandle), *triggerHandle, run, rho))cutAccSYM=1;
-   if (RecSelected("_AccASYM", (*zrecHandle), *triggerHandle, run, rho))cutAccASYM=1;
-   if (RecSelected("_Trg", (*zrecHandle), *triggerHandle, run, rho))cutTrg=1;
-   if (RecSelected("_Imp", (*zrecHandle), *triggerHandle, run, rho))cutImp=1;
-   if (RecSelected("_ConvASYM", (*zrecHandle), *triggerHandle, run, rho))cutConvASYM=1;
-   if (RecSelected("_IsoSYM", (*zrecHandle), *triggerHandle, run, rho))cutIsoSYM=1;
-   if (RecSelected("_IsoASYM", (*zrecHandle), *triggerHandle, run, rho))cutIsoASYM=1;
-   if (RecSelected("_EiDSYM", (*zrecHandle), *triggerHandle, run, rho))cutEiDSYM=1;
-   if (RecSelected("_EiDASYM", (*zrecHandle), *triggerHandle, run, rho))cutEiDASYM=1;
+   if (RecSelected_ele("_AccSYM", (*zrecHandle), *triggerHandle, run, rho))cutAccSYM=1;
+   if (RecSelected_ele("_AccASYM", (*zrecHandle), *triggerHandle, run, rho))cutAccASYM=1;
+   if (RecSelected_ele("_Trg", (*zrecHandle), *triggerHandle, run, rho))cutTrg=1;
+   if (RecSelected_ele("_Imp", (*zrecHandle), *triggerHandle, run, rho))cutImp=1;
+   if (RecSelected_ele("_ConvASYM", (*zrecHandle), *triggerHandle, run, rho))cutConvASYM=1;
+   if (RecSelected_ele("_IsoSYM", (*zrecHandle), *triggerHandle, run, rho))cutIsoSYM=1;
+   if (RecSelected_ele("_IsoASYM", (*zrecHandle), *triggerHandle, run, rho))cutIsoASYM=1;
+   if (RecSelected_ele("_EiDSYM", (*zrecHandle), *triggerHandle, run, rho))cutEiDSYM=1;
+   if (RecSelected_ele("_EiDASYM", (*zrecHandle), *triggerHandle, run, rho))cutEiDASYM=1;
    
-   if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle), *triggerHandle, run, rho)){
+   if (RecSelected_ele(_RecoCutFlags[1].c_str(), (*zrecHandle), *triggerHandle, run, rho)){
    
       const reco::GsfTrackRef& track0 = recdau0->gsfTrack();
       const reco::GsfTrackRef& track1 = recdau1->gsfTrack();
@@ -984,7 +984,7 @@ void  RecoElectronNtuple::process(const fwlite::Event& iEvent)
 
    //stricter cuts
       
-      if (RecSelected(_RecoCutFlags[1].c_str(), (*zrecHandle), *triggerHandle, run, rho)&&RecSelected(_RecoCutFlags[2].c_str(), (*zrecHandle), *triggerHandle, run, rho)&&RecSelected(_RecoCutFlags[3].c_str(), (*zrecHandle), *triggerHandle, run, rho)&&RecSelected(_RecoCutFlags[4].c_str(), (*zrecHandle), *triggerHandle, run, rho)&&RecSelected(_RecoCutFlags[5].c_str(), (*zrecHandle), *triggerHandle, run, rho)&&RecSelected(_RecoCutFlags[6].c_str(), (*zrecHandle), *triggerHandle, run, rho)){
+      if (RecSelected_ele(_RecoCutFlags[1].c_str(), (*zrecHandle), *triggerHandle, run, rho)&&RecSelected_ele(_RecoCutFlags[2].c_str(), (*zrecHandle), *triggerHandle, run, rho)&&RecSelected_ele(_RecoCutFlags[3].c_str(), (*zrecHandle), *triggerHandle, run, rho)&&RecSelected_ele(_RecoCutFlags[4].c_str(), (*zrecHandle), *triggerHandle, run, rho)&&RecSelected_ele(_RecoCutFlags[5].c_str(), (*zrecHandle), *triggerHandle, run, rho)&&RecSelected_ele(_RecoCutFlags[6].c_str(), (*zrecHandle), *triggerHandle, run, rho)){
   
       zmass_AllCuts=(*zrecHandle)[0].mass();
       

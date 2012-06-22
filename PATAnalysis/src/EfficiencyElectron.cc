@@ -1132,13 +1132,11 @@ void EfficiencyElectron::process(const fwlite::Event& iEvent){
 	fwlite::Handle<pat::TriggerEvent> triggerHandle;
 	triggerHandle.getByLabel(iEvent, "patTriggerEvent");
 
-
 	fwlite::Handle<std::vector<reco::CompositeCandidate> > zgenHandle;
-	zgenHandle.getByLabel(iEvent, "zeegenfull");
+	zgenHandle.getByLabel(iEvent, "zeegen");
 
 	fwlite::Handle<std::vector<reco::GenJet> > jetgenHandle;
 	jetgenHandle.getByLabel(iEvent, "selectedGenJetsOld");
-
 	
 	//Z Gen daughters
 	std::vector<const pat::Electron*> zgendaughters;
@@ -1267,7 +1265,7 @@ void EfficiencyElectron::process(const fwlite::Event& iEvent){
 		if(zrecHandle->size()){
 	
 			//Events with a selected Zee 1
-			if (RecSelected(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
+			if (RecSelected_ele(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
 				//Eff vs Reco Jet variables
 				for(unsigned int i = 0; (i < geniso_recjets.size()+1) && ((i+1)<10); i++){
 					RecoInclJetEff_1->AddBinContent(i+1,1);
@@ -1277,7 +1275,7 @@ void EfficiencyElectron::process(const fwlite::Event& iEvent){
 	
 			//Events with a selected Zee 1 With Gen(Acc) Req.
 			if (GenSelectedInAcceptance((*zgenHandle), _selections) && 
-			    RecSelected(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
+			    RecSelected_ele(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
 				//Eff vs Reco Jet variables With Gen(Acc)
 				for(unsigned int i = 0; (i < geniso_recjets.size()+1) && ((i+1)<10); i++){
 					RecoInclJetEffWGA_1->AddBinContent(i+1,1);
@@ -1286,8 +1284,8 @@ void EfficiencyElectron::process(const fwlite::Event& iEvent){
 			}
 
 			//Events with a selected Zee 1+2
-			if (RecSelected(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
+			if (RecSelected_ele(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
 				//Eff vs Reco Jet variables
 				for(unsigned int i = 0; (i < geniso_recjets.size()+1) && ((i+1)<10); i++){
 					RecoInclJetEff_12->AddBinContent(i+1,1);
@@ -1297,8 +1295,8 @@ void EfficiencyElectron::process(const fwlite::Event& iEvent){
 	
 			//Events with a selected Zee 1+2 With Gen(Acc) Req.
 			if (GenSelectedInAcceptance((*zgenHandle), _selections) && 
-			    RecSelected(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
+			    RecSelected_ele(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
 				//Eff vs Reco Jet variables With Gen(Acc)
 				for(unsigned int i = 0; (i < geniso_recjets.size()+1) && ((i+1)<10); i++){
 					RecoInclJetEffWGA_12->AddBinContent(i+1,1);
@@ -1307,9 +1305,9 @@ void EfficiencyElectron::process(const fwlite::Event& iEvent){
 			}
 	
 			//Events with a selected Zee 1+2+3
-			if (RecSelected(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
+			if (RecSelected_ele(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
 				//Eff vs Reco Jet variables
 				for(unsigned int i = 0; (i < geniso_recjets.size()+1)&&((i+1)<10); i++){
 					RecoInclJetEff_123->AddBinContent(i+1,1);
@@ -1319,9 +1317,9 @@ void EfficiencyElectron::process(const fwlite::Event& iEvent){
 	
 			//Events with a selected Zee 1+2+3 With Gen(Acc) Req.
 			if (GenSelectedInAcceptance((*zgenHandle), _selections) && 
-			    RecSelected(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
+			    RecSelected_ele(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
 				//Eff vs Reco Jet variables With Gen(Acc)
 				for(unsigned int i = 0; (i < geniso_recjets.size()+1)&&((i+1)<10); i++){
 					RecoInclJetEffWGA_123->AddBinContent(i+1,1);
@@ -1330,10 +1328,10 @@ void EfficiencyElectron::process(const fwlite::Event& iEvent){
 			}
 	
 			//Events with a selected Zee 1+2+3+4
-			if (RecSelected(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[4].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
+			if (RecSelected_ele(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[4].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
 				//Eff vs Reco Jet variables
 				for(unsigned int i = 0; (i < geniso_recjets.size()+1) && ((i+1)<10); i++){
 					RecoInclJetEff_1234->AddBinContent(i+1,1);
@@ -1343,10 +1341,10 @@ void EfficiencyElectron::process(const fwlite::Event& iEvent){
 	
 			//Events with a selected Zee 1+2+3+4 With Gen(Acc) Req.
 			if (GenSelectedInAcceptance((*zgenHandle), _selections) && 
-			    RecSelected(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho) &&
-			    RecSelected(_RecoCutFlags[4].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
+			    RecSelected_ele(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho) &&
+			    RecSelected_ele(_RecoCutFlags[4].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
 				//Eff vs Reco Jet variables With Gen(Acc)
 				for(unsigned int i = 0; (i < geniso_recjets.size()+1) && ((i+1)<10); i++){
 					RecoInclJetEffWGA_1234->AddBinContent(i+1,1);
@@ -1355,11 +1353,11 @@ void EfficiencyElectron::process(const fwlite::Event& iEvent){
 			}
 	
 			//Events with a selected Zee 1+2+3+4+5
-			if (RecSelected(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho) &&
-			    RecSelected(_RecoCutFlags[4].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[5].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
+			if (RecSelected_ele(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho) &&
+			    RecSelected_ele(_RecoCutFlags[4].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[5].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
 				//Eff vs Reco Jet variables
 				for(unsigned int i = 0; (i < geniso_recjets.size()+1) && ((i+1)<10); i++){
 					RecoInclJetEff_12345->AddBinContent(i+1,1);
@@ -1369,11 +1367,11 @@ void EfficiencyElectron::process(const fwlite::Event& iEvent){
 	
 			//Events with a selected Zee 1+2+3+4+5 With Gen(Acc) Req.
 			if (GenSelectedInAcceptance((*zgenHandle), _selections) && 
-			    RecSelected(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[4].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[5].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
+			    RecSelected_ele(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[4].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[5].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
 				//Eff vs Reco Jet variables With Gen(Acc)
 				for(unsigned int i = 0; (i < geniso_recjets.size()+1) && ((i+1)<10); i++){
 					RecoInclJetEffWGA_12345->AddBinContent(i+1,1);
@@ -1382,12 +1380,12 @@ void EfficiencyElectron::process(const fwlite::Event& iEvent){
 			}
 	
 			//Events with a selected Zee 1+2+3+4+5+6
-			if (RecSelected(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[4].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[5].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[6].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
+			if (RecSelected_ele(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[4].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[5].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[6].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
 				//Eff vs Reco Jet variables
 				for(unsigned int i = 0; (i < geniso_recjets.size()+1) && ((i+1)<10); i++){
 					RecoInclJetEff_123456->AddBinContent(i+1,1);
@@ -1397,12 +1395,12 @@ void EfficiencyElectron::process(const fwlite::Event& iEvent){
 	
 			//Events with a selected Zee 1+2+3+4+5+6 With Gen(Acc) Req.
 			if (GenSelectedInAcceptance((*zgenHandle), _selections) && 
-			    RecSelected(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[4].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[5].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[6].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
+			    RecSelected_ele(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[4].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[5].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[6].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
 				//Eff vs Reco Jet variables With Gen(Acc)
 				for(unsigned int i = 0; (i < geniso_recjets.size()+1) && ((i+1)<10); i++){
 					RecoInclJetEffWGA_123456->AddBinContent(i+1,1);
@@ -1411,13 +1409,13 @@ void EfficiencyElectron::process(const fwlite::Event& iEvent){
 			}	
 
 			//Events with a selected Zee 1+2+3+4+5+6+7
-			if (RecSelected(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[4].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[5].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[6].c_str(), *zrecHandle, *triggerHandle, _run, _rho) &&
-			    RecSelected(_RecoCutFlags[7].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
+			if (RecSelected_ele(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[4].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[5].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[6].c_str(), *zrecHandle, *triggerHandle, _run, _rho) &&
+			    RecSelected_ele(_RecoCutFlags[7].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
 				//Eff vs Reco Jet variables
 				for(unsigned int i = 0; (i < geniso_recjets.size()+1) && ((i+1)<10); i++){
 					RecoInclJetEff_1234567->AddBinContent(i+1,1);
@@ -1427,13 +1425,13 @@ void EfficiencyElectron::process(const fwlite::Event& iEvent){
 	
 			//Events with a selected Zee 1+2+3+4+5+6+7 With Gen(Acc) Req.
 			if (GenSelectedInAcceptance((*zgenHandle), _selections) && 
-			    RecSelected(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[4].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[5].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
-			    RecSelected(_RecoCutFlags[6].c_str(), *zrecHandle, *triggerHandle, _run, _rho) &&
-			    RecSelected(_RecoCutFlags[7].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
+			    RecSelected_ele(_RecoCutFlags[1].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[2].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[3].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[4].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[5].c_str(), *zrecHandle, *triggerHandle, _run, _rho) && 
+			    RecSelected_ele(_RecoCutFlags[6].c_str(), *zrecHandle, *triggerHandle, _run, _rho) &&
+			    RecSelected_ele(_RecoCutFlags[7].c_str(), *zrecHandle, *triggerHandle, _run, _rho)){
 				//Eff vs Reco Jet variables With Gen(Acc)
 				for(unsigned int i = 0; (i < geniso_recjets.size()+1) && ((i+1)<10); i++){
 					RecoInclJetEffWGA_1234567->AddBinContent(i+1,1);

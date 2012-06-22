@@ -2,7 +2,6 @@
 #include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "TFile.h"
 #include "TTree.h"
 #include "TParameter.h"
@@ -32,7 +31,7 @@ using namespace std;
 
 -1. All
 11. DYJetstoLL_All 			(not skimmed)
-12. TTJets_All 				(skimmed)
+12. TTJets_All 			(skimmed)
 13. WJetsToLNu_All 			(skimmed)
 14. QCD_EMEnriched_Pt20to30_All		(skimmed)
 15. QCD_EMEnriched_Pt30to80_All 	(skimmed)
@@ -95,9 +94,7 @@ int main(int argc, char *argv[]) {
 	ProcEvents=atoi(argv[2]);
 
 	//List of Source Files
-
-	string SourceFilesDir = "/raid/sandro/Analisi/rel_CMSSW_4_2_5_modifiche_TeP/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/SourceFilesElectrons/";
-
+	string SourceFilesDir 		= "SourceFilesElectrons/";
 
 	string Run2011A_May10ReReco_v1 = "Run2011A_May10ReReco_v1.list";
 	string Run2011A_PromptReco_v4 = "";
@@ -105,7 +102,7 @@ int main(int argc, char *argv[]) {
 	string Run2011A_PromptReco_v6 = "";
 	string Run2011B_PromptReco_v1 = "";
 
-	string DYJetstoLL_All = ""; 
+	string DYJetstoLL_All = "DYToLL.list"; 
 	string TTJets_All = "";
 	string WJetsToLNu_All = "";
 	string QCD_EMEnriched_Pt20to30_All = "";
@@ -144,16 +141,18 @@ int main(int argc, char *argv[]) {
 	string WZJetsTo3LNu_Sample = "";
 	string ZZJetsTo4L_Sample = "";	
 
-	string Test = "Test.list";
+	string Test = "test_Ele_sc8.list";
+	//string Test = "test_Ele_May10.list";
 
 	sample = "mc";
  
 	//tag to recognize the analysis in the output file 
-	string analysis = "_modifiche_TeP"; 
+	//string analysis = "_TnP_acc_iso_id_hlt_leg8_test"; 
+	string analysis = "_TnP_acc_iso_id_DY";
 
-
-	//Path of PATAnalysis dir - DO NOT FORGET THE SLASH AT THE END OF THE PATH
-	string path="/raid/sandro/Analisi/rel_CMSSW_4_2_5_modifiche_TeP/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/AnalysisElectrons/";
+	
+	//Path of PATAnalysis dir - DO NOT FORGET THE SLASH AT THE END OF THE PATH (complete path)
+	string path="/raid/tropiano/ZJets/TP/Electrons/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/AnalysisElectrons/";
 
 
 	//Modules
@@ -168,11 +167,11 @@ int main(int argc, char *argv[]) {
 
 	
 	//Cuts: if number = 0, the cut doesn't affect the Z REC selection
-	int Acc	= 1;
-	int Trg	= 4;
+	int Acc	=  1;
+	int Trg	=  0;
 	int Qual = 0;
-	int Imp = 0;
-	int Iso = 2;
+	int Imp =  0;
+	int Iso =  2;
 	int ElID = 3;
 	int Conv = 0;
 
@@ -185,7 +184,7 @@ int main(int argc, char *argv[]) {
 
 	//JEC Uncertainty applied to RecoMuonNtuple: 0 = NotApplied, 1 = Added, -1 = Subtracted
 	int JECUnc = 0; //default value = 0
-	string JECUncFilePath = "/data/sfrosali/Zjets/Commit/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/JECUncertainty/Jec10V1_Uncertainty_AK5PF.txt";
+	string JECUncFilePath = "/data/sfrosali/Zjets/Commit/CMSSW_4_2_25/src/Firenze/PATAnalysis/bin/JECUncertainty/Jec10V1_Uncertainty_AK5PF.txt";
 
 	//Normalization
 	string Norm = "True";
@@ -204,7 +203,7 @@ int main(int argc, char *argv[]) {
 	bool Log = false;
 	
 	//Gen Particle Matching
-	//string GenParticleMatch = "False";
+	string GenParticleMatch = "False";
 	
 	//Sample: Data -> "data"; MC -> "mc"
 
@@ -719,33 +718,31 @@ int main(int argc, char *argv[]) {
 	}
 
 
-	gEnv->SetValue("Proof.Sandbox", "/raid/sandro/.proof");
+	gEnv->SetValue("Proof.Sandbox", "/raid/tropiano/.proof");
 
 	TProof * p = TProof::Open("");
 
-	//	p->SetParallel(CPU);
+	p->SetParallel(CPU);
 	p->SetParameter( "PROOF_UseTreeCache", ( Int_t ) 0 );
 
 
 	gSystem->Load("libFWCoreFWLite");
 	AutoLibraryLoader::enable();
 	gSystem->Load("libFirenzePATAnalysis");
-
-	p->Exec(".x /raid/sandro/Analisi/rel_CMSSW_4_2_5_modifiche_TeP/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/remote.C");
+	p->Exec(".x /raid/tropiano/ZJets/TP/Electrons/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/remote.C");
 
 	if(PreDefName>0 || PreDefName==-9){
-		TDSet* SetDS = getDS(sourceList.c_str());
-
-		string cfgPath = path;
-		cfgPath+=outputName;
-		cfgPath+=".py";
-		TNamed* configfile = new TNamed("ConfigFile", cfgPath.c_str());
-		p->AddInput(configfile);
-		p->Process(SetDS, "FWLiteTSelector","",ProcEvents);
-		p->ClearInput();
-		delete SetDS;
+	  TDSet* SetDS = getDS(sourceList.c_str());
+	  
+	  string cfgPath = path;
+	  cfgPath+=outputName;
+	  cfgPath+=".py";
+	  TNamed* configfile = new TNamed("ConfigFile", cfgPath.c_str());
+	  p->AddInput(configfile);
+	  p->Process(SetDS, "FWLiteTSelector","",ProcEvents);
+	  p->ClearInput();
+	  delete SetDS;
 	}
-
 
 	if(PreDefName==0){ 
 
