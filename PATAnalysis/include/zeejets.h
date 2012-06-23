@@ -183,106 +183,106 @@ void Parameters(int i, par* Par){
 
 
 		case(11):
-			//DYJetstoLL_All:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)
+			//DYJetstoLL_All:  _EventNumber = 2446664 events -> _EventNumber/_xsec = 802.7 pb-1 (not skimmed)
 			Par->_xsec = 3048.;
 			Par->_EventFilter = 1.;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 26278781;
+			Par->_EventNumber = 0;
 			break;
 
 		case(12):
-			//TTJets_All:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//TTJets_All:  _EventNumber = 51221591 events -> _EventNumber/_xsec = 310434 pb-1 (skimmed)
 			Par->_xsec = 165.;
 			Par->_EventFilter = 1.;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 51221591;
 			break;
 
 		case(13):
-			//WJetsToLNu_All:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//WJetsToLNu_All:  _EventNumber = 81676286 events -> _EventNumber/_xsec = 2608 pb-1 (skimmed)
 			Par->_xsec = 31314.;
 			Par->_EventFilter = 1.;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 81676286;
 			break;
 
 		case(14):
-			//QCD_EMEnriched_Pt20to30_All:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//QCD_EMEnriched_Pt20to30_All:  _EventNumber = 26587740 events -> _EventNumber/(_xsec * _EventFilter) = 10,6 pb-1  (skimmed)
 			Par->_xsec = 2.361E8;
 			Par->_EventFilter = 0.0106;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 26587740;
 			break;
 
 		case(15):
-			//QCD_EMEnriched_Pt30to80_All:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//QCD_EMEnriched_Pt30to80_All:  _EventNumber = 26240974 events  -> _EventNumber/(_xsec * _EventFilter) = 7,24 pb-1  (skimmed)
 			Par->_xsec = 5.944E7;
 			Par->_EventFilter = 0.061;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 26240974;
 			break;
 
 		case(16):
-			//QCD_EMEnriched_Pt80to170_All:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//QCD_EMEnriched_Pt80to170_All:  _EventNumber = 7307766 events -> _EventNumber/(_xsec * _EventFilter) = 51,17 pb-1  (skimmed)
 			Par->_xsec = 898200.0;
 			Par->_EventFilter = 0.159;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 7566325;
+			Par->_EventNumber = 7307766;
 			break;
 
 		case(17):
-			//QCD_BCtoE_Pt20to30_All:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//QCD_BCtoE_Pt20to30_All:  _EventNumber = 2071133 events  -> _EventNumber/(_xsec * _EventFilter) = 14,87 pb-1  (skimmed)
 			Par->_xsec = 2.361E8;
 			Par->_EventFilter = 5.9E-4;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 2071133;
 			break;
 
 		case(18):
-			//QCD_BCtoE_Pt30to80_All:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//QCD_BCtoE_Pt30to80_All:  _EventNumber = 1453740 events -> _EventNumber/(_xsec * _EventFilter) =  10,11 pb-1  (skimmed)
 			Par->_xsec = 5.944E7;
 			Par->_EventFilter = 0.00242;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 1453740;
 			break;
 
 		case(19):
-			//QCD_BCtoE_Pt80to170_All:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//QCD_BCtoE_Pt80to170_All:  _EventNumber = 1082691 events  -> _EventNumber/(_xsec * _EventFilter) =  114,80 pb-1  (skimmed)
 			Par->_xsec = 898200.0;
 			Par->_EventFilter = 0.0105;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 1082691;
 			break;
 
 		case(101):
-			//WWJetsTo2L2Nu_All:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//WWJetsTo2L2Nu_All:  _EventNumber = 1197558 events -> _EventNumber/_xsec = 27850 pb-1   (skimmed)
 			Par->_xsec = 43.0;
 			Par->_EventFilter = 1.;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 1197558;
 			break;
 
 		case(102):
-			//WZJetsTo3LNu_All:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//WZJetsTo3LNu_All:   _EventNumber = 921134 events -> _EventNumber/_xsec =  50612 pb-1   (skimmed)
 			Par->_xsec = 18.2;
 			Par->_EventFilter = 1.;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 921134;
 			break;
 
 		case(103):
-			//ZZJetsTo4L_All:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//ZZJetsTo4L_All:   _EventNumber events = 696454 -> _EventNumber/_xsec = 118043 pb-1   (skimmed)
 			Par->_xsec = 5.9;
 			Par->_EventFilter = 1.;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 696454;
 			break;
 
 
 
 
 		case(21):
-			//DYJetstoLL_Train:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)
+			//DYJetstoLL_Train:  _EventNumber = 1199895 events -> _EventNumber/_xsec =  393,7 pb-1 (not skimmed)
 			Par->_xsec = 3048.;
 			Par->_EventFilter = 1.;
 			Par->_EventsPerFile = 0;
@@ -290,96 +290,96 @@ void Parameters(int i, par* Par){
 			break;
 
 		case(22):
-			//TTJets_Train:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//TTJets_Train:  _EventNumber = 25476773 events -> _EventNumber/_xsec = 154404  pb-1  (skimmed)
 			Par->_xsec = 165.;
 			Par->_EventFilter = 1.;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 25476773;
 			break;
 
 		case(23):
-			//WJetsToLNu_Train:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//WJetsToLNu_Train:  _EventNumber = 40895295 events -> _EventNumber/_xsec =  1306 pb-1  (skimmed)
 			Par->_xsec = 31314.;
 			Par->_EventFilter = 1.;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 40895295;
 			break;
 
 		case(24):
-			//QCD_EMEnriched_Pt20to30_Train:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//QCD_EMEnriched_Pt20to30_Train:  _EventNumber = 13224194 events -> _EventNumber/(_xsec * _EventFilter) = 5,28 pb-1  (skimmed)
 			Par->_xsec = 2.361E8;
 			Par->_EventFilter = 0.0106;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 13224194;
 			break;
 
 		case(25):
-			//QCD_EMEnriched_Pt30to80_Train:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//QCD_EMEnriched_Pt30to80_Train:  _EventNumber = 13165476 events -> _EventNumber/(_xsec * _EventFilter) = 3,63 pb-1  (skimmed)
 			Par->_xsec = 5.944E7;
 			Par->_EventFilter = 0.061;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 13165476;
 			break;
 
 		case(26):
-			//QCD_EMEnriched_Pt80to170_Train:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//QCD_EMEnriched_Pt80to170_Train:  _EventNumber = 3659576 events -> _EventNumber/(_xsec * _EventFilter) = 25,62 pb-1  (skimmed)
 			Par->_xsec = 898200.0;
 			Par->_EventFilter = 0.159;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 3659576;
 			break;
 
 		case(27):
-			//QCD_BCtoE_Pt20to30_Train:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//QCD_BCtoE_Pt20to30_Train:  _EventNumber = 971133 events -> _EventNumber/(_xsec * _EventFilter) = 6,97 pb-1  (skimmed)
 			Par->_xsec = 2.361E8;
 			Par->_EventFilter = 5.9E-4;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 971133;
 			break;
 
 		case(28):
-			//QCD_BCtoE_Pt30to80_Train:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//QCD_BCtoE_Pt30to80_Train:  _EventNumber = 750000 events -> _EventNumber/(_xsec * _EventFilter) = 5,21 pb-1  (skimmed)
 			Par->_xsec = 5.944E7;
 			Par->_EventFilter = 0.00242;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 750000;
 			break;
 
 		case(29):
-			//QCD_BCtoE_Pt80to170_Train:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//QCD_BCtoE_Pt80to170_Train:  _EventNumber = 575227 events -> _EventNumber/(_xsec * _EventFilter) = 61 pb-1  (skimmed)
 			Par->_xsec = 898200.0;
 			Par->_EventFilter = 0.0105;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 575227;
 			break;
 
 		case(201):
-			//WWJetsTo2L2Nu_Train:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//WWJetsTo2L2Nu_Train:  _EventNumber = 622993 events -> _EventNumber/_xsec = 14488 pb-1 (skimmed)
 			Par->_xsec = 43.0;
 			Par->_EventFilter = 1.;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 622993;
 			break;
 
 		case(202):
-			//WZJetsTo3LNu_Train:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//WZJetsTo3LNu_Train:  _EventNumber = 421134 events -> _EventNumber/_xsec =  23139 pb-1 (skimmed)
 			Par->_xsec = 18.2;
 			Par->_EventFilter = 1.;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 421134;
 			break;
 
 		case(203):
-			//ZZJetsTo4L_Train:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//ZZJetsTo4L_Train:  _EventNumber = 346454 events -> _EventNumber/_xsec = 58721 pb-1 (skimmed)
 			Par->_xsec = 5.9;
 			Par->_EventFilter = 1.;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 346454;
 			break;
 
 
 		case(31):
-			//DYJetstoLL_Sample:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)
+			//DYJetstoLL_Sample:  _EventNumber = 1246769 events -> _EventNumber/_xsec = 409 pb-1 (not skimmed)
 			Par->_xsec = 3048.;
 			Par->_EventFilter = 1.;
 			Par->_EventsPerFile = 0;
@@ -387,91 +387,91 @@ void Parameters(int i, par* Par){
 			break;
 
 		case(32):
-			//TTJets_Sample:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//TTJets_Sample:  _EventNumber =  25744818 events -> _EventNumber/_xsec = 156029 pb-1  (skimmed)
 			Par->_xsec = 165.;
 			Par->_EventFilter = 1.;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 25744818;
 			break;
 
 		case(33):
-			//WJetsToLNu_Sample:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//WJetsToLNu_Sample:  _EventNumber = 40780991 events -> _EventNumber/_xsec = 1302 pb-1  (skimmed)
 			Par->_xsec = 31314.;
 			Par->_EventFilter = 1.;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 40780991;
 			break;
 
 		case(34):
-			//QCD_EMEnriched_Pt20to30_Sample:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//QCD_EMEnriched_Pt20to30_Sample:  _EventNumber = 13363546 events -> _EventNumber/(_xsec * _EventFilter) = 5,34  pb-1  (skimmed)
 			Par->_xsec = 2.361E8;
 			Par->_EventFilter = 0.0106;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 13363546;
 			break;
 
 		case(35):
-			//QCD_EMEnriched_Pt30to80_Sample:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//QCD_EMEnriched_Pt30to80_Sample:  _EventNumber = 13075498 events -> _EventNumber/(_xsec * _EventFilter) =  3,60 pb-1  (skimmed)
 			Par->_xsec = 5.944E7;
 			Par->_EventFilter = 0.061;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 13075498;
 			break;
 
 		case(36):
-			//QCD_EMEnriched_Pt80to170_Sample:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//QCD_EMEnriched_Pt80to170_Sample:  _EventNumber = 3648190 events -> _EventNumber/(_xsec * _EventFilter) = 25,54  pb-1  (skimmed)
 			Par->_xsec = 898200.0;
 			Par->_EventFilter = 0.159;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 3648190;
 			break;
 
 		case(37):
-			//QCD_BCtoE_Pt20to30_Sample:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//QCD_BCtoE_Pt20to30_Sample:  _EventNumber = 1100000 events -> _EventNumber/(_xsec * _EventFilter) = 7,90 pb-1  (skimmed)
 			Par->_xsec = 2.361E8;
 			Par->_EventFilter = 5.9E-4;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 1100000;
 			break;
 
 		case(38):
-			//QCD_BCtoE_Pt30to80_Sample:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//QCD_BCtoE_Pt30to80_Sample:  _EventNumber = 750000 events -> _EventNumber/(_xsec * _EventFilter) = 5,21 pb-1  (skimmed)
 			Par->_xsec = 5.944E7;
 			Par->_EventFilter = 0.00242;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 750000;
 			break;
 
 		case(39):
-			//QCD_BCtoE_Pt80to170_Sample:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//QCD_BCtoE_Pt80to170_Sample:  _EventNumber = 507464 events -> _EventNumber/(_xsec * _EventFilter) = 53,80  pb-1  (skimmed)
 			Par->_xsec = 898200.0;
 			Par->_EventFilter = 0.0105;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 507464;
 			break;
 
 		case(301):
-			//WWJetsTo2L2Nu_Sample:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//WWJetsTo2L2Nu_Sample:  _EventNumber = 574565 events -> _EventNumber/_xsec = 13362 pb-1  (skimmed)
 			Par->_xsec = 43.0;
 			Par->_EventFilter = 1.;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 574565;
 			break;
 
 		case(302):
-			//WZJetsTo3LNu_Sample:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//WZJetsTo3LNu_Sample:  _EventNumber = 500000 events -> _EventNumber/_xsec = 27472 pb-1  (skimmed)
 			Par->_xsec = 18.2;
 			Par->_EventFilter = 1.;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 500000;
 			break;
 
 		case(303):
-			//ZZJetsTo4L_Sample:  _EventNumber events = _EventNumber/_xsec pb-1 (not skimmed)  (skimmed)
+			//ZZJetsTo4L_Sample:  _EventNumber = 350000 events -> _EventNumber/_xsec = vpb-1  (skimmed)
 			Par->_xsec = 5.9;
 			Par->_EventFilter = 1.;
 			Par->_EventsPerFile = 0;
-			Par->_EventNumber = 0;
+			Par->_EventNumber = 350000;
 			break;
 
 
