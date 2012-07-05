@@ -32,31 +32,37 @@ namespace Rivet {
       const FinalState fs(-5.0,5.0);
       addProjection(fs, "FS");
       
-      // Zee
-      LeadingParticlesFinalState ZeeFS(FinalState(-2.5,2.5, 0.)); 
+      // Zee (create electron pairs to veto them afterwards)
+      LeadingParticlesFinalState ZeeFS(FinalState(-2.4, 2.4, 20.)); 
       ZeeFS.addParticleIdPair(ELECTRON);
       addProjection(ZeeFS, "ZeeFS");
-      // Zmm
-      LeadingParticlesFinalState ZmmFS(FinalState(-2.4,2.4, 0.)); 
+
+      // Zmm (create muon pairs to veto them afterwards)
+      LeadingParticlesFinalState ZmmFS(FinalState(-2.4, 2.4, 20.)); 
       ZmmFS.addParticleIdPair(MUON);
       addProjection(ZmmFS, "ZmmFS");
-
+      
+      //create lepton pairs without pT and eta cut  
       vector<pair<PdgId,PdgId> > vidsZ;
       vidsZ.push_back(make_pair(ELECTRON, POSITRON));
       vidsZ.push_back(make_pair(MUON, ANTIMUON));
       
+      //final state with leptons with inv mass around the Z peak
       FinalState fsZ(-5.0,5.0);
       InvMassFinalState invfsZ(fsZ, vidsZ, 71*GeV, 111*GeV);
       addProjection(invfsZ, "INVFSZ");
-  
+
+      //create a final state without electrons/muons with high pT and from a Z  
       VetoedFinalState vfs(fs);
       vfs.addVetoOnThisFinalState(invfsZ);
       vfs.addVetoOnThisFinalState(ZeeFS);
       vfs.addVetoOnThisFinalState(ZmmFS);
 
+      //build the jets without leptons in it
       addProjection(vfs, "VFS");
       addProjection(FastJets(vfs, FastJets::ANTIKT, 0.5), "ak5Jets");
       addProjection(FastJets(vfs, FastJets::ANTIKT, 0.4), "ak4Jets");      
+
       //data points
       //histograms 
       _histMll            = bookHistogram1D("Mll", 60, 50., 130.);
@@ -96,14 +102,16 @@ namespace Rivet {
       bool isFid1 = false;
       bool isFid2 = false;
       if(lepton=="electron"){
-	isFid1 = ((fabs(eta1)<1.4442)||((fabs(eta1)>1.566)&&(fabs(eta1)<2.5)));
-	isFid2 = ((fabs(eta2)<1.4442)||((fabs(eta2)>1.566)&&(fabs(eta2)<2.5)));
+	isFid1 = //((fabs(eta1)<1.4442)||((fabs(eta1)>1.566)&&
+	  (fabs(eta1)<2.4);
+	isFid2 = //((fabs(eta2)<1.4442)||((fabs(eta2)>1.566)&&
+	  (fabs(eta2)<2.4);
       }
       if(lepton=="muon"){
 	isFid1 = ((fabs(eta1)<2.4));
 	isFid2 = ((fabs(eta2)<2.4));
       }
-
+      
       if( isFid1 && isFid2 && pt1>20 && pt2 >20){
 	const FourMomentum pmom = Zdaughters[0].momentum() + Zdaughters[1].momentum();
 	double mass = sqrt(pmom.invariant());
@@ -114,104 +122,6 @@ namespace Rivet {
       else return false;
     }
     
-    bool ApplyElectronCutsForZee(double pt1, double pt2, double eta1, double eta2){
-      bool isFid1 = ((fabs(eta1)<1.4442)||((fabs(eta1)>1.566)&&(fabs(eta1)<2.5)));
-      bool isFid2 = ((fabs(eta2)<1.4442)||((fabs(eta2)>1.566)&&(fabs(eta2)<2.5)));
-      if( isFid1 && isFid2 && pt1>20 && pt2 >10) return true;
-      else return false;
-    }
-    
-    bool ApplyMuonCutsForZmm(double pt1, double pt2, double eta1, double eta2){
-      if(fabs(eta1)<2.4  && fabs(eta2)<2.4 && pt1>20 && pt2>20) return true;
-      else return false;
-    }
-    
-    
-    bool ApplyElectronCutsForWen(double pt1, double eta1){
-      bool isFid1 = ((fabs(eta1)<1.4442)||((fabs(eta1)>1.566)&&(fabs(eta1)<2.5)));
-      if( isFid1 && pt1>20 ) return true;
-      return 0;
-    }
- 
-   
-    bool ApplyMuonCutsForWmn(double pt1, double eta1){
-      bool isFid1 = ((fabs(eta1)<2.1));
-      if( isFid1 && pt1>20) return true;
-      return 0;
-    }
-    
-
-    void Fill(AIDA::IHistogram1D*& _histJetMult, const double& weight, std::vector<FourMomentum>& finaljet_list){
-      _histJetMult->fill(0, weight);
-      for (size_t i=0 ; i<finaljet_list.size() ; ++i) {
-        if (i==6) break;
-        _histJetMult->fill(i+1, weight);  // inclusive
-      }
-    }  
-    
-    void FillNoverNm1(AIDA::IHistogram1D*& _histJetMult,AIDA::IDataPointSet* _histNoverNm1){
-      std::vector<double> y, yerr;
-      for (int i=0; i<_histJetMult->axis().bins()-1; i++) {
-        double val = 0.;
-        double err = 0.;
-        if (!fuzzyEquals(_histJetMult->binHeight(i), 0)) {
-          val = _histJetMult->binHeight(i+1) / _histJetMult->binHeight(i);
-          err = val * sqrt(  pow(_histJetMult->binError(i+1)/_histJetMult->binHeight(i+1), 2)
-                           + pow(_histJetMult->binError(i)  /_histJetMult->binHeight(i)  , 2) );
-        }
-        y.push_back(val);
-        yerr.push_back(err);
-      }
-      _histNoverNm1->setCoordinate(1, y, yerr);
-    }    
-    void FillNoverN0(AIDA::IHistogram1D*& _histJetMult,AIDA::IDataPointSet* _histNoverN0){
-      std::vector<double> y, yerr;
-      for (int i=0; i<_histJetMult->axis().bins()-1; i++) {
-        double val = 0.;
-        double err = 0.;
-        if (!fuzzyEquals(_histJetMult->binHeight(i), 0)) {
-          val = _histJetMult->binHeight(i+1) / _histJetMult->binHeight(0);
-          err = val * sqrt(  pow(_histJetMult->binError(i+1)/_histJetMult->binHeight(i+1), 2)
-                           + pow(_histJetMult->binError(0)  /_histJetMult->binHeight(0)  , 2) );
-        }
-        y.push_back(val);
-        yerr.push_back(err);
-      }
-      _histNoverN0->setCoordinate(1, y, yerr);
-    }    
-
-    
-   void FillChargeAssymHistogramSet(  AIDA::IHistogram1D*& _histJetMult1,AIDA::IHistogram1D*& _histJetMult2, AIDA::IDataPointSet* _histJetMultRatio12 ){
-      std::vector<double> yval, yerr;
-      for (int i = 0; i < 4; ++i) {
-        std::vector<double> xval; xval.push_back(i);
-        std::vector<double> xerr; xerr.push_back(.5);
-        double ratio = 0;
-        double err = 0.;
-        double num = _histJetMult1->binHeight(i)-_histJetMult2->binHeight(i);
-	double den = _histJetMult1->binHeight(i)+_histJetMult2->binHeight(i);
-	double errNum = 0;
-	errNum = std::pow(_histJetMult1->binError(i),2)+std::pow(_histJetMult2->binError(i),2);
-	double errDen = 0;
-	errDen = std::pow(_histJetMult1->binError(i),2)+std::pow(_histJetMult2->binError(i),2); 
-
-        if (den)ratio = num/den;
-
-        if(num)
-	  errNum = errNum/(num*num); 
-        if(den) 
-	  errDen = errDen/(den*den);
-
-        err = std::sqrt(errDen+errNum);
-	if(!(err==err))err=0;
-        yval.push_back(ratio);
-        yerr.push_back(ratio*err);
-        }
-        _histJetMultRatio12->setCoordinate(1,yval,yerr);
-      }
-    
-
-
     
     void analyze(const Event& event) {
       //some flag definitions.
@@ -220,88 +130,51 @@ namespace Rivet {
     
       const double weight = event.weight();
       
-      //define the Z candidate
+      //define the Z candidate 
       const InvMassFinalState& invMassFinalStateZ = applyProjection<InvMassFinalState>(event, "INVFSZ");
-      ////const InvMassFinalState& invMassFinalStateW = applyProjection<InvMassFinalState>(event, "INVFSW");
-      const LeadingParticlesFinalState& ZeeFS = applyProjection<LeadingParticlesFinalState>(event, "ZeeFS");
-      const LeadingParticlesFinalState& ZmmFS = applyProjection<LeadingParticlesFinalState>(event, "ZmmFS");
+      const LeadingParticlesFinalState& ZeeFS     = applyProjection<LeadingParticlesFinalState>(event, "ZeeFS");
+      const LeadingParticlesFinalState& ZmmFS     = applyProjection<LeadingParticlesFinalState>(event, "ZmmFS");
       
-      bool isW(false); bool isZ(false);
+      bool isZ(false);
       
-      isZ= (ZeeFS.particles().size()>1 && ZmmFS.empty()) || (ZmmFS.particles().size()>1 && ZeeFS.empty()); 
-      //isW=(!WminusenuFS.empty() || !WplusenuFS.empty() || !WminusmunuFS.empty() || !WplusmunuFS.empty());
+      isZ = ((ZeeFS.particles().size()>1) || (ZmmFS.particles().size()>1)); 
       
-      //isW  = (invMassFinalStateZ.empty() && !(invMassFinalStateW.empty()));
-      //isZ  = !(invMassFinalStateZ.empty());
-      //&& invMassFinalStateW.empty());
-      
-      const ParticleVector& ZeeDaus  = ZeeFS.particlesByPt();
+      const ParticleVector& ZeeDaus = ZeeFS.particlesByPt();
       const ParticleVector& ZmmDaus = ZmmFS.particlesByPt();
 
-      //const ParticleVector&  ZDecayProducts =  invMassFinalStateZ.particles();
-      
-      //if (ZDecayProducts.size() < 2 ) vetoEvent; 
-      //&& WDecayProducts.size() <2) vetoEvent;
-      
       double pt1=-9999.,  pt2=-9999.;
       double phi1=-9999., phi2=-9999.;
       double eta1=-9999., eta2=-9999.;
       
       if(isZ){
         cout<<"found a Z"<<endl;
-	if(ZeeDaus.size()==2 && ZmmDaus.size()<2){
+	if(ZeeDaus.size()>1 && ZmmDaus.size()<2){
 	  isZee = ApplyZAcceptance(ZeeFS,"electron");
 	  GetPtEtaPhi(ZeeDaus[0],pt1,eta1,phi1);
 	  GetPtEtaPhi(ZeeDaus[1],pt2,eta2,phi2);
 	}
-	if(ZmmDaus.size()==2 && ZeeDaus.size()<2){
+	if(ZmmDaus.size()>1 && ZeeDaus.size()<2){
 	  isZmm = ApplyZAcceptance(ZmmFS,"muon");
+	  GetPtEtaPhi(ZmmDaus[0],pt1,eta1,phi1);
+          GetPtEtaPhi(ZmmDaus[1],pt2,eta2,phi2);
 	}
       }
 
-      /*if(isZ){
-	pt1  = ZDecayProducts[0].momentum().pT();
-	pt2  = ZDecayProducts[1].momentum().pT();
-	eta1 = ZDecayProducts[0].momentum().eta();
-	eta2 = ZDecayProducts[1].momentum().eta();
-	phi1 = ZDecayProducts[0].momentum().phi();
-	phi2 = ZDecayProducts[1].momentum().phi();
-      }
-      
-      isZmm = isZ && ((fabs(ZDecayProducts[0].pdgId()) == 13) && (fabs(ZDecayProducts[1].pdgId()) == 13));
-      isZee = isZ && ((fabs(ZDecayProducts[0].pdgId()) == 11) && (fabs(ZDecayProducts[1].pdgId()) == 11));*/
-      
-
       if(!(isZmm||isZee)) vetoEvent;
-      
-      /*bool passBosonConditions = false;
-      //apply kinematical cuts on pt and eta
-      if(isZmm)passBosonConditions = ApplyMuonCutsForZmm(pt1,pt2,eta1,eta2);
-      if(isZee)passBosonConditions = ApplyElectronCutsForZee(pt1,pt2,eta1,eta2);
-      
-      
-      if(!passBosonConditions) vetoEvent;*/
       
       //Obtain the jets.
       vector<FourMomentum> finaljet_list;
-      foreach (const Jet& j, applyProjection<FastJets>(event, "ak4Jets").jetsByPt(30.0*GeV)) {
+      foreach (const Jet& j, applyProjection<FastJets>(event, "ak5Jets").jetsByPt(30.0*GeV)) {
 	const double jeta = j.momentum().eta();
 	const double jphi = j.momentum().phi();
 	const double jpt  = j.momentum().pT();
 	//kinematic cuts on the jets 
 	if (fabs(jeta) < 2.5){
-	  if(jpt>50){
-	    if(isZee){
-	      if (deltaR(pt1, phi1, jeta, jphi) > 0.3 && deltaR(pt2, phi2, jeta, jphi) > 0.3)
-		finaljet_list.push_back(j.momentum());
-	      continue;
-	    }
-	    else if(isZmm){
-              //require minimum separation  between jets
-	      if (deltaR(pt1, phi1, jeta, jphi) > 0.4 && deltaR(pt2, phi2, jeta, jphi) > 0.4)
-                finaljet_list.push_back(j.momentum());
-              continue;
-            }
+	  if(jpt>30.){
+	    //require minimum separation  between jets
+	    if (deltaR(pt1, phi1, jeta, jphi) > 0.4 && deltaR(pt2, phi2, jeta, jphi) > 0.4)
+	      finaljet_list.push_back(j.momentum());
+	    continue;
 	  }
 	}
       }
