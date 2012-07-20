@@ -15,11 +15,12 @@
 namespace Rivet {
   
   
-  class ZJETS_ANGULAR_DRESS: public Analysis {
+  class ZJETS_ANGULAR_DRESS_NEW: public Analysis {
+
   public:
     
-    ZJETS_ANGULAR_DRESS()
-      : Analysis("ZJETS_ANGULAR_DRESS")
+    ZJETS_ANGULAR_DRESS_NEW()
+      : Analysis("ZJETS_ANGULAR_DRESS_NEW")
     {
       setBeams(PROTON, PROTON);
       setNeedsCrossSection(true);
@@ -60,15 +61,21 @@ namespace Rivet {
       _histPtJet2         = bookHistogram1D("PtJet2", 45, 50., 500.);
       _histPtJet3         = bookHistogram1D("PtJet3", 45, 50., 500.);
       _histPtJet4         = bookHistogram1D("PtJet4", 45, 50., 500.);
-      _histDeltaPhiZJ1    = bookHistogram1D("DeltaPhiZJ1", 32, 0., 3.15);
-      _histDeltaPhiZJ2    = bookHistogram1D("DeltaPhiZJ2", 32, 0., 3.15);
-      _histDeltaPhiZJ3    = bookHistogram1D("DeltaPhiZJ3", 32, 0., 3.15);
-      _histDeltaPhiZJ1_2  = bookHistogram1D("DeltaPhiZJ1_2", 32, 0., 3.15);
-      _histDeltaPhiZJ1_3  = bookHistogram1D("DeltaPhiZJ1_3", 32, 0., 3.15);
-      _histDeltaPhiZJ2_3  = bookHistogram1D("DeltaPhiZJ2_3", 32, 0., 3.15);
-      _histDeltaPhiJ1J2_2 = bookHistogram1D("DeltaPhiJ1J2_2", 32, 0., 3.15);
-      _histDeltaPhiJ1J2_3 = bookHistogram1D("DeltaPhiJ1J2_3", 32, 0., 3.15);
-      _histSumDeltaPhi    = bookHistogram1D("SumDeltaPhi", 32, 0, 6.30);
+      //DeltaPhi(Z,J1) for >=1 jet events
+      _histDeltaPhiZJ1_1  = bookHistogram1D("DeltaPhiZJ1_1", 30, 0., 3.14160);                                                                      
+      //DeltaPhi(Z,J1) for >=2 jets events                                                                                                                
+      _histDeltaPhiZJ1_2  = bookHistogram1D("DeltaPhiZJ1_2", 30, 0., 3.14160);
+      //DeltaPhi(Z,J1) for >=3 jets events
+      _histDeltaPhiZJ1_3  = bookHistogram1D("DeltaPhiZJ1_3", 30, 0., 3.14160);
+      //DeltaPhi(Z,J2) for >=3 jets events                                                                                                                  
+      _histDeltaPhiZJ2_3  = bookHistogram1D("DeltaPhiZJ2_3", 30, 0., 3.14160);
+      //DeltaPhi(Z,J3) for >=3 jets events
+      _histDeltaPhiZJ3_3  = bookHistogram1D("DeltaPhiZJ3_3", 30, 0., 3.14160);
+      //DeltaPhi(Ji,Jj) for >=3 jets events
+      _histDeltaPhiJ1J2_3 = bookHistogram1D("DeltaPhiJ1J2_2", 30, 0., 3.14160);
+      _histDeltaPhiJ2J3_3 = bookHistogram1D("DeltaPhiJ2J3_3", 30, 0., 3.14160);
+      _histDeltaPhiJ1J3_3 = bookHistogram1D("DeltaPhiJ1J3_3", 30, 0., 3.14160);
+      
       
     }
     
@@ -132,13 +139,13 @@ namespace Rivet {
       
       if(Njets){
 	//double Njets = finaljet_list.size();
-	cout<<"No of jets: "    <<Njets<<endl;
+	//cout<<"No of jets: "    <<Njets<<endl;
 	//cout<<"pt 1st jet: "    <<finaljet_list[0].pT()<<endl;
 	//cout<<"pt 1st lepton: " <<leptons[0].momentum().pT()<<endl;
         //cout<<"pt 2nd lepton: " <<leptons[1].momentum().pT()<<endl;
-        cout<<"1st jet eta,phi: ("<<finaljet_list[0].eta()<<     ","<<finaljet_list[0].phi()     <<endl;
-	cout<<"1st lep eta,phi: ("<<leptons[0].momentum().eta()<<","<<leptons[0].momentum().phi()<<endl;
-	cout<<"2nd lep eta,phi: ("<<leptons[1].momentum().eta()<<","<<leptons[1].momentum().phi()<<endl;
+        //cout<<"1st jet eta,phi: ("<<finaljet_list[0].eta()<<     ","<<finaljet_list[0].phi()     <<endl;
+	//cout<<"1st lep eta,phi: ("<<leptons[0].momentum().eta()<<","<<leptons[0].momentum().phi()<<endl;
+	//cout<<"2nd lep eta,phi: ("<<leptons[1].momentum().eta()<<","<<leptons[1].momentum().phi()<<endl;
 
 	//FourMomentum pZ = ZDecayProducts[0].momentum() + ZDecayProducts[1].momentum();
 	double Mll  = pZ.mass();
@@ -150,7 +157,7 @@ namespace Rivet {
 	_histNjets->fill(Njets, weight);
 	_histPtll->fill(Ptll, weight);
 	_histPtJet1->fill(PtJet1, weight);
-	_histDeltaPhiZJ1->fill(deltaPhi(PhiJet1,PhiZ), weight);
+	_histDeltaPhiZJ1_1->fill(deltaPhi(PhiJet1,PhiZ), weight);
 	
 	if(Njets>1){
 	  FourMomentum pJ1J2 = finaljet_list[0] + finaljet_list[1];
@@ -159,27 +166,24 @@ namespace Rivet {
 	  double PhiJet2 = finaljet_list[1].phi();
 	  _histMjj->fill(Mjj);
 	  _histPtJet2->fill(PtJet2, weight);
-	  _histDeltaPhiZJ2->fill(deltaPhi(PhiJet2,PhiZ), weight);
 	  _histDeltaPhiZJ1_2->fill(deltaPhi(PhiJet1,PhiZ), weight);
-	  _histDeltaPhiJ1J2_2->fill(deltaPhi(PhiJet1,PhiJet2), weight);
 	  
 	  if(Njets>2){
 	    double PtJet3  = finaljet_list[2].pT();
 	    double PhiJet3 = finaljet_list[2].phi();
-	    double SumDeltaPhi = deltaPhi(PhiJet1,PhiJet2) + deltaPhi(PhiJet1,PhiJet3) + deltaPhi(PhiJet2,PhiJet3);
-	    _histSumDeltaPhi->fill(SumDeltaPhi, weight);
+	    //double SumDeltaPhi = deltaPhi(PhiJet1,PhiJet2) + deltaPhi(PhiJet1,PhiJet3) + deltaPhi(PhiJet2,PhiJet3);
 	    _histPtJet3->fill(PtJet3, weight);
 	    _histDeltaPhiZJ1_3->fill(deltaPhi(PhiJet1,PhiZ), weight);
 	    _histDeltaPhiZJ2_3->fill(deltaPhi(PhiJet2,PhiZ), weight);
+	    _histDeltaPhiZJ3_3->fill(deltaPhi(PhiZ,PhiJet3), weight);
 	    _histDeltaPhiJ1J2_3->fill(deltaPhi(PhiJet1,PhiJet2), weight);
-	    _histDeltaPhiZJ3->fill(deltaPhi(PhiZ,PhiJet3), weight);
+	    _histDeltaPhiJ1J3_3->fill(deltaPhi(PhiJet1,PhiJet3), weight);
+	    _histDeltaPhiJ2J3_3->fill(deltaPhi(PhiJet2,PhiJet3), weight);
 	    
 	    if(Njets>3){
 	      double PtJet4  = finaljet_list[2].pT();
-	      //double SumDeltaPhi = deltaPhi(PhiJet1,PhiJet2) + deltaPhi(PhiJet1,PhiJet3) + deltaPhi(PhiJet3,PhiJet2);
-	      _histPtJet4->fill(PtJet4, weight);
-	      //(_histSumDeltaPhi->fill(SumDeltaPhi, weight);
-	    }
+	       _histPtJet4->fill(PtJet4, weight);
+	     }
 	  }
 	}
       }
@@ -205,9 +209,9 @@ namespace Rivet {
       
       if(isAcceptance && isMassRange) return true;
       else return false;
-      }
-
-      
+    }
+    
+    
     /// Normalise histograms etc., after the run
     void finalize() {
     }
@@ -221,19 +225,19 @@ namespace Rivet {
     AIDA::IHistogram1D* _histPtJet2;         
     AIDA::IHistogram1D* _histPtJet3;         
     AIDA::IHistogram1D* _histPtJet4;         
-    AIDA::IHistogram1D* _histDeltaPhiZJ1;    
-    AIDA::IHistogram1D* _histDeltaPhiZJ2;    
-    AIDA::IHistogram1D* _histDeltaPhiZJ3;    
-    AIDA::IHistogram1D* _histDeltaPhiZJ1_2;  
-    AIDA::IHistogram1D* _histDeltaPhiZJ1_3;  
+    AIDA::IHistogram1D* _histDeltaPhiZJ1_1;    
+    AIDA::IHistogram1D* _histDeltaPhiZJ1_2;    
+    AIDA::IHistogram1D* _histDeltaPhiZJ1_3;    
     AIDA::IHistogram1D* _histDeltaPhiZJ2_3;  
-    AIDA::IHistogram1D* _histDeltaPhiJ1J2_2; 
+    AIDA::IHistogram1D* _histDeltaPhiZJ3_3;  
     AIDA::IHistogram1D* _histDeltaPhiJ1J2_3; 
-    AIDA::IHistogram1D* _histSumDeltaPhi;    
+    AIDA::IHistogram1D* _histDeltaPhiJ1J3_3;
+    AIDA::IHistogram1D* _histDeltaPhiJ2J3_3; 
+    //AIDA::IHistogram1D* _histSumDeltaPhi;    
     
     };
   
-    AnalysisBuilder<ZJETS_ANGULAR_DRESS> plugin_ZJETS_ANGULAR_DRESS;
+    AnalysisBuilder<ZJETS_ANGULAR_DRESS_NEW> plugin_ZJETS_ANGULAR_DRESS_NEW;
     
   }
 
