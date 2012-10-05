@@ -5,7 +5,7 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 # Customization
 ####################
 
-isMC = False       # True: MC, False: Data - To set in recZeePatAddOns_cff.py too!
+isMC = True       # True: MC, False: Data - To set in recZeePatAddOns_cff.py too!
 MCSkimm = True    # True: MC Skimming (no signal!)
 DataSkimm = True   # True: Data Skimming (standard configuration)
 
@@ -19,14 +19,14 @@ numEventsToRun = -1                  # (e.g. -1 to run on all events)
 #MC
 #nameOutput = 'DYJetsToLL_M_50_Fall11_Ele.root' # Output file name
 
+#nameOutput = 'QCD_BCtoE_Pt20to30_Fall11_Ele.root'
+#nameOutput = 'QCD_BCtoE_Pt30to80_Fall11_Ele.root'
+#nameOutput = 'QCD_BCtoE_Pt80to170_Fall11_Ele.root'
+#nameOutput = 'QCD_EMEnriched_Pt20to30_Fall11_Ele.root'
+#nameOutput = 'QCD_EMEnriched_Pt30to80_Fall11_Ele.root'
+#nameOutput = 'QCD_EMEnriched_Pt80to170_Fall11_Ele.root'
 #nameOutput = 'TTJets_Fall11_Ele.root'
-#nameOutput = 'WJetsToLNu_Fall11_Ele.root'
-#nameOutput = 'QCD_Pt20to30_EMEnriched_Fall11_Ele.root'
-#nameOutput = 'QCD_Pt30to80_EMEnriched_Fall11_Ele.root'
-#nameOutput = 'QCD_Pt80to170_EMEnriched_Fall11_Ele.root'
-#nameOutput = 'QCD_Pt20to30_BCtoE_Fall11_Ele.root'
-#nameOutput = 'QCD_Pt30to80_BCtoE_Fall11_Ele.root'
-#nameOutput = 'QCD_Pt80to170_BCtoE_Fall11_Ele.root'
+nameOutput = 'WJetsToLNu_Fall11_Ele.root'
 #nameOutput = 'WWJetsTo2L2Nu_Fall11_Ele.root'
 
 #nameOutput = 'WZJetsTo3LNu_Fall11_Ele.root'
@@ -37,7 +37,7 @@ numEventsToRun = -1                  # (e.g. -1 to run on all events)
 #nameOutput = 'DoubleElectron_Run2011A_PromptReco_v4.root'
 #nameOutput = 'DoubleElectron_Run2011A_05Aug2011_v1.root'
 #nameOutput = 'DoubleElectron_Run2011A_PromptReco_v6.root'
-nameOutput = 'DoubleElectron_Run2011B_PromptReco_v1.root'
+#nameOutput = 'DoubleElectron_Run2011B_PromptReco_v1.root'
                  
 
 DataSubset = False   # True: select a Data subset
@@ -47,7 +47,7 @@ Data_Range = '175873:1-175873:32'
 GloTagMC = 'START42_V17::All'              # Global Tag MC
 GloTagData = 'GR_R_42_V25::All'            # Global Tag Data
 
-pathTrigger = '(path("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*", 1, 1) || path("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*", 1, 1) || path("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*", 1, 1)) || (path("HLT_L1_SingleEG5_v*", 1, 1) || path("HLT_L1_SingleEG12_v*", 1, 1)) || (path("HLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_v*", 1, 1) || path("HLT_Ele32_CaloIdL_CaloIsoVL_SC17_v*", 1, 1))' # selecting the trigger objects
+pathTrigger = '(path("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*", 1, 1) || path("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*", 1, 1) || path("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*", 1, 1)) || (path("HLT_L1_SingleEG5_v*", 1, 1) || path("HLT_L1_SingleEG12_v*", 1, 1)) || (path("HLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_v*", 1, 1) || path("HLT_Ele32_CaloIdL_CaloIsoVL_SC17_v*", 1, 1)) || (path("HLT_Photon50_CaloIdVL_IsoL_v*", 1, 1) || path("HLT_Photon75_CaloIdVL_v*", 1, 1) || path("HLT_Photon90_CaloIdVL_v*", 1, 1) || path("HLT_Photon90_CaloIdVL_IsoL_v*", 1, 1) || path("HLT_Photon125_v*", 1, 1) || path("HLT_Photon135_v*", 1, 1))' # selecting the trigger objects
 
 #type("TriggerElectron") && 
 #path("HLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v*", 1, 1)' # secondo Ele32 presente nei dati (SingleEle)

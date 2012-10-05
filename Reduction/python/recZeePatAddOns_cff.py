@@ -1,7 +1,7 @@
 ####################
 # Customization
 ####################
-isMC = False
+isMC = True
 ####################
 
 import FWCore.ParameterSet.Config as cms
