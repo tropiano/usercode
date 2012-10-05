@@ -18,10 +18,10 @@ echo "RESTO = $RESTO"
 
 if [ "$RESTO" -eq 0 ]; then
 	N=$(expr $M / 2)
-	echo $N
+	echo "N = $N"
 else
 	N=$(expr $(expr $M - 1) / 2)
-	echo $N
+	echo "N = $N"
 fi
 
 #All
