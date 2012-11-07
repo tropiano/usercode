@@ -164,13 +164,17 @@ void RecoElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
    if(_selections=="SYM"){
    _RecoCutFlags[_Acc] =  "_AccSYM";
    _RecoCutFlags[_Conv] = "_ConvSYM"; 
-   _RecoCutFlags[_Iso] =  "_IsoSYM";
-   _RecoCutFlags[_ElID] =  "_ElIDSYM";}
+//   _RecoCutFlags[_Iso] =  "_IsoSYM";
+   _RecoCutFlags[_Iso] =  "_IsoPhotonSYM";
+//   _RecoCutFlags[_ElID] =  "_ElIDSYM";
+   _RecoCutFlags[_ElID] =  "_ElIDPhotonSYM";}
    if(_selections=="ASYM"){
    _RecoCutFlags[_Acc] =  "_AccASYM";
    _RecoCutFlags[_Conv] = "_ConvASYM"; 
-   _RecoCutFlags[_Iso] =  "_IsoASYM";
-   _RecoCutFlags[_ElID] =  "_ElIDASYM";}
+//   _RecoCutFlags[_Iso] =  "_IsoASYM";
+   _RecoCutFlags[_Iso] =  "_IsoPhotonASYM";
+//   _RecoCutFlags[_ElID] =  "_ElIDASYM";
+   _RecoCutFlags[_ElID] =  "_ElIDPhotonASYM";}
      
    _RecoCutFlags[_Trg] =  "_Trg";   
    _RecoCutFlags[_Imp] =  "_Imp";
@@ -2015,11 +2019,17 @@ void  RecoElectron::process(const fwlite::Event& iEvent){
 	
 	string IsoFlag, ElIDFlag;
 	if(_selections=="SYM"){
-	IsoFlag="_IsoSYM";
-	ElIDFlag="_ElIDSYM";}
+//	IsoFlag="_IsoSYM";
+	IsoFlag="_IsoPhotonSYM";
+//	ElIDFlag="_ElIDSYM";
+	ElIDFlag="_ElIDPhotonSYM";
+	}
 	if(_selections=="ASYM"){
-	IsoFlag="_IsoASYM";
-	ElIDFlag="_ElIDASYM";}
+//	IsoFlag="_IsoASYM";
+	IsoFlag="_IsoPhotonASYM";
+//	ElIDFlag="_ElIDASYM";
+	ElIDFlag="_ElIDPhotonASYM";
+	}
  
 	for(int fcount = 1; fcount<7; fcount++){
 	
@@ -2134,8 +2144,9 @@ void RecoElectron::finalize(){
    Report<<"Normalization factor = "<<_norm<<endl;}
    if(!_Norm || lumi==0)Report<<"Sample not normalized"<<endl;
    Report<<endl<<"Selections Type used = "<<_selections.c_str()<<endl;
-   if(_selections=="SYM")Report<<"Endcap ElID applied = "<<ElID_End_SYM.c_str()<<endl;
-   Report<<"Barrel ElID applied = "<<ElID_Bar_SYM.c_str()<<endl;
+   if(_selections=="SYM")
+//   Report<<"Endcap ElID applied = "<<ElID_End_SYM.c_str()<<endl;
+//   Report<<"Barrel ElID applied = "<<ElID_Bar_SYM.c_str()<<endl;
    Report<<"Selections applied:"<<endl;
    Report<<_RecoCutFlags[1].c_str()<<endl;
    Report<<_RecoCutFlags[2].c_str()<<endl;
@@ -2207,10 +2218,10 @@ void RecoElectron::finalize(){
    //Report<<"eta_el_excl_down = "<<eta_el_excl_down<<endl;
    Report<<"zmassmin_asym = "<<zmassmin_asym<<endl;
    Report<<"zmassmax_asym = "<<zmassmax_asym<<endl<<endl;
-   Report<<"ASYM0 Endcaps ElID applied = "<<ElID_End_ASYM0.c_str()<<endl;
-   Report<<"ASYM0 Barrel ElID applied = "<<ElID_Bar_ASYM0.c_str()<<endl;
-   Report<<"ASYM1 Endcaps ElID applied = "<<ElID_End_ASYM1.c_str()<<endl;
-   Report<<"ASYM1 Barrel ElID applied = "<<ElID_Bar_ASYM1.c_str()<<endl;
+//   Report<<"ASYM0 Endcaps ElID applied = "<<ElID_End_ASYM0.c_str()<<endl;
+//   Report<<"ASYM0 Barrel ElID applied = "<<ElID_Bar_ASYM0.c_str()<<endl;
+//   Report<<"ASYM1 Endcaps ElID applied = "<<ElID_End_ASYM1.c_str()<<endl;
+//   Report<<"ASYM1 Barrel ElID applied = "<<ElID_Bar_ASYM1.c_str()<<endl;
    Report<<"dxycut = "<<dxycut<<endl<<endl;
    Report<<"ptjetmin = "<<ptjetmin<<endl;
    Report<<"etajetmax = "<<etajetmax<<endl;

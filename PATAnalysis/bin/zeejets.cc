@@ -30,44 +30,44 @@ using namespace std;
 5. Run2011B_PromptReco_v1		(skimmed)
 
 -1. All
-11. DYJetstoLL_All 			(not skimmed)
-12. TTJets_All 			(skimmed)
-13. WJetsToLNu_All 			(skimmed)
+11. DYJetstoLL_M50_All			(not skimmed)
+12. TTJets_All				(skimmed)
+13. WJetsToLNu_All			(skimmed)
 14. QCD_EMEnriched_Pt20to30_All		(skimmed)
-15. QCD_EMEnriched_Pt30to80_All 	(skimmed)
+15. QCD_EMEnriched_Pt30to80_All		(skimmed)
 16. QCD_EMEnriched_Pt80to170_All	(skimmed)
-17. QCD_BCtoE_Pt20to30_All 		(skimmed)
+17. QCD_BCtoE_Pt20to30_All		(skimmed)
 18. QCD_BCtoE_Pt30to80_All 		(skimmed)
 19. QCD_BCtoE_Pt80to170_All		(skimmed)
-101. WWJetsTo2L2Nu_All 			(skimmed)
-102. WZJetsTo3LNu_All 			(skimmed)
-103. ZZJetsTo4L_All 			(skimmed)
+101. WWJetsTo2L2Nu_All			(skimmed)
+102. WZJetsTo3LNu_All			(skimmed)
+103. ZZJetsTo4L_All			(skimmed)
 
 -2. All Train
-21. DYJetstoLL_All_Train 		(not skimmed)
-22. TTJets_All_Train 		(skimmed)
-23. WJetsToLNu_All_Train 		(skimmed)
+21. DYJetstoLL_M50_Train 		(not skimmed)
+22. TTJets_Train			(skimmed)
+23. WJetsToLNu_Train	 		(skimmed)
 24. QCD_EMEnriched_Pt20to30_Train	(skimmed)
 25. QCD_EMEnriched_Pt30to80_Train	(skimmed)
 26. QCD_EMEnriched_Pt80to170_Train	(skimmed)
 27. QCD_BCtoE_Pt20to30_Train 		(skimmed)
 28. QCD_BCtoE_Pt30to80_Train 		(skimmed)
 29. QCD_BCtoE_Pt80to170_Train		(skimmed)
-201. WWJetsTo2L2Nu_All_Train 		(skimmed)
+201. WWJetsTo2L2Nu_Train 		(skimmed)
 202. WZJetsTo3LNu_Train 		(skimmed)
 203. ZZJetsTo4L_Train 			(skimmed)
 
 -3. All Sample
-31. DYJetstoLL_All_Sample 		(not skimmed)
-32. TTJets_All_Sample 		(skimmed)
-33. WJetsToLNu_All_Sample 		(skimmed)
+31. DYJetstoLL_M50_Sample 		(not skimmed)
+32. TTJets_Sample			(skimmed)
+33. WJetsToLNu_Sample			(skimmed)
 34. QCD_EMEnriched_Pt20to30_Sample	(skimmed)
 35. QCD_EMEnriched_Pt30to80_Sample	(skimmed)
 36. QCD_EMEnriched_Pt80to170_Sample	(skimmed)
 37. QCD_BCtoE_Pt20to30_Sample 		(skimmed)
 38. QCD_BCtoE_Pt30to80_Sample 		(skimmed)
 39. QCD_BCtoE_Pt80to170_Sample		(skimmed)
-301. WWJetsTo2L2Nu_All_Sample 		(skimmed)
+301. WWJetsTo2L2Nu_Sample 		(skimmed)
 302. WZJetsTo3LNu_Sample 		(skimmed)
 303. ZZJetsTo4L_Sample 			(skimmed)
 
@@ -82,77 +82,78 @@ int main(int argc, char *argv[]) {
 	int PreDefName, ProcEvents;
 	string sourceList, sample, outNameSuf;
 
-	if (argc<3) {
-		cout << "Usage is zeejets.exe PreDefName, ProcEvents, stop" << endl;
+	if (argc <3) {
+		cout << "Usage is: " << endl << "zeejets.exe PreDefName ProcEvents" << endl << "Stop" << endl;
 		return 0;
 	}
 	else
 
-	PreDefName=atoi(argv[1]);
+	PreDefName = atoi(argv[1]);
  
  	//Number of events to be processed
-	ProcEvents=atoi(argv[2]);
+	ProcEvents = atoi(argv[2]);
 
 	//List of Source Files
-	string SourceFilesDir 		= "SourceFilesElectrons/";
+	string SourceFilesDir = "SourceFilesElectrons/";
 
 	string Run2011A_May10ReReco_v1 = "Run2011A_May10ReReco_v1.list";
-	string Run2011A_PromptReco_v4 = "";
-	string Run2011A_05Aug2011_v1 = "";
-	string Run2011A_PromptReco_v6 = "";
-	string Run2011B_PromptReco_v1 = "";
+	string Run2011A_PromptReco_v4 = "Run2011A_PromptReco_v4.list";
+	string Run2011A_05Aug2011_v1 = "Run2011A_05Aug2011_v1.list";
+	string Run2011A_PromptReco_v6 = "Run2011A_PromptReco_v6.list";
+	string Run2011B_PromptReco_v1 = "Run2011B_PromptReco_v1.list";
 
-	string DYJetstoLL_All = "DYToLL.list"; 
-	string TTJets_All = "";
-	string WJetsToLNu_All = "";
-	string QCD_EMEnriched_Pt20to30_All = "";
-	string QCD_EMEnriched_Pt30to80_All = "";
-	string QCD_EMEnriched_Pt80to170_All = "";
-	string QCD_BCtoE_Pt20to30_All = "";
-	string QCD_BCtoE_Pt30to80_All = "";
-	string QCD_BCtoE_Pt80to170_All = "";
-	string WWJetsTo2L2Nu_All = "";
-	string WZJetsTo3LNu_All = "";
-	string ZZJetsTo4L_All = "";	
+	string DYJetstoLL_M50_All = "DYJetstoLL_M50_All.list"; 
+	string TTJets_All = "TTJets_All.list";
+	string WJetsToLNu_All = "WJetsToLNu_All.list";
+	string QCD_EMEnriched_Pt20to30_All = "QCD_EMEnriched_Pt20to30_All.list";
+	string QCD_EMEnriched_Pt30to80_All = "QCD_EMEnriched_Pt30to80_All.list";
+	string QCD_EMEnriched_Pt80to170_All = "QCD_EMEnriched_Pt80to170_All.list";
+	string QCD_BCtoE_Pt20to30_All = "QCD_BCtoE_Pt20to30_All.list";
+	string QCD_BCtoE_Pt30to80_All = "QCD_BCtoE_Pt30to80_All.list";
+	string QCD_BCtoE_Pt80to170_All = "QCD_BCtoE_Pt80to170_All.list";
+	string WWJetsTo2L2Nu_All = "WWJetsTo2L2Nu_All.list";
+	string WZJetsTo3LNu_All = "WZJetsTo3LNu_All.list";
+	string ZZJetsTo4L_All = "ZZJetsTo4L_All.list";	
 
-	string DYJetstoLL_Train = ""; 
-	string TTJets_Train = "";
-	string WJetsToLNu_Train = "";
-	string QCD_EMEnriched_Pt20to30_Train = "";
-	string QCD_EMEnriched_Pt30to80_Train = "";
-	string QCD_EMEnriched_Pt80to170_Train = "";
-	string QCD_BCtoE_Pt20to30_Train = "";
-	string QCD_BCtoE_Pt30to80_Train = "";
-	string QCD_BCtoE_Pt80to170_Train = "";
-	string WWJetsTo2L2Nu_Train = "";
-	string WZJetsTo3LNu_Train = "";
-	string ZZJetsTo4L_Train = "";	
+	string DYJetstoLL_M50_Train = "DYJetstoLL_M50_Train.list"; 
+	string TTJets_Train = "TTJets_Train.list";
+	string WJetsToLNu_Train = "WJetsToLNu_Train.list";
+	string QCD_EMEnriched_Pt20to30_Train = "QCD_EMEnriched_Pt20to30_Train.list";
+	string QCD_EMEnriched_Pt30to80_Train = "QCD_EMEnriched_Pt30to80_Train.list";
+	string QCD_EMEnriched_Pt80to170_Train = "QCD_EMEnriched_Pt80to170_Train.list";
+	string QCD_BCtoE_Pt20to30_Train = "QCD_BCtoE_Pt20to30_Train.list";
+	string QCD_BCtoE_Pt30to80_Train = "QCD_BCtoE_Pt30to80_Train.list";
+	string QCD_BCtoE_Pt80to170_Train = "QCD_BCtoE_Pt80to170_Train.list";
+	string WWJetsTo2L2Nu_Train = "WWJetsTo2L2Nu_Train.list";
+	string WZJetsTo3LNu_Train = "WZJetsTo3LNu_Train.list";
+	string ZZJetsTo4L_Train = "ZZJetsTo4L_Train.list";	
 
-	string DYJetstoLL_Sample = ""; 
-	string TTJets_Sample = "";
-	string WJetsToLNu_Sample = "";
-	string QCD_EMEnriched_Pt20to30_Sample = "";
-	string QCD_EMEnriched_Pt30to80_Sample = "";
-	string QCD_EMEnriched_Pt80to170_Sample = "";
-	string QCD_BCtoE_Pt20to30_Sample = "";
-	string QCD_BCtoE_Pt30to80_Sample = "";
-	string QCD_BCtoE_Pt80to170_Sample = "";
-	string WWJetsTo2L2Nu_Sample = "";
-	string WZJetsTo3LNu_Sample = "";
-	string ZZJetsTo4L_Sample = "";	
+	string DYJetstoLL_M50_Sample = "DYJetstoLL_M50_Sample.list"; 
+	string TTJets_Sample = "TTJets_Sample.list";
+	string WJetsToLNu_Sample = "WJetsToLNu_Sample.list";
+	string QCD_EMEnriched_Pt20to30_Sample = "QCD_EMEnriched_Pt20to30_Sample.list";
+	string QCD_EMEnriched_Pt30to80_Sample = "QCD_EMEnriched_Pt30to80_Sample.list";
+	string QCD_EMEnriched_Pt80to170_Sample = "QCD_EMEnriched_Pt80to170_Sample.list";
+	string QCD_BCtoE_Pt20to30_Sample = "QCD_BCtoE_Pt20to30_Sample.list";
+	string QCD_BCtoE_Pt30to80_Sample = "QCD_BCtoE_Pt30to80_Sample.list";
+	string QCD_BCtoE_Pt80to170_Sample = "QCD_BCtoE_Pt80to170_Sample.list";
+	string WWJetsTo2L2Nu_Sample = "WWJetsTo2L2Nu_Sample.list";
+	string WZJetsTo3LNu_Sample = "WZJetsTo3LNu_Sample.list";
+	string ZZJetsTo4L_Sample = "ZZJetsTo4L_Sample.list";	
 
-	string Test = "test_Ele_sc8.list";
-	//string Test = "test_Ele_May10.list";
+	string Test = "Test.list";
 
+
+	//sample: "data" or "mc"
 	sample = "mc";
  
+
 	//tag to recognize the analysis in the output file 
-	//string analysis = "_TnP_acc_iso_id_hlt_leg8_test"; 
-	string analysis = "_TnP_acc_iso_id_DY";
+	string analysis = "_TeP_ElePhoton";
 
 	
 	//Path of PATAnalysis dir - DO NOT FORGET THE SLASH AT THE END OF THE PATH (complete path)
-	string path="/raid/tropiano/ZJets/TP/Electrons/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/AnalysisElectrons/";
+	string path="/data/sandro/Analisi/rel_CMSSW_4_2_5_PhotonsPAT/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/AnalysisElectrons/";
 
 
 	//Modules
@@ -168,7 +169,7 @@ int main(int argc, char *argv[]) {
 	
 	//Cuts: if number = 0, the cut doesn't affect the Z REC selection
 	int Acc	=  1;
-	int Trg	=  0;
+	int Trg	=  4;
 	int Qual = 0;
 	int Imp =  0;
 	int Iso =  2;
@@ -203,10 +204,12 @@ int main(int argc, char *argv[]) {
 	bool Log = false;
 	
 	//Gen Particle Matching
-	string GenParticleMatch = "False";
+	//string GenParticleMatch = "False";
 	
-	//Sample: Data -> "data"; MC -> "mc"
 
+	//definition of source List and sample (data or mc)
+
+	// -> data
 	if(PreDefName==-9) sourceList = (SourceFilesDir + Test).c_str();
  
 	if(PreDefName==1){
@@ -230,9 +233,9 @@ int main(int argc, char *argv[]) {
 		sample = "data";
 	}
 
-
+	// -> MC All
 	else if (PreDefName==11){
-		sourceList = (SourceFilesDir + DYJetstoLL_All).c_str();
+		sourceList = (SourceFilesDir + DYJetstoLL_M50_All).c_str();
 		sample = "mc";
 	}
 	else if (PreDefName==12){
@@ -280,9 +283,9 @@ int main(int argc, char *argv[]) {
 		sample = "mc";
 	}
 
-
+	// -> MC Train
 	else if (PreDefName==21){
-		sourceList = (SourceFilesDir + DYJetstoLL_Train).c_str();
+		sourceList = (SourceFilesDir + DYJetstoLL_M50_Train).c_str();
 		sample = "mc";
 	}
 	else if (PreDefName==22){
@@ -330,9 +333,9 @@ int main(int argc, char *argv[]) {
 		sample = "mc";
 	}
 
-
+	// -> MC Sample
 	else if (PreDefName==31){
-		sourceList = (SourceFilesDir + DYJetstoLL_Sample).c_str();
+		sourceList = (SourceFilesDir + DYJetstoLL_M50_Sample).c_str();
 		sample = "mc";
 	}
 	else if (PreDefName==32){
@@ -384,9 +387,15 @@ int main(int argc, char *argv[]) {
 	cout << "RUNNING ON " << sourceList << endl;
 	cout << "PreDefName " << PreDefName << endl;
 
+
+	// output file
+
 	name(PreDefName);
 	string outputName = SampleName;
 	outputName+=analysis+=outNameSuf;
+
+
+	// Parmeters setting and cfg creation
 
 	double xsec = 1.0; 
 	double EventFilter = 1.0;
@@ -398,6 +407,7 @@ int main(int argc, char *argv[]) {
 		GEN = false;
 	}
 	
+	// ->  Single Sample or Test 
 	if(PreDefName>0 || PreDefName==-9){
 		
 		//Parameters
@@ -411,6 +421,7 @@ int main(int argc, char *argv[]) {
 		
 	}
 
+	// -> All data
 	if(PreDefName==0){
 		
 		Parameters(1, &ParStruct);
@@ -450,7 +461,7 @@ int main(int argc, char *argv[]) {
 		
 	}
 
-
+	// -> MC All
 	if(PreDefName==-1){
 
 		Parameters(11, &ParStruct);
@@ -458,7 +469,7 @@ int main(int argc, char *argv[]) {
 		EventFilter=ParStruct._EventFilter;
 		EventsPerFile=ParStruct._EventsPerFile;
 		EventNumber=ParStruct._EventNumber;
-		makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Qual, Imp, Iso, ElID, Conv, path.c_str(), DYJetstoLL_All.c_str(), "DYJetstoLL_All", Norm.c_str(), EventsPerFile, EventNumber, ProcEvents, xsec*EventFilter, targetLumi, NtupleFill, JECUnc, JECUncFilePath);
+		makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Qual, Imp, Iso, ElID, Conv, path.c_str(), DYJetstoLL_M50_All.c_str(), "DYJetstoLL_M50_All", Norm.c_str(), EventsPerFile, EventNumber, ProcEvents, xsec*EventFilter, targetLumi, NtupleFill, JECUnc, JECUncFilePath);
 		
 		Parameters(12, &ParStruct);
 		xsec=ParStruct._xsec;
@@ -539,7 +550,7 @@ int main(int argc, char *argv[]) {
 
 	}
 
-
+	// -> MC Train
 	if(PreDefName==-2){
 		
 		Parameters(21, &ParStruct);
@@ -547,7 +558,7 @@ int main(int argc, char *argv[]) {
 		EventFilter=ParStruct._EventFilter;
 		EventsPerFile=ParStruct._EventsPerFile;
 		EventNumber=ParStruct._EventNumber;
-		makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Qual, Imp, Iso, ElID, Conv, path.c_str(), DYJetstoLL_Train.c_str(), "DYJetstoLL_Train", "False", EventsPerFile, EventNumber, ProcEvents, xsec*EventFilter, targetLumi, NtupleFill, JECUnc, JECUncFilePath);//Il train del segnale non è norm. per avere un conf. corretto con effMC (altrimenti avrei le barre d'errore sbagliate)
+		makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Qual, Imp, Iso, ElID, Conv, path.c_str(), DYJetstoLL_M50_Train.c_str(), "DYJetstoLL_M50_Train", "False", EventsPerFile, EventNumber, ProcEvents, xsec*EventFilter, targetLumi, NtupleFill, JECUnc, JECUncFilePath);//Il Train del segnale non è norm. per avere un conf. corretto con effMC (altrimenti avrei le barre d'errore sbagliate)
 		
 		Parameters(22, &ParStruct);
 		xsec=ParStruct._xsec;
@@ -629,6 +640,7 @@ int main(int argc, char *argv[]) {
 	}
 
 
+	// -> MC Sample
 	if(PreDefName==-3){
 		
 		Parameters(31, &ParStruct);
@@ -636,7 +648,7 @@ int main(int argc, char *argv[]) {
 		EventFilter=ParStruct._EventFilter;
 		EventsPerFile=ParStruct._EventsPerFile;
 		EventNumber=ParStruct._EventNumber;
-		makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Qual, Imp, Iso, ElID, Conv, path.c_str(), DYJetstoLL_Sample.c_str(), "DYJetstoLL_Sample", Norm.c_str(), EventsPerFile, EventNumber, ProcEvents, xsec*EventFilter, targetLumi, NtupleFill, JECUnc, JECUncFilePath);
+		makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Qual, Imp, Iso, ElID, Conv, path.c_str(), DYJetstoLL_M50_Sample.c_str(), "DYJetstoLL_M50_Sample", Norm.c_str(), EventsPerFile, EventNumber, ProcEvents, xsec*EventFilter, targetLumi, NtupleFill, JECUnc, JECUncFilePath);
 		
 		Parameters(32, &ParStruct);
 		xsec=ParStruct._xsec;
@@ -718,7 +730,8 @@ int main(int argc, char *argv[]) {
 	}
 
 
-	gEnv->SetValue("Proof.Sandbox", "/raid/tropiano/.proof");
+	//TProof settings
+	gEnv->SetValue("Proof.Sandbox", "/data/sandro/.proof");
 
 	TProof * p = TProof::Open("");
 
@@ -729,8 +742,12 @@ int main(int argc, char *argv[]) {
 	gSystem->Load("libFWCoreFWLite");
 	AutoLibraryLoader::enable();
 	gSystem->Load("libFirenzePATAnalysis");
-	p->Exec(".x /raid/tropiano/ZJets/TP/Electrons/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/remote.C");
+	p->Exec(".x /data/sandro/Analisi/rel_CMSSW_4_2_5_PhotonsPAT/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/remote.C");
 
+
+	//Process
+
+	// ->  Single Sample or Test 
 	if(PreDefName>0 || PreDefName==-9){
 	  TDSet* SetDS = getDS(sourceList.c_str());
 	  
@@ -744,6 +761,7 @@ int main(int argc, char *argv[]) {
 	  delete SetDS;
 	}
 
+	// -> All data
 	if(PreDefName==0){ 
 
 		string cfgPath_0_1=path+"Run2011A_May10ReReco_v1.py";
@@ -788,11 +806,11 @@ int main(int argc, char *argv[]) {
 
 	}
 
-
+	// -> MC All
 	if(PreDefName==-1){ 
 
-		string cfgPath_1_11=path+"DYJetstoLL_All.py";
-		TDSet* SetDS_1_11 = getDS(DYJetstoLL_All.c_str());
+		string cfgPath_1_11=path+"DYJetstoLL_M50_All.py";
+		TDSet* SetDS_1_11 = getDS(DYJetstoLL_M50_All.c_str());
 		TNamed* configfile_1_11 = new TNamed("ConfigFile", cfgPath_1_11.c_str());
 		p->AddInput(configfile_1_11);
 		p->Process(SetDS_1_11, "FWLiteTSelector","",ProcEvents);
@@ -889,11 +907,11 @@ int main(int argc, char *argv[]) {
 
 	}
 
-
+	// -> MC Train
 	if(PreDefName==-2){ 
 
-		string cfgPath_2_21=path+"DYJetstoLL_Train.py";
-		TDSet* SetDS_2_21 = getDS(DYJetstoLL_Train.c_str());
+		string cfgPath_2_21=path+"DYJetstoLL_M50_Train.py";
+		TDSet* SetDS_2_21 = getDS(DYJetstoLL_M50_Train.c_str());
 		TNamed* configfile_2_21 = new TNamed("ConfigFile", cfgPath_2_21.c_str());
 		p->AddInput(configfile_2_21);
 		p->Process(SetDS_2_21, "FWLiteTSelector","",ProcEvents);
@@ -990,24 +1008,24 @@ int main(int argc, char *argv[]) {
 
 	}
 
-
+	// -> MC Sample
 	if(PreDefName==-3){ 
 
-		string cfgPath_3_331=path+"DYJetstoLL_Sample.py";
-		TDSet* SetDS_3_331 = getDS(DYJetstoLL_Sample.c_str());
-		TNamed* configfile_3_331 = new TNamed("ConfigFile", cfgPath_3_331.c_str());
-		p->AddInput(configfile_3_331);
-		p->Process(SetDS_3_331, "FWLiteTSelector","",ProcEvents);
+		string cfgPath_3_31=path+"DYJetstoLL_M50_Sample.py";
+		TDSet* SetDS_3_31 = getDS(DYJetstoLL_M50_Sample.c_str());
+		TNamed* configfile_3_31 = new TNamed("ConfigFile", cfgPath_3_31.c_str());
+		p->AddInput(configfile_3_31);
+		p->Process(SetDS_3_31, "FWLiteTSelector","",ProcEvents);
 		p->ClearInput();
-		delete SetDS_3_331;
+		delete SetDS_3_31;
 
-		string cfgPath_3_332=path+"TTJets_Sample.py";
-		TDSet* SetDS_3_332 = getDS(TTJets_Sample.c_str());
-		TNamed* configfile_3_332 = new TNamed("ConfigFile", cfgPath_3_332.c_str());
-		p->AddInput(configfile_3_332);
-		p->Process(SetDS_3_332, "FWLiteTSelector","",ProcEvents);
+		string cfgPath_3_32=path+"TTJets_Sample.py";
+		TDSet* SetDS_3_32 = getDS(TTJets_Sample.c_str());
+		TNamed* configfile_3_32 = new TNamed("ConfigFile", cfgPath_3_32.c_str());
+		p->AddInput(configfile_3_32);
+		p->Process(SetDS_3_32, "FWLiteTSelector","",ProcEvents);
 		p->ClearInput();
-		delete SetDS_3_332;
+		delete SetDS_3_32;
 
 		string cfgPath_3_33=path+"WJetsToLNu_Sample.py";
 		TDSet* SetDS_3_33 = getDS(WJetsToLNu_Sample.c_str());

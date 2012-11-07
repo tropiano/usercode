@@ -1,7 +1,7 @@
 #!/bin/bash
 
-NAME=QCD_BCtoE_Pt20to30
-DIR=crab_0_120917_195049/res
+NAME=Run2011A_05Aug2011_v1
+DIR=crab_0_120918_115134/res
 
 #--------------
 TMP=Tmp

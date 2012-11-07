@@ -10,23 +10,27 @@ MCSkimm = True    # True: MC Skimming (no signal!)
 DataSkimm = True   # True: Data Skimming (standard configuration)
 
 nameSource = [ #'file:input_DoubleElectron_Run2011A_May10ReReco.root'
-               'file:input_DYJetsToLL_M50_Fall11.root'         
+               'file:input_DYJetsToLL_M50_Summer11.root'
+               #'file:input_DYJetsToLL_M50_Fall11.root'         
                #'file:input_DoubleMu_Run2011A_May10ReReco.root' # Input file name
              ] 
 
-numEventsToRun = -1                  # (e.g. -1 to run on all events)
+numEventsToRun = -1                 # (e.g. -1 to run on all events)
+
+
+#nameOutput = 'Test.root' # Output file name
 
 #MC
-#nameOutput = 'DYJetsToLL_M_50_Fall11_Ele.root' # Output file name
+#nameOutput = 'DYJetsToLL_M_50_Fall11_Ele.root' 
 
 #nameOutput = 'QCD_BCtoE_Pt20to30_Fall11_Ele.root'
 #nameOutput = 'QCD_BCtoE_Pt30to80_Fall11_Ele.root'
 #nameOutput = 'QCD_BCtoE_Pt80to170_Fall11_Ele.root'
 #nameOutput = 'QCD_EMEnriched_Pt20to30_Fall11_Ele.root'
-#nameOutput = 'QCD_EMEnriched_Pt30to80_Fall11_Ele.root'
+nameOutput = 'QCD_EMEnriched_Pt30to80_Fall11_Ele.root'
 #nameOutput = 'QCD_EMEnriched_Pt80to170_Fall11_Ele.root'
 #nameOutput = 'TTJets_Fall11_Ele.root'
-nameOutput = 'WJetsToLNu_Fall11_Ele.root'
+#nameOutput = 'WJetsToLNu_Fall11_Ele.root'
 #nameOutput = 'WWJetsTo2L2Nu_Fall11_Ele.root'
 
 #nameOutput = 'WZJetsTo3LNu_Fall11_Ele.root'
@@ -202,16 +206,20 @@ process.load('RecoJets.Configuration.RecoPFJets_cff')
 
 ## Turn-on the FastJet density calculation 
 process.kt6PFJets.doRhoFastjet = True
-#process.kt6PFJets.Rho_EtaMax = cms.double(5.0)
+process.kt6PFJets.Rho_EtaMax = cms.double(5.0)
 
 ## Turn-on the FastJet jet area calculation for your favorite algorithm
 process.ak5PFJets.doAreaFastjet = True
-#process.ak5PFJets.Rho_EtaMax = cms.double(5.0)
+process.ak5PFJets.Rho_EtaMax = cms.double(5.0)
+
+## Turn-on the fastjet area in |eta|<2.5 needed for the photonISO
+process.kt6PFJets25 = process.kt6PFJets.clone( doRhoFastjet = True )
+process.kt6PFJets25.Rho_EtaMax = cms.double(2.5)
 
 ## Slimming the PFJet collection by raising the pt cut
 process.ak5PFJets.jetPtMin = cms.double(15.0)
 
-process.L1FastCorrection = cms.Sequence(process.kt6PFJets * process.ak5PFJets)
+process.L1FastCorrection = cms.Sequence(process.kt6PFJets25 * process.kt6PFJets * process.ak5PFJets)
 
 addJetCollection(process,cms.InputTag('ak5PFJets'),'AK5', 'PFL1corrected',
                  doJTA        = True,
@@ -349,7 +357,7 @@ if isMC == True:
 process.out.outputCommands.extend(zeerecEventContent)
 process.out.outputCommands.extend(jetrecEventContent)
 #process.out.outputCommands.extend(patTriggerEventContent)
-process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*', 'keep *_pat*METs*_*_*', 'keep *_patTriggerEvent_*_*', 'keep patTriggerPaths_patTrigger_*_*', 'keep *_goodTracks_*_*', 'keep double_kt6PFJets_rho_PAT*', 'keep PileupSummaryInfos_*_*_*','keep recoGenParticles_genParticles_*_*'])
+process.out.outputCommands.extend(['keep *_offlinePrimaryVertices*_*_*', 'keep *_pat*METs*_*_*', 'keep *_patTriggerEvent_*_*', 'keep patTriggerPaths_patTrigger_*_*', 'keep *_goodTracks_*_*', 'keep double_kt6PFJets_rho_PAT*', 'keep double_kt6PFJets25_rho_PAT*', 'keep PileupSummaryInfos_*_*_*','keep recoGenParticles_genParticles_*_*'])
 
 process.out.dropMetaData = cms.untracked.string('DROPPED')
 process.out.SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') )

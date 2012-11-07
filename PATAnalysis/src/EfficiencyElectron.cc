@@ -83,15 +83,19 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 	if(_selections=="SYM"){
 		_RecoCutFlags[_Acc] = "_AccSYM";
 		_RecoCutFlags[_Qual] = "_QualSYM"; 
-		_RecoCutFlags[_Iso] = "_IsoSYM";
-		_RecoCutFlags[_ElID] = "_ElIDSYM";
+//		_RecoCutFlags[_Iso] = "_IsoSYM";
+		_RecoCutFlags[_Iso] = "_IsoPhotonSYM";
+//		_RecoCutFlags[_ElID] = "_ElIDSYM";
+		_RecoCutFlags[_ElID] = "_ElIDPhotonSYM";
 		_RecoCutFlags[_Conv] = "_ConvSYM";
 	}
 	if(_selections=="ASYM"){
 		_RecoCutFlags[_Acc] = "_AccASYM";
 		_RecoCutFlags[_Qual] = "_QualASYM"; 
-		_RecoCutFlags[_Iso] = "_IsoASYM";
-		_RecoCutFlags[_ElID] = "_ElIDASYM";
+//		_RecoCutFlags[_Iso] = "_IsoASYM";
+		_RecoCutFlags[_Iso] = "_IsoPhotonASYM";
+//		_RecoCutFlags[_ElID] = "_ElIDASYM";
+		_RecoCutFlags[_ElID] = "_ElIDPhotonASYM";
 		_RecoCutFlags[_Conv] = "_ConvASYM";
 	}
 	
@@ -348,6 +352,7 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 			if(i<7) probe_cuts_123456.push_back(singleEl_Probe_Imp);
 			if(i<8) probe_cuts_1234567.push_back(singleEl_Probe_Imp);
 		}
+/*
 		if(_RecoCutFlags[i] == "_IsoSYM"){
 			if(i<2) probe_cuts_1.push_back(singleEl_Probe_Iso_SYM);
 			if(i<3) probe_cuts_12.push_back(singleEl_Probe_Iso_SYM);
@@ -357,6 +362,17 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 			if(i<7) probe_cuts_123456.push_back(singleEl_Probe_Iso_SYM);
 			if(i<8) probe_cuts_1234567.push_back(singleEl_Probe_Iso_SYM);
 		}
+*/
+		if(_RecoCutFlags[i] == "_IsoPhotonSYM"){
+			if(i<2) probe_cuts_1.push_back(singleEl_Probe_IsoPhoton_SYM);
+			if(i<3) probe_cuts_12.push_back(singleEl_Probe_IsoPhoton_SYM);
+			if(i<4) probe_cuts_123.push_back(singleEl_Probe_IsoPhoton_SYM);
+			if(i<5) probe_cuts_1234.push_back(singleEl_Probe_IsoPhoton_SYM);
+			if(i<6) probe_cuts_12345.push_back(singleEl_Probe_IsoPhoton_SYM);
+			if(i<7) probe_cuts_123456.push_back(singleEl_Probe_IsoPhoton_SYM);
+			if(i<8) probe_cuts_1234567.push_back(singleEl_Probe_IsoPhoton_SYM);
+		}
+/*
 		if(_RecoCutFlags[i] == "_ElIDSYM"){
 			if(i<2) probe_cuts_1.push_back(singleEl_Probe_ElID_SYM);
 			if(i<3) probe_cuts_12.push_back(singleEl_Probe_ElID_SYM);
@@ -366,6 +382,17 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 			if(i<7) probe_cuts_123456.push_back(singleEl_Probe_ElID_SYM);
 			if(i<8) probe_cuts_1234567.push_back(singleEl_Probe_ElID_SYM);
 		}
+*/
+		if(_RecoCutFlags[i] == "_ElIDPhotonSYM"){
+			if(i<2) probe_cuts_1.push_back(singleEl_Probe_ElIDPhoton_SYM);
+			if(i<3) probe_cuts_12.push_back(singleEl_Probe_ElIDPhoton_SYM);
+			if(i<4) probe_cuts_123.push_back(singleEl_Probe_ElIDPhoton_SYM);
+			if(i<5) probe_cuts_1234.push_back(singleEl_Probe_ElIDPhoton_SYM);
+			if(i<6) probe_cuts_12345.push_back(singleEl_Probe_ElIDPhoton_SYM);
+			if(i<7) probe_cuts_123456.push_back(singleEl_Probe_ElIDPhoton_SYM);
+			if(i<8) probe_cuts_1234567.push_back(singleEl_Probe_ElIDPhoton_SYM);
+		}
+
 		if(_RecoCutFlags[i] == "_ConvSYM"){
 			if(i<2) probe_cuts_1.push_back(singleEl_Probe_Conv_SYM);
 			if(i<3) probe_cuts_12.push_back(singleEl_Probe_Conv_SYM);
@@ -606,6 +633,7 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 				if(i<7) probe_cuts0_123456.push_back(singleEl_Probe_Imp);
 				if(i<8) probe_cuts0_1234567.push_back(singleEl_Probe_Imp);
 			}
+/*
 			if(_RecoCutFlags[i] == "_IsoASYM"){
 				if(i<2) probe_cuts0_1.push_back(singleEl_Probe_Iso_ASYM0);
 				if(i<3) probe_cuts0_12.push_back(singleEl_Probe_Iso_ASYM0);
@@ -615,7 +643,17 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 				if(i<7) probe_cuts0_123456.push_back(singleEl_Probe_Iso_ASYM0);
 				if(i<8) probe_cuts0_1234567.push_back(singleEl_Probe_Iso_ASYM0);
 			}
-			if(_RecoCutFlags[i] == "_ElIDASYM"){
+*/
+			if(_RecoCutFlags[i] == "_IsoPhotonASYM"){
+				if(i<2) probe_cuts0_1.push_back(singleEl_Probe_IsoPhoton_ASYM0);
+				if(i<3) probe_cuts0_12.push_back(singleEl_Probe_IsoPhoton_ASYM0);
+				if(i<4) probe_cuts0_123.push_back(singleEl_Probe_IsoPhoton_ASYM0);
+				if(i<5) probe_cuts0_1234.push_back(singleEl_Probe_IsoPhoton_ASYM0);
+				if(i<6) probe_cuts0_12345.push_back(singleEl_Probe_IsoPhoton_ASYM0);
+				if(i<7) probe_cuts0_123456.push_back(singleEl_Probe_IsoPhoton_ASYM0);
+				if(i<8) probe_cuts0_1234567.push_back(singleEl_Probe_IsoPhoton_ASYM0);
+			}
+/*			if(_RecoCutFlags[i] == "_ElIDASYM"){
 				if(i<2) probe_cuts0_1.push_back(singleEl_Probe_ElID_ASYM0);
 				if(i<3) probe_cuts0_12.push_back(singleEl_Probe_ElID_ASYM0);
 				if(i<4) probe_cuts0_123.push_back(singleEl_Probe_ElID_ASYM0);
@@ -624,6 +662,17 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 				if(i<7) probe_cuts0_123456.push_back(singleEl_Probe_ElID_ASYM0);
 				if(i<8) probe_cuts0_1234567.push_back(singleEl_Probe_ElID_ASYM0);
 			}
+*/
+			if(_RecoCutFlags[i] == "_ElIDPhotonASYM"){
+				if(i<2) probe_cuts0_1.push_back(singleEl_Probe_ElIDPhoton_ASYM0);
+				if(i<3) probe_cuts0_12.push_back(singleEl_Probe_ElIDPhoton_ASYM0);
+				if(i<4) probe_cuts0_123.push_back(singleEl_Probe_ElIDPhoton_ASYM0);
+				if(i<5) probe_cuts0_1234.push_back(singleEl_Probe_ElIDPhoton_ASYM0);
+				if(i<6) probe_cuts0_12345.push_back(singleEl_Probe_ElIDPhoton_ASYM0);
+				if(i<7) probe_cuts0_123456.push_back(singleEl_Probe_ElIDPhoton_ASYM0);
+				if(i<8) probe_cuts0_1234567.push_back(singleEl_Probe_ElIDPhoton_ASYM0);
+			}
+
 			if(_RecoCutFlags[i] == "_ConvASYM"){
 				if(i<2) probe_cuts0_1.push_back(singleEl_Probe_Conv_ASYM0);
 				if(i<3) probe_cuts0_12.push_back(singleEl_Probe_Conv_ASYM0);
@@ -860,6 +909,7 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 				if(i<7) probe_cuts1_123456.push_back(singleEl_Probe_Imp);
 				if(i<8) probe_cuts1_1234567.push_back(singleEl_Probe_Imp);
 			}
+/*
 			if(_RecoCutFlags[i] == "_IsoASYM"){
 				if(i<2) probe_cuts1_1.push_back(singleEl_Probe_Iso_ASYM1);
 				if(i<3) probe_cuts1_12.push_back(singleEl_Probe_Iso_ASYM1);
@@ -869,6 +919,17 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 				if(i<7) probe_cuts1_123456.push_back(singleEl_Probe_Iso_ASYM1);
 				if(i<8) probe_cuts1_1234567.push_back(singleEl_Probe_Iso_ASYM1);
 			}
+*/
+			if(_RecoCutFlags[i] == "_IsoPhotonASYM"){
+				if(i<2) probe_cuts1_1.push_back(singleEl_Probe_IsoPhoton_ASYM1);
+				if(i<3) probe_cuts1_12.push_back(singleEl_Probe_IsoPhoton_ASYM1);
+				if(i<4) probe_cuts1_123.push_back(singleEl_Probe_IsoPhoton_ASYM1);
+				if(i<5) probe_cuts1_1234.push_back(singleEl_Probe_IsoPhoton_ASYM1);
+				if(i<6) probe_cuts1_12345.push_back(singleEl_Probe_IsoPhoton_ASYM1);
+				if(i<7) probe_cuts1_123456.push_back(singleEl_Probe_IsoPhoton_ASYM1);
+				if(i<8) probe_cuts1_1234567.push_back(singleEl_Probe_IsoPhoton_ASYM1);
+			}
+/*
 			if(_RecoCutFlags[i] == "_ElIDASYM"){
 				if(i<2) probe_cuts1_1.push_back(singleEl_Probe_ElID_ASYM1);
 				if(i<3) probe_cuts1_12.push_back(singleEl_Probe_ElID_ASYM1);
@@ -878,6 +939,17 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 				if(i<7) probe_cuts1_123456.push_back(singleEl_Probe_ElID_ASYM1);
 				if(i<8) probe_cuts1_1234567.push_back(singleEl_Probe_ElID_ASYM1);
 			}
+*/
+			if(_RecoCutFlags[i] == "_ElIDPhotonASYM"){
+				if(i<2) probe_cuts1_1.push_back(singleEl_Probe_ElIDPhoton_ASYM1);
+				if(i<3) probe_cuts1_12.push_back(singleEl_Probe_ElIDPhoton_ASYM1);
+				if(i<4) probe_cuts1_123.push_back(singleEl_Probe_ElIDPhoton_ASYM1);
+				if(i<5) probe_cuts1_1234.push_back(singleEl_Probe_ElIDPhoton_ASYM1);
+				if(i<6) probe_cuts1_12345.push_back(singleEl_Probe_ElIDPhoton_ASYM1);
+				if(i<7) probe_cuts1_123456.push_back(singleEl_Probe_ElIDPhoton_ASYM1);
+				if(i<8) probe_cuts1_1234567.push_back(singleEl_Probe_ElIDPhoton_ASYM1);
+			}
+
 			if(_RecoCutFlags[i] == "_ConvASYM"){
 				if(i<2) probe_cuts1_1.push_back(singleEl_Probe_Conv_ASYM1);
 				if(i<3) probe_cuts1_12.push_back(singleEl_Probe_Conv_ASYM1);
