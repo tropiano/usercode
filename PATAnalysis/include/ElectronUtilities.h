@@ -211,6 +211,17 @@ static double SYM_TAG_minVaHit = 15.;
 static double SYM_TAG_electronCombinedIsoRhoCut = 0.2;
 //static string SYM_TAG_ElID = ""; //if "" no ElID cut applied
 
+
+// SYM Probe cuts
+static double SYM_PRO_ptelcut = 100.;    //Gev/c
+static double SYM_PRO_etaelcut = 2.4;
+//static double SYM_PRO_eta_el_excl_up = 1.566;               //Excluded Eta region
+//static double SYM_PRO_eta_el_excl_down = 1.4442;           //Excluded Eta region
+static double SYM_PRO_dxycut = 0.02;     //cm
+static double SYM_PRO_maxchi2 = 3.;
+static double SYM_PRO_minVaHit = 15.;
+static double SYM_PRO_electronCombinedIsoRhoCut = 0.15;
+//static string SYM_PRO_ElID = ""; //if "" no ElID cut applied
 ////////////////////////
 
 
@@ -270,8 +281,8 @@ static double ASYM0_TAG_etaelcut = 2.4;
 static double ASYM0_TAG_minVaHit = 0.;
 static double ASYM0_TAG_maxchi2 = 9999.;
 static double ASYM0_TAG_dxycut = 0.05;     //cm
-static double ASYM0_TAG_electronCombinedIsoRhoCut = 0.1;     //CombRelIso
-//static double ASYM0_TAG_electronCombinedIsoCut = 0.1;
+static double ASYM0_TAG_electronCombinedIsoRhoCut = 0.2;     //CombRelIso
+//static double ASYM0_TAG_electronCombinedIsoCut = 0.2;
 //static string ASYM0_TAG_ElID = ""; //if "" no ElID cut applied
 
 // ASYM1 Tag cuts (for hard electron probe)
@@ -282,9 +293,32 @@ static double ASYM1_TAG_etaelcut = 2.4;
 static double ASYM1_TAG_minVaHit = 0.;
 static double ASYM1_TAG_maxchi2 = 9999.;
 static double ASYM1_TAG_dxycut = 0.05;     //cm
-static double ASYM1_TAG_electronCombinedIsoRhoCut = 0.1;       //CombRelIso
-//static double ASYM1_TAG_electronCombinedIsoCut = 0.1;
+static double ASYM1_TAG_electronCombinedIsoRhoCut = 0.2;       //CombRelIso
+//static double ASYM1_TAG_electronCombinedIsoCut = 0.2;
 //static string ASYM1_TAG_ElID = ""; //if "" no ElID cut applied
+
+
+// ASYM0 Probe cuts
+static double ASYM0_PRO_ptelcut = 100.;    //Gev/c
+static double ASYM0_PRO_etaelcut = 2.4;
+//static double ASYM0_PRO_eta_el_excl_up = 1.566;               //Excluded Eta region
+//static double ASYM0_PRO_eta_el_excl_down = 1.4442;           //Excluded Eta region
+static double ASYM0_PRO_dxycut = 0.02;     //cm
+static double ASYM0_PRO_maxchi2 = 3.;
+static double ASYM0_PRO_minVaHit = 15.;
+static double ASYM0_PRO_electronCombinedIsoRhoCut = 0.15;
+//static string ASYM0_PRO_ElID = ""; //if "" no ElID cut applied
+
+// ASYM1 Probe cuts
+static double ASYM1_PRO_ptelcut = 100.;    //Gev/c
+static double ASYM1_PRO_etaelcut = 2.4;
+//static double ASYM1_PRO_eta_el_excl_up = 1.566;               //Excluded Eta region
+//static double ASYM1_PRO_eta_el_excl_down = 1.4442;           //Excluded Eta region
+static double ASYM1_PRO_dxycut = 0.02;     //cm
+static double ASYM1_PRO_maxchi2 = 3.;
+static double ASYM1_PRO_minVaHit = 15.;
+static double ASYM1_PRO_electronCombinedIsoRhoCut = 0.15;
+//static string ASYM1_PRO_ElID = ""; //if "" no ElID cut applied
 
 /////////////////////////
 
@@ -324,6 +358,8 @@ inline std::vector<const pat::Electron*> ZGENDaughters(const std::vector<reco::C
 	const pat::Electron* finaldau0 = 0; 
 	const pat::Electron* finaldau1 = 0; 
 
+	if (dau0 && dau1){
+
 	if (dau0->numberOfDaughters()){
 		bool el0set = false;
 		for (unsigned int i = 0; i < dau0->numberOfDaughters(); ++i ){
@@ -357,8 +393,8 @@ inline std::vector<const pat::Electron*> ZGENDaughters(const std::vector<reco::C
 	
 	zdaughters.push_back(leading);
 	zdaughters.push_back(second);
-	
-	if(zdaughters.size()==1 || zdaughters.size()>2){
+	}
+	if(zdaughters.size()==0 || zdaughters.size()==1 || zdaughters.size()>2){
 		std::cout << "ERROR! Wrong Z daughters association. Z daughters number = "<<zdaughters.size()<<std::endl;
 		std::vector<const pat::Electron*> nullzdaughters;
 		return nullzdaughters;
@@ -745,14 +781,14 @@ inline bool RecSelected_ele(string Flag, const std::vector<reco::CompositeCandid
 		bool iso0 = false;	
 		bool iso1 = false;
 
-		bool isoPhoton0 = false;	
-		bool isoPhoton1 = false;
+//		bool isoPhoton0 = false;	
+//		bool isoPhoton1 = false;
 			
 		bool electron_ID0 = false;
 		bool electron_ID1 = false;
 
-		bool electron_IDPhoton0 = false;
-		bool electron_IDPhoton1 = false;
+//		bool electron_IDPhoton0 = false;
+//		bool electron_IDPhoton1 = false;
 
 		bool conv0 = false;
 		bool conv1 = false;
@@ -1030,6 +1066,7 @@ inline bool RecSelected_ele(string Flag, const std::vector<reco::CompositeCandid
 			return iso0 && iso1;
 		}
 
+/*
 		else if(Flag=="_IsoPhotonSYM"){
 
 			double rho25 = rho; 			
@@ -1163,7 +1200,7 @@ inline bool RecSelected_ele(string Flag, const std::vector<reco::CompositeCandid
 	
 				return isoPhoton0 && isoPhoton1;		
 		}
-
+*/
 		else if(Flag=="_ElIDSYM"){
 			//https://twiki.cern.ch/twiki/bin/view/CMS/SimpleCutBasedEleID
 			if(dau0->isEB()){
@@ -1276,6 +1313,7 @@ inline bool RecSelected_ele(string Flag, const std::vector<reco::CompositeCandid
 			return electron_ID0 && electron_ID1;
 		}
 
+/*
 		else if(Flag=="_ElIDPhotonSYM"){
 			//https://twiki.cern.ch/twiki/bin/view/CMS/SimpleCutBasedEleID
 
@@ -1381,7 +1419,7 @@ inline bool RecSelected_ele(string Flag, const std::vector<reco::CompositeCandid
 			}
 			return electron_IDPhoton0 && electron_IDPhoton1;
 		}
-
+*/
 		else if(Flag=="_1"){
 			return true;
 		}
@@ -1421,14 +1459,14 @@ inline bool RecSelected_mod(string Flag, const std::vector<reco::CompositeCandid
 		bool iso0 = false;	
 		bool iso1 = false;
 			
-		bool isoPhoton0 = false;	
-		bool isoPhoton1 = false;
+//		bool isoPhoton0 = false;	
+//		bool isoPhoton1 = false;
 
 		bool electron_ID0 = false;
 		bool electron_ID1 = false;
 
-		bool electron_IDPhoton0 = false;
-		bool electron_IDPhoton1 = false;
+//		bool electron_IDPhoton0 = false;
+//		bool electron_IDPhoton1 = false;
 
 		bool conv0 = false;
 		bool conv1 = false;
@@ -1705,6 +1743,7 @@ inline bool RecSelected_mod(string Flag, const std::vector<reco::CompositeCandid
 			return iso0 && iso1;
 		}
 
+/*
 		else if(Flag=="_IsoPhotonSYM"){
 
 			double rho25 = rho; 			
@@ -1839,7 +1878,7 @@ inline bool RecSelected_mod(string Flag, const std::vector<reco::CompositeCandid
 	
 				return isoPhoton0 && isoPhoton1;		
 		}
-
+*/
 		else if(Flag=="_ElIDSYM"){
 			//https://twiki.cern.ch/twiki/bin/view/CMS/SimpleCutBasedEleID
 			if(dau0->isEB()){
@@ -1952,6 +1991,7 @@ inline bool RecSelected_mod(string Flag, const std::vector<reco::CompositeCandid
 			return electron_ID0 && electron_ID1;
 		}
 
+/*
 		else if(Flag=="_ElIDPhotonSYM"){
 			//https://twiki.cern.ch/twiki/bin/view/CMS/SimpleCutBasedEleID
 
@@ -2057,7 +2097,7 @@ inline bool RecSelected_mod(string Flag, const std::vector<reco::CompositeCandid
 			}
 			return electron_IDPhoton0 && electron_IDPhoton1;
 		}
-
+*/
 		else if(Flag=="_1"){
 			return true;
 		}
@@ -2315,19 +2355,19 @@ inline bool singleEl_Tag_SYM(const reco::Candidate& cand, int run, double rho){
 	bool Acc = true;
 	bool Qual = true;
 	bool Iso = true;
-	bool IsoPhoton = true;
+//	bool IsoPhoton = true;
 	bool Imp = true;
 	bool ElID = true;
-	bool ElIDPhoton = true;
+//	bool ElIDPhoton = true;
 	bool Conv = true;
 
 	bool TAG_acc = false;
 	bool TAG_qual = false;
 	bool TAG_iso  = false;
-	bool TAG_isoPhoton  = false;
+//	bool TAG_isoPhoton  = false;
 	bool TAG_imp = false;
 	bool TAG_elID = false;
-	bool TAG_elIDPhoton = false;
+//	bool TAG_elIDPhoton = false;
 	bool TAG_conv = false;
 
 	if(electron){
@@ -2379,6 +2419,7 @@ inline bool singleEl_Tag_SYM(const reco::Candidate& cand, int run, double rho){
 			}
 		}
 
+/*
 		//Iso Photon
 		if(IsoPhoton){
 
@@ -2419,6 +2460,7 @@ inline bool singleEl_Tag_SYM(const reco::Candidate& cand, int run, double rho){
 			}
 		
 		}
+*/
 
 		//Imp
 		if(Imp){
@@ -2451,6 +2493,7 @@ inline bool singleEl_Tag_SYM(const reco::Candidate& cand, int run, double rho){
 			}
 		}
 
+/*
 		//ElID Photon
 		if(ElIDPhoton){
 			//https://twiki.cern.ch/twiki/bin/view/CMS/SimpleCutBasedEleID
@@ -2479,6 +2522,7 @@ inline bool singleEl_Tag_SYM(const reco::Candidate& cand, int run, double rho){
 				return false;
 			}
 		}
+*/
 
 		//Conv
 		if(Conv){
@@ -2507,10 +2551,10 @@ inline bool singleEl_Tag_SYM(const reco::Candidate& cand, int run, double rho){
 		return TAG_acc &&
 		       TAG_imp &&
 		       TAG_qual &&
-//		       TAG_iso &&
-		       TAG_isoPhoton &&
-//		       TAG_elID &&
-		       TAG_elIDPhoton &&
+		       TAG_iso &&
+//		       TAG_isoPhoton &&
+		       TAG_elID &&
+//		       TAG_elIDPhoton &&
 		       TAG_conv;
 	}
 	else{
@@ -2558,18 +2602,18 @@ inline bool singleEl_Tag_ASYM0(const reco::Candidate& cand, int run, double rho)
 	bool Acc = true;
 	bool Qual = true;
 	bool Iso = true;
-	bool IsoPhoton = true;
+//	bool IsoPhoton = true;
 	bool Imp = true;
 	bool ElID = true;
-	bool ElIDPhoton = true;
+//	bool ElIDPhoton = true;
 	bool Conv = true;
 
 	bool TAG_acc = false;
 	bool TAG_qual = false;
 	bool TAG_iso  = false;
-	bool TAG_isoPhoton  = false;
+//	bool TAG_isoPhoton  = false;
 	bool TAG_imp = false;
-	bool TAG_elIDPhoton = false;
+//	bool TAG_elIDPhoton = false;
 	bool TAG_elID = false;
 
 	bool TAG_conv = false;
@@ -2623,6 +2667,7 @@ inline bool singleEl_Tag_ASYM0(const reco::Candidate& cand, int run, double rho)
 			}
 		}
 
+/*
 		//Iso Photon
 		if(IsoPhoton){
 
@@ -2663,8 +2708,7 @@ inline bool singleEl_Tag_ASYM0(const reco::Candidate& cand, int run, double rho)
 			}
 		
 		}
-
-
+*/
 
 		//Imp
 		if(Imp){
@@ -2697,6 +2741,7 @@ inline bool singleEl_Tag_ASYM0(const reco::Candidate& cand, int run, double rho)
 			}
 		}
 
+/*
 		//ElID Photon
 		if(ElIDPhoton){
 			//https://twiki.cern.ch/twiki/bin/view/CMS/SimpleCutBasedEleID
@@ -2725,6 +2770,7 @@ inline bool singleEl_Tag_ASYM0(const reco::Candidate& cand, int run, double rho)
 				return false;
 			}
 		}
+*/
 
 		//Conv
 		if(Conv){
@@ -2753,10 +2799,10 @@ inline bool singleEl_Tag_ASYM0(const reco::Candidate& cand, int run, double rho)
 		return TAG_acc &&
 		       TAG_imp &&
 		       TAG_qual &&
-//		       TAG_iso &&
-		       TAG_isoPhoton &&
-//		       TAG_elID &&
-		       TAG_elIDPhoton &&
+		       TAG_iso &&
+//		       TAG_isoPhoton &&
+		       TAG_elID &&
+//		       TAG_elIDPhoton &&
 		       TAG_conv;
 	}
 	else{
@@ -2802,19 +2848,19 @@ inline bool singleEl_Tag_ASYM1(const reco::Candidate& cand, int run, double rho)
 	bool Acc = true;
 	bool Qual = true;
 	bool Iso = true;
-	bool IsoPhoton = true;
+//	bool IsoPhoton = true;
 	bool Imp = true;
 	bool ElID = true;
-	bool ElIDPhoton = true;
+//	bool ElIDPhoton = true;
 	bool Conv = true;
 
 	bool TAG_acc = false;
 	bool TAG_qual = false;
 	bool TAG_iso  = false;
-	bool TAG_isoPhoton  = false;
+//	bool TAG_isoPhoton  = false;
 	bool TAG_imp = false;
 	bool TAG_elID = false;
-	bool TAG_elIDPhoton = false;
+//	bool TAG_elIDPhoton = false;
 	bool TAG_conv = false;
 
 	if(electron){
@@ -2866,6 +2912,7 @@ inline bool singleEl_Tag_ASYM1(const reco::Candidate& cand, int run, double rho)
 			}
 		}
 
+/*
 		//Iso Photon
 		if(IsoPhoton){
 
@@ -2906,7 +2953,7 @@ inline bool singleEl_Tag_ASYM1(const reco::Candidate& cand, int run, double rho)
 			}
 		
 		}
-
+*/
 
 		//Imp
 		if(Imp){
@@ -2939,6 +2986,7 @@ inline bool singleEl_Tag_ASYM1(const reco::Candidate& cand, int run, double rho)
 			}
 		}
 
+/*
 		//ElID Photon
 		if(ElIDPhoton){
 			//https://twiki.cern.ch/twiki/bin/view/CMS/SimpleCutBasedEleID
@@ -2967,6 +3015,7 @@ inline bool singleEl_Tag_ASYM1(const reco::Candidate& cand, int run, double rho)
 				return false;
 			}
 		}
+*/
 
 		//Conv
 		if(Conv){
@@ -2995,10 +3044,10 @@ inline bool singleEl_Tag_ASYM1(const reco::Candidate& cand, int run, double rho)
 		return TAG_acc &&
 		       TAG_imp &&
 		       TAG_qual &&
-//		       TAG_iso &&
-		       TAG_isoPhoton &&
-//		       TAG_elID &&
-		       TAG_elIDPhoton &&
+		       TAG_iso &&
+//		       TAG_isoPhoton &&
+		       TAG_elID &&
+//		       TAG_elIDPhoton &&
 		       TAG_conv;
 	}
 	else{
@@ -3044,8 +3093,8 @@ inline bool singleEl_Probe_Acc_SYM(const reco::Candidate& cand, int run, double 
 	const pat::Electron* electron = CloneCandidate(cand);
 
 	if(electron){
-		return electron->pt() >= ptelcut && 
-		       fabs(electron->eta()) <= etaelcut &&
+		return electron->pt() >= SYM_PRO_ptelcut && 
+		       fabs(electron->eta()) <= SYM_PRO_etaelcut &&
 		       !(electron->isEBEEGap());
 		       //(fabs(electron->eta())<eta_el_excl_down || fabs(electron->eta())>eta_el_excl_up);
 	}
@@ -3096,12 +3145,12 @@ inline bool singleEl_Probe_Trg_SYM(const reco::Candidate& cand, int run){
 
 
 // Single Electron cut - Impact Parameter: SYM
-inline bool singleEl_Probe_Imp(const reco::Candidate& cand, int run, double rho){
+inline bool singleEl_Probe_Imp_SYM(const reco::Candidate& cand, int run, double rho){
 
 	const pat::Electron* electron = CloneCandidate(cand);
 
 	if(electron){
-		return electron->dB() < dxycut;
+		return electron->dB() < SYM_PRO_dxycut;
 	}
 	else{
 		return false;
@@ -3133,8 +3182,8 @@ inline bool singleEl_Probe_Qual_SYM(const reco::Candidate& cand, int run, double
 
 		const reco::GsfTrackRef track = electron->gsfTrack();
 		assert(track.isNonnull());
-		if(track->numberOfValidHits() > SYM_TAG_minVaHit && 
-		   track->normalizedChi2() < SYM_TAG_maxchi2){
+		if(track->numberOfValidHits() > SYM_PRO_minVaHit && 
+		   track->normalizedChi2() < SYM_PRO_maxchi2){
 			qual = true;
 		}
 
@@ -3146,8 +3195,7 @@ inline bool singleEl_Probe_Qual_SYM(const reco::Candidate& cand, int run, double
 }
 
 
-
-
+/*
 // Single Electron cut - Isolation with rho: SYM
 inline bool singleEl_Probe_Iso_SYM(const reco::Candidate& cand, int run, double rho){
 
@@ -3175,7 +3223,7 @@ inline bool singleEl_Probe_Iso_SYM(const reco::Candidate& cand, int run, double 
 			return false;
 		}
 						
-		if(combinedIso03Rho <= electronCombinedIsoRhoCut_SYM){ 
+		if(combinedIso03Rho <= SYM_PRO_electronCombinedIsoRhoCut){ 
 			iso = true;
 		} 
 		return iso;
@@ -3185,8 +3233,9 @@ inline bool singleEl_Probe_Iso_SYM(const reco::Candidate& cand, int run, double 
 	}
 
 }
+*/
 
-
+/*
 // Single Electron cut - Isolation without rho: SYM
 inline bool singleEl_Probe_Iso_SYM_mod(const reco::Candidate& cand, int run, double rho){
 
@@ -3214,7 +3263,7 @@ inline bool singleEl_Probe_Iso_SYM_mod(const reco::Candidate& cand, int run, dou
 			return false;
 		}
 						
-		if(combinedIso03 <= electronCombinedIsoCut_SYM){ 
+		if(combinedIso03 <= SYM_PRO_electronCombinedIsoCut){ 
 			iso = true;
 		} 
 		return iso;
@@ -3223,9 +3272,10 @@ inline bool singleEl_Probe_Iso_SYM_mod(const reco::Candidate& cand, int run, dou
 		return false;
 	}
 }
+*/
 
 // Single Electron cut - Isolation with rho Photon: SYM
-inline bool singleEl_Probe_IsoPhoton_SYM(const reco::Candidate& cand, int run, double rho){
+inline bool singleEl_Probe_Iso_SYM(const reco::Candidate& cand, int run, double rho){
 
 	const pat::Electron* electron = CloneCandidate(cand);
 
@@ -3288,7 +3338,7 @@ inline bool singleEl_Probe_Iso_SYM(const reco::Candidate& cand, int run){
 }
 */
 
-
+/*
 // Single Electron cut - Electron ID: SYM
 inline bool singleEl_Probe_ElID_SYM(const reco::Candidate& cand, int run, double rho){
 
@@ -3323,6 +3373,8 @@ inline bool singleEl_Probe_ElID_SYM(const reco::Candidate& cand, int run, double
 		return false;
 	}
 }
+*/
+
 /*old
 inline bool singleEl_Probe_EiD_SYM(const reco::Candidate& cand, int run){
 	const pat::Electron* electron = CloneCandidate(cand);
@@ -3342,7 +3394,7 @@ inline bool singleEl_Probe_EiD_SYM(const reco::Candidate& cand, int run){
 */
 
 // Single Electron cut - Electron ID Photon: SYM
-inline bool singleEl_Probe_ElIDPhoton_SYM(const reco::Candidate& cand, int run, double rho){
+inline bool singleEl_Probe_ElID_SYM(const reco::Candidate& cand, int run, double rho){
 
 	const pat::Electron* electron = CloneCandidate(cand);
 
@@ -3426,8 +3478,8 @@ inline bool singleEl_Probe_Acc_ASYM0(const reco::Candidate& cand, int run, doubl
 	const pat::Electron* el0 = CloneCandidate(cand);
 
 	if(el0){
-		return el0->pt() >= ptelcut0 && 
-		       fabs(el0->eta()) <= etaelcut &&
+		return el0->pt() >= ASYM0_PRO_ptelcut && 
+		       fabs(el0->eta()) <= ASYM0_PRO_etaelcut &&
 		       !(el0->isEBEEGap());
 		       //(fabs(el0->eta()) < eta_el_excl_down || fabs(el0->eta()) > eta_el_excl_up);
 	}
@@ -3456,8 +3508,8 @@ inline bool singleEl_Probe_Acc_ASYM1(const reco::Candidate& cand, int run, doubl
 	const pat::Electron* el1 = CloneCandidate(cand);
 
 	if(el1){
-		return el1->pt() >= ptelcut1 && 
-		       fabs(el1->eta()) <= etaelcut &&
+		return el1->pt() >= ASYM1_PRO_ptelcut && 
+		       fabs(el1->eta()) <= ASYM1_PRO_etaelcut &&
 		       !(el1->isEBEEGap());
 		       //(fabs(el1->eta()) < eta_el_excl_down || fabs(el1->eta()) > eta_el_excl_up);
 	}
@@ -3535,6 +3587,31 @@ inline bool singleEl_Probe_Trg_ASYM1(const reco::Candidate& cand, int run, doubl
 	}
 }
 
+// Single Electron cut - Impact Parameter: ASYM0
+inline bool singleEl_Probe_Imp_ASYM0(const reco::Candidate& cand, int run, double rho){
+
+	const pat::Electron* electron = CloneCandidate(cand);
+
+	if(electron){
+		return electron->dB() < ASYM0_PRO_dxycut;
+	}
+	else{
+		return false;
+	}
+}
+
+// Single Electron cut - Impact Parameter: ASYM1
+inline bool singleEl_Probe_Imp_ASYM1(const reco::Candidate& cand, int run, double rho){
+
+	const pat::Electron* electron = CloneCandidate(cand);
+
+	if(electron){
+		return electron->dB() < ASYM1_PRO_dxycut;
+	}
+	else{
+		return false;
+	}
+}
   
 // Single Electron cut - Quality: ASYM, leg0
 inline bool singleEl_Probe_Qual_ASYM0(const reco::Candidate& cand, int run, double rho){
@@ -3547,8 +3624,8 @@ inline bool singleEl_Probe_Qual_ASYM0(const reco::Candidate& cand, int run, doub
 
 		const reco::GsfTrackRef track = el0->gsfTrack();
 		assert(track.isNonnull());
-		if(track->numberOfValidHits() > minVaHit_ASYM0 && 
-		   track->normalizedChi2() < maxchi2_ASYM0){
+		if(track->numberOfValidHits() > ASYM0_PRO_minVaHit && 
+		   track->normalizedChi2() < ASYM0_PRO_maxchi2){
 			qual0 = true;
 		}
 		return qual0;
@@ -3570,8 +3647,8 @@ inline bool singleEl_Probe_Qual_ASYM1(const reco::Candidate& cand, int run, doub
 
 		const reco::GsfTrackRef track = el1->gsfTrack();
 		assert(track.isNonnull());
-		if(track->numberOfValidHits() > minVaHit_ASYM1 && 
-		   track->normalizedChi2() < maxchi2_ASYM1){
+		if(track->numberOfValidHits() > ASYM1_PRO_minVaHit && 
+		   track->normalizedChi2() < ASYM1_PRO_maxchi2){
 			qual1 = true;
 		}
 		return qual1;
@@ -3581,7 +3658,7 @@ inline bool singleEl_Probe_Qual_ASYM1(const reco::Candidate& cand, int run, doub
 	}
 }
 
-
+/*
 // Single Electron cut - Isolation with rho: ASYM, leg0
 inline bool singleEl_Probe_Iso_ASYM0(const reco::Candidate& cand, int run, double rho){
 
@@ -3609,7 +3686,7 @@ inline bool singleEl_Probe_Iso_ASYM0(const reco::Candidate& cand, int run, doubl
 			return false;
 		}
 						
-		if(combinedIso03Rho <= electronCombinedIsoRhoCut_ASYM0){ 
+		if(combinedIso03Rho <= ASYM0_PRO_electronCombinedIsoRhoCut){ 
 			iso0 = true;
 		} 
 		return iso0;
@@ -3618,8 +3695,9 @@ inline bool singleEl_Probe_Iso_ASYM0(const reco::Candidate& cand, int run, doubl
 		return false;
 	}
 }
+*/
 
-
+/*
 // Single Electron cut - Isolation with rho: ASYM, leg1
 inline bool singleEl_Probe_Iso_ASYM1(const reco::Candidate& cand, int run, double rho){
 
@@ -3647,7 +3725,7 @@ inline bool singleEl_Probe_Iso_ASYM1(const reco::Candidate& cand, int run, doubl
 			return false;
 		}
 						
-		if(combinedIso03Rho <= electronCombinedIsoRhoCut_ASYM1){ 
+		if(combinedIso03Rho <= ASYM1_PRO_electronCombinedIsoRhoCut){ 
 			iso1 = true;
 		} 
 		return iso1;
@@ -3656,8 +3734,9 @@ inline bool singleEl_Probe_Iso_ASYM1(const reco::Candidate& cand, int run, doubl
 		return false;
 	}
 }
+*/
 
-
+/*
 // Single Electron cut - Isolation without rho: ASYM, leg0
 inline bool singleEl_Probe_Iso_ASYM0_mod(const reco::Candidate& cand, int run, double rho){
 
@@ -3685,7 +3764,7 @@ inline bool singleEl_Probe_Iso_ASYM0_mod(const reco::Candidate& cand, int run, d
 			return false;
 		}
 						
-		if(combinedIso03 <= electronCombinedIsoCut_ASYM0){ 
+		if(combinedIso03 <= ASYM0_PRO_electronCombinedIsoCut){ 
 			iso0 = true;
 		} 
 		return iso0;
@@ -3694,6 +3773,7 @@ inline bool singleEl_Probe_Iso_ASYM0_mod(const reco::Candidate& cand, int run, d
 		return false;
 	}
 }
+*/
 /*old
 inline bool singleEl_Probe_Iso_ASYM0(const reco::Candidate& cand, int run){
 	const pat::Electron* el0 = CloneCandidate(cand);
@@ -3715,7 +3795,7 @@ inline bool singleEl_Probe_Iso_ASYM0(const reco::Candidate& cand, int run){
 }
 */
 
-
+/*
 // Single Electron cut - Isolation without rho: ASYM, leg1
 inline bool singleEl_Probe_Iso_ASYM1_mod(const reco::Candidate& cand, int run, double rho){
 
@@ -3743,7 +3823,7 @@ inline bool singleEl_Probe_Iso_ASYM1_mod(const reco::Candidate& cand, int run, d
 			return false;
 		}
 						
-		if(combinedIso03 <= electronCombinedIsoCut_ASYM1){ 
+		if(combinedIso03 <= ASYM1_PRO_electronCombinedIsoCut){ 
 			iso1 = true;
 		} 
 		return iso1;
@@ -3752,6 +3832,7 @@ inline bool singleEl_Probe_Iso_ASYM1_mod(const reco::Candidate& cand, int run, d
 		return false;
 	}
 }
+*/
 /*old
 inline bool singleEl_Probe_Iso_ASYM1(const reco::Candidate& cand, int run){
 	const pat::Electron* el1 = CloneCandidate(cand);
@@ -3774,7 +3855,7 @@ inline bool singleEl_Probe_Iso_ASYM1(const reco::Candidate& cand, int run){
 */
 
 // Single Electron cut - Isolation with rho Photon: ASYM, leg0
-inline bool singleEl_Probe_IsoPhoton_ASYM0(const reco::Candidate& cand, int run, double rho){
+inline bool singleEl_Probe_Iso_ASYM0(const reco::Candidate& cand, int run, double rho){
 
 	const pat::Electron* electron = CloneCandidate(cand);
 
@@ -3826,7 +3907,7 @@ inline bool singleEl_Probe_IsoPhoton_ASYM0(const reco::Candidate& cand, int run,
 
 
 // Single Electron cut - Isolation with rho Photon: ASYM, leg1
-inline bool singleEl_Probe_IsoPhoton_ASYM1(const reco::Candidate& cand, int run, double rho){
+inline bool singleEl_Probe_Iso_ASYM1(const reco::Candidate& cand, int run, double rho){
 
 	const pat::Electron* electron = CloneCandidate(cand);
 
@@ -3896,7 +3977,7 @@ inline bool singleEl_Probe_Iso_ASYM0(const reco::Candidate& cand, int run){
 }
 */
 
-
+/*
 // Single Electron cut - Electron ID: ASYM, leg0
 inline bool singleEl_Probe_ElID_ASYM0(const reco::Candidate& cand, int run, double rho){
 
@@ -3931,7 +4012,9 @@ inline bool singleEl_Probe_ElID_ASYM0(const reco::Candidate& cand, int run, doub
 		return false;
 	}
 }
+*/
 
+/*
 // Single Electron cut - Electron ID: ASYM, leg1
 inline bool singleEl_Probe_ElID_ASYM1(const reco::Candidate& cand, int run, double rho){
 
@@ -3966,9 +4049,10 @@ inline bool singleEl_Probe_ElID_ASYM1(const reco::Candidate& cand, int run, doub
 		return false;
 	}
 }
+*/
 
 // Single Electron cut - Electron ID Photon: ASYM, leg0
-inline bool singleEl_Probe_ElIDPhoton_ASYM0(const reco::Candidate& cand, int run, double rho){
+inline bool singleEl_Probe_ElID_ASYM0(const reco::Candidate& cand, int run, double rho){
 
 	const pat::Electron* el0 = CloneCandidate(cand);
 
@@ -4012,7 +4096,7 @@ inline bool singleEl_Probe_ElIDPhoton_ASYM0(const reco::Candidate& cand, int run
 
 
 // Single Electron cut - Electron ID Photon: ASYM, leg1
-inline bool singleEl_Probe_ElIDPhoton_ASYM1(const reco::Candidate& cand, int run, double rho){
+inline bool singleEl_Probe_ElID_ASYM1(const reco::Candidate& cand, int run, double rho){
 
 	const pat::Electron* el1 = CloneCandidate(cand);
 
@@ -4140,10 +4224,10 @@ inline bool singleEl_Tag_AllSel_SYM(const reco::Candidate& cand, int run, double
 	       //singleEl_Probe_Imp(cand, run, rho) &&
 	       //singleEl_Probe_Qual_SYM(cand, run, rho) &&
 	       //singleEl_Probe_Conv_SYM(cand, run, rho) && 
-//	       singleEl_Probe_Iso_SYM(cand, run, rho) &&
-	       singleEl_Probe_IsoPhoton_SYM(cand, run, rho) &&
-//	       singleEl_Probe_ElID_SYM(cand, run, rho) && 
-	       singleEl_Probe_ElIDPhoton_SYM(cand, run, rho);
+	       singleEl_Probe_Iso_SYM(cand, run, rho) &&
+//	       singleEl_Probe_IsoPhoton_SYM(cand, run, rho) &&
+	       singleEl_Probe_ElID_SYM(cand, run, rho);
+//	       singleEl_Probe_ElIDPhoton_SYM(cand, run, rho);
 }
 
 
@@ -4155,10 +4239,10 @@ inline bool singleEl_Tag_AllSel_ASYM0(const reco::Candidate& cand, int run, doub
 	       //singleEl_Probe_Imp(cand, run, rho) &&
 	       //singleEl_Probe_Qual_ASYM0(cand, run, rho) && 
 	       //singleEl_Probe_Conv_ASYM0(cand, run, rho) && 
-//	       singleEl_Probe_Iso_ASYM0(cand, run, rho) && 
-	       singleEl_Probe_IsoPhoton_ASYM0(cand, run, rho) && 
-//	       singleEl_Probe_ElID_ASYM0(cand, run, rho) &&
-	       singleEl_Probe_ElIDPhoton_ASYM0(cand, run, rho);
+	       singleEl_Probe_Iso_ASYM0(cand, run, rho) && 
+//	       singleEl_Probe_IsoPhoton_ASYM0(cand, run, rho) && 
+	       singleEl_Probe_ElID_ASYM0(cand, run, rho);
+//	       singleEl_Probe_ElIDPhoton_ASYM0(cand, run, rho);
 }
 
 
@@ -4170,10 +4254,10 @@ inline bool singleEl_Tag_AllSel_ASYM1(const reco::Candidate& cand, int run, doub
 	       //singleEl_Probe_Imp(cand, run, rho) && 
 	       //singleEl_Probe_Qual_ASYM1(cand, run, rho) &&
 	       //singleEl_Probe_Conv_ASYM1(cand, run, rho) && 
-//	       singleEl_Probe_Iso_ASYM1(cand, run, rho) && 
-	       singleEl_Probe_IsoPhoton_ASYM1(cand, run, rho) && 
-//	       singleEl_Probe_ElID_ASYM1(cand, run, rho) &&
-	       singleEl_Probe_ElIDPhoton_ASYM1(cand, run, rho);
+	       singleEl_Probe_Iso_ASYM1(cand, run, rho) && 
+//	       singleEl_Probe_IsoPhoton_ASYM1(cand, run, rho) && 
+	       singleEl_Probe_ElID_ASYM1(cand, run, rho); 
+//	       singleEl_Probe_ElIDPhoton_ASYM1(cand, run, rho);
 }
 
     

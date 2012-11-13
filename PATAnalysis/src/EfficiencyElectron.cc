@@ -83,19 +83,19 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 	if(_selections=="SYM"){
 		_RecoCutFlags[_Acc] = "_AccSYM";
 		_RecoCutFlags[_Qual] = "_QualSYM"; 
-//		_RecoCutFlags[_Iso] = "_IsoSYM";
-		_RecoCutFlags[_Iso] = "_IsoPhotonSYM";
-//		_RecoCutFlags[_ElID] = "_ElIDSYM";
-		_RecoCutFlags[_ElID] = "_ElIDPhotonSYM";
+		_RecoCutFlags[_Iso] = "_IsoSYM";
+//		_RecoCutFlags[_Iso] = "_IsoPhotonSYM";
+		_RecoCutFlags[_ElID] = "_ElIDSYM";
+//		_RecoCutFlags[_ElID] = "_ElIDPhotonSYM";
 		_RecoCutFlags[_Conv] = "_ConvSYM";
 	}
 	if(_selections=="ASYM"){
 		_RecoCutFlags[_Acc] = "_AccASYM";
 		_RecoCutFlags[_Qual] = "_QualASYM"; 
-//		_RecoCutFlags[_Iso] = "_IsoASYM";
-		_RecoCutFlags[_Iso] = "_IsoPhotonASYM";
-//		_RecoCutFlags[_ElID] = "_ElIDASYM";
-		_RecoCutFlags[_ElID] = "_ElIDPhotonASYM";
+		_RecoCutFlags[_Iso] = "_IsoASYM";
+//		_RecoCutFlags[_Iso] = "_IsoPhotonASYM";
+		_RecoCutFlags[_ElID] = "_ElIDASYM";
+//		_RecoCutFlags[_ElID] = "_ElIDPhotonASYM";
 		_RecoCutFlags[_Conv] = "_ConvASYM";
 	}
 	
@@ -344,15 +344,15 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 			if(i<8) probe_cuts_1234567.push_back(singleEl_Probe_Qual_SYM);
 		}
 		if(_RecoCutFlags[i] == "_Imp"){
-			if(i<2) probe_cuts_1.push_back(singleEl_Probe_Imp);
-			if(i<3) probe_cuts_12.push_back(singleEl_Probe_Imp);
-			if(i<4) probe_cuts_123.push_back(singleEl_Probe_Imp);
-			if(i<5) probe_cuts_1234.push_back(singleEl_Probe_Imp);
-			if(i<6) probe_cuts_12345.push_back(singleEl_Probe_Imp);
-			if(i<7) probe_cuts_123456.push_back(singleEl_Probe_Imp);
-			if(i<8) probe_cuts_1234567.push_back(singleEl_Probe_Imp);
+			if(i<2) probe_cuts_1.push_back(singleEl_Probe_Imp_SYM);
+			if(i<3) probe_cuts_12.push_back(singleEl_Probe_Imp_SYM);
+			if(i<4) probe_cuts_123.push_back(singleEl_Probe_Imp_SYM);
+			if(i<5) probe_cuts_1234.push_back(singleEl_Probe_Imp_SYM);
+			if(i<6) probe_cuts_12345.push_back(singleEl_Probe_Imp_SYM);
+			if(i<7) probe_cuts_123456.push_back(singleEl_Probe_Imp_SYM);
+			if(i<8) probe_cuts_1234567.push_back(singleEl_Probe_Imp_SYM);
 		}
-/*
+
 		if(_RecoCutFlags[i] == "_IsoSYM"){
 			if(i<2) probe_cuts_1.push_back(singleEl_Probe_Iso_SYM);
 			if(i<3) probe_cuts_12.push_back(singleEl_Probe_Iso_SYM);
@@ -362,7 +362,7 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 			if(i<7) probe_cuts_123456.push_back(singleEl_Probe_Iso_SYM);
 			if(i<8) probe_cuts_1234567.push_back(singleEl_Probe_Iso_SYM);
 		}
-*/
+/*
 		if(_RecoCutFlags[i] == "_IsoPhotonSYM"){
 			if(i<2) probe_cuts_1.push_back(singleEl_Probe_IsoPhoton_SYM);
 			if(i<3) probe_cuts_12.push_back(singleEl_Probe_IsoPhoton_SYM);
@@ -372,7 +372,7 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 			if(i<7) probe_cuts_123456.push_back(singleEl_Probe_IsoPhoton_SYM);
 			if(i<8) probe_cuts_1234567.push_back(singleEl_Probe_IsoPhoton_SYM);
 		}
-/*
+*/
 		if(_RecoCutFlags[i] == "_ElIDSYM"){
 			if(i<2) probe_cuts_1.push_back(singleEl_Probe_ElID_SYM);
 			if(i<3) probe_cuts_12.push_back(singleEl_Probe_ElID_SYM);
@@ -382,7 +382,7 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 			if(i<7) probe_cuts_123456.push_back(singleEl_Probe_ElID_SYM);
 			if(i<8) probe_cuts_1234567.push_back(singleEl_Probe_ElID_SYM);
 		}
-*/
+/*
 		if(_RecoCutFlags[i] == "_ElIDPhotonSYM"){
 			if(i<2) probe_cuts_1.push_back(singleEl_Probe_ElIDPhoton_SYM);
 			if(i<3) probe_cuts_12.push_back(singleEl_Probe_ElIDPhoton_SYM);
@@ -392,7 +392,7 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 			if(i<7) probe_cuts_123456.push_back(singleEl_Probe_ElIDPhoton_SYM);
 			if(i<8) probe_cuts_1234567.push_back(singleEl_Probe_ElIDPhoton_SYM);
 		}
-
+*/
 		if(_RecoCutFlags[i] == "_ConvSYM"){
 			if(i<2) probe_cuts_1.push_back(singleEl_Probe_Conv_SYM);
 			if(i<3) probe_cuts_12.push_back(singleEl_Probe_Conv_SYM);
@@ -501,12 +501,12 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 
 	//Efficienza di singolo leptone in funzione di pt ed eta
 
-	for(int i=0; i<11; i++) _ptBinTP[i] = -1;
+	for(int i=0; i<3; i++) _ptBinTP[i] = -1;
 
-	_ptBinTP[0] = 20;	//GeV
-	_ptBinTP[1] = 50;	//GeV
-	_ptBinTP[2] = 100;	//GeV
-	_ptBinTP[3] = 200;	//GeV
+	_ptBinTP[0] = 100;	//GeV
+	_ptBinTP[1] = 150;	//GeV
+	_ptBinTP[2] = 300;	//GeV
+//	_ptBinTP[3] = ;	        //GeV
 
 	string name_TagDir_Pt_Barrel = "Tag&Probe_Pt_Barrel";
 	string name_TagDir_Pt_Endcap = "Tag&Probe_Pt_Endcap";
@@ -625,15 +625,15 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 				if(i<8) probe_cuts0_1234567.push_back(singleEl_Probe_Qual_ASYM0);
 			} 
 			if(_RecoCutFlags[i] == "_Imp"){
-				if(i<2) probe_cuts0_1.push_back(singleEl_Probe_Imp);
-				if(i<3) probe_cuts0_12.push_back(singleEl_Probe_Imp);
-				if(i<4) probe_cuts0_123.push_back(singleEl_Probe_Imp);
-				if(i<5) probe_cuts0_1234.push_back(singleEl_Probe_Imp);
-				if(i<6) probe_cuts0_12345.push_back(singleEl_Probe_Imp);
-				if(i<7) probe_cuts0_123456.push_back(singleEl_Probe_Imp);
-				if(i<8) probe_cuts0_1234567.push_back(singleEl_Probe_Imp);
+				if(i<2) probe_cuts0_1.push_back(singleEl_Probe_Imp_ASYM0);
+				if(i<3) probe_cuts0_12.push_back(singleEl_Probe_Imp_ASYM0);
+				if(i<4) probe_cuts0_123.push_back(singleEl_Probe_Imp_ASYM0);
+				if(i<5) probe_cuts0_1234.push_back(singleEl_Probe_Imp_ASYM0);
+				if(i<6) probe_cuts0_12345.push_back(singleEl_Probe_Imp_ASYM0);
+				if(i<7) probe_cuts0_123456.push_back(singleEl_Probe_Imp_ASYM0);
+				if(i<8) probe_cuts0_1234567.push_back(singleEl_Probe_Imp_ASYM0);
 			}
-/*
+
 			if(_RecoCutFlags[i] == "_IsoASYM"){
 				if(i<2) probe_cuts0_1.push_back(singleEl_Probe_Iso_ASYM0);
 				if(i<3) probe_cuts0_12.push_back(singleEl_Probe_Iso_ASYM0);
@@ -643,7 +643,7 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 				if(i<7) probe_cuts0_123456.push_back(singleEl_Probe_Iso_ASYM0);
 				if(i<8) probe_cuts0_1234567.push_back(singleEl_Probe_Iso_ASYM0);
 			}
-*/
+/*
 			if(_RecoCutFlags[i] == "_IsoPhotonASYM"){
 				if(i<2) probe_cuts0_1.push_back(singleEl_Probe_IsoPhoton_ASYM0);
 				if(i<3) probe_cuts0_12.push_back(singleEl_Probe_IsoPhoton_ASYM0);
@@ -653,7 +653,8 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 				if(i<7) probe_cuts0_123456.push_back(singleEl_Probe_IsoPhoton_ASYM0);
 				if(i<8) probe_cuts0_1234567.push_back(singleEl_Probe_IsoPhoton_ASYM0);
 			}
-/*			if(_RecoCutFlags[i] == "_ElIDASYM"){
+*/
+			if(_RecoCutFlags[i] == "_ElIDASYM"){
 				if(i<2) probe_cuts0_1.push_back(singleEl_Probe_ElID_ASYM0);
 				if(i<3) probe_cuts0_12.push_back(singleEl_Probe_ElID_ASYM0);
 				if(i<4) probe_cuts0_123.push_back(singleEl_Probe_ElID_ASYM0);
@@ -662,7 +663,7 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 				if(i<7) probe_cuts0_123456.push_back(singleEl_Probe_ElID_ASYM0);
 				if(i<8) probe_cuts0_1234567.push_back(singleEl_Probe_ElID_ASYM0);
 			}
-*/
+/*
 			if(_RecoCutFlags[i] == "_ElIDPhotonASYM"){
 				if(i<2) probe_cuts0_1.push_back(singleEl_Probe_ElIDPhoton_ASYM0);
 				if(i<3) probe_cuts0_12.push_back(singleEl_Probe_ElIDPhoton_ASYM0);
@@ -672,7 +673,7 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 				if(i<7) probe_cuts0_123456.push_back(singleEl_Probe_ElIDPhoton_ASYM0);
 				if(i<8) probe_cuts0_1234567.push_back(singleEl_Probe_ElIDPhoton_ASYM0);
 			}
-
+*/
 			if(_RecoCutFlags[i] == "_ConvASYM"){
 				if(i<2) probe_cuts0_1.push_back(singleEl_Probe_Conv_ASYM0);
 				if(i<3) probe_cuts0_12.push_back(singleEl_Probe_Conv_ASYM0);
@@ -779,12 +780,12 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 
 		//Efficienza di singolo leptone in funzione di pt ed eta
 
-		for(int i=0; i<11; i++) _ptBinTP0[i] = -1;
+		for(int i=0; i<3; i++) _ptBinTP0[i] = -1;
 
-		_ptBinTP0[0] = 20;	//GeV
-		_ptBinTP0[1] = 50;	//GeV
-		_ptBinTP0[2] = 100;	//GeV
-		_ptBinTP0[3] = 200;	//GeV
+		_ptBinTP0[0] = 100;	//GeV
+		_ptBinTP0[1] = 150;	//GeV
+		_ptBinTP0[2] = 300;	//GeV
+//		_ptBinTP0[3] = ;	//GeV
 
 		string name_TagDir0_Pt_Barrel = "Tag&Probe0_Pt_Barrel";
 		string name_TagDir0_Pt_Endcap = "Tag&Probe0_Pt_Endcap";
@@ -901,15 +902,15 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 				if(i<8) probe_cuts1_1234567.push_back(singleEl_Probe_Qual_ASYM1);
 			}
 			if(_RecoCutFlags[i] == "_Imp"){
-				if(i<2) probe_cuts1_1.push_back(singleEl_Probe_Imp);
-				if(i<3) probe_cuts1_12.push_back(singleEl_Probe_Imp);
-				if(i<4) probe_cuts1_123.push_back(singleEl_Probe_Imp);
-				if(i<5) probe_cuts1_1234.push_back(singleEl_Probe_Imp);
-				if(i<6) probe_cuts1_12345.push_back(singleEl_Probe_Imp);
-				if(i<7) probe_cuts1_123456.push_back(singleEl_Probe_Imp);
-				if(i<8) probe_cuts1_1234567.push_back(singleEl_Probe_Imp);
+				if(i<2) probe_cuts1_1.push_back(singleEl_Probe_Imp_ASYM1);
+				if(i<3) probe_cuts1_12.push_back(singleEl_Probe_Imp_ASYM1);
+				if(i<4) probe_cuts1_123.push_back(singleEl_Probe_Imp_ASYM1);
+				if(i<5) probe_cuts1_1234.push_back(singleEl_Probe_Imp_ASYM1);
+				if(i<6) probe_cuts1_12345.push_back(singleEl_Probe_Imp_ASYM1);
+				if(i<7) probe_cuts1_123456.push_back(singleEl_Probe_Imp_ASYM1);
+				if(i<8) probe_cuts1_1234567.push_back(singleEl_Probe_Imp_ASYM1);
 			}
-/*
+
 			if(_RecoCutFlags[i] == "_IsoASYM"){
 				if(i<2) probe_cuts1_1.push_back(singleEl_Probe_Iso_ASYM1);
 				if(i<3) probe_cuts1_12.push_back(singleEl_Probe_Iso_ASYM1);
@@ -919,7 +920,7 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 				if(i<7) probe_cuts1_123456.push_back(singleEl_Probe_Iso_ASYM1);
 				if(i<8) probe_cuts1_1234567.push_back(singleEl_Probe_Iso_ASYM1);
 			}
-*/
+/*
 			if(_RecoCutFlags[i] == "_IsoPhotonASYM"){
 				if(i<2) probe_cuts1_1.push_back(singleEl_Probe_IsoPhoton_ASYM1);
 				if(i<3) probe_cuts1_12.push_back(singleEl_Probe_IsoPhoton_ASYM1);
@@ -929,7 +930,7 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 				if(i<7) probe_cuts1_123456.push_back(singleEl_Probe_IsoPhoton_ASYM1);
 				if(i<8) probe_cuts1_1234567.push_back(singleEl_Probe_IsoPhoton_ASYM1);
 			}
-/*
+*/
 			if(_RecoCutFlags[i] == "_ElIDASYM"){
 				if(i<2) probe_cuts1_1.push_back(singleEl_Probe_ElID_ASYM1);
 				if(i<3) probe_cuts1_12.push_back(singleEl_Probe_ElID_ASYM1);
@@ -939,7 +940,7 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 				if(i<7) probe_cuts1_123456.push_back(singleEl_Probe_ElID_ASYM1);
 				if(i<8) probe_cuts1_1234567.push_back(singleEl_Probe_ElID_ASYM1);
 			}
-*/
+/*
 			if(_RecoCutFlags[i] == "_ElIDPhotonASYM"){
 				if(i<2) probe_cuts1_1.push_back(singleEl_Probe_ElIDPhoton_ASYM1);
 				if(i<3) probe_cuts1_12.push_back(singleEl_Probe_ElIDPhoton_ASYM1);
@@ -949,7 +950,7 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 				if(i<7) probe_cuts1_123456.push_back(singleEl_Probe_ElIDPhoton_ASYM1);
 				if(i<8) probe_cuts1_1234567.push_back(singleEl_Probe_ElIDPhoton_ASYM1);
 			}
-
+*/
 			if(_RecoCutFlags[i] == "_ConvASYM"){
 				if(i<2) probe_cuts1_1.push_back(singleEl_Probe_Conv_ASYM1);
 				if(i<3) probe_cuts1_12.push_back(singleEl_Probe_Conv_ASYM1);
@@ -1055,12 +1056,12 @@ void EfficiencyElectron::begin(TFile* out, const edm::ParameterSet& iConfig){
 		_TagProbe_Electron1_Excl_Double = new TagAndProbeFillerElectron(TagDir1_Excl_Double, string(name_TPFiller1_Double.c_str()), nbin_mult, mult_xmin, mult_xmax, tag_cuts_0_AllSel, probe_cuts1_1, probe_cuts1_1234567, "soft");
 		_TagProbe_Electron1_Incl_Double = new TagAndProbeFillerElectron(TagDir1_Incl_Double, string(name_TPFiller1_Double.c_str()), nbin_mult, mult_xmin, mult_xmax, tag_cuts_0_AllSel, probe_cuts1_1, probe_cuts1_1234567, "soft");
 
-		for(int i=0; i<11; i++) _ptBinTP1[i] = -1;
+		for(int i=0; i<3; i++) _ptBinTP1[i] = -1;
 
-		_ptBinTP1[0] = 20;	//GeV
-		_ptBinTP1[1] = 50;	//GeV
-		_ptBinTP1[2] = 100;	//GeV
-		_ptBinTP1[3] = 200;	//GeV
+		_ptBinTP1[0] = 100;	//GeV
+		_ptBinTP1[1] = 150;	//GeV
+		_ptBinTP1[2] = 300;	//GeV
+//		_ptBinTP1[3] = ;	//GeV
 
 		string name_TagDir1_Pt_Barrel = "Tag&Probe1_Pt_Barrel";
 		string name_TagDir1_Pt_Endcap = "Tag&Probe1_Pt_Endcap";
@@ -1521,6 +1522,8 @@ void EfficiencyElectron::process(const fwlite::Event& iEvent){
 	
 			if(gendau0->pt()>_ptBinTP[0] && gendau0->pt()<_ptBinTP[1]) genpt0 = 0;
 			if(gendau0->pt()>_ptBinTP[1] && gendau0->pt()<_ptBinTP[2]) genpt0 = 1;
+			if(gendau0->pt()>_ptBinTP[2])                              genpt0 = 2;
+/*
 			if(gendau0->pt()>_ptBinTP[2] && gendau0->pt()<_ptBinTP[3]) genpt0 = 2;
 			if(gendau0->pt()>_ptBinTP[3] && gendau0->pt()<_ptBinTP[4]) genpt0 = 3;
 			if(gendau0->pt()>_ptBinTP[4] && gendau0->pt()<_ptBinTP[5]) genpt0 = 4;
@@ -1529,9 +1532,11 @@ void EfficiencyElectron::process(const fwlite::Event& iEvent){
 			if(gendau0->pt()>_ptBinTP[7] && gendau0->pt()<_ptBinTP[8]) genpt0 = 7;
 			if(gendau0->pt()>_ptBinTP[8] && gendau0->pt()<_ptBinTP[9]) genpt0 = 8;
 			if(gendau0->pt()>_ptBinTP[9] && gendau0->pt()<_ptBinTP[10]) genpt0 = 9;
-	
+*/	
 			if(gendau1->pt()>_ptBinTP[0] && gendau1->pt()<_ptBinTP[1]) genpt1 = 0;
 			if(gendau1->pt()>_ptBinTP[1] && gendau1->pt()<_ptBinTP[2]) genpt1 = 1;
+			if(gendau1->pt()>_ptBinTP[2])                              genpt1 = 2;
+/*
 			if(gendau1->pt()>_ptBinTP[2] && gendau1->pt()<_ptBinTP[3]) genpt1 = 2;
 			if(gendau1->pt()>_ptBinTP[3] && gendau1->pt()<_ptBinTP[4]) genpt1 = 3;
 			if(gendau1->pt()>_ptBinTP[4] && gendau1->pt()<_ptBinTP[5]) genpt1 = 4;
@@ -1540,7 +1545,7 @@ void EfficiencyElectron::process(const fwlite::Event& iEvent){
 			if(gendau1->pt()>_ptBinTP[7] && gendau1->pt()<_ptBinTP[8]) genpt1 = 7;
 			if(gendau1->pt()>_ptBinTP[8] && gendau1->pt()<_ptBinTP[9]) genpt1 = 8;
 			if(gendau1->pt()>_ptBinTP[9] && gendau1->pt()<_ptBinTP[10]) genpt1 = 9;
-	
+*/	
 			if(MassWindow(*zgenHandle, _selections)){
 	
 				if(gendau0->isEB()) AccDenom_GenSingleElPt_Barrel->Fill(genpt0);	
@@ -1579,6 +1584,8 @@ void EfficiencyElectron::process(const fwlite::Event& iEvent){
 	
 			if(recdau0->pt()>_ptBinTP[0] && recdau0->pt()<_ptBinTP[1]) recpt0 = 0;
 			if(recdau0->pt()>_ptBinTP[1] && recdau0->pt()<_ptBinTP[2]) recpt0 = 1;
+			if(recdau0->pt()>_ptBinTP[2])                              recpt0 = 2;
+/*
 			if(recdau0->pt()>_ptBinTP[2] && recdau0->pt()<_ptBinTP[3]) recpt0 = 2;
 			if(recdau0->pt()>_ptBinTP[3] && recdau0->pt()<_ptBinTP[4]) recpt0 = 3;
 			if(recdau0->pt()>_ptBinTP[4] && recdau0->pt()<_ptBinTP[5]) recpt0 = 4;
@@ -1587,9 +1594,11 @@ void EfficiencyElectron::process(const fwlite::Event& iEvent){
 			if(recdau0->pt()>_ptBinTP[7] && recdau0->pt()<_ptBinTP[8]) recpt0 = 7;
 			if(recdau0->pt()>_ptBinTP[8] && recdau0->pt()<_ptBinTP[9]) recpt0 = 8;
 			if(recdau0->pt()>_ptBinTP[9] && recdau0->pt()<_ptBinTP[10]) recpt0 = 9;
-	
+*/	
 			if(recdau1->pt()>_ptBinTP[0] && recdau1->pt()<_ptBinTP[1]) recpt1 = 0;
 			if(recdau1->pt()>_ptBinTP[1] && recdau1->pt()<_ptBinTP[2]) recpt1 = 1;
+			if(recdau1->pt()>_ptBinTP[2])                              recpt1 = 2;
+/*
 			if(recdau1->pt()>_ptBinTP[2] && recdau1->pt()<_ptBinTP[3]) recpt1 = 2;
 			if(recdau1->pt()>_ptBinTP[3] && recdau1->pt()<_ptBinTP[4]) recpt1 = 3;
 			if(recdau1->pt()>_ptBinTP[4] && recdau1->pt()<_ptBinTP[5]) recpt1 = 4;
@@ -1598,7 +1607,7 @@ void EfficiencyElectron::process(const fwlite::Event& iEvent){
 			if(recdau1->pt()>_ptBinTP[7] && recdau1->pt()<_ptBinTP[8]) recpt1 = 7;
 			if(recdau1->pt()>_ptBinTP[8] && recdau1->pt()<_ptBinTP[9]) recpt1 = 8;
 			if(recdau1->pt()>_ptBinTP[9] && recdau1->pt()<_ptBinTP[10]) recpt1 = 9;
-	
+*/	
 			if(MassWindow(*zrecHandle, _selections)){
 	
 				if(_selections=="SYM"){ 

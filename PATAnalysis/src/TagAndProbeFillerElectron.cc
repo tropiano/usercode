@@ -83,6 +83,8 @@ void TagAndProbeFillerElectron::fill(const reco::Candidate& Z, int run, double r
 			if(_eta==0 || _eta==1){
 				if(Z.daughter(0)->pt()>pt[0] && Z.daughter(0)->pt()<pt[1])  x = 0;
 				if(Z.daughter(0)->pt()>pt[1] && Z.daughter(0)->pt()<pt[2])  x = 1;
+				if(Z.daughter(0)->pt()>pt[2])                               x = 2;
+/*
 				if(Z.daughter(0)->pt()>pt[2] && Z.daughter(0)->pt()<pt[3])  x = 2;
 				if(Z.daughter(0)->pt()>pt[3] && Z.daughter(0)->pt()<pt[4])  x = 3;
 				if(Z.daughter(0)->pt()>pt[4] && Z.daughter(0)->pt()<pt[5])  x = 4;
@@ -91,6 +93,7 @@ void TagAndProbeFillerElectron::fill(const reco::Candidate& Z, int run, double r
 				if(Z.daughter(0)->pt()>pt[7] && Z.daughter(0)->pt()<pt[8])  x = 7;
 				if(Z.daughter(0)->pt()>pt[8] && Z.daughter(0)->pt()<pt[9])  x = 8;
 				if(Z.daughter(0)->pt()>pt[9] && Z.daughter(0)->pt()<pt[10]) x = 9;
+*/
 			} 
 
 			if (tag(*(Z.daughter(1)), _run, _rho)) probe(*(Z.daughter(0)), Z.mass(), x, w, _run, _rho);
@@ -102,6 +105,8 @@ void TagAndProbeFillerElectron::fill(const reco::Candidate& Z, int run, double r
 		if(_eta==0 || _eta==1){
 			if(Z.daughter(1)->pt()>pt[0] && Z.daughter(1)->pt()<pt[1])  x = 0;
 			if(Z.daughter(1)->pt()>pt[1] && Z.daughter(1)->pt()<pt[2])  x = 1;
+			if(Z.daughter(1)->pt()>pt[2])                               x = 2;
+/*
 			if(Z.daughter(1)->pt()>pt[2] && Z.daughter(1)->pt()<pt[3])  x = 2;
 			if(Z.daughter(1)->pt()>pt[3] && Z.daughter(1)->pt()<pt[4])  x = 3;
 			if(Z.daughter(1)->pt()>pt[4] && Z.daughter(1)->pt()<pt[5])  x = 4;
@@ -110,6 +115,7 @@ void TagAndProbeFillerElectron::fill(const reco::Candidate& Z, int run, double r
 			if(Z.daughter(1)->pt()>pt[7] && Z.daughter(1)->pt()<pt[8])  x = 7;
 			if(Z.daughter(1)->pt()>pt[8] && Z.daughter(1)->pt()<pt[9])  x = 8;
 			if(Z.daughter(1)->pt()>pt[9] && Z.daughter(1)->pt()<pt[10]) x = 9;
+*/
 		} 
 
 		//tag cand 1, probe cand 2 -> efficiency lepton 1
@@ -127,6 +133,8 @@ void TagAndProbeFillerElectron::fill(const reco::Candidate& Z, int run, double r
 		if(_eta==0 || _eta==1){
 			if(Z.daughter(0)->pt()>pt[0] && Z.daughter(0)->pt()<pt[1])  x = 0;
 			if(Z.daughter(0)->pt()>pt[1] && Z.daughter(0)->pt()<pt[2])  x = 1;
+			if(Z.daughter(0)->pt()>pt[2])                               x = 2;
+/*
 			if(Z.daughter(0)->pt()>pt[2] && Z.daughter(0)->pt()<pt[3])  x = 2;
 			if(Z.daughter(0)->pt()>pt[3] && Z.daughter(0)->pt()<pt[4])  x = 3;
 			if(Z.daughter(0)->pt()>pt[4] && Z.daughter(0)->pt()<pt[5])  x = 4;
@@ -135,6 +143,7 @@ void TagAndProbeFillerElectron::fill(const reco::Candidate& Z, int run, double r
 			if(Z.daughter(0)->pt()>pt[7] && Z.daughter(0)->pt()<pt[8])  x = 7;
 			if(Z.daughter(0)->pt()>pt[8] && Z.daughter(0)->pt()<pt[9])  x = 8;
 			if(Z.daughter(0)->pt()>pt[9] && Z.daughter(0)->pt()<pt[10]) x = 9;
+*/
 		} 
 
 		//tag cand 2, probe cand 1 -> efficiency lepton 0

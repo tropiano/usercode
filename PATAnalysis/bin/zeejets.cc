@@ -30,7 +30,7 @@ using namespace std;
 5. Run2011B_PromptReco_v1		(skimmed)
 
 -1. All
-11. DYJetstoLL_M50_All			(not skimmed)
+11. DYJetsToLL_M50_All			(not skimmed)
 12. TTJets_All				(skimmed)
 13. WJetsToLNu_All			(skimmed)
 14. QCD_EMEnriched_Pt20to30_All		(skimmed)
@@ -44,7 +44,7 @@ using namespace std;
 103. ZZJetsTo4L_All			(skimmed)
 
 -2. All Train
-21. DYJetstoLL_M50_Train 		(not skimmed)
+21. DYJetsToLL_M50_Train 		(not skimmed)
 22. TTJets_Train			(skimmed)
 23. WJetsToLNu_Train	 		(skimmed)
 24. QCD_EMEnriched_Pt20to30_Train	(skimmed)
@@ -58,7 +58,7 @@ using namespace std;
 203. ZZJetsTo4L_Train 			(skimmed)
 
 -3. All Sample
-31. DYJetstoLL_M50_Sample 		(not skimmed)
+31. DYJetsToLL_M50_Sample 		(not skimmed)
 32. TTJets_Sample			(skimmed)
 33. WJetsToLNu_Sample			(skimmed)
 34. QCD_EMEnriched_Pt20to30_Sample	(skimmed)
@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
 	string Run2011A_PromptReco_v6 = "Run2011A_PromptReco_v6.list";
 	string Run2011B_PromptReco_v1 = "Run2011B_PromptReco_v1.list";
 
-	string DYJetstoLL_M50_All = "DYJetstoLL_M50_All.list"; 
+	string DYJetsToLL_M50_All = "DYJetsToLL_M50_All.list"; 
 	string TTJets_All = "TTJets_All.list";
 	string WJetsToLNu_All = "WJetsToLNu_All.list";
 	string QCD_EMEnriched_Pt20to30_All = "QCD_EMEnriched_Pt20to30_All.list";
@@ -115,7 +115,7 @@ int main(int argc, char *argv[]) {
 	string WZJetsTo3LNu_All = "WZJetsTo3LNu_All.list";
 	string ZZJetsTo4L_All = "ZZJetsTo4L_All.list";	
 
-	string DYJetstoLL_M50_Train = "DYJetstoLL_M50_Train.list"; 
+	string DYJetsToLL_M50_Train = "DYJetsToLL_M50_Train.list"; 
 	string TTJets_Train = "TTJets_Train.list";
 	string WJetsToLNu_Train = "WJetsToLNu_Train.list";
 	string QCD_EMEnriched_Pt20to30_Train = "QCD_EMEnriched_Pt20to30_Train.list";
@@ -128,7 +128,7 @@ int main(int argc, char *argv[]) {
 	string WZJetsTo3LNu_Train = "WZJetsTo3LNu_Train.list";
 	string ZZJetsTo4L_Train = "ZZJetsTo4L_Train.list";	
 
-	string DYJetstoLL_M50_Sample = "DYJetstoLL_M50_Sample.list"; 
+	string DYJetsToLL_M50_Sample = "DYJetsToLL_M50_Sample.list"; 
 	string TTJets_Sample = "TTJets_Sample.list";
 	string WJetsToLNu_Sample = "WJetsToLNu_Sample.list";
 	string QCD_EMEnriched_Pt20to30_Sample = "QCD_EMEnriched_Pt20to30_Sample.list";
@@ -153,7 +153,7 @@ int main(int argc, char *argv[]) {
 
 	
 	//Path of PATAnalysis dir - DO NOT FORGET THE SLASH AT THE END OF THE PATH (complete path)
-	string path="/data/sandro/Analisi/rel_CMSSW_4_2_5_PhotonsPAT/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/AnalysisElectrons/";
+	string path="/data/sandro/Analisi/rel_CMSSW_4_2_5_PhotonsPAT_TEP/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/AnalysisElectrons/";
 
 
 	//Modules
@@ -198,7 +198,7 @@ int main(int argc, char *argv[]) {
 	   PreDefName==5) Norm="False"; // Do not normalize for data
 
 	//Number of CPUs
-	int CPU = 1;
+	int CPU = 7;
 
 	//Log (non funziona)
 	bool Log = false;
@@ -235,7 +235,7 @@ int main(int argc, char *argv[]) {
 
 	// -> MC All
 	else if (PreDefName==11){
-		sourceList = (SourceFilesDir + DYJetstoLL_M50_All).c_str();
+		sourceList = (SourceFilesDir + DYJetsToLL_M50_All).c_str();
 		sample = "mc";
 	}
 	else if (PreDefName==12){
@@ -285,7 +285,7 @@ int main(int argc, char *argv[]) {
 
 	// -> MC Train
 	else if (PreDefName==21){
-		sourceList = (SourceFilesDir + DYJetstoLL_M50_Train).c_str();
+		sourceList = (SourceFilesDir + DYJetsToLL_M50_Train).c_str();
 		sample = "mc";
 	}
 	else if (PreDefName==22){
@@ -335,7 +335,7 @@ int main(int argc, char *argv[]) {
 
 	// -> MC Sample
 	else if (PreDefName==31){
-		sourceList = (SourceFilesDir + DYJetstoLL_M50_Sample).c_str();
+		sourceList = (SourceFilesDir + DYJetsToLL_M50_Sample).c_str();
 		sample = "mc";
 	}
 	else if (PreDefName==32){
@@ -469,7 +469,7 @@ int main(int argc, char *argv[]) {
 		EventFilter=ParStruct._EventFilter;
 		EventsPerFile=ParStruct._EventsPerFile;
 		EventNumber=ParStruct._EventNumber;
-		makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Qual, Imp, Iso, ElID, Conv, path.c_str(), DYJetstoLL_M50_All.c_str(), "DYJetstoLL_M50_All", Norm.c_str(), EventsPerFile, EventNumber, ProcEvents, xsec*EventFilter, targetLumi, NtupleFill, JECUnc, JECUncFilePath);
+		makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Qual, Imp, Iso, ElID, Conv, path.c_str(), DYJetsToLL_M50_All.c_str(), "DYJetsToLL_M50_All", Norm.c_str(), EventsPerFile, EventNumber, ProcEvents, xsec*EventFilter, targetLumi, NtupleFill, JECUnc, JECUncFilePath);
 		
 		Parameters(12, &ParStruct);
 		xsec=ParStruct._xsec;
@@ -558,7 +558,7 @@ int main(int argc, char *argv[]) {
 		EventFilter=ParStruct._EventFilter;
 		EventsPerFile=ParStruct._EventsPerFile;
 		EventNumber=ParStruct._EventNumber;
-		makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Qual, Imp, Iso, ElID, Conv, path.c_str(), DYJetstoLL_M50_Train.c_str(), "DYJetstoLL_M50_Train", "False", EventsPerFile, EventNumber, ProcEvents, xsec*EventFilter, targetLumi, NtupleFill, JECUnc, JECUncFilePath);//Il Train del segnale non è norm. per avere un conf. corretto con effMC (altrimenti avrei le barre d'errore sbagliate)
+		makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Qual, Imp, Iso, ElID, Conv, path.c_str(), DYJetsToLL_M50_Train.c_str(), "DYJetsToLL_M50_Train", "False", EventsPerFile, EventNumber, ProcEvents, xsec*EventFilter, targetLumi, NtupleFill, JECUnc, JECUncFilePath);//Il Train del segnale non è norm. per avere un conf. corretto con effMC (altrimenti avrei le barre d'errore sbagliate)
 		
 		Parameters(22, &ParStruct);
 		xsec=ParStruct._xsec;
@@ -648,7 +648,7 @@ int main(int argc, char *argv[]) {
 		EventFilter=ParStruct._EventFilter;
 		EventsPerFile=ParStruct._EventsPerFile;
 		EventNumber=ParStruct._EventNumber;
-		makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Qual, Imp, Iso, ElID, Conv, path.c_str(), DYJetstoLL_M50_Sample.c_str(), "DYJetstoLL_M50_Sample", Norm.c_str(), EventsPerFile, EventNumber, ProcEvents, xsec*EventFilter, targetLumi, NtupleFill, JECUnc, JECUncFilePath);
+		makeCfg("mc", selections, JetType, GEN, RECO, EFF, NTUPLE, Acc, Trg, Qual, Imp, Iso, ElID, Conv, path.c_str(), DYJetsToLL_M50_Sample.c_str(), "DYJetsToLL_M50_Sample", Norm.c_str(), EventsPerFile, EventNumber, ProcEvents, xsec*EventFilter, targetLumi, NtupleFill, JECUnc, JECUncFilePath);
 		
 		Parameters(32, &ParStruct);
 		xsec=ParStruct._xsec;
@@ -742,7 +742,7 @@ int main(int argc, char *argv[]) {
 	gSystem->Load("libFWCoreFWLite");
 	AutoLibraryLoader::enable();
 	gSystem->Load("libFirenzePATAnalysis");
-	p->Exec(".x /data/sandro/Analisi/rel_CMSSW_4_2_5_PhotonsPAT/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/remote.C");
+	p->Exec(".x /data/sandro/Analisi/rel_CMSSW_4_2_5_PhotonsPAT_TEP/CMSSW_4_2_5/src/Firenze/PATAnalysis/bin/remote.C");
 
 
 	//Process
@@ -809,8 +809,8 @@ int main(int argc, char *argv[]) {
 	// -> MC All
 	if(PreDefName==-1){ 
 
-		string cfgPath_1_11=path+"DYJetstoLL_M50_All.py";
-		TDSet* SetDS_1_11 = getDS(DYJetstoLL_M50_All.c_str());
+		string cfgPath_1_11=path+"DYJetsToLL_M50_All.py";
+		TDSet* SetDS_1_11 = getDS(DYJetsToLL_M50_All.c_str());
 		TNamed* configfile_1_11 = new TNamed("ConfigFile", cfgPath_1_11.c_str());
 		p->AddInput(configfile_1_11);
 		p->Process(SetDS_1_11, "FWLiteTSelector","",ProcEvents);
@@ -910,8 +910,8 @@ int main(int argc, char *argv[]) {
 	// -> MC Train
 	if(PreDefName==-2){ 
 
-		string cfgPath_2_21=path+"DYJetstoLL_M50_Train.py";
-		TDSet* SetDS_2_21 = getDS(DYJetstoLL_M50_Train.c_str());
+		string cfgPath_2_21=path+"DYJetsToLL_M50_Train.py";
+		TDSet* SetDS_2_21 = getDS(DYJetsToLL_M50_Train.c_str());
 		TNamed* configfile_2_21 = new TNamed("ConfigFile", cfgPath_2_21.c_str());
 		p->AddInput(configfile_2_21);
 		p->Process(SetDS_2_21, "FWLiteTSelector","",ProcEvents);
@@ -1011,8 +1011,8 @@ int main(int argc, char *argv[]) {
 	// -> MC Sample
 	if(PreDefName==-3){ 
 
-		string cfgPath_3_31=path+"DYJetstoLL_M50_Sample.py";
-		TDSet* SetDS_3_31 = getDS(DYJetstoLL_M50_Sample.c_str());
+		string cfgPath_3_31=path+"DYJetsToLL_M50_Sample.py";
+		TDSet* SetDS_3_31 = getDS(DYJetsToLL_M50_Sample.c_str());
 		TNamed* configfile_3_31 = new TNamed("ConfigFile", cfgPath_3_31.c_str());
 		p->AddInput(configfile_3_31);
 		p->Process(SetDS_3_31, "FWLiteTSelector","",ProcEvents);

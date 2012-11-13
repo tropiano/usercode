@@ -205,9 +205,13 @@ class EfficiencyElectron : public MyPatAnalysis{
 		
 		double _xsec;
 		
-		double _ptBinTP[11];
-		double _ptBinTP0[11];
-		double _ptBinTP1[11];
+//		double _ptBinTP[11];
+//		double _ptBinTP0[11];
+//		double _ptBinTP1[11];
+		double _ptBinTP[3];
+		double _ptBinTP0[3];
+		double _ptBinTP1[3];
+
 
 };
 

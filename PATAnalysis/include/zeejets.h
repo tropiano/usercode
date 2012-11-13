@@ -24,7 +24,7 @@ using namespace std;
 5. Run2011B_PromptReco_v1		(skimmed)
 
 -1. All
-11. DYJetstoLL_M50_All 			(not skimmed)
+11. DYJetsToLL_M50_All 			(not skimmed)
 12. TTJets_All 				(skimmed)
 13. WJetsToLNu_All 			(skimmed)
 14. QCD_EMEnriched_Pt20to30_All		(skimmed)
@@ -38,7 +38,7 @@ using namespace std;
 103. ZZJetsTo4L_All 			(skimmed)
 
 -2. All Train
-21. DYJetstoLL_M50_Train 		(not skimmed)
+21. DYJetsToLL_M50_Train 		(not skimmed)
 22. TTJets_Train 			(skimmed)
 23. WJetsToLNu_Train	 		(skimmed)
 24. QCD_EMEnriched_Pt20to30_Train	(skimmed)
@@ -52,7 +52,7 @@ using namespace std;
 203. ZZJetsTo4L_Train 			(skimmed)
 
 -3. All Sample
-31. DYJetstoLL_M50_Sample 		(not skimmed)
+31. DYJetsToLL_M50_Sample 		(not skimmed)
 32. TTJets_Sample 			(skimmed)
 33. WJetsToLNu_Sample 			(skimmed)
 34. QCD_EMEnriched_Pt20to30_Sample	(skimmed)
@@ -79,7 +79,7 @@ inline void name(int i){
 	else if(i==4) SampleName="Run2011A_PromptReco_v6";
 	else if(i==5) SampleName="Run2011B_PromptReco_v1";
 
-	else if(i==11) SampleName="DYJetstoLL_M50_All";
+	else if(i==11) SampleName="DYJetsToLL_M50_All";
 	else if(i==12) SampleName="TTJets_All";
 	else if(i==13) SampleName="WJetsToLNu_All";
 	else if(i==14) SampleName="QCD_EMEnriched_Pt20to30_All";
@@ -92,7 +92,7 @@ inline void name(int i){
 	else if(i==102) SampleName="WZJetsTo3LNu_All";
 	else if(i==103) SampleName="ZZJetsTo4L_All";
 
-	else if(i==21) SampleName="DYJetstoLL_M50_Train";
+	else if(i==21) SampleName="DYJetsToLL_M50_Train";
 	else if(i==22) SampleName="TTJets_Train";
 	else if(i==23) SampleName="WJetsToLNu_Train";
 	else if(i==24) SampleName="QCD_EMEnriched_Pt20to30_Train";
@@ -105,7 +105,7 @@ inline void name(int i){
 	else if(i==202) SampleName="WZJetsTo3LNu_Train";
 	else if(i==203) SampleName="ZZJetsTo4L_Train";
 
-	else if(i==31) SampleName="DYJetstoLL_M50_Sample";
+	else if(i==31) SampleName="DYJetsToLL_M50_Sample";
 	else if(i==32) SampleName="TTJets_Sample";
 	else if(i==33) SampleName="WJetsToLNu_Sample";
 	else if(i==34) SampleName="QCD_EMEnriched_Pt20to30_Sample";
@@ -184,7 +184,7 @@ void Parameters(int i, par* Par){
 
 	//MC All
 		case(11):
-			//DYJetstoLL_M50_All:  _EventNumber = 35560196 events -> _EventNumber/_xsec = 11667 pb-1 (not skimmed)
+			//DYJetsToLL_M50_All:  _EventNumber = 35560196 events -> _EventNumber/_xsec = 11667 pb-1 (not skimmed)
 			Par->_xsec = 3048.;
 			Par->_EventFilter = 1.;
 			Par->_EventsPerFile = 0;
@@ -283,7 +283,7 @@ void Parameters(int i, par* Par){
 
 	//MC Train
 		case(21):
-			//DYJetstoLL_M50_Train:  _EventNumber = 17854257 events -> _EventNumber/_xsec =  5858 pb-1 (not skimmed)
+			//DYJetsToLL_M50_Train:  _EventNumber = 17854257 events -> _EventNumber/_xsec =  5858 pb-1 (not skimmed)
 			Par->_xsec = 3048.;
 			Par->_EventFilter = 1.;
 			Par->_EventsPerFile = 0;
@@ -381,7 +381,7 @@ void Parameters(int i, par* Par){
 
 	//MC Sample
 		case(31):
-			//DYJetstoLL_M50_Sample:  _EventNumber = 17705939 events -> _EventNumber/_xsec = 5809 pb-1 (not skimmed)
+			//DYJetsToLL_M50_Sample:  _EventNumber = 17705939 events -> _EventNumber/_xsec = 5809 pb-1 (not skimmed)
 			Par->_xsec = 3048.;
 			Par->_EventFilter = 1.;
 			Par->_EventsPerFile = 0;
