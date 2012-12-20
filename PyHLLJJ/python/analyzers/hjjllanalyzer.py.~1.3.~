@@ -1,0 +1,252 @@
+import operator 
+import itertools
+import copy
+
+from ROOT import TLorentzVector
+
+from CMGTools.RootTools.fwlite.Analyzer import Analyzer
+from CMGTools.RootTools.fwlite.Event import Event
+from CMGTools.RootTools.statistics.Counter import Counter, Counters
+from CMGTools.RootTools.fwlite.AutoHandle import AutoHandle
+from CMGTools.RootTools.physicsobjects.PhysicsObjects import Jet, GenParticle,Electron,Muon
+from FWCore.ParameterSet.Types import InputTag 
+
+from CMGTools.RootTools.utils.DeltaR import deltaR, deltaPhi
+from math import pi, sqrt, acos
+from sets import Set
+import numpy
+
+from HiggsAna.PyHLLJJ.kinfitters import DiJetKinFitter
+        
+class hjjllanalyzer( Analyzer ):
+
+    def declareHandles(self):
+        super(hjjllanalyzer, self).declareHandles()
+        self.handles['jets'] = AutoHandle ('cmgJet',
+                                           'std::vector<cmg::PFJet>')
+        self.mchandles['genParticles'] = AutoHandle( 'genParticles',
+                                                     'std::vector<reco::GenParticle>' )
+        self.handles['muons'] = AutoHandle( 'muonPresel',
+                                                     'std::vector<cmg::Muon>' )
+        self.handles['electrons'] = AutoHandle( 'electronPresel',
+                                                     'std::vector<cmg::Electron>' )
+        self.handles['trigger'] = AutoHandle(('TriggerResults', "", "HLT"), 'edm::TriggerResults')                                           
+
+        self.handles['hmumujj'] = AutoHandle('cmgHiggsSelKinFitMu', 'vector<cmg::HiggsCandidate<cmg::DiObject<cmg::Muon,cmg::Muon>,cmg::DiObject<cmg::PFJet,cmg::PFJet> > >')
+        self.handles['hmumujjnofit'] = AutoHandle('cmgHiggsSelMu', 'vector<cmg::HiggsCandidate<cmg::DiObject<cmg::Muon,cmg::Muon>,cmg::DiObject<cmg::PFJet,cmg::PFJet> > >')
+
+        self.handles['heejj'] = AutoHandle('cmgHiggsSelKinFitEle', 'vector<cmg::HiggsCandidate<cmg::DiObject<cmg::Electron,cmg::Electron>,cmg::DiObject<cmg::PFJet,cmg::PFJet> > >')
+        self.handles['heejjnofit'] = AutoHandle('cmgHiggsSelEle', 'vector<cmg::HiggsCandidate<cmg::DiObject<cmg::Electron,cmg::Electron>,cmg::DiObject<cmg::PFJet,cmg::PFJet> > >')
+
+        
+        #self.handles['pf'] = AutoHandle ('particleFlow',
+        #                                 'std::vector<reco::PFCandidate>')
+
+    def buildMCinfo(self, event):
+        self.isHZZ = False
+        self.zlep = [] 
+        self.zhad = []
+        self.vbfjets = [] 
+
+        for ptc in self.mchandles['genParticles'].product():
+            if ptc.status() != 3 :
+              #print ptc.status()
+              continue
+            if abs(ptc.pdgId()) < 6 and ptc.pt()>2:
+              isfromZ = False
+              for i in range(ptc.numberOfMothers()):
+                if ptc.mother(i).pdgId() == 23:
+                  isfromZ = True
+                  break
+              if not isfromZ :
+                hasstatus3dau = False
+                for i in range(ptc.numberOfDaughters()):
+                  if ptc.daughter(i).status()==3:
+                    hasstatus3dau = True
+                    break
+                if hasstatus3dau:    
+                  self.vbfjets.append(ptc)
+                elif not (ptc.mother(0).status() == 3 and ptc.mother(0).pt()>2):
+                  self.vbfjets.append(ptc)
+            if abs(ptc.pdgId())==25:
+              #print "Higgs"
+              ndau = ptc.numberOfDaughters()
+              #print "ndau=",ndau
+              #for i in range(ndau):
+              #  print "dauid=",ptc.daughter(i).pdgId()
+              #for some reason the third daughter is another H  
+              if ndau == 3:
+                if ptc.daughter(0).pdgId() ==23 and ptc.daughter(1).pdgId() ==23:
+                  if abs(ptc.daughter(0).daughter(0).pdgId())>=11 and abs(ptc.daughter(0).daughter(0).pdgId())<=16:
+                    self.zlep.append(ptc.daughter(0))
+                    self.zhad.append(ptc.daughter(1))
+                  else :
+                    self.zlep.append(ptc.daughter(1))
+                    self.zhad.append(ptc.daughter(0))
+                  self.isHZZ = True
+                  #print "HZZ!"
+
+    def beginLoop(self):
+        super(hjjllanalyzer,self).beginLoop()
+        self.counters.addCounter('h_gen')
+        count = self.counters.counter('h_gen')
+        count.register('All events')
+        count.register('All h events')
+        count.register('h->jjll')
+        self.counters.addCounter('h_rec')
+        count1 = self.counters.counter('h_rec')
+        count1.register('All events')
+
+        
+
+
+    def process(self, iEvent, event):
+        self.readCollections( iEvent )
+
+        self.buildMCinfo(iEvent)
+
+        eventNumber = iEvent.eventAuxiliary().id().event()
+        myEvent = Event(event.iEv)
+        setattr(event, self.name, myEvent)
+        event = myEvent
+        event.genVBFdeltaPhi = -99.
+        #if len(self.vbfjets) != 2:
+        #  print "Warning: ",len(self.vbfjets)," VBF partons"
+        #if len(self.vbfjets) > 2:
+        #  event.genVBFdeltaPhi = deltaPhi(self.vbfjets[0].phi(), self.vbfjets[1].phi())
+        event.step=0  
+        
+        event.alljets = []
+        event.leadingmuons = []
+        event.leadingelectrons = []
+        event.dimuonmass = -1
+        event.dielectronmass = -1
+        event.deltaeta = -1;
+        event.deltaphi = -99;
+        event.mjj = -1;
+        if not self.handles['electrons'].isValid():
+          #print "invalid collection!"
+          return
+       
+        #iEvent is of type ChainEvent
+        #trignames = iEvent.object().triggerNames(self.handles['trigger'].product())
+        #for i in range(self.handles['trigger'].product().size()):
+        #  print trignames.triggerName(i)
+        trigger = iEvent.object().triggerResultsByName('HLT') #self.handles['trigger'].product()
+        event.dimuonTrigger = 1 if trigger.accept('HLT_Mu13_Mu8_v16') else 0
+        #print "dimuon: %d" %event.dimuonTrigger
+        event.dielectronTrigger = 1 if trigger.accept('HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v15')  else 0
+        #print "dielectron: %d" %event.dielectronTrigger
+        
+
+
+        for electron in self.handles['electrons'].product():
+          event.leadingelectrons.append(Electron(electron))
+
+        event.leadingelectrons.sort(key=lambda a: a.pt(), reverse = True)
+        while(len(event.leadingelectrons)>2):
+          event.leadingelectrons.pop()
+
+        for muon in self.handles['muons'].product():
+          event.leadingmuons.append(Electron(muon))
+            
+        event.leadingmuons.sort(key=lambda a: a.pt(), reverse = True)
+        while(len(event.leadingmuons)>2):
+          event.leadingmuons.pop()   
+        
+        if len(event.leadingmuons) == 2 or len(event.leadingelectrons) == 2 :
+          event.step+=1   
+
+        if len(event.leadingmuons) == 2:
+          event.dimuonmass = ( event.leadingmuons[0].p4() + event.leadingmuons[1].p4() ).mass()
+          if event.dimuonmass < 70.:
+            event.step+=1
+
+        if len(event.leadingelectrons) == 2:
+          event.dielectronmass = ( event.leadingelectrons[0].p4() + event.leadingelectrons[1].p4() ).mass()
+          if event.dielectronmass < 70.:
+            event.step+=1
+
+        if not self.handles['jets'].isValid():
+          print "invalid collection!"
+          return
+        for jet in self.handles['jets'].product():
+          if jet.pt() > 0.:
+            event.alljets.append(Jet(jet))
+
+        event.alljets.sort(key=lambda a: a.pt(), reverse = True)
+        if len(event.alljets)>=2:
+          event.step+=1
+
+        triggerjets = []
+        for jet in event.alljets:
+          if jet.pt() > 35.:
+            triggerjets.append(Jet(jet))
+
+        #sort triggerjets in rapidity
+        triggerjets.sort(key=lambda a: a.rapidity(), reverse = True )
+        if ( len(triggerjets)>=2 ):
+          event.step+=1
+          event.deltaeta = triggerjets[0].rapidity() - triggerjets[len(triggerjets)-1].rapidity()
+          event.deltaphi = deltaPhi(triggerjets[0].phi(), triggerjets[len(triggerjets)-1].phi())
+          event.mjj = ( triggerjets[0].p4() + triggerjets[len(triggerjets)-1].p4() ).mass()    
+
+        #higgs candidates
+        event.hmumujj = []
+        event.heejj = []
+        event.mumu = []
+        event.ee = []
+        event.jj = []
+        if len(self.handles['hmumujj'].product()) > 0:
+          #if len(self.handles['hmumujj'].product()) != 1:
+            #print "WARNING! more than one hmumujj candidates"
+          hmumujj = self.handles['hmumujj'].product()[0]
+          event.hmumujj.append(hmumujj)
+          event.mumu.append(hmumujj.leg1())
+          event.jj.append(hmumujj.leg2())
+
+        if len(self.handles['heejj'].product()) > 0:
+          if len(event.hmumujj) != 0:
+            print "WARNING! found and heejj when and hmumujj is already present"
+          #if len(self.handles['heejj'].product()) != 1:
+            #print "WARNING! more than one heejj candidates"
+          heejj = self.handles['heejj'].product()[0]
+          event.heejj.append(heejj)
+          event.ee.append(heejj.leg1())
+          event.jj.append(heejj.leg2())
+
+        #refit the candidates
+        hrefit = []
+        event.truezhad = self.zhad
+        for candidate in self.handles['hmumujjnofit'].product():
+          jjnofit = candidate.leg2()
+          jet1 = jjnofit.leg1().p4()
+          jet2 = jjnofit.leg2().p4()
+          #if len(self.zhad):
+          #  kinfitter = DiJetKinFitter("GiulioFitter", "GiulioFitter", self.zhad[0].mass())
+          #else:  
+          kinfitter = DiJetKinFitter("GiulioFitter", "GiulioFitter", 91.1876, 5.)
+          result = kinfitter.fit(jet1, jet2)
+          chi2 = kinfitter.getChi2()
+          hfit = copy.deepcopy(candidate)
+          hfit.leg2().leg1().setP4(result.first)
+          hfit.leg2().leg2().setP4(result.second)
+          hfit.leg2().setP4(result.first+result.second)
+          hfit.setP4(hfit.leg1().p4()+result.first+result.second)
+          t = hfit, chi2
+          hrefit.append(t)
+
+        hrefit.sort(key=lambda a: a[1])
+        event.hbest = []
+        event.deltaPhiLJ = []
+        if len(hrefit):
+          event.hbest.append((hrefit[0])[0])
+          event.deltaPhiLJ.append( abs( deltaPhi(event.hbest[0].leg1().leg1().phi(), event.hbest[0].leg2().leg1().phi()) ) ) 
+          event.deltaPhiLJ.append( abs( deltaPhi(event.hbest[0].leg1().leg1().phi(), event.hbest[0].leg2().leg2().phi()) ) ) 
+          event.deltaPhiLJ.append( abs( deltaPhi(event.hbest[0].leg1().leg2().phi(), event.hbest[0].leg2().leg1().phi()) ) ) 
+          event.deltaPhiLJ.append( abs( deltaPhi(event.hbest[0].leg1().leg2().phi(), event.hbest[0].leg2().leg2().phi()) ) )
+
+        event.deltaPhiLJ.sort() 
+        #print event.deltaPhiLJ
+          
+
