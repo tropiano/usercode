@@ -1,0 +1,11 @@
+#python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py test DYJets10To50_cfg.py -N 100000 -p 0 -f
+#python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py test DYJets50_cfg.py -N 100000 -p 0 -f
+#python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py test VBFH125_cfg.py -N 100000 -p 0 -f
+
+#python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py test DYJets10To50nopresel_cfg.py -N 100000 -p 0 -f
+#python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py test DYJets50nopresel_cfg.py -N 100000 -p 0 -f
+#python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py test VBFH125nopresel_cfg.py -N 100000 -p 0 -f
+
+#python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py test DYJets10To50newpresel_cfg.py -N 10000000 -p 0 -f
+#python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py test DYJets50newpresel_cfg.py -N 10000000 -p 0 -f
+python  ../../CMGTools/RootTools/python/fwlite/MultiLoop.py test VBFH125newpresel_cfg.py -N 1000 -p 0 -f

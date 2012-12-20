@@ -1,0 +1,40 @@
+####INSTRUCTIONS FOR 5_3_3_patch3
+
+export SCRAM_ARCH=slc5_amd64_gcc462
+wget -O installCMGTools.py "http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/CMG/CMGTools/Common/bin/installCMGTools.py?view=co"
+python installCMGTools.py -r CMSSW_5_3_3_patch3 --recipe=exp_BleedingEdge
+cd CMGTools/CMSSW_5_3_3_patch3/src
+cmsenv
+cvs up -r 1.53 PhysicsTools/PatAlgos/python/tools/tauTools.py
+cvs up -r 1.12 PhysicsTools/PatAlgos/python/producersLayer1/tauProducer_cff.py
+cvs up -r 1.15 PhysicsTools/PatAlgos/python/recoLayer0/tauDiscriminators_cff.py
+chmod +x CMGTools/Production/scripts/*.py
+chmod +x CMGTools/Common/scripts/*.py
+cd EGamma/EGammaAnalysisTools/data
+cat download.url | xargs wget
+cd -
+cvs co -r gravitonbanch -d Alessio/RooFitUtil/src/RooFitUtils UserCode/Bonato/ZJetsAnalysis/ZJetsAnalysisV1/test/ANALYSISSELECTOR/Utils
+cvs co -r gravitonbanch -d Alessio/RooFitUtil/src/PDFs UserCode/Bonato/ZJetsAnalysis/ZJetsAnalysisV1/test/ANALYSISSELECTOR/PDFs
+rm -f Alessio/RooFitUtil/src/RooFitUtils/plot_llr.C
+rm -f Alessio/RooFitUtil/src/RooFitUtils/bkgPDFfitter.C 
+rm -f Alessio/RooFitUtil/src/RooFitUtils/JetKinFitter.cc
+mv Alessio/RooFitUtil/src/RooFitUtils/BuildFile.xml Alessio/RooFitUtil/src
+cvs co -r FF2012-06-28 -d pandolf/QuarkGluonTagger UserCode/pandolf/QuarkGluonTagger
+cvs co -r V00-08-00  -d Francesco/QGLikelihood/    UserCode/pandolf/QGLikelihood
+cvs co -d HiggsAna/BTagSFUtil -r ab_2012-05-15 UserCode/pandolf/BTagSFUtil
+rm -f HiggsAna/BTagSFUtil/*.h HiggsAna/BTagSFUtil/*.cc
+cvs co -d Francesco/KinFitter/src UserCode/pandolf/KinematicFit
+rm -f Francesco/KinFitter/src/T*
+rm -f Francesco/KinFitter/src/LeptonNeutrinoKinFitter.*
+cvs co -d AnalysisDataFormats/HiggsAna UserCode/sbologne/HiggsAna/DataFormats
+cvs co -d HiggsAna/HLLJJPAT UserCode/sbologne/HiggsAna/HLLJJPAT    
+cvs co -d HiggsAna/HEEJJ UserCode/sbologne/HiggsAna/HEEJJ   
+cvs co -d HiggsAna/HMMJJ UserCode/sbologne/HiggsAna/HMMJJ 
+cvs co -d HiggsAna/HLLJJCommon UserCode/sbologne/HiggsAna/HLLJJCommon     
+addpkg DataFormats/Candidate
+cvs co -d HiggsAna/PyHLLJJ UserCode/Lenzip/PyHLLJJ
+mv ./HiggsAna/HLLJJCommon/plugins/QGProducer.cc ./HiggsAna/HLLJJCommon/plugins/QGProducer.cc.no
+patch -p0 < HiggsAna/PyHLLJJ/giulioCMSSW_5_3_3_patch3.patch
+##CROSSED FINGERS
+scram b
+
