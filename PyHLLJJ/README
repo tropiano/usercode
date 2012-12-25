@@ -32,7 +32,7 @@ cvs co -d HiggsAna/HEEJJ UserCode/sbologne/HiggsAna/HEEJJ
 cvs co -d HiggsAna/HMMJJ UserCode/sbologne/HiggsAna/HMMJJ 
 cvs co -d HiggsAna/HLLJJCommon UserCode/sbologne/HiggsAna/HLLJJCommon     
 addpkg DataFormats/Candidate
-cvs co -d HiggsAna/PyHLLJJ UserCode/Lenzip/PyHLLJJ
+cvs co -d HiggsAna/PyHLLJJ UserCode/Firenze/PyHLLJJ
 mv ./HiggsAna/HLLJJCommon/plugins/QGProducer.cc ./HiggsAna/HLLJJCommon/plugins/QGProducer.cc.no
 patch -p0 < HiggsAna/PyHLLJJ/giulioCMSSW_5_3_3_patch3.patch
 ##CROSSED FINGERS
